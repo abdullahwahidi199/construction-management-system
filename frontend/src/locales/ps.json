@@ -1,0 +1,194 @@
+{
+  "managerNavbar": {
+    "dashboard": "ډشبورډ",
+    "projects": "پروژې",
+    "subContractors": "فرعي قراردادیان",
+    "contracts": "قراردادونه",
+    "expenses": "لګښتونه",
+    "employees": "کارکوونکي",
+    "payrolls": "معاشونه",
+    "attendance": "حاضري",
+    "brand": "منیجر هب"
+  },
+  "dashboard": {
+    "title": "ډشبورډ",
+    "subtitle": "ستاسو د ساختماني مدیریت سیسټم عمومي کتنه",
+    "failedTitle": "ډشبورډ نه دی بار شوی",
+    "failedMessage": "یو ستونزه رامنځته شوې",
+    "tryAgain": "بیا هڅه وکړئ",
+    "lastUpdated": "وروستی تازه",
+    "refresh": "تازه کول"
+  },
+  "kpi": {
+    "totalProjects": "ټولې پروژې",
+    "ongoing": "روان",
+    "completed": "بشپړ شوي",
+    "totalOutflow": "ټول لګښت",
+    "activeContracts": "فعال قراردادونه",
+    "activeEmployees": "فعال کارکوونکي",
+    "thisMonthExpenses": "د دې میاشت لګښتونه",
+    "overdueProjects": "ځنډېدلې پروژې",
+    "needAttention": "پام ته اړتیا لري",
+    "allOnTrack": "هر څه سم روان دي"
+  },
+  "alerts": {
+    "title": "خبرتیاوې او اخطارونه",
+    "empty": "هیڅ خبرتیا نشته — هر څه سم ښکاري!",
+    "criticalAlert": "جدي خبرتیا",
+    "criticalAlerts": "جدي خبرتیاوې",
+    "high": "لوړ",
+    "medium": "منځنی",
+    "low": "ټیټ"
+  },
+
+  "financialOverview": {
+    "title": "مالي عمومي کتنه",
+
+    "totalBudget": "ټوله بودیجه",
+
+    "expenses": "لګښتونه",
+    "expensesUsd": "لګښتونه (USD)",
+    "expensesAfn": "لګښتونه (AFN)",
+
+    "payroll": "معاشونه",
+    "netPayrollUsd": "خالص معاش (USD)",
+    "netPayrollAfn": "خالص معاش (AFN)",
+    "grossPayrollUsd": "ټول معاش (USD)",
+    "grossPayrollAfn": "ټول معاش (AFN)",
+
+    "contracts": "قراردادونه",
+    "contractValueUsd": "د قرارداد ارزښت (USD)",
+    "contractValueAfn": "د قرارداد ارزښت (AFN)",
+    "paymentsMadeUsd": "ترسره شوې تادیات (USD)",
+    "paymentsMadeAfn": "ترسره شوې تادیات (AFN)",
+    "remainingUsd": "پاتې (USD)",
+    "remainingAfn": "پاتې (AFN)",
+
+    "grandTotalOutflowUsd": "ټول مصرف (USD)",
+    "grandTotalOutflowAfn": "ټول مصرف (AFN)"
+  },
+  "expenseSummary": {
+    "title": "د لګښتونو لنډیز",
+    "entries": "ثبتونه",
+    "monthlyTrend": "میاشتنی بهیر (وروستي ۱۲ میاشتې)",
+    "noData": "د لګښتونو معلومات نشته",
+    "byCategory": "د کټګورۍ له مخې",
+    "byProject": "د پروژې له مخې",
+
+    "general": "عمومي",
+    "materials": "مواد",
+    "staffSalary": "د کارکوونکو معاش",
+    "dailyWages": "ورځنۍ مزدوري",
+    "contracts": "قراردادونه",
+    "equipment": "تجهیزات",
+    "utilities": "خدمتونه",
+    "other": "نور",
+
+    "jan": "جنوري",
+    "feb": "فبروري",
+    "mar": "مارچ",
+    "apr": "اپرېل",
+    "may": "مې",
+    "jun": "جون",
+    "jul": "جولای",
+    "aug": "اګست",
+    "sep": "سپتمبر",
+    "oct": "اکتوبر",
+    "nov": "نومبر",
+    "dec": "دسمبر"
+  },
+
+  "budgetComparison": {
+    "title": "د بودیجې او حقیقي لګښت پرتله",
+    "emptyTitle": "بودیجه او حقیقي لګښت",
+    "noData": "هیڅ فعاله پروژه د بودیجې معلوماتو سره نشته",
+
+    "budget": "بودیجه",
+    "spent": "لګول شوي",
+    "utilization": "د کارونې کچه",
+
+    "overBudget": "له بودیجې زیات",
+    "overBudgetProjects": "له بودیجې زیاتې پروژې",
+    "used": "کارول شوي"
+  },
+
+  "projectOverview": {
+    "title": "د پروژو عمومي کتنه",
+    "total": "ټول",
+
+    "byStatus": "د وضعیت له مخې",
+    "statusBreakdown": "د وضعیت وېش",
+    "byPropertyType": "د ملکیت ډول له مخې",
+
+    "noProjects": "تر اوسه پروژه نشته",
+
+    "planning": "د پلان پړاو",
+    "ongoing": "روانه",
+    "completed": "بشپړه شوې",
+    "onHold": "درول شوې",
+
+    "residential": "استوګنیز",
+    "commercial": "سوداګریز",
+    "mixed": "ګډ",
+
+    "overdueProject": "ځنډېدلې پروژه",
+    "overdueProjects": "ځنډېدلې پروژې",
+    "due": "وروستۍ نېټه"
+  },
+
+  "contractSection": {
+    "title": "قراردادونه او فرعي قراردادیان",
+    "contracts": "قراردادونه",
+
+    "totalValue": "ټول ارزښت",
+    "totalPaid": "ټول تادیه شوي",
+    "retentionHeld": "ساتل شوې اندازه",
+    "avgCompletion": "د بشپړېدو اوسط",
+
+    "contractStatus": "د قرارداد وضعیت",
+
+    "endingWithin30Days": "په راتلونکو ۳۰ ورځو کې پای ته رسېږي",
+
+    "subcontractors": "فرعي قراردادیان",
+    "active": "فعال",
+    "inactive": "غیرفعال",
+
+    "draft": "مسوده",
+    "activeStatus": "فعال",
+    "completed": "بشپړ شوی",
+    "terminated": "لغوه شوی",
+    "cancelled": "فسخ شوی"
+  },
+  
+  "workforceSection": {
+    "title": "کاري ځواک او حاضري",
+
+    "active": "فعال",
+
+    "total": "ټول",
+    "activeEmployees": "فعال",
+    "inactiveEmployees": "غیرفعال",
+
+    "todayAttendance": "د نن ورځې حاضري",
+
+    "present": "حاضر",
+    "absent": "غایب",
+    "halfDay": "نیمه ورځ",
+    "leave": "رخصتي",
+    "unmarked": "ثبت نه شوی",
+
+    "weeklyTrend": "اوونیز بهیر",
+
+    "byDepartment": "د څانګې له مخې",
+
+    "management": "مدیریت",
+    "engineering": "انجنیري",
+    "construction": "ساختماني",
+    "administration": "اداري",
+    "finance": "مالي",
+    "hr": "بشري سرچینې",
+    "procurement": "تدارکات",
+    "safety": "خوندیتوب"
+  }
+
+}

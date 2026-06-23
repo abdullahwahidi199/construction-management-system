@@ -1,0 +1,194 @@
+{
+  "managerNavbar": {
+    "dashboard": "داشبورد",
+    "projects": "پروژه‌ها",
+    "subContractors": "قراردادکاران فرعی",
+    "contracts": "قراردادها",
+    "expenses": "مصارف",
+    "employees": "کارمندان",
+    "payrolls": "معاشات",
+    "attendance": "حاضری",
+    "brand": "منیجر هاب"
+  },
+  "dashboard": {
+    "title": "داشبورد",
+    "subtitle": "نمای کلی سیستم مدیریت ساخت‌وساز شما",
+    "failedTitle": "بارگذاری داشبورد ناموفق بود",
+    "failedMessage": "مشکلی رخ داده است",
+    "tryAgain": "دوباره تلاش کنید",
+    "lastUpdated": "آخرین به‌روزرسانی",
+    "refresh": "تازه‌سازی"
+  },
+  "kpi": {
+    "totalProjects": "تمام پروژه‌ها",
+    "ongoing": "در حال اجرا",
+    "completed": "تکمیل شده",
+    "totalOutflow": "مجموع مصارف",
+    "activeContracts": "قراردادهای فعال",
+    "activeEmployees": "کارمندان فعال",
+    "thisMonthExpenses": "مصارف این ماه",
+    "overdueProjects": "پروژه‌های تأخیر شده",
+    "needAttention": "نیاز به توجه",
+    "allOnTrack": "همه در مسیر درست"
+  },
+  "alerts": {
+    "title": "هشدارها و اعلان‌ها",
+    "empty": "هیچ هشداری وجود ندارد — همه چیز خوب به نظر می‌رسد!",
+    "criticalAlert": "هشدار بحرانی",
+    "criticalAlerts": "هشدارهای بحرانی",
+    "high": "بلند",
+    "medium": "متوسط",
+    "low": "کم"
+  },
+
+  "financialOverview": {
+    "title": "نمای مالی",
+
+    "totalBudget": "بودجه مجموعی",
+
+    "expenses": "مصارف",
+    "expensesUsd": "مصارف (USD)",
+    "expensesAfn": "مصارف (AFN)",
+
+    "payroll": "معاشات",
+    "netPayrollUsd": "معاش خالص (USD)",
+    "netPayrollAfn": "معاش خالص (AFN)",
+    "grossPayrollUsd": "معاش ناخالص (USD)",
+    "grossPayrollAfn": "معاش ناخالص (AFN)",
+
+    "contracts": "قراردادها",
+    "contractValueUsd": "ارزش قراردادها (USD)",
+    "contractValueAfn": "ارزش قراردادها (AFN)",
+    "paymentsMadeUsd": "پرداخت‌های انجام‌شده (USD)",
+    "paymentsMadeAfn": "پرداخت‌های انجام‌شده (AFN)",
+    "remainingUsd": "باقی‌مانده (USD)",
+    "remainingAfn": "باقی‌مانده (AFN)",
+
+    "grandTotalOutflowUsd": "مجموع مصارف (USD)",
+    "grandTotalOutflowAfn": "مجموع مصارف (AFN)"
+  },
+
+  "expenseSummary": {
+    "title": "خلاصه مصارف",
+    "entries": "رکورد",
+    "monthlyTrend": "روند ماهانه (۱۲ ماه اخیر)",
+    "noData": "اطلاعات مصرف موجود نیست",
+    "byCategory": "بر اساس دسته‌بندی",
+    "byProject": "بر اساس پروژه",
+
+    "general": "عمومی",
+    "materials": "مواد",
+    "staffSalary": "معاش کارمندان",
+    "dailyWages": "مزد روزانه",
+    "contracts": "قراردادها",
+    "equipment": "تجهیزات",
+    "utilities": "خدمات",
+    "other": "سایر",
+
+    "jan": "جنوری",
+    "feb": "فبروری",
+    "mar": "مارچ",
+    "apr": "اپریل",
+    "may": "می",
+    "jun": "جون",
+    "jul": "جولای",
+    "aug": "اگست",
+    "sep": "سپتمبر",
+    "oct": "اکتوبر",
+    "nov": "نومبر",
+    "dec": "دسمبر"
+  },
+
+  "budgetComparison": {
+    "title": "مقایسه بودجه و مصرف واقعی",
+    "emptyTitle": "بودجه در مقابل مصرف واقعی",
+    "noData": "هیچ پروژه فعالی با معلومات بودجه موجود نیست",
+
+    "budget": "بودجه",
+    "spent": "مصرف شده",
+    "utilization": "میزان استفاده",
+
+    "overBudget": "بیش از بودجه",
+    "overBudgetProjects": "پروژه‌های بیش از بودجه",
+    "used": "استفاده شده"
+  },
+
+  "projectOverview": {
+    "title": "نمای پروژه‌ها",
+    "total": "مجموع",
+
+    "byStatus": "بر اساس وضعیت",
+    "statusBreakdown": "تفکیک وضعیت",
+    "byPropertyType": "بر اساس نوع ملک",
+
+    "noProjects": "هنوز پروژه‌ای وجود ندارد",
+
+    "planning": "در حال پلان",
+    "ongoing": "در حال اجرا",
+    "completed": "تکمیل شده",
+    "onHold": "متوقف",
+
+    "residential": "مسکونی",
+    "commercial": "تجاری",
+    "mixed": "مختلط",
+
+    "overdueProject": "پروژه تأخیر یافته",
+    "overdueProjects": "پروژه‌های تأخیر یافته",
+    "due": "موعد"
+  },
+
+  "contractSection": {
+    "title": "قراردادها و قراردادیان فرعی",
+    "contracts": "قرارداد",
+
+    "totalValue": "ارزش مجموعی",
+    "totalPaid": "پرداخت شده",
+    "retentionHeld": "مبلغ نگهداشته شده",
+    "avgCompletion": "میانگین تکمیل",
+
+    "contractStatus": "وضعیت قرارداد",
+
+    "endingWithin30Days": "خاتمه در ۳۰ روز آینده",
+
+    "subcontractors": "قراردادیان فرعی",
+    "active": "فعال",
+    "inactive": "غیرفعال",
+
+    "draft": "پیش‌نویس",
+    "activeStatus": "فعال",
+    "completed": "تکمیل شده",
+    "terminated": "فسخ شده",
+    "cancelled": "لغو شده"
+  },
+
+  "workforceSection": {
+    "title": "نیروی کاری و حاضری",
+
+    "active": "فعال",
+
+    "total": "مجموع",
+    "activeEmployees": "فعال",
+    "inactiveEmployees": "غیرفعال",
+
+    "todayAttendance": "حاضری امروز",
+
+    "present": "حاضر",
+    "absent": "غایب",
+    "halfDay": "نیمه روز",
+    "leave": "رخصتی",
+    "unmarked": "ثبت نشده",
+
+    "weeklyTrend": "روند هفتگی",
+
+    "byDepartment": "براساس بخش",
+
+    "management": "مدیریت",
+    "engineering": "انجنیری",
+    "construction": "ساختمانی",
+    "administration": "اداری",
+    "finance": "مالی",
+    "hr": "منابع بشری",
+    "procurement": "تدارکات",
+    "safety": "ایمنی"
+  }
+}

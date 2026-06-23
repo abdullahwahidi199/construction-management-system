@@ -1,0 +1,5474 @@
+[
+  {
+    "model": "expenses.expense",
+    "pk": 1,
+    "fields": {
+      "project": 5,
+      "serial_number": 1,
+      "expense_date": "2025-05-20",
+      "description": "پرداخت مصارفات استعلام های ریاست صدور مجوز بابت تعمیرللندر 6 واقع شهر نو از قبیل کرای موتر , به حوزه دریایی,کرای موتر به ریاست برشنا,کرای موتر به جکشن 5 کلوله پشته,نان چاشت , کارت مبایل و غیره",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "2270.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "69.7700",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 2,
+    "fields": {
+      "project": 5,
+      "serial_number": 2,
+      "expense_date": "2025-06-03",
+      "description": "پرداخت کرای تکسی به ریاست آبرسانی فاضلاب شهری , کرای موتر به شهر نو و برگشت و خریداری نوشابه و آب معدنی بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "69.4500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 3,
+    "fields": {
+      "project": 5,
+      "serial_number": 3,
+      "expense_date": "2025-06-03",
+      "description": "پرداخت کرای موتر به شهر نو و کرای تکسی با ریاست اطفائیه بخاطر نقشه تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "250.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "69.4500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 4,
+    "fields": {
+      "project": 5,
+      "serial_number": 4,
+      "expense_date": "2025-06-16",
+      "description": "پرداخت کرای موتر به ریاست آبرسانی بخاطر اخذ تعرفه تعمیرللندر 6 و خریداری کارت مبایل به رایگان نمودن سیم کارت",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "330.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "70.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5,
+    "fields": {
+      "project": 5,
+      "serial_number": 5,
+      "expense_date": "2025-06-22",
+      "description": "پرداخت کرای موتر به ریاست اطفائیه بابت نقشه للندر 6 , کرای موتر به ریاست اطفائیه بابت نقشه اصلاح شده للندر 6 و کرای موتر به دفتر انجنیر فیصل شهرنو",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "200.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "70.8500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 6,
+    "fields": {
+      "project": 5,
+      "serial_number": 6,
+      "expense_date": "2025-06-30",
+      "description": "پرداخت کرای موتر به ریاست آبرسانی بابت استعلام تعمیر للندر 6 , مصارف نان چاشت ,کمیشن بانکی تعرفه آبرسانی, و کرای تکسی به شهر نو دفتر انجنیر فیصل",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "430.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "70.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 7,
+    "fields": {
+      "project": 5,
+      "serial_number": 7,
+      "expense_date": "2025-07-02",
+      "description": "پرداخت کرای موتر به شهر نو بخاطر فورم دستور نقشه تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "80.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "69.7500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 8,
+    "fields": {
+      "project": 5,
+      "serial_number": 8,
+      "expense_date": "2025-09-06",
+      "description": "خریداری تیل پطرول به موتر لکسس بخاطر تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "2000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "67.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 9,
+    "fields": {
+      "project": 5,
+      "serial_number": 9,
+      "expense_date": "2025-09-06",
+      "description": "خریداری غذا از رستورانت به مهمانان تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1975.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "67.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 10,
+    "fields": {
+      "project": 5,
+      "serial_number": 10,
+      "expense_date": "2025-09-06",
+      "description": "پرداخت برای رئیس صدور مجوز توسط حاجی رفیع الله بخاطر امر اعمار تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "9000.00",
+      "exchange_rate": "67.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 11,
+    "fields": {
+      "project": 5,
+      "serial_number": 11,
+      "expense_date": "2025-09-06",
+      "description": "خریداری پیتزا به کارمندان ریاست صدور مجوز بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1970.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "67.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 12,
+    "fields": {
+      "project": 5,
+      "serial_number": 12,
+      "expense_date": "2025-09-08",
+      "description": "خریداری تار رجه به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "50.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "67.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 13,
+    "fields": {
+      "project": 5,
+      "serial_number": 13,
+      "expense_date": "2025-09-09",
+      "description": "پرداخت برای رئیس صدور مجوز بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "5000.00",
+      "exchange_rate": "68.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 14,
+    "fields": {
+      "project": 5,
+      "serial_number": 14,
+      "expense_date": "2025-09-09",
+      "description": "پرداخت برای پسر رئیس صدور مجوز بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "100.00",
+      "exchange_rate": "68.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 15,
+    "fields": {
+      "project": 5,
+      "serial_number": 15,
+      "expense_date": "2025-09-09",
+      "description": "پرداخت برای ملازمین ریاست صدور مجوز بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "2000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "68.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 16,
+    "fields": {
+      "project": 5,
+      "serial_number": 16,
+      "expense_date": "2025-09-09",
+      "description": "خریداری جای نماز به مسجد ریاست صدور مجوز بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "13000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "68.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 17,
+    "fields": {
+      "project": 5,
+      "serial_number": 17,
+      "expense_date": "2025-09-09",
+      "description": "پرداخت پول کمیشن حاجی عبدالحق به جاوید سکندری",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "20000.00",
+      "exchange_rate": "68.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 18,
+    "fields": {
+      "project": 5,
+      "serial_number": 18,
+      "expense_date": "2025-09-09",
+      "description": "پرداخت برای جاوید سکندری بابت قباله تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "5000.00",
+      "exchange_rate": "68.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 19,
+    "fields": {
+      "project": 5,
+      "serial_number": 19,
+      "expense_date": "2025-09-09",
+      "description": "پرداخت برای حاجی عبدالحق بابت جایداد تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "50000.00",
+      "exchange_rate": "68.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 20,
+    "fields": {
+      "project": 5,
+      "serial_number": 20,
+      "expense_date": "2025-09-09",
+      "description": "پرداخت برای خریداری تحفه به فامیل رئیس صدور مجوز بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "350.00",
+      "exchange_rate": "68.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 21,
+    "fields": {
+      "project": 5,
+      "serial_number": 21,
+      "expense_date": "2025-09-25",
+      "description": "پیش پرداخت برای اسماعیل بابت کندن کاری پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "4000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "67.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 22,
+    "fields": {
+      "project": 5,
+      "serial_number": 22,
+      "expense_date": "2025-09-30",
+      "description": "خریداری تیل پطرول به موتر بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "4000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "67.4500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 23,
+    "fields": {
+      "project": 5,
+      "serial_number": 23,
+      "expense_date": "2025-09-30",
+      "description": "خریداری غذا از رستورانت به مهمانان تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1990.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "67.4500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 24,
+    "fields": {
+      "project": 5,
+      "serial_number": 24,
+      "expense_date": "2025-10-01",
+      "description": "خریداری تیل پطرول به موتر لکسس بخاطر تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "67.4500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 25,
+    "fields": {
+      "project": 5,
+      "serial_number": 25,
+      "expense_date": "2025-10-02",
+      "description": "پرداخت برای حاجی گل نظر بابت خریداری لباس به فامیل رئیس صدور مجوز و به مصارف حاجی گل نظر بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "200.00",
+      "exchange_rate": "67.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 26,
+    "fields": {
+      "project": 5,
+      "serial_number": 26,
+      "expense_date": "2025-10-02",
+      "description": "پرداخت برای حاجی گل نظر بخاطر حوض آب بازی و مصارف متفرقه بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "3500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "67.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 27,
+    "fields": {
+      "project": 5,
+      "serial_number": 27,
+      "expense_date": "2025-10-15",
+      "description": "پرداخت رشوه برای انجنیران کنترول ساختمانها بابت خط اندازی تعمیرللندر 6 (نوت: از مجموع پرداخت 200$ دالر مبلغ 100$ آن توسط حاجی مطیع الله پرداخت گردیده که دوباره برایش پرداخت گردیده.",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "200.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 28,
+    "fields": {
+      "project": 5,
+      "serial_number": 28,
+      "expense_date": "2025-10-15",
+      "description": "خریداری پایپ لیول , اسپری و میخ فولادی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "380.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 29,
+    "fields": {
+      "project": 5,
+      "serial_number": 29,
+      "expense_date": "2025-10-15",
+      "description": "خریداری چکش و رجه به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "450.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 30,
+    "fields": {
+      "project": 5,
+      "serial_number": 30,
+      "expense_date": "2025-10-15",
+      "description": "خریداری متر 50 متره به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "400.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 31,
+    "fields": {
+      "project": 5,
+      "serial_number": 31,
+      "expense_date": "2025-10-15",
+      "description": "خریداری سمنت سفید به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "130.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 32,
+    "fields": {
+      "project": 5,
+      "serial_number": 32,
+      "expense_date": "2025-10-18",
+      "description": "خریداری برمه چارجی ,کلگی پیچکش به تعمیر للندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "2060.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 33,
+    "fields": {
+      "project": 5,
+      "serial_number": 33,
+      "expense_date": "2025-10-18",
+      "description": "پرداخت برای مصارفات تعمیرللندر 6 از قبیل کرای تکسی ع رشوه ب رئیس صدور مجوز,تعرفه ریاست کنترول ساختمانها,کاپی نقشه ها,تعرفه خط اندازی, مصارفات متفرقه و غیره توسط حاجی احسان الله سهاک",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "23080.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 34,
+    "fields": {
+      "project": 5,
+      "serial_number": 34,
+      "expense_date": "2025-10-18",
+      "description": "پرداخت کرای تکسی بابت انتقال مواد فلز کاری به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 35,
+    "fields": {
+      "project": 5,
+      "serial_number": 35,
+      "expense_date": "2025-10-18",
+      "description": "خریداری چرخ کلان, رول , مترو پل برش , چاقو , اسکرنج به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "9400.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 36,
+    "fields": {
+      "project": 5,
+      "serial_number": 36,
+      "expense_date": "2025-10-18",
+      "description": "خریداری اسپری و مارکر به خط اندازی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "120.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 37,
+    "fields": {
+      "project": 5,
+      "serial_number": 37,
+      "expense_date": "2025-10-20",
+      "description": "خریداری یک پایه ماشین جنراتور 27hp دیزلی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "36000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 38,
+    "fields": {
+      "project": 5,
+      "serial_number": 38,
+      "expense_date": "2025-10-20",
+      "description": "خریداری مبلایل , کرای موتر ,جوالی بابت بالا کردن جنراتور تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 39,
+    "fields": {
+      "project": 5,
+      "serial_number": 39,
+      "expense_date": "2025-10-21",
+      "description": "خریداری کندکسر و دستکش به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "330.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 40,
+    "fields": {
+      "project": 5,
+      "serial_number": 40,
+      "expense_date": "2025-10-21",
+      "description": "خریداری آب نوشیدنی , نوار طفلون , گوتکه ,برشینگ,زانوخم و فلق به تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "520.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 41,
+    "fields": {
+      "project": 5,
+      "serial_number": 41,
+      "expense_date": "2025-10-21",
+      "description": "خریداری تیل پطرول به موتر بخاطر تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "2000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 42,
+    "fields": {
+      "project": 5,
+      "serial_number": 42,
+      "expense_date": "2025-10-21",
+      "description": "خریداری پایپ 1\" پی پی آر و ریسمان 14 ملی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "15720.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 43,
+    "fields": {
+      "project": 5,
+      "serial_number": 43,
+      "expense_date": "2025-10-21",
+      "description": "خریداری رجه و کرای باربری به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "560.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 44,
+    "fields": {
+      "project": 5,
+      "serial_number": 44,
+      "expense_date": "2025-10-21",
+      "description": "خریداری آب بازک 2/2 1\" به چاه آب تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "9500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 45,
+    "fields": {
+      "project": 5,
+      "serial_number": 45,
+      "expense_date": "2025-10-23",
+      "description": "پرداخت برای نورگل بابت اجرت ساعتوار اسکواتور و انتقال پرانه از تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "500000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 46,
+    "fields": {
+      "project": 5,
+      "serial_number": 46,
+      "expense_date": "2025-10-23",
+      "description": "پرداخت برای سفر برقی بابت آب بازک تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 47,
+    "fields": {
+      "project": 5,
+      "serial_number": 47,
+      "expense_date": "2025-10-28",
+      "description": "پرداخت برای خریداری 700 خریطه سمنت ایرانی به نرخ 550 افغانی و 250 خریطه سمنت ایرانی به نرخ 561 افغانی به تعیمرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "525250.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 48,
+    "fields": {
+      "project": 5,
+      "serial_number": 48,
+      "expense_date": "2025-10-28",
+      "description": "پیش پرداخت برای غلام علی مکسر کار بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 49,
+    "fields": {
+      "project": 5,
+      "serial_number": 49,
+      "expense_date": "2025-10-30",
+      "description": "پیش پرداخت برای انجنیر صفی الله بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "50000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 50,
+    "fields": {
+      "project": 5,
+      "serial_number": 50,
+      "expense_date": "2025-10-30",
+      "description": "پرداخت برای نورالدین بابت کرای انتقال خرک و غیره به تعیمرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "6750.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 51,
+    "fields": {
+      "project": 5,
+      "serial_number": 51,
+      "expense_date": "2025-11-03",
+      "description": "پرداخت پول باقیمانده و تصفیه حساب غلام علی مکسر کار بابت کانکریت ریزی 38 حلقه پایل فی دانه از قرار 1150 افغانی",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "33700.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 52,
+    "fields": {
+      "project": 5,
+      "serial_number": 52,
+      "expense_date": "2025-11-03",
+      "description": "پرداخت قسط اول برای عظیم الله ستانکزی بابت حفاری پایل های تحکیماتی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "400000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 53,
+    "fields": {
+      "project": 5,
+      "serial_number": 53,
+      "expense_date": "2025-11-03",
+      "description": "پرداخت شرکت مواد ساختمانی سلیمان داودزی بابت خریداری ریگ شسته و کرش به کانکریت ریزی پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "155500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 54,
+    "fields": {
+      "project": 5,
+      "serial_number": 54,
+      "expense_date": "2025-11-04",
+      "description": "پراخت برای مصارفات تاریخ های مختلف تعمیرللندر6 از تاریخ 21 اکتوبر 2025 الی 04 نوامبر 2025 از قبیل چای صبح , نان چاشت ,رول اصلی , گاز مایع,فیوز اتومات,تیل دیزل به جنراتور,رینگ ایرانی به دفتر ساحوی ,بیل گرد,متر 5 متره ,نوشابه,آب معدنی,گوشت مرغ,نان خشک , بوره,تار رجه,دستکش,مبلایل به جنراتور,وسایل آشپزخانه از قبیل ترموز چای ,گیلاس,کپگیر,دسترخوان,کاسه,مواد شوینده,تیل دیزل به جنراتور,رشوه به برقی ساحه بخاطر وصل نمودن برق ,ذخیره آب ,کراچی ,نل 40 , لوازم آشپزخانه ,مواد ساختمانی و یک بندل پایپ پلاستیکی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "27080.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 55,
+    "fields": {
+      "project": 5,
+      "serial_number": 55,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت اجرت مزد دو نفر مزدور کار بابت کندن کاری رینگ های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "400.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 56,
+    "fields": {
+      "project": 5,
+      "serial_number": 56,
+      "expense_date": "2025-11-04",
+      "description": "خریداری گاز مایع به دفتر ساحوی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "450.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 57,
+    "fields": {
+      "project": 5,
+      "serial_number": 57,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت برای خریداری مصارفات تاریخ های مختلف تعمیرللندر 6 از تاریخ 16 اکتوبر 2025 الی 04 نوامبر 2025 از قبیل تیل جنراتور,نان خشک , نوشابه,آب معدنی,گوشت ,روغن,پیاز , کچالو,چای صبح,کرای زرنج باخاطرانتقال تخته ها,خرید سامان آلات برقی,قفل , مبلایل,پل چرخ,تیل دیزل,نان چاشت ,پرزه جات به جنراتور و غیره",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "9210.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 58,
+    "fields": {
+      "project": 5,
+      "serial_number": 58,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت برای کرن کار بابت پائین کردن پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "4750.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 59,
+    "fields": {
+      "project": 5,
+      "serial_number": 59,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت برای خریداری مصارفات تاریخ های مختلف تعمیرللندر 6 از تاریخ 19 اکتوبر 2025 الی 04 نوامبر 2025 نان خشک به چای صبح,کرای موتر چوکیداربابت طی مراحل اسناد برق ,خریداری مواد خوراکه برنج,روغن ,لوبیا,نخود,مایع ظرفشویی,نمک,بوره,شامپو,صابون,پیاز ,رومی,کچالو,مرچ تازه,نان شب,لحاف ,دوشک,بالشت,اجرت کرن بخاطر کشیدن آب بازک از چاه,گوشت به دفتر ساحوی,لوبیا,رومی,کرای تکسی,سرکی بالون گاز,صافی ,نان خشک و سیخ ولدینگ به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "16580.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 60,
+    "fields": {
+      "project": 5,
+      "serial_number": 60,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت برای تخلیه یک تیلر سیمنت به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "800.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 61,
+    "fields": {
+      "project": 5,
+      "serial_number": 61,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت برای کرن کار بابت پائین کردن پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "5000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 62,
+    "fields": {
+      "project": 5,
+      "serial_number": 62,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت مصرف بل برق تعمیرللندر 6 همراه با کرای موتر به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "3000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 63,
+    "fields": {
+      "project": 5,
+      "serial_number": 63,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت برای چاه کن پایل های دستی در چاه سپتیک به تعداد 2 پایل 5 متره تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 64,
+    "fields": {
+      "project": 5,
+      "serial_number": 64,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت برای تخلیه چاه فاضلاب تعمیرللندر 6 توسط تانکر کلان",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "2000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 65,
+    "fields": {
+      "project": 5,
+      "serial_number": 65,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت برای تیمور شاه بابت اجرت سه نفر مزدور کار بخاطر پاک کاری کی از دیوار های استنادی و خالی کردن در جای مناسب بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1050.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 66,
+    "fields": {
+      "project": 5,
+      "serial_number": 66,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت کرای زرنج بخاطر انتقال ماشین سوخته شده جنراتور تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "300.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 67,
+    "fields": {
+      "project": 5,
+      "serial_number": 67,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت برای حسین کرن کار بابت انتقال دیوار های استنادی للندر 6 از داخل حویلی به پیاده رو به مقدار 11 عدد",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "4500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 68,
+    "fields": {
+      "project": 5,
+      "serial_number": 68,
+      "expense_date": "2025-11-04",
+      "description": "خریداری بیل , گلگل و دسته بیل به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1150.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 69,
+    "fields": {
+      "project": 5,
+      "serial_number": 69,
+      "expense_date": "2025-11-04",
+      "description": "خریداری تیل دیزل به جنراتور تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 70,
+    "fields": {
+      "project": 5,
+      "serial_number": 70,
+      "expense_date": "2025-11-04",
+      "description": "خریداری گلماله پلاستیکی و آب معدنی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "90.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 71,
+    "fields": {
+      "project": 5,
+      "serial_number": 71,
+      "expense_date": "2025-11-04",
+      "description": "خریداری کچالو , سیر,مرچ تازه ,آب نوشیدنی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "240.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 72,
+    "fields": {
+      "project": 5,
+      "serial_number": 72,
+      "expense_date": "2025-11-04",
+      "description": "خریداری یک رئس گوساله به خیرات تعمیرللندر 6 , اجرت قصابی گوساله,کرای انتقال به ساحه ,خریداری بادنجان رومی و آب نوشیدنی",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "49850.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 73,
+    "fields": {
+      "project": 5,
+      "serial_number": 73,
+      "expense_date": "2025-11-04",
+      "description": "پرداخت برای سرگروپ برقی بخاطر وصل نمودن میتر های سه فاز تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "800.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 74,
+    "fields": {
+      "project": 5,
+      "serial_number": 74,
+      "expense_date": "2025-11-06",
+      "description": "پردخت برای نورالدین بابت انتقال پایه های فلزی از للندر 5 به للندر 6 و کرای انتقال چوب و قالب از للندر 5 به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 75,
+    "fields": {
+      "project": 5,
+      "serial_number": 75,
+      "expense_date": "2025-11-06",
+      "description": "خریداری کارت مبایل به انجنیر صفی الله",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 76,
+    "fields": {
+      "project": 5,
+      "serial_number": 76,
+      "expense_date": "2025-11-11",
+      "description": "پرداخت برای نورگل بابت کندن کاری تهکوی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "399000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 77,
+    "fields": {
+      "project": 5,
+      "serial_number": 77,
+      "expense_date": "2025-11-11",
+      "description": "پرداخت دفعه دوم برای نورگل بابت کندن کاری تهکوی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "99750.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 78,
+    "fields": {
+      "project": 5,
+      "serial_number": 78,
+      "expense_date": "2025-11-16",
+      "description": "پیش پرداخت برای عبدالمتین بابت ماه عقرب 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 79,
+    "fields": {
+      "project": 5,
+      "serial_number": 79,
+      "expense_date": "2025-11-17",
+      "description": "پرداخت برای نورگل بابت کندن کاری تهکوی تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "664000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 80,
+    "fields": {
+      "project": 5,
+      "serial_number": 80,
+      "expense_date": "2025-11-18",
+      "description": "پرداخت برای کرای تکسی کاریگرن به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "150.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 81,
+    "fields": {
+      "project": 5,
+      "serial_number": 81,
+      "expense_date": "2025-11-18",
+      "description": "پرداخت برای کرای انتقال مواد اضافی از للندر 6 به گدام کارته سه",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1200.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 82,
+    "fields": {
+      "project": 5,
+      "serial_number": 82,
+      "expense_date": "2025-11-20",
+      "description": "پرداخت برای محمد نسیم کرن کار بابت انتقال کانتینر 20 فت از کارته سه به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "5000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 83,
+    "fields": {
+      "project": 5,
+      "serial_number": 83,
+      "expense_date": "2025-11-22",
+      "description": "پرداخت برای مصارفات تعمیرللندر 6 توسط حاجی احسان الله سهاک از تاریخ 04 نوامبر الی 22 نوامبر 2025 از قبیل تیل دیزل به جنراتور,نان خشک به دفتر ساحوی,گاز مایع ,مواد خوراکه از قبیل پیاز,آب معدنی,پایپ کرمچی,رشوه به سرگروپ برقی , انجنیر حامد برقی ,کرای تکسی کاریگران,روغن مایع,متر 50 متره,مواد خوراکه بامیه,شلغم,مرچ تازه , گوشت مرغ و گاز مایع به دفتر ساحوی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "24300.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 84,
+    "fields": {
+      "project": 5,
+      "serial_number": 84,
+      "expense_date": "2025-11-22",
+      "description": "پرداخت برای مصارفات تعمیرللندر 6 توسط حاجی احسان الله سهاک از تاریخ 04 نوامبر الی 22 نوامبر 2025 از قبیل جالی سبز به دروازه عمومی,فوتوکاپی 4 جلد نقشه ها همراه با پوش,مواد خوراکه ,تیل دیزل به جنراتور,فیوز اتومات سه فاز و پلک و ساکت 16 امپیر,لابرتیپ , بامیه , آب نوشیدنی,گاز مایع , نان خشک , گچ به خط اندازی,پل چرخ,شاول,دبل پیچ,نوک برمه,پل برمه 8 ملی,کرای جایداد شمسی تاور بخاطر کاریگران للندر 6  و خریداری رنگ اسپری به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "17657.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 85,
+    "fields": {
+      "project": 5,
+      "serial_number": 85,
+      "expense_date": "2025-11-22",
+      "description": "پرداخت برای مصارفات تعمیرللندر 6 توسط حاجی احسان الله سهاک از تاریخ 04 نوامبر الی 22 نوامبر 2025 از قبیل رنگ فولادی و رنگ اسپری , مواد خوراکه سیر, رومی ,پیاز, کچالو, تخم مرغ ,آب معدنی,روغن مایع,مایع ظرفشویی,تار رجه,متر 50 متره,گوشت مرغ,سامی,شیردهن همرا با اجرت نصب,شیشه پاکن,انرژی به اسکواتورکاران , پرداخت برای انجنیران ناحیه 4 , کنترول ساختمانها و حوزه پولیس و نوشابه به انجینران ناحیه بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "9370.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 86,
+    "fields": {
+      "project": 5,
+      "serial_number": 86,
+      "expense_date": "2025-11-23",
+      "description": "پرداخت برای نورگل بابت کندن کاری تهکوی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "664000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 87,
+    "fields": {
+      "project": 5,
+      "serial_number": 87,
+      "expense_date": "2025-11-24",
+      "description": "پرداخت اجرت ساعتوار اسکواتور در تعمیرللندر 6 بابت امورات پاک کاری ساحه بخاطر پایل های تحکیماتی",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "6433.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 88,
+    "fields": {
+      "project": 5,
+      "serial_number": 88,
+      "expense_date": "2025-11-24",
+      "description": "خریداری پایپ کرمچی 6\" به کانکریت ریزی پایل های اساسی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "50.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 89,
+    "fields": {
+      "project": 5,
+      "serial_number": 89,
+      "expense_date": "2025-11-25",
+      "description": "پرداخت معاش عبدالمتین ولد نیک محمد بابت سه روزه ماه میزان 1404 در تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 90,
+    "fields": {
+      "project": 5,
+      "serial_number": 90,
+      "expense_date": "2025-11-25",
+      "description": "پرداخت معاش عبدالمتین ولد نیک محمد بابت ماه عقرب 1404 بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 91,
+    "fields": {
+      "project": 5,
+      "serial_number": 91,
+      "expense_date": "2025-11-25",
+      "description": "پرداخت معاش محمد نادر ولد صوفی مقبول شاه بابت شش روزه ماه میزان 1404 در تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "2000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 92,
+    "fields": {
+      "project": 5,
+      "serial_number": 92,
+      "expense_date": "2025-11-25",
+      "description": "پرداخت معاش عحمد نادر ولد صوفی مقبول شاه بابت ماه عقرب 1404 بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 93,
+    "fields": {
+      "project": 5,
+      "serial_number": 93,
+      "expense_date": "2025-11-25",
+      "description": "پرداخت معاش عبدالبصیر ولد رضا بابت سه روزه ماه میزان 1404 در تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 94,
+    "fields": {
+      "project": 5,
+      "serial_number": 94,
+      "expense_date": "2025-11-25",
+      "description": "پرداخت معاش عبدالبصیر ولد رضا بابت ماه عقرب 1404 بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 95,
+    "fields": {
+      "project": 5,
+      "serial_number": 95,
+      "expense_date": "2025-11-25",
+      "description": "پیش پرداخت برای انجنیر صفی الله بابت ماه عقرب 1404تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "25000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 96,
+    "fields": {
+      "project": 5,
+      "serial_number": 96,
+      "expense_date": "2025-11-26",
+      "description": "خریداری عطر توسط حاجی رفیع الله به رئیس صدور مجوز بابت تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "336.29",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 97,
+    "fields": {
+      "project": 5,
+      "serial_number": 97,
+      "expense_date": "2025-11-27",
+      "description": "پرداخت برای محمد نسیم کرن کار بابت تعمیر پائین نمودن پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "41400.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 98,
+    "fields": {
+      "project": 5,
+      "serial_number": 98,
+      "expense_date": "2025-11-27",
+      "description": "پرداخت برای نورگل بابت کندن کاری تعمیرللندر 6 معادل 5000$",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "332500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 99,
+    "fields": {
+      "project": 5,
+      "serial_number": 99,
+      "expense_date": "2025-11-27",
+      "description": "پرداخت معاش عبدالبصیرولد محمد وکیل چوکیدار تعمیرللندر 6 ماه عقرب 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "12500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 100,
+    "fields": {
+      "project": 5,
+      "serial_number": 100,
+      "expense_date": "2025-11-27",
+      "description": "پرداخت برای نورالدین بابت سیم تابی پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "120000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 101,
+    "fields": {
+      "project": 5,
+      "serial_number": 101,
+      "expense_date": "2025-11-29",
+      "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت به کانکریت ریزی پایل های اساسی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1328000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 102,
+    "fields": {
+      "project": 5,
+      "serial_number": 102,
+      "expense_date": "2025-11-30",
+      "description": "خریداری پایپ کرمچی به کانکریت ریزی پایل های اساسی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "3100.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 103,
+    "fields": {
+      "project": 5,
+      "serial_number": 103,
+      "expense_date": "2025-11-30",
+      "description": "خریداری تیل پطرول به موتر کرولا نقره ایی استفاده به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "2600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 104,
+    "fields": {
+      "project": 5,
+      "serial_number": 104,
+      "expense_date": "2025-11-30",
+      "description": "پرداخت برای علی داد مکسر کار بابت کانکریت ریزی پایل های اساسی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "30000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 105,
+    "fields": {
+      "project": 5,
+      "serial_number": 105,
+      "expense_date": "2025-12-01",
+      "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت به کانکریت ریزی پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1315460.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3700",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 106,
+    "fields": {
+      "project": 5,
+      "serial_number": 106,
+      "expense_date": "2025-12-01",
+      "description": "خریداری کندکسر به آب بازک تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "270.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 107,
+    "fields": {
+      "project": 5,
+      "serial_number": 107,
+      "expense_date": "2025-12-01",
+      "description": "خریداری لین 3/4 به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "26000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 108,
+    "fields": {
+      "project": 5,
+      "serial_number": 108,
+      "expense_date": "2025-12-01",
+      "description": "خریداری پایپ لابری به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "3700.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 109,
+    "fields": {
+      "project": 5,
+      "serial_number": 109,
+      "expense_date": "2025-12-01",
+      "description": "خریداری پایپ , زانو خم و برشینگ به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "9710.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 110,
+    "fields": {
+      "project": 5,
+      "serial_number": 110,
+      "expense_date": "2025-12-01",
+      "description": "خریداری کوتگه سامی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "300.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 111,
+    "fields": {
+      "project": 5,
+      "serial_number": 111,
+      "expense_date": "2025-12-02",
+      "description": "پرداخت برای جاوید سکندری بابت سیخ گول تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "10000.00",
+      "exchange_rate": "66.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 112,
+    "fields": {
+      "project": 5,
+      "serial_number": 112,
+      "expense_date": "2025-12-03",
+      "description": "پرداخت برای مصارفات حاجی احسان الله از تاریخ 25 نوامبر الی 03 دسمبر 2025 از قبیل تیل دیزل به جنراتور,لحاف یک نفره ,بوره , نمک,سیمک, آب معدنی,گچ,لوبیا,نخود,بوره,چای سبز,روغن ,کچالو,اندل به جنراتور,تخم مرغ,تیل پطول به موتر,گاز مایع ,جین لین,اسپیری ,پنچری تایر کراچی و اجرت پائین کردن سمنت توسط مزدورکاران تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "15760.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1200",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 113,
+    "fields": {
+      "project": 5,
+      "serial_number": 113,
+      "expense_date": "2025-12-03",
+      "description": "پرداخت برای مصارفات حاجی احسان الله از تاریخ 25 نوامبر الی 03 دسمبر 2025 از قبیل کرای رفت و آمد انجنیر وحید به للندر 4, کرای تکسی انجنیر محبوب الله و کرای موتر کارمندان به تعمیرللندر 6 ,پرداخت برای برقی ساحه بابت فیوز سوخته گی ,کرای تکسی سیخ از سرای مطیع الله,نان خشک , برشینگ ,تبدیل , تفلون, برق دستی ,آب نوشیدنی,جاین کلفت , دستکش ,مصاله دیگ , کتر , مبلایل تبدیلی جنراتور, و کری موتر و اجرت سه نفر مزدور کاران بابت پیش کردن سمنت به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "23020.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1200",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 114,
+    "fields": {
+      "project": 5,
+      "serial_number": 114,
+      "expense_date": "2025-12-04",
+      "description": "پرداخت برای  حاجی عبدالکریم خریداری سیمنت ایرانی به کانکریت ریزی پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "346485.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 115,
+    "fields": {
+      "project": 5,
+      "serial_number": 115,
+      "expense_date": "2025-12-04",
+      "description": "پرداخت برای علی داد مکسر کار بدست زمان برادرش بابت کانکریت ریزی پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "25000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 116,
+    "fields": {
+      "project": 5,
+      "serial_number": 116,
+      "expense_date": "2025-12-04",
+      "description": "پرداخت برای شرکت سلیمان داودزی بابت خریداری ریگ و کرش به پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "279625.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 117,
+    "fields": {
+      "project": 5,
+      "serial_number": 117,
+      "expense_date": "2025-12-04",
+      "description": "پرداخت برای نور گل بابت کندن کاری تهکوی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "330000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 118,
+    "fields": {
+      "project": 5,
+      "serial_number": 118,
+      "expense_date": "2025-12-04",
+      "description": "پرداخت برای نورالدین بابت سیم تابی پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "16500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 119,
+    "fields": {
+      "project": 5,
+      "serial_number": 119,
+      "expense_date": "2025-12-04",
+      "description": "خریداری تحفه توسط حاجی رفیع الله بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "129.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 120,
+    "fields": {
+      "project": 5,
+      "serial_number": 120,
+      "expense_date": "2025-12-07",
+      "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "695360.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 121,
+    "fields": {
+      "project": 5,
+      "serial_number": 121,
+      "expense_date": "2025-12-07",
+      "description": "پرداخت برای نورالدین بابت سیم تابی پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "35000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 122,
+    "fields": {
+      "project": 5,
+      "serial_number": 122,
+      "expense_date": "2025-12-10",
+      "description": "پرداخت برای مصارفات بل های حاجی احسان الله سهاک از تاریخ 03 دسمبر 2025 الی 10 دسمبر 2025 تعمیرلندر6 از قبیل گوشت مرغ ,پیاز ,سبزی,آب نوشیدنی ,تاسک وال ماشین,تیل دیزل,بیلر بخاطر کانکریت,کرای زرنج,کرای رفت و آمد از ساحه للندر 6 به دفتر کارته چهار,گاز مایع,پل چرخ,جور کردن فیوز سوخته گی صندوق برق,تیل دیزل به جنراتور,اجرت مزدور کاران بخاطر پیش نمودن سمنت ,کراچی از نل 40 ,مواد خوراکه, اجرت 4 نفر  تیل دیزل به جنراتور و لابرتیب به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "27340.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 123,
+    "fields": {
+      "project": 5,
+      "serial_number": 123,
+      "expense_date": "2025-12-10",
+      "description": "پرداخت برای مصارفات بل های حاجی احسان الله سهاک از تاریخ 03 دسمبر 2025 الی 10 دسمبر 2025 تعمیرلندر6 پیش پرداخت برای عبدالمتین بابت ماه قوس 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 124,
+    "fields": {
+      "project": 5,
+      "serial_number": 124,
+      "expense_date": "2025-12-10",
+      "description": "پرداخت برای مصارفات بل های حاجی احسان الله سهاک از تاریخ 03 دسمبر 2025 الی 10 دسمبر 2025 تعمیرلندر6 پش پرداخت برای میرویس ولد عبدالبصیر بابت ماه قوس 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 125,
+    "fields": {
+      "project": 5,
+      "serial_number": 125,
+      "expense_date": "2025-12-10",
+      "description": "پرداخت برای مصارفات بل های حاجی احسان الله سهاک از تاریخ 03 دسمبر 2025 الی 10 دسمبر 2025 تعمیرلندر6 رداخت برای مزدورکاران نورالدین بابت پائین نمودن سمنت و هموار کاری ساحه جاینت B و خریداری آب نوشیدنی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "3710.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 126,
+    "fields": {
+      "project": 5,
+      "serial_number": 126,
+      "expense_date": "2025-12-10",
+      "description": "پرداخت برای مصارفات بل های حاجی احسان الله سهاک از تاریخ 03 دسمبر 2025 الی 10 دسمبر 2025 تعمیرلندر6 از قبیل گوشت تیل دیزل , گاز مایع , پیچ کش برقی ,خرپیچ , سیمک دیگ ,آب نوشیدنی,اجرت 4 نفر مزدورکاران,بابت پیش کردن سمنت,تیل دیزل به جنراتور و خریداری پائیپ کرمچی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "9060.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 127,
+    "fields": {
+      "project": 5,
+      "serial_number": 127,
+      "expense_date": "2025-12-10",
+      "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت ایرانی به کانکریت ریزی پایل های تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1327140.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 128,
+    "fields": {
+      "project": 5,
+      "serial_number": 128,
+      "expense_date": "2025-12-10",
+      "description": "پرداخت برای شرکت سلیمان داودزی توسط مشعل بابت خریداری ریگ و جغل به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "409250.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 129,
+    "fields": {
+      "project": 5,
+      "serial_number": 129,
+      "expense_date": "2025-12-10",
+      "description": "پرداخت برای علی داد مکسر کار بابت کانکریت ریزی پایل های اساسی تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "30000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 130,
+    "fields": {
+      "project": 5,
+      "serial_number": 130,
+      "expense_date": "2025-12-10",
+      "description": "پرداخت برای نور گل بابت کندن کاری تعمیرللندر6 بدست مشعل به گفته نور گل توسط زنگ مبایل",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "331000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 131,
+    "fields": {
+      "project": 5,
+      "serial_number": 131,
+      "expense_date": "2025-12-10",
+      "description": "پرداخت برای نورالدین بابت سیم تابی پایل های تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "100000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 132,
+    "fields": {
+      "project": 5,
+      "serial_number": 132,
+      "expense_date": "2025-12-10",
+      "description": "پرداخت برای محمد نسیم کرن کار بابت پائین نمودن پایل های تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "20000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 133,
+    "fields": {
+      "project": 5,
+      "serial_number": 133,
+      "expense_date": "2025-12-11",
+      "description": "پرداخت برای عظیم الله جهادیار بابت حفاری پایل های اساسی تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "992250.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 134,
+    "fields": {
+      "project": 5,
+      "serial_number": 134,
+      "expense_date": "2025-12-11",
+      "description": "پرداخت برای انجنیر وحید الله صدیقی بخاطر انترنت و کارت مبایل  بابت تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 135,
+    "fields": {
+      "project": 5,
+      "serial_number": 135,
+      "expense_date": "2025-12-14",
+      "description": "خریداری مواد ضد نم به کانکریت ریزی شفته بالای سنگ بولدر تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "28800.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 136,
+    "fields": {
+      "project": 5,
+      "serial_number": 136,
+      "expense_date": "2025-12-14",
+      "description": "خریداری رجه به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "90.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 137,
+    "fields": {
+      "project": 5,
+      "serial_number": 137,
+      "expense_date": "2025-12-14",
+      "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت به تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "695100.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 138,
+    "fields": {
+      "project": 5,
+      "serial_number": 138,
+      "expense_date": "2025-12-14",
+      "description": "پرداخت برای گلکار بابت شفته کاری تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 139,
+    "fields": {
+      "project": 5,
+      "serial_number": 139,
+      "expense_date": "2025-12-14",
+      "description": "پرداخت برای انجنیر عبدالقدیر نبوی بابت تضمین جواز و انجنیر بابت امر تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "200.00",
+      "exchange_rate": "66.1000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 140,
+    "fields": {
+      "project": 5,
+      "serial_number": 140,
+      "expense_date": "2025-12-14",
+      "description": "خریداری و تهیه لباس برای  کارمندان ریاست کنترول ساختمانها بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "11800.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 141,
+    "fields": {
+      "project": 5,
+      "serial_number": 141,
+      "expense_date": "2025-12-15",
+      "description": "خریداری اسپیسر به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "7000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 142,
+    "fields": {
+      "project": 5,
+      "serial_number": 142,
+      "expense_date": "2025-12-17",
+      "description": "پرداخت برای علی داد مکسر کار بابت کانکریت ریزی پایل های اساسی تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "66200.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 143,
+    "fields": {
+      "project": 5,
+      "serial_number": 143,
+      "expense_date": "2025-12-18",
+      "description": "پرداخت برای خریداری مواد ضد نم به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "17600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 144,
+    "fields": {
+      "project": 5,
+      "serial_number": 144,
+      "expense_date": "2025-12-18",
+      "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت ایرانی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "350000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 145,
+    "fields": {
+      "project": 5,
+      "serial_number": 145,
+      "expense_date": "2025-12-18",
+      "description": "پرداخت برای نورالدین بابت سیم تابی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "99450.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 146,
+    "fields": {
+      "project": 5,
+      "serial_number": 146,
+      "expense_date": "2025-12-18",
+      "description": "پرداخت برای شرکت ساختمانی سلیمان داودزی بابت خریداری ریگ شسته و جغل بادامی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "125500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 147,
+    "fields": {
+      "project": 5,
+      "serial_number": 147,
+      "expense_date": "2025-12-18",
+      "description": "پرداخت برای نسیم کرن کار بابت پائین کردن پایل های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10800.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 148,
+    "fields": {
+      "project": 5,
+      "serial_number": 148,
+      "expense_date": "2025-12-20",
+      "description": "پرداخت برای نورالدین بابت سیم تابی تعمیرللندر6 معادل به افغانی 33100",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "33100.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 149,
+    "fields": {
+      "project": 5,
+      "serial_number": 149,
+      "expense_date": "2025-12-21",
+      "description": "پرداخت و تصفیه حساب عظیم الله بابت حفاری پایل های اساسی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1757350.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 150,
+    "fields": {
+      "project": 5,
+      "serial_number": 150,
+      "expense_date": "2025-12-21",
+      "description": "پرداخت و تصفیه حساب باقیمانده عظیم الله بابت حفاری پایل های تحکیماتی تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "52525.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 151,
+    "fields": {
+      "project": 5,
+      "serial_number": 151,
+      "expense_date": "2025-12-24",
+      "description": "پرداخت برای حاجی احسان الله سهاک بابت مصارفات تاریخ های مختلف به تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "49470.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 152,
+    "fields": {
+      "project": 5,
+      "serial_number": 152,
+      "expense_date": "2025-12-24",
+      "description": "پرداخت برای شرکت مواد ساختمانی سلیمان داودزی بابت خریداری ریگ شسته , جغل بادامی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "104000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 153,
+    "fields": {
+      "project": 5,
+      "serial_number": 153,
+      "expense_date": "2025-12-24",
+      "description": "پرداخت برای علی داد مکسر کار بابت کانکریت ریزی پایل های اساسی تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "30000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 154,
+    "fields": {
+      "project": 5,
+      "serial_number": 154,
+      "expense_date": "2025-12-24",
+      "description": "پیش پرداخت برای انجنیر وحید الله ولد حبیب الله بابت ماه قوس 1404 للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 155,
+    "fields": {
+      "project": 5,
+      "serial_number": 155,
+      "expense_date": "2025-12-24",
+      "description": "پرداخت برای محمد حسن بابت اجرت 4.5 روزه ایزوگام کاری تشناب های تعمیرللندر5",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "4500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 156,
+    "fields": {
+      "project": 5,
+      "serial_number": 156,
+      "expense_date": "2025-12-25",
+      "description": "پرداخت و تصفیه حساب محمد نسیم کرن کار بابت پائین کردن پایل های تعمیرللندر6 بدست رحمت الله",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "14600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 157,
+    "fields": {
+      "project": 5,
+      "serial_number": 157,
+      "expense_date": "2025-12-29",
+      "description": "پرداخت شرکت هرات الکتریک بابت خریداری کیبل مغان به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "44880.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 158,
+    "fields": {
+      "project": 5,
+      "serial_number": 158,
+      "expense_date": "2025-12-30",
+      "description": "پرداخت کرای تکسی رفت و آمد کاریگران  به تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 159,
+    "fields": {
+      "project": 5,
+      "serial_number": 159,
+      "expense_date": "2025-12-31",
+      "description": "پرداخت معاش محمد نادر ولد صوفی مقبول شاه بابت ماه قوس 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 160,
+    "fields": {
+      "project": 5,
+      "serial_number": 160,
+      "expense_date": "2025-12-31",
+      "description": "پرداخت معاش محمد بصیر ولد محمد وکیل چوکیدار تعمیرللندر 6 بابت ماه قوس 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "12500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 161,
+    "fields": {
+      "project": 5,
+      "serial_number": 161,
+      "expense_date": "2025-12-31",
+      "description": "پرداخت معاش باقیمانده میرویس ولد عبدالبصیر کاریگر للندر 6 بابت ماه قوس 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "5167.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 162,
+    "fields": {
+      "project": 5,
+      "serial_number": 162,
+      "expense_date": "2025-12-31",
+      "description": "پرداخت معاش باقیمانده عبدالمتین ولد نیک محمد کاریگر للندر 6 بابت ماه قوس 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "9500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 163,
+    "fields": {
+      "project": 5,
+      "serial_number": 163,
+      "expense_date": "2025-12-31",
+      "description": "پرداخت معاش باقیمانده عبدالبصیر ولد رضا کاریگر للندر 6 بابت ماه قوس 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 164,
+    "fields": {
+      "project": 5,
+      "serial_number": 164,
+      "expense_date": "2025-12-31",
+      "description": "پرداخت برای مصارف نان چاشت حاجی عاشق الله , فرید و نورالدین قالبکار بابت خریدرای مواد قالبکاری به تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "650.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 165,
+    "fields": {
+      "project": 5,
+      "serial_number": 165,
+      "expense_date": "2025-12-31",
+      "description": "پرداخت معاش باقیمانده انجنیر وحید الله ولد حبیب الله بابت ماه قوس 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "15000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 166,
+    "fields": {
+      "project": 5,
+      "serial_number": 166,
+      "expense_date": "2025-12-31",
+      "description": "پیش پرداخت برای انجنیر وحید الله ولد حبیب الله بابت ماه جدی 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "5000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 167,
+    "fields": {
+      "project": 5,
+      "serial_number": 167,
+      "expense_date": "2025-12-31",
+      "description": "پرداخت برای نورالدین بابت سیم تابی تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "46200.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 168,
+    "fields": {
+      "project": 5,
+      "serial_number": 168,
+      "expense_date": "2026-01-07",
+      "description": "خریداری کیک برای مهمان ها, آب نوشیدنی, کرایی کراچی, لابرتیب میخ فولادی, لابرتیب و پرداخت برای ترافیک بخاطر تخلیه سیخ 5 متر, برقی بابت جور کردن ماشین نوردین و خریدری تیل دیزل بابت للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "3040.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 169,
+    "fields": {
+      "project": 5,
+      "serial_number": 169,
+      "expense_date": "2026-01-07",
+      "description": "خریداری تیل دیزل, میخ ساده و میخ فولادی به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1420.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 170,
+    "fields": {
+      "project": 5,
+      "serial_number": 170,
+      "expense_date": "2026-01-07",
+      "description": "خریداری رب, روغن و گاز به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1200.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 171,
+    "fields": {
+      "project": 5,
+      "serial_number": 171,
+      "expense_date": "2026-01-07",
+      "description": "خریداری نیم سیر کچال و پیاز, پیاز و کچالو, زردک , آب و گوشت به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1460.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 172,
+    "fields": {
+      "project": 5,
+      "serial_number": 172,
+      "expense_date": "2026-01-07",
+      "description": "خریداری ذال چرخ و مبلایل به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "570.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 173,
+    "fields": {
+      "project": 5,
+      "serial_number": 173,
+      "expense_date": "2026-01-07",
+      "description": "خریداری پل برش, دست کش و تیل دیزل به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1940.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 174,
+    "fields": {
+      "project": 5,
+      "serial_number": 174,
+      "expense_date": "2026-01-07",
+      "description": "خریداری تیل دیزل, آب نوشیدنی و انرژی و پرداخت کرایه بصیر و فواد بخاطر رفتن به ریاست شهر داری بابت للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1680.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 175,
+    "fields": {
+      "project": 5,
+      "serial_number": 175,
+      "expense_date": "2026-01-07",
+      "description": "خریداری پل برش, دست کش وشش رخی به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "680.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 176,
+    "fields": {
+      "project": 5,
+      "serial_number": 176,
+      "expense_date": "2026-01-07",
+      "description": "خریداری رول یک متری و کرایه آن به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 177,
+    "fields": {
+      "project": 5,
+      "serial_number": 177,
+      "expense_date": "2026-01-07",
+      "description": "خریداری کیک پزی, آب نوشیدنی آن به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "360.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 178,
+    "fields": {
+      "project": 5,
+      "serial_number": 178,
+      "expense_date": "2026-01-07",
+      "description": "خریداری رجه به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "160.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 179,
+    "fields": {
+      "project": 5,
+      "serial_number": 179,
+      "expense_date": "2026-01-07",
+      "description": "خریداری تیوب و آب نوشیدنی  به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "180.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 180,
+    "fields": {
+      "project": 5,
+      "serial_number": 180,
+      "expense_date": "2026-01-07",
+      "description": "خریداری تیل دیزل به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1240.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 181,
+    "fields": {
+      "project": 5,
+      "serial_number": 181,
+      "expense_date": "2026-01-07",
+      "description": "خریداری تیل دیزل به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1240.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 182,
+    "fields": {
+      "project": 5,
+      "serial_number": 182,
+      "expense_date": "2026-01-07",
+      "description": "خریداری دسته بیل و لابرتیب به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "330.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 183,
+    "fields": {
+      "project": 5,
+      "serial_number": 183,
+      "expense_date": "2026-01-07",
+      "description": "خریداری Aquomed admine به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "9600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 184,
+    "fields": {
+      "project": 5,
+      "serial_number": 184,
+      "expense_date": "2026-01-07",
+      "description": "خریداری تیل دیزل به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1220.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 185,
+    "fields": {
+      "project": 5,
+      "serial_number": 185,
+      "expense_date": "2026-01-07",
+      "description": "خریداری رب کلان به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "140.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 186,
+    "fields": {
+      "project": 5,
+      "serial_number": 186,
+      "expense_date": "2026-01-07",
+      "description": "پرداخت برای مزد دو نفر گلکار و دو نفر مزدور کار و مزد برقی بابت جور کردن پلک و کانکریت ریزی تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "2300.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 187,
+    "fields": {
+      "project": 5,
+      "serial_number": 187,
+      "expense_date": "2026-01-07",
+      "description": "خریداری بوره, چای, لوبیا, نخود, روغن, رب و مایح ظرف شویی به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "3480.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 188,
+    "fields": {
+      "project": 5,
+      "serial_number": 188,
+      "expense_date": "2026-01-07",
+      "description": "خریداری گاز به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 189,
+    "fields": {
+      "project": 5,
+      "serial_number": 189,
+      "expense_date": "2026-01-07",
+      "description": "خریداری نان خشک به تعداد 524 به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "4250.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 190,
+    "fields": {
+      "project": 5,
+      "serial_number": 190,
+      "expense_date": "2026-01-07",
+      "description": "پرداخت برای 6 نفر مزدور کار بابت تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1800.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 191,
+    "fields": {
+      "project": 5,
+      "serial_number": 191,
+      "expense_date": "2026-01-07",
+      "description": "خریدرای  ساکت و کرای بصیر بابت تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "940.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 192,
+    "fields": {
+      "project": 5,
+      "serial_number": 192,
+      "expense_date": "2026-01-07",
+      "description": "خریدرای 227 ورق, پوش پلاستیکی و فوتوکاپی نقشه های للندر 6 بابت تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1550.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 193,
+    "fields": {
+      "project": 5,
+      "serial_number": 193,
+      "expense_date": "2026-01-07",
+      "description": "پرداخت برای نور گل بابت کندن کاری دو منزل تهکوی به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "462700.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 194,
+    "fields": {
+      "project": 5,
+      "serial_number": 194,
+      "expense_date": "2026-01-07",
+      "description": "پرداخت برای شرکت مواد ساختمانی سلیمان داودزی بابت خریداری کرش بادامی و ریگ شسته به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "63000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 195,
+    "fields": {
+      "project": 5,
+      "serial_number": 194,
+      "expense_date": "2026-01-07",
+      "description": "پرداخت برای نور گل بابت کندن کاری دو منزل تهکوی به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "462700.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 196,
+    "fields": {
+      "project": 5,
+      "serial_number": 195,
+      "expense_date": "2026-01-11",
+      "description": "پرداخت برای نورالدین بابت سیم تاپی تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "66000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 197,
+    "fields": {
+      "project": 5,
+      "serial_number": 196,
+      "expense_date": "2026-01-14",
+      "description": "خریداری سیم حستی 1.5 میلی چینایی بایت تعمیر للندر6 به دست حاجی احسان سهاک",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "520.00",
+      "exchange_rate": "66.2200",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 198,
+    "fields": {
+      "project": 5,
+      "serial_number": 197,
+      "expense_date": "2026-01-14",
+      "description": "پرداخت برای نورالدین بابت سیم تاپی تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "132400.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 199,
+    "fields": {
+      "project": 5,
+      "serial_number": 198,
+      "expense_date": "2026-01-14",
+      "description": "پرداخت برای نورالدین قالبکاری پایل های تحکیماتی تعمیر للندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "18000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 200,
+    "fields": {
+      "project": 5,
+      "serial_number": 199,
+      "expense_date": "2026-01-14",
+      "description": "پرداخت و تصفیه حساب مکمل علی داد مکسر کار بابت کانکریت ریزی پایل های اساسی و شفته ریزی بالای سنگ بولدر دو سکشن به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "80300.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 201,
+    "fields": {
+      "project": 5,
+      "serial_number": 200,
+      "expense_date": "2026-01-14",
+      "description": "پرداخت کرای انتقال مکسر کانکریت ریزی به تعمیر للندر 6 نظر به ضرورت ساحه",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 202,
+    "fields": {
+      "project": 5,
+      "serial_number": 201,
+      "expense_date": "2026-01-14",
+      "description": "پرداخت برای مشعل بابت خریداری کرش بادامی و ریگ شسته به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "219000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 203,
+    "fields": {
+      "project": 5,
+      "serial_number": 202,
+      "expense_date": "2026-01-14",
+      "description": "پرداخت و تصفیه حساب مکمل بابت اجرت ساعتوار و کندن کاری دو منزل تعکوی توسط قراردادی نورگل ولد حاجی خان گل به نعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1335690.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 204,
+    "fields": {
+      "project": 5,
+      "serial_number": 203,
+      "expense_date": "2026-01-14",
+      "description": "خریداری کارت مبایل به انجنیر وحیدالله صدیقی بابت فعال نمودن انترنت",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 205,
+    "fields": {
+      "project": 5,
+      "serial_number": 204,
+      "expense_date": "2026-01-15",
+      "description": "پیش پرداخت برای انجنیر وحیدالله ولد حبیب الله بابت ماه جدی 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 206,
+    "fields": {
+      "project": 5,
+      "serial_number": 205,
+      "expense_date": "2026-01-22",
+      "description": "پرداخت برای شرکت زمزم استیل بابت خریداری سیم 1.5 ملی جستی به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "54.00",
+      "exchange_rate": "66.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 207,
+    "fields": {
+      "project": 5,
+      "serial_number": 205,
+      "expense_date": "2026-01-24",
+      "description": "پرداخت برای میرویس ولد عبدالله بصیر بابت ماه جدی 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2200",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 208,
+    "fields": {
+      "project": 5,
+      "serial_number": 206,
+      "expense_date": "2026-01-24",
+      "description": "پرداخت برای عبدلله بصیر ولد رضا بابت ماه جدی 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2200",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 209,
+    "fields": {
+      "project": 5,
+      "serial_number": 207,
+      "expense_date": "2026-01-27",
+      "description": "پرداخت برای عبدلله متین ولد نیک محمد بابت ماه جدی 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 210,
+    "fields": {
+      "project": 5,
+      "serial_number": 208,
+      "expense_date": "2026-01-27",
+      "description": "پرداخت برای وحیدالله صدیقی ولد حبیب الله بابت ماه جدی 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "15000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.1300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 211,
+    "fields": {
+      "project": 5,
+      "serial_number": 209,
+      "expense_date": "2026-01-29",
+      "description": "پرداخت محمد بصیر ولد محمد وکیل بابت ماه جدی 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "12500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 212,
+    "fields": {
+      "project": 5,
+      "serial_number": 210,
+      "expense_date": "2026-01-29",
+      "description": "پرداخت محمد نادر  ولد سفی مقبول شاه بابت ماه جدی 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 213,
+    "fields": {
+      "project": 5,
+      "serial_number": 211,
+      "expense_date": "2026-01-29",
+      "description": "پرداخت علی احمد ولد جما خان بابت ماه جدی 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "3667.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 214,
+    "fields": {
+      "project": 5,
+      "serial_number": 212,
+      "expense_date": "2026-01-29",
+      "description": "پرداخت برای سادر ولی ولد صبرالله بابت ماه جدی 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "3333.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 215,
+    "fields": {
+      "project": 5,
+      "serial_number": 213,
+      "expense_date": "2026-01-29",
+      "description": "پرداخت برای سادر ولی ولد صبرالله بابت ماه جدی 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "3333.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 216,
+    "fields": {
+      "project": 5,
+      "serial_number": 214,
+      "expense_date": "2026-01-31",
+      "description": "پرداخت برای شیرباز بابت خریداری سنگ بولدر به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "156800.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 217,
+    "fields": {
+      "project": 5,
+      "serial_number": 215,
+      "expense_date": "2026-01-31",
+      "description": "پرداخت برای نوردین بابت سیم تابی تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "33250.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 218,
+    "fields": {
+      "project": 5,
+      "serial_number": 216,
+      "expense_date": "2026-02-02",
+      "description": "پرداخت برای 3 نفر کاریگر علی داد به خاطری کانکریت باقیمانده, کشیدن مکسر توسط کرین از تهکاوی روی زمین و 2 نفر کاریگر از جمع نورالدین روز که کانکریت باقی مانده بود",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "7450.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.3900",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 219,
+    "fields": {
+      "project": 5,
+      "serial_number": 217,
+      "expense_date": "2026-02-02",
+      "description": "پرداخت لحاف یک نفره و پرداخت کرایه تکسی به للندر 6,خریداری چین کلیت ترکی از فروشگاه وطن الکتریک به تعمیر للندر 6,خریداری دسته بیل و کلنگ به تعمیر للندر 6, خریداری گوک , زنجیر برای قلف, قلف خورد و آب به تعمیر للندر 6 و پرداخت برای انجینیر ناحیه 4 به خاطری بازدید و امضای سیخ بندی",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "3990.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.3900",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 220,
+    "fields": {
+      "project": 5,
+      "serial_number": 218,
+      "expense_date": "2026-02-02",
+      "description": "خریداری یکونیم کیلو گوشت, آب و مرچ به تعمیر للندر 6, خریداری گاز مایع به تعمیر للندر 6, خریداری بالشت پور, خریداری چاینک 4 لیتر و خریداری یک سیر کچالو , مرچ, سبزی و آب نوشیدنی",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "2870.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.3900",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 221,
+    "fields": {
+      "project": 5,
+      "serial_number": 219,
+      "expense_date": "2026-02-02",
+      "description": "پرداخت برای برق و کرایه نصییر, خریداری گاز به تعمیر للندر 6, خریداری گوشت یک نیم کیلو, مرچ, سبزی و آب به تعمیر للندر 6, خریداری 490 دانه نان از تاریخ 1404/10/17 الی 1404/11/5 به تعمیر للندر 6 و کرایه ماه دلو و جنوری شمسی پلازا و صرفیه بل برق ماه جدی",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "23180.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.3900",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 222,
+    "fields": {
+      "project": 5,
+      "serial_number": 220,
+      "expense_date": "2026-02-02",
+      "description": "خریداری گاز به للندر 6, خریداری رومی خشک یک قعطی, گوشت یک و نیم کیلو , سبزی و آب به تعمیر للندر 6, خریداری گاز, خریداری برنج ,نخود,دال, مایع ضرف شویی , پیاز , کچالو , سیر و کرایه موتر به تعمیر للندر 6 و خریداری دستکش به تعمیر  للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "7230.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.3900",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 223,
+    "fields": {
+      "project": 5,
+      "serial_number": 221,
+      "expense_date": "2026-02-02",
+      "description": "خریداری صافی نیکی , آب و غیره به تعمیر للندر 6, خریداری ریگ ششنه و پرداخت کرایه به تعمیر للندر6, خریداری پلاس, پیچکش, قفل , دبل , چکش آهنی و پیچ اسکرو به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1490.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.3900",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 224,
+    "fields": {
+      "project": 5,
+      "serial_number": 222,
+      "expense_date": "2026-02-04",
+      "description": "پرداخت برای نورالدین بابت مصارف روزانه به خاطری بیکار ماندن کاریگران نورالدین در تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "21000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 225,
+    "fields": {
+      "project": 5,
+      "serial_number": 223,
+      "expense_date": "2026-02-04",
+      "description": "پرداخت برای نورالدین بابت سیم تاپی تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "65200.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 226,
+    "fields": {
+      "project": 5,
+      "serial_number": 224,
+      "expense_date": "2026-02-04",
+      "description": "پرداخت برای نورالدین بابت سیم تاپی تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "30000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "66.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 227,
+    "fields": {
+      "project": 5,
+      "serial_number": 225,
+      "expense_date": "2026-02-07",
+      "description": "پیش پرداخت برای انجنیر وحیدالله ولد حبیب الله بابت ماه دلو 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "6500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 228,
+    "fields": {
+      "project": 5,
+      "serial_number": 226,
+      "expense_date": "2026-02-16",
+      "description": "پرداخت برای حاجی عبدلکریم بابت خریداری سمنت ایرانی به تعیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "184000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "62.7000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 229,
+    "fields": {
+      "project": 5,
+      "serial_number": 227,
+      "expense_date": "2026-02-16",
+      "description": "پیش پرداخت برای شزکت کانکریت ریزی توحید مسکن بابت فوندیشن تعمیر للندر 6 ( توسط صرافی سرای شهزاده نزد حاجی خانی خیشکی وال)",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "30000.00",
+      "exchange_rate": "62.7000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 230,
+    "fields": {
+      "project": 5,
+      "serial_number": 228,
+      "expense_date": "2026-02-16",
+      "description": "پرداخت یرای خریداری مواد ضد نم برای کانکریت ریزی شفته بالای سنگ های بولدر تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "33600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "62.7000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 231,
+    "fields": {
+      "project": 5,
+      "serial_number": 229,
+      "expense_date": "2026-02-16",
+      "description": "خریداری سنگ سیاه اسپیسر از شرکت هلال به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "6600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "62.6100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 232,
+    "fields": {
+      "project": 5,
+      "serial_number": 230,
+      "expense_date": "2026-02-18",
+      "description": "پرداخت پول باقیمانده علی خان مکسر کار بابت شفته ریزی جاینت A تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "15000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 233,
+    "fields": {
+      "project": 5,
+      "serial_number": 231,
+      "expense_date": "2026-02-18",
+      "description": "پرداخت یرای نوردین بابت مصارف روزانه کاریگرانش بابت تعمیر للندر 6 و همچنان اجرت بالا کردن سیخ های گول از ساحه تهکوی به کف زمین تعمیر للندر 6 توسط عزیز الله",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "57500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 234,
+    "fields": {
+      "project": 5,
+      "serial_number": 232,
+      "expense_date": "2026-02-19",
+      "description": "پرداخت اجرت کرن کار بابت پایین نمودن 17 بندل فی بندل از قرار 500 افغانی به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "8500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 235,
+    "fields": {
+      "project": 5,
+      "serial_number": 233,
+      "expense_date": "2026-02-19",
+      "description": "پرداخت معاش وحیدالله صدیقی ولد حبییب الله بابت ماه دلو 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "18500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 236,
+    "fields": {
+      "project": 5,
+      "serial_number": 234,
+      "expense_date": "2026-02-21",
+      "description": "پرداخت برای مطبعه بخاطری چاپ رویی واسکت به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.0700",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 237,
+    "fields": {
+      "project": 5,
+      "serial_number": 235,
+      "expense_date": "2026-02-22",
+      "description": "اجر احواله توسط چک نمبر 2354 برای شرکت کانکریت ریزی توحید مسکن بابت فوندیشن تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "20000.00",
+      "exchange_rate": "63.0700",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 238,
+    "fields": {
+      "project": 5,
+      "serial_number": 236,
+      "expense_date": "2026-02-22",
+      "description": "خریداری کارت موبایل برای فعال کردن انترنیت برای انجنیر وحیدالله",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.0700",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 239,
+    "fields": {
+      "project": 5,
+      "serial_number": 237,
+      "expense_date": "2026-02-23",
+      "description": "پرداخت برای قربان کرن کار بابت انتقال جنراتور از للندر 2 به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "2000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 240,
+    "fields": {
+      "project": 5,
+      "serial_number": 238,
+      "expense_date": "2026-02-24",
+      "description": "خریداری تیل پطرول به موتر سایکل بخاطر رفتن زین الله به للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "190.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 241,
+    "fields": {
+      "project": 5,
+      "serial_number": 239,
+      "expense_date": "2026-02-24",
+      "description": "خریداری  تیل پطرول به موتر بخار رفتن به مزار شریف و پرداخت برای مصارفات عذا یی مزار شریف بخاطری  خریداری تخته ها",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "6710.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 242,
+    "fields": {
+      "project": 5,
+      "serial_number": 240,
+      "expense_date": "2026-02-25",
+      "description": "مصارفات تعمیر للندر 6 توسط حاجی احسان از تاریخ 3 فیبروری الی 25 فیبروری که صورت گرفته است",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "83750.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 243,
+    "fields": {
+      "project": 5,
+      "serial_number": 241,
+      "expense_date": "2026-02-25",
+      "description": "پرداخت برای میرویس  ولد عبدالبصیر بابت ماه دلو 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "7333.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 244,
+    "fields": {
+      "project": 5,
+      "serial_number": 242,
+      "expense_date": "2026-02-25",
+      "description": "پرداخت برای محمد بصیر ولد محمد وکیل بابت ماه دلو 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "12500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 245,
+    "fields": {
+      "project": 5,
+      "serial_number": 243,
+      "expense_date": "2026-02-25",
+      "description": "پرداخت برای صبرالله ولد الله محمد بابت ماه دلو 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 246,
+    "fields": {
+      "project": 5,
+      "serial_number": 244,
+      "expense_date": "2026-02-25",
+      "description": "پرداخت برای  صابر ولی  ولد صبرالله بابت ماه دلو 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 247,
+    "fields": {
+      "project": 5,
+      "serial_number": 245,
+      "expense_date": "2026-02-25",
+      "description": "پرداخت برای علی احمد  ولد جمعه خان بابت ماه دلو 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 248,
+    "fields": {
+      "project": 5,
+      "serial_number": 246,
+      "expense_date": "2026-02-26",
+      "description": "پرداخت برای محمد نادر ولد صافی مقبول شاه بابت ماه دلو 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.2100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 249,
+    "fields": {
+      "project": 5,
+      "serial_number": 247,
+      "expense_date": "2026-02-26",
+      "description": "پرداخت برای نورالدین بابت سیم تابی تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "63200.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.2100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 250,
+    "fields": {
+      "project": 5,
+      "serial_number": 248,
+      "expense_date": "2026-02-26",
+      "description": "پرداخت و تصفیه حساب شرکت کانکریت ریزی افغان پلانت بابت پایل های تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "9000.00",
+      "exchange_rate": "63.2100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 251,
+    "fields": {
+      "project": 5,
+      "serial_number": 249,
+      "expense_date": "2026-03-04",
+      "description": "پرداخت مصارف روزانه کاریگران نورالدین قراردادی تعمیر للندر 6 از تاریخ 16 دلو ای 27  دلو 1404 فی روز از قرار 3500 افغانی",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "42000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 252,
+    "fields": {
+      "project": 5,
+      "serial_number": 250,
+      "expense_date": "2026-03-08",
+      "description": "پرداخت فعلی برای لحوه تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "30000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 253,
+    "fields": {
+      "project": 5,
+      "serial_number": 251,
+      "expense_date": "2026-03-10",
+      "description": "پرداخت برای شرکت فراز آژمان بابت خریداری کاک سقفی به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "125.00",
+      "exchange_rate": "63.5500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 254,
+    "fields": {
+      "project": 5,
+      "serial_number": 252,
+      "expense_date": "2026-03-11",
+      "description": "پرداخت برای نورالدین بابت سیم تاپی تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "95100.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 255,
+    "fields": {
+      "project": 5,
+      "serial_number": 253,
+      "expense_date": "2026-03-11",
+      "description": "پرداخت برای شرکت سلیمان داودزی بابت خریداری کش به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "53750.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 256,
+    "fields": {
+      "project": 5,
+      "serial_number": 254,
+      "expense_date": "2026-03-11",
+      "description": "خریداری سیخ ولدنگ به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "420.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 257,
+    "fields": {
+      "project": 5,
+      "serial_number": 255,
+      "expense_date": "2026-03-11",
+      "description": "مصارفات هذا تعمیر للندر 6 از تاریخ 25 فیبروری الی 11 مارچ سال 2026 توسط انجینیراحسان",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "42530.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 258,
+    "fields": {
+      "project": 5,
+      "serial_number": 256,
+      "expense_date": "2026-03-12",
+      "description": "پیش پرداخت برای انجنیر وحید الله ولد حبیب الله بابت ماه حوت 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "1500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 259,
+    "fields": {
+      "project": 5,
+      "serial_number": 257,
+      "expense_date": "2026-03-12",
+      "description": "پرداخت برای شرکت کانکریت ریزی توحید مسکن بابت تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "10000.00",
+      "exchange_rate": "63.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 260,
+    "fields": {
+      "project": 5,
+      "serial_number": 258,
+      "expense_date": "2026-03-16",
+      "description": "پرداخت معاش محمد نادر ولد صفی مقبول شاه بابت ماه حوت 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.8300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 261,
+    "fields": {
+      "project": 5,
+      "serial_number": 259,
+      "expense_date": "2026-03-16",
+      "description": "پرداخت معاش عبدالبصیر ولد رضا بابت ماه حوت 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.8300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 262,
+    "fields": {
+      "project": 5,
+      "serial_number": 260,
+      "expense_date": "2026-03-16",
+      "description": "پرداخت معاش میرویس ولد عبدالبصیربابت ماه حوت 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.8300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 263,
+    "fields": {
+      "project": 5,
+      "serial_number": 261,
+      "expense_date": "2026-03-16",
+      "description": "پرداخت معاش علی احمد ولد جمعه خان بابت ماه حوت 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.8300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 264,
+    "fields": {
+      "project": 5,
+      "serial_number": 262,
+      "expense_date": "2026-03-16",
+      "description": "پرداخت معاش سردار ولی ولد صبرالله بابت ماه حوت 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.8300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 265,
+    "fields": {
+      "project": 5,
+      "serial_number": 263,
+      "expense_date": "2026-03-16",
+      "description": "پردخت معاش صبرالله ولد الله محمد بابت ماه حوت 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.8300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 266,
+    "fields": {
+      "project": 5,
+      "serial_number": 264,
+      "expense_date": "2026-03-16",
+      "description": "پرداخت معاش عبدالمطین ولد نیک محمد بابت ماه حوت 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "8621.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.8300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 267,
+    "fields": {
+      "project": 5,
+      "serial_number": 265,
+      "expense_date": "2026-03-16",
+      "description": "پرداخت برای خریداری 20 خریطه سمنت ایرانی به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "11600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.8300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 268,
+    "fields": {
+      "project": 5,
+      "serial_number": 266,
+      "expense_date": "2026-03-16",
+      "description": "پرداخت برای نورالدین بخاطری سوراخ نمودن جک ها به تعداد 490 فی دانه 10 افغانی و کرای موتر بابت انتقال ماشین به ساحه للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "5800.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.8300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 269,
+    "fields": {
+      "project": 5,
+      "serial_number": 267,
+      "expense_date": "2026-03-16",
+      "description": "پیش پرداخت برای وحیدالله ولد حبیب الله انجینیر ساحوی تعمیر للندر بابت ماه حوت 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "11000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.8300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 270,
+    "fields": {
+      "project": 5,
+      "serial_number": 268,
+      "expense_date": "2026-03-17",
+      "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "330800.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.7000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 271,
+    "fields": {
+      "project": 5,
+      "serial_number": 269,
+      "expense_date": "2026-03-17",
+      "description": "پرداخت برای کاکا بادام گل بدست روزالدین بابت انتقال چوب و چک ها از گدام کارته سه به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "4500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.7000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 272,
+    "fields": {
+      "project": 5,
+      "serial_number": 270,
+      "expense_date": "2026-03-17",
+      "description": "پرداخت معاش وحیدالله صدیقی بابت ماه حوت سال 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "12500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.7000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 273,
+    "fields": {
+      "project": 5,
+      "serial_number": 271,
+      "expense_date": "2026-03-31",
+      "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "97500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 274,
+    "fields": {
+      "project": 5,
+      "serial_number": 272,
+      "expense_date": "2026-03-31",
+      "description": "خریداری دستکش, مبلایل سوخته به جنراتور, گاز, برس رنگ, تار رجه, گوشت , انرژی در روزی کانکریت ریزی و مصارف متفرقه آب, خرما و چارجر بطری به جنراتور, تیل تیزل, خریداری یک راس گوسفند برای حاجی عبدالحق به هدایت حاجی رفیع بخاطری آمدن از حج عمره و کرایه موتری آن, آب, پالک, تخم و دیگر مصارف, پرداخت کرایه دو نفر کاریگر بابت کانکریت ریزی به تعمیر للندر 4 و کرایه تکسی دو نفر کاریگر بابت کارنکریت کرایه واپسی و کرایه دو نفر کاریگر بابت آمدن ار للندر 6 به للندر 5  به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "16530.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 275,
+    "fields": {
+      "project": 5,
+      "serial_number": 273,
+      "expense_date": "2026-03-31",
+      "description": "خریداری تار رجه, پرداخت کرای انتقال دو کاریگر از للندر 5 به للندر 6 و کرایه موتری مازدا بابت انتقال 500 دانه جک کرایی از قصبه به للندر 6, خریداری دو عدد کوک به چاشت , بالتی و انرژی در روز کانکریت ریزی چت اول تعمیر للندر 6, خریداری  650 عدد نان فی دانه 8 افغانی بابت تعمیر للندر 6, خریداری آب ترازو, پیپ و قلم تراش به تعمیر للندر 6, خریداری انرژی و کیک به انجنیران و دوکتوران در روز کانکریت ریزی, خریداری یک عدد تخم, آب و بطری به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "11420.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 276,
+    "fields": {
+      "project": 5,
+      "serial_number": 274,
+      "expense_date": "2026-03-31",
+      "description": "خریداری تیل دیزل, گاز, مبلایل, خریداری مبلایل به جنراتوری تعمیر للندر 6, کرایه رفت و آمد ار للندر 5 به للندر 6 بخاطری مبلایل تبدیلی, خریداری تیل دیزل, متر, توش, رجه, دستکش به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "8230.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 277,
+    "fields": {
+      "project": 5,
+      "serial_number": 275,
+      "expense_date": "2026-03-31",
+      "description": "خریداری تیل دیزل به جنراتور,پرداخت برای دو نفر کلگار روزدین در روز کانکریت ریزی تعمیر للندر 6, پرداخت برای دو نفر پولیس شرینی عیدی  و خریداری بادنجان خشک بابت تعمیر للندر 6, تیل دیزل به جنراتور, خریداری خامه و مربا به تعمیر للندر 6 و خریداری سر گوساله بابت تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "12600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 278,
+    "fields": {
+      "project": 5,
+      "serial_number": 276,
+      "expense_date": "2026-03-31",
+      "description": "خریداری تیل دیزل برای جنراتور, یک دانه لور رنگ کلان, رنگ روغنی و لور, پرداخت بل برق دارای اسم مشترک  سید فاروق, عبدالرحیم , عدهن لعل  و کرایه موتری آن,  پرداخت اضافه پولی بارگیری  تخته 250 دانه و خریداری یک پلاستیک سیب به تعمیر للندر 6, پرداخت برای ذین الله بابت آوردن جنراترو خورد به تعمیر للندر 6, خریداری ساکت, پل چرخ, قلم آهنی و غیره , پرداخت برای آوردن ویبراتور از تعمیر للندر 4 به تعمیر للندر 6 و رساندن انجنیر وحید و احسان از ساحه کار الی کمپنی و چهار قلعه و پرداخت برای 2 نفر کاریگر در روز کانکریت ریزی به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "15870.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 279,
+    "fields": {
+      "project": 5,
+      "serial_number": 277,
+      "expense_date": "2026-03-31",
+      "description": "خریداری گاز به تعمیر للندر 6, گوشت مرغ, کارت موبایل برای انترنیت انجنیر وحید, انرژی , آب, سبزی, برای انجنیران, تیل پطرول, مبلایل برای جنراتور, گوشت مرغ, تیل دیزل برای جنراتور, تار رجه, رنگ روغنی, لور کلان , لور خورد, برس و رجه و پرداخت کرایه وتری آن به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "7450.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 280,
+    "fields": {
+      "project": 5,
+      "serial_number": 278,
+      "expense_date": "2026-03-31",
+      "description": "خریداری گوشت گوساله به تعمیر للندر 6, خریداری تیل دیزل به جنراتور, مبلایل به جنراتور, خریداری روغن, لوبیا, دال نخود, روب, پیاز, ترکاری, مایع ظرف شویی و غیره به تعمیر للندر 6, خریداری تیل دیزلو پطرول به جنراتور و موتر , گاز, جوس به مهمانان حاجی رفیع در روزکانکریت ریزی, انرژی , کیک به کاریگر ها در روز کانکریت ریزی",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10350.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 281,
+    "fields": {
+      "project": 5,
+      "serial_number": 279,
+      "expense_date": "2026-03-31",
+      "description": "پرداخت برای 2 نفر کاریگر در روز کانکریت ریزی و پرداخت برای انجنیر وحید کرایه موتریش را به تعمیر للندر 6, خریداری گاز, گوشت, مبلایل برای جنراتور, تیل دیزل و پطرول برای جنراترو و موتر, دست گش, جالی, پل سنگ برش, دبل و غیره به تعمیر للندر 6, تیل دیزل و پطرول برای جنراتور و موتر به تعمیر للندر 6 , تیل دیزل برای جنراتور به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "9250.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 282,
+    "fields": {
+      "project": 5,
+      "serial_number": 280,
+      "expense_date": "2026-03-31",
+      "description": "خریداری مواد ساختمانی از قبیل کریسن یک قوتی و غیره و پرداخت کرایه میرویس",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "560.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 283,
+    "fields": {
+      "project": 5,
+      "serial_number": 281,
+      "expense_date": "2026-04-01",
+      "description": "پرداخت برای ترمیم و سیم پیچی داینمو 15 کیلووات به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "6000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.2000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 284,
+    "fields": {
+      "project": 5,
+      "serial_number": 282,
+      "expense_date": "2026-04-02",
+      "description": "پرداخت برای شرکت مواد ساختمانی سلیمان داودزی بابت خریداری ریگ شسته به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "61000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.9000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 285,
+    "fields": {
+      "project": 5,
+      "serial_number": 283,
+      "expense_date": "2026-04-02",
+      "description": "پرداخت برای شرکت تجارتی حاجی نادر سلطانی دولت زی بابت خریداری سیخ گول 22 ملی به تعمیر للندر 6, پرداخت برای شرکت تجارتی حاجی نادر سلطانی دولت زی بابت خریداری سیخ گول 14 ملی, 16 ملی و 22 ملی به تعمیر للندر 6,  پرداخت برای شرکت تجارتی حاجی نادر سلطان دولت زی از مجموع بل نمبر 415 بابت خریداری سیخ گول 10 ملی به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "40000.00",
+      "exchange_rate": "64.9000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 286,
+    "fields": {
+      "project": 5,
+      "serial_number": 284,
+      "expense_date": "2026-04-04",
+      "description": "پیش پرداخت برای انجنیر وحید الله ولد حبیب الله بابت ماه حمل 1405",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "5000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 287,
+    "fields": {
+      "project": 5,
+      "serial_number": 285,
+      "expense_date": "2026-04-07",
+      "description": "پرداخت برای نورالدین بابت سیم تابی  و قالبکاری تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "13000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 288,
+    "fields": {
+      "project": 5,
+      "serial_number": 286,
+      "expense_date": "2026-04-08",
+      "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "51840.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 289,
+    "fields": {
+      "project": 5,
+      "serial_number": 287,
+      "expense_date": "2026-04-11",
+      "description": "پرداخت برای نورالدین بابت قالب کاری تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "20000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.6300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 290,
+    "fields": {
+      "project": 5,
+      "serial_number": 288,
+      "expense_date": "2026-04-11",
+      "description": "پیش پرداخت برای میرویس ولد عبدالبصیر بابت ماه حمل 1405",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.6300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 291,
+    "fields": {
+      "project": 5,
+      "serial_number": 289,
+      "expense_date": "2026-04-15",
+      "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیر للندر 6 بدست محمد هاشم",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "26000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "65.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 292,
+    "fields": {
+      "project": 5,
+      "serial_number": 290,
+      "expense_date": "2026-04-15",
+      "description": "پرداخت برای شرکت آهن آلات کوهدامن بابت خریداری سیخ گول 12 ملی به تعمیر للندر 6,   پرداخت برای شرکت آهن آلات کوهدامن بابت خریداری سیخ گول 10 ملی و 12 ملی به تعمیر للندر 6   ,  پرداخت هذا به نقد خریداری شده و پول آن توسط جاوید سکندری پرداخت گردیده",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "18627.00",
+      "exchange_rate": "65.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 293,
+    "fields": {
+      "project": 5,
+      "serial_number": 291,
+      "expense_date": "2026-04-16",
+      "description": "پرداخت برای شرکت آهن آلات کوهدامن بابت خریداری نقدی سیخ گول 20 ملی و 25 ملی به تعمیر للندر 6 و اجرا آن توسط صرافی خانی گل توسط چک نمبر 2383",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "10520.00",
+      "exchange_rate": "64.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 294,
+    "fields": {
+      "project": 5,
+      "serial_number": 292,
+      "expense_date": "2026-04-18",
+      "description": "پرداخت کرای جک های کرایی به تعداد 500 پایه از تاریخ 06 حمل 1405 الی  06 ثور 1405 فی ماه از قرار 25000 افغانی",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "25000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 295,
+    "fields": {
+      "project": 5,
+      "serial_number": 293,
+      "expense_date": "2026-04-21",
+      "description": "خریداری لباس ورزشی و پروتین توسط سمیر للندر",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "8500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 296,
+    "fields": {
+      "project": 5,
+      "serial_number": 294,
+      "expense_date": "2026-04-21",
+      "description": "خریداری تیل دیزل به جنراتور, رجه, گوشت مرغ, گاز,شکاستیب, پرداخت برای دو نفر گلکار بخاطری گانگریت ریزی, نان چاشت کاریگر ها, خریداری نخود , رب, روغن, پیاز و ترکاری به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "9200.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 297,
+    "fields": {
+      "project": 5,
+      "serial_number": 295,
+      "expense_date": "2026-04-21",
+      "description": "خریداری مبلایل, تیل دیزل , تار رجه, گاز, پل چرخ نازک و سیخ ویلدنک و پلک  به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "7805.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 298,
+    "fields": {
+      "project": 5,
+      "serial_number": 295,
+      "expense_date": "2026-04-21",
+      "description": "خریداری  یک دانه  گل ماله آهنی, یک دانه گل ماله پلاستیکی, گوشت, پیپ لیول, تیل دیزل, پیپ 3 فاز, پرداخت بل برق و پرداخت کرایه میرویس  و غیره به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "9215.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 299,
+    "fields": {
+      "project": 5,
+      "serial_number": 296,
+      "expense_date": "2026-04-21",
+      "description": "پرداخت برای آمر کنترول ساختمانی ناحیه بخاطری اخذ اجازه کانکریت در روز های بارانی شرنی داد و کرایه موتری وی,   خریداری تیل پطرول به ویبراتور ها, پرداخت برای کاریگران نوردین یک نفر گلکار دو نفر کاریگر در کانکریت ریزی پایه های جفت تعمیر للندر 6 , پرداخت نصب لوحه و ترمیم پروجکتور, پرداخت کرایه انجنیر وحید از للندر 6 به خانه , خریداری قوتی , پلک بابت صندوق برق تعمیر للندر 6, خریداری گوشت , پرداخت برای کاریگران نوردین یک نفر گلکار دو نفر کاریگر در روز کانکریت ریزی چت A تعمیر للندر 6, خریداری کاک سااختمانی به تعمیر للندر 6, خریداری نان و تیل دیزل به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "20570.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 300,
+    "fields": {
+      "project": 5,
+      "serial_number": 297,
+      "expense_date": "2026-04-21",
+      "description": "پرداخت معاش برای میرویس ولد عبدالبصیر بابت ماه حمل 1405 به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "9500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 301,
+    "fields": {
+      "project": 5,
+      "serial_number": 298,
+      "expense_date": "2026-04-21",
+      "description": "پرداخت معاش برای عبدالبصیر ولد رضا  بابت ماه حمل 1405 به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 302,
+    "fields": {
+      "project": 5,
+      "serial_number": 299,
+      "expense_date": "2026-04-21",
+      "description": "پرداخت معاش علی احمد ولد جما خان بابت حمل 1405 به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 303,
+    "fields": {
+      "project": 5,
+      "serial_number": 300,
+      "expense_date": "2026-04-21",
+      "description": "پیش پرداخت برای وحید الله ولد حبیب الله انجنیر ساحوی تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "5000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 304,
+    "fields": {
+      "project": 5,
+      "serial_number": 301,
+      "expense_date": "2026-04-21",
+      "description": "پرداخت معاش وحیدالله صدیقی ولد حبیب الله بابت ماه حمل 1405 به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "20000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 305,
+    "fields": {
+      "project": 5,
+      "serial_number": 302,
+      "expense_date": "2026-04-22",
+      "description": "پرداخت معاش محمد نادر ولد  صفی مقبول ساهی بابت ماه حمل 1405 به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 306,
+    "fields": {
+      "project": 5,
+      "serial_number": 303,
+      "expense_date": "2026-04-22",
+      "description": "پرداخت معاش سردار ولی بابت ماه حمل 1405 به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.8100",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 307,
+    "fields": {
+      "project": 5,
+      "serial_number": 304,
+      "expense_date": "2026-04-23",
+      "description": "پرداخت برای شرکت مواد ساختمانی شیر باز بابت خریداری ریگ شسته به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "5600.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 308,
+    "fields": {
+      "project": 5,
+      "serial_number": 305,
+      "expense_date": "2026-04-23",
+      "description": "پرداخت کرای جک ها به تعداد 500 پایه به تعمیر للندر 6 بابت ماه ثور 1405",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "25000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 309,
+    "fields": {
+      "project": 5,
+      "serial_number": 306,
+      "expense_date": "2026-04-23",
+      "description": "پرداخت برای محمد نسیم کرن کار بابت پاین کردن 8 بندل سیخ های گول خریداری شده از شرکت فقیر استیل به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "4000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 310,
+    "fields": {
+      "project": 5,
+      "serial_number": 307,
+      "expense_date": "2026-04-23",
+      "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "300000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.5000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 311,
+    "fields": {
+      "project": 5,
+      "serial_number": 308,
+      "expense_date": "2026-04-27",
+      "description": "پرداخت مصارف روزانه تعمیر للندر 6 توسط حاجی احسان از 21 آپریل الی 27 آپریل 2026 از قبیل خریداری تیل به جنراتور, کریه زرنج, سویچ, گوشت مرغ, گاز و غیره",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "8830.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.5300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 312,
+    "fields": {
+      "project": 5,
+      "serial_number": 309,
+      "expense_date": "2026-04-27",
+      "description": "پرداخت مصارف روزانه تعمیر للندر 6 توسط حاجی احسان از 21 آپریل الی 27 آپریل 2026 از قبیل خریداری آب, مارکر, تیل, پل برش, فیوز و غیره",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "15360.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.5300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 313,
+    "fields": {
+      "project": 5,
+      "serial_number": 310,
+      "expense_date": "2026-04-27",
+      "description": "پرداخت مصارف روزانه تعمیر للندر 6 توسط حاجی احسان از 21 آپریل الی 27 آپریل 2026 از قبیل خریداری پل, جالی, تیل دیزل, پرداخت به ترافیک, گوشت و غیره",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "23250.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.5300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 314,
+    "fields": {
+      "project": 5,
+      "serial_number": 311,
+      "expense_date": "2026-04-27",
+      "description": "پرداخت مصارف روزانه تعمیر للندر 6 توسط حاجی احسان از 21 آپریل الی 27 آپریل 2026 از قبیل خریداری لور, گوشت, ویبراتور, پرداخت به گلکار و کاریگر و غیره",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "8790.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.5300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 315,
+    "fields": {
+      "project": 5,
+      "serial_number": 312,
+      "expense_date": "2026-04-27",
+      "description": "پرداخت مصارف روزانه تعمیر للندر 6 توسط حاجی احسان از 21 آپریل الی 27 آپریل 2026 از قبیل خریداری مبلایل, رنگ روغنی, لور, تیل, فلتر دیزل, پرزه جنراتور و غیره",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "8420.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.5300",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 316,
+    "fields": {
+      "project": 5,
+      "serial_number": 313,
+      "expense_date": "2026-04-28",
+      "description": "خریداری سمنت ایرانی و انتقال آن از تعمیر للندر 5 به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "10200.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 317,
+    "fields": {
+      "project": 5,
+      "serial_number": 314,
+      "expense_date": "2026-04-30",
+      "description": "پرداخت برای شرکت هرات الکتریک بابت خریداری سیم جستی 1.5 ملی به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "1100.00",
+      "exchange_rate": "64.3000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 318,
+    "fields": {
+      "project": 5,
+      "serial_number": 315,
+      "expense_date": "2026-05-06",
+      "description": "پرداخت برای نوالدین بابت سیم توی تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "69000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.9500",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 319,
+    "fields": {
+      "project": 5,
+      "serial_number": 316,
+      "expense_date": "2026-05-07",
+      "description": "پیش پرداخت برای وحیدالله ولد حبیب الله انجینیر ساحوی تعمیر للندر 6 و ثور سال 1405",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "5000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "64.4000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 320,
+    "fields": {
+      "project": 5,
+      "serial_number": 317,
+      "expense_date": "2026-05-07",
+      "description": "پرداخت برای خورده فروشی خوست بابت خریداری رنج 21/23 و 22 به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "320.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.9000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 321,
+    "fields": {
+      "project": 5,
+      "serial_number": 318,
+      "expense_date": "2026-05-09",
+      "description": "خریداری تیل پطرول بابت موتر سایکل برای تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "100.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 322,
+    "fields": {
+      "project": 5,
+      "serial_number": 319,
+      "expense_date": "2026-05-11",
+      "description": "مصارف تعمیر للندر 6 از قبیل پول کردیت انجنیر, پرداخت برای کاریگران, خریداری  گاز, پرداخت برای آوردن سیخ گول, خریداری ویبراتور, تیل دیزل  برای جنراتور, گوشت و غیره",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "53300.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.7000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 323,
+    "fields": {
+      "project": 5,
+      "serial_number": 320,
+      "expense_date": "2026-05-11",
+      "description": "پرداخت برای محمد بشیر کرن بابت  تخلیه 25 بتدل سیخ گول خریداری از شرکت خریداری از شرکت خان ابسیل به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "12500.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.7000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 324,
+    "fields": {
+      "project": 5,
+      "serial_number": 321,
+      "expense_date": "2026-05-14",
+      "description": "پرداخت برای شرکت زمزم استیل بابت خریداری سیخ گول به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "10000.00",
+      "exchange_rate": "63.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 325,
+    "fields": {
+      "project": 5,
+      "serial_number": 322,
+      "expense_date": "2026-05-14",
+      "description": "پرداخت برای نوالدین بابت سیم تابی و قالبکاری به تعمیر للندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "200000.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "63.6000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 326,
+    "fields": {
+      "project": 5,
+      "serial_number": 323,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 327,
+    "fields": {
+      "project": 5,
+      "serial_number": 324,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 328,
+    "fields": {
+      "project": 5,
+      "serial_number": 325,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 329,
+    "fields": {
+      "project": 5,
+      "serial_number": 326,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 330,
+    "fields": {
+      "project": 5,
+      "serial_number": 327,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 331,
+    "fields": {
+      "project": 5,
+      "serial_number": 328,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 332,
+    "fields": {
+      "project": 5,
+      "serial_number": 329,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 333,
+    "fields": {
+      "project": 5,
+      "serial_number": 330,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 334,
+    "fields": {
+      "project": 5,
+      "serial_number": 331,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 335,
+    "fields": {
+      "project": 5,
+      "serial_number": 332,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 336,
+    "fields": {
+      "project": 5,
+      "serial_number": 333,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 337,
+    "fields": {
+      "project": 5,
+      "serial_number": 334,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 338,
+    "fields": {
+      "project": 5,
+      "serial_number": 330,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 339,
+    "fields": {
+      "project": 5,
+      "serial_number": 331,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 340,
+    "fields": {
+      "project": 5,
+      "serial_number": 332,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 341,
+    "fields": {
+      "project": 5,
+      "serial_number": 333,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 342,
+    "fields": {
+      "project": 5,
+      "serial_number": 334,
+      "expense_date": "NaT",
+      "description": "",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": "0.00",
+      "amount_usd": "0.00",
+      "exchange_rate": "0.0000",
+      "expense_type": "general"
+    }
+  }
+]

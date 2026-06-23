@@ -1,0 +1,161 @@
+import { useLanguage } from "../../hooks/useLanguage";
+import Card from "../ui/Card";
+
+const formatCurrency = (val) => {
+  if (val === null || val === undefined) return "0";
+
+  const num = parseFloat(val);
+
+  return num.toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+};
+
+function FinancialRow({ label, value, prefix = "", color, bold = false }) {
+  return (
+    <div className="flex items-center justify-between py-2.5 border-b border-[var(--border)] last:border-0">
+      <span className="text-sm text-[var(--muted)]">{label}</span>
+
+      <span
+        className={`text-sm ${bold ? "font-bold" : "font-medium"}`}
+        style={{ color: color || "var(--text)" }}
+      >
+        {prefix}
+        {formatCurrency(value)}
+      </span>
+    </div>
+  );
+}
+
+export default function FinancialOverview({ data }) {
+  if (!data) return null;
+  const { t } = useLanguage();
+  return (
+    <Card title={t("financialOverview.title")}>
+      <div className="space-y-0">
+        <FinancialRow
+          label={t("financialOverview.totalBudget")}
+          value={data.total_budget_all_projects}
+          bold
+        />
+
+        {/* Expenses */}
+        <div className="mt-4 mb-1">
+          <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
+            {t("financialOverview.expenses")}
+          </p>
+        </div>
+
+        <FinancialRow
+          label={t("financialOverview.expensesUsd")}
+          value={data.expenses?.total_usd}
+          prefix="$"
+        />
+
+        <FinancialRow
+          label={t("financialOverview.expensesAfn")}
+          value={data.expenses?.total_afn}
+          prefix="؋"
+        />
+
+        {/* Payroll */}
+        <div className="mt-4 mb-1">
+          <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
+            {t("financialOverview.payroll")}
+          </p>
+        </div>
+
+        <FinancialRow
+          label={t("financialOverview.netPayrollUsd")}
+          value={data.payroll?.net_usd}
+          prefix="$"
+        />
+
+        <FinancialRow
+          label={t("financialOverview.netPayrollAfn")}
+          value={data.payroll?.net_afn}
+          prefix="؋"
+        />
+
+        <FinancialRow
+          label={t("financialOverview.grossPayrollUsd")}
+          value={data.payroll?.gross_usd}
+          prefix="$"
+          color="var(--muted)"
+        />
+
+        <FinancialRow
+          label={t("financialOverview.grossPayrollAfn")}
+          value={data.payroll?.gross_afn}
+          prefix="؋"
+          color="var(--muted)"
+        />
+
+        {/* Contracts */}
+        <div className="mt-4 mb-1">
+          <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
+            {t("financialOverview.contracts")}
+          </p>
+        </div>
+
+        <FinancialRow
+          label={t("financialOverview.contractValueUsd")}
+          value={data.contracts?.total_contract_value_usd}
+          prefix="$"
+        />
+
+        <FinancialRow
+          label={t("financialOverview.contractValueAfn")}
+          value={data.contracts?.total_contract_value_afn}
+          prefix="؋"
+        />
+
+        <FinancialRow
+          label={t("financialOverview.paymentsMadeUsd")}
+          value={data.contracts?.total_payments_made_usd}
+          prefix="$"
+        />
+
+        <FinancialRow
+          label={t("financialOverview.paymentsMadeAfn")}
+          value={data.contracts?.total_payments_made_afn}
+          prefix="؋"
+        />
+
+        <FinancialRow
+          label={t("financialOverview.remainingUsd")}
+          value={data.contracts?.total_remaining_usd}
+          prefix="$"
+          color="var(--warning)"
+        />
+
+        <FinancialRow
+          label={t("financialOverview.remainingAfn")}
+          value={data.contracts?.total_remaining_afn}
+          prefix="؋"
+          color="var(--warning)"
+        />
+
+        {/* Grand Totals */}
+        <div className="mt-4 pt-3 border-t-2 border-[var(--border)]">
+          <FinancialRow
+            label={t("financialOverview.grandTotalOutflowUsd")}
+            value={data.grand_total_outflow?.usd}
+            prefix="$"
+            bold
+            color="var(--primary)"
+          />
+
+          <FinancialRow
+            label={t("financialOverview.grandTotalOutflowAfn")}
+            value={data.grand_total_outflow?.afn}
+            prefix="؋"
+            bold
+            color="var(--primary)"
+          />
+        </div>
+      </div>
+    </Card>
+  );
+}

@@ -1,0 +1,62 @@
+/* =========================
+   LIGHT
+========================= */
+:root {
+  --bg: #ffffff;
+  --text: #111111;
+  --muted: #6b7280;
+
+  --card: #f9fafb;
+  --border: #e5e7eb;
+
+  --primary: #2563eb;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --warning: #d97706;
+
+  --hover: #f3f4f6;
+}
+
+/* =========================
+   DARK
+========================= */
+.dark {
+  /* DARK THEME */
+
+  --bg: #0f172a;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+
+  --card: #1e293b;
+  --border: #334155;
+
+  --primary: #3b82f6;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+
+  --hover: #273449;
+
+  --shadow: rgba(0, 0, 0, 0.4);
+}
+
+/* =========================
+   CONSTRUCTION PRO
+========================= */
+.construction {
+  --bg: #f4f1ea;
+  --text: #2b2b2b;
+  --muted: #6b7280;
+
+  --card: #ffffff;
+  --border: #d6d3d1;
+
+  /* Construction Orange */
+  --primary: #ea580c;
+
+  --danger: #dc2626;
+  --success: #15803d;
+  --warning: #ca8a04;
+
+  --hover: #f5e7d8;
+}

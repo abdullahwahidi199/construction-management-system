@@ -1,0 +1,458 @@
+import React, { useState, useMemo } from "react";
+import useFetch from "../../../hooks/useFetch";
+import InvoiceFormModal from "./InvoiceFormModal";
+import ContractInvoiceDetails from "../../contracts/ContractInvoiceDetails";
+
+const STATUS_COLORS = {
+  pending: "var(--warning)",
+  approved: "var(--primary)",
+  partially_paid: "var(--warning)",
+  paid: "var(--success)",
+  cancelled: "var(--danger)",
+};
+
+const STATUS_FILTERS = [
+  { value: "", label: "All Statuses" },
+  { value: "pending", label: "Pending" },
+  { value: "approved", label: "Approved" },
+  { value: "partially_paid", label: "Partially Paid" },
+  { value: "paid", label: "Paid" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+// Shared input style for consistency
+const inputStyle = {
+  padding: "0.5rem 0.75rem",
+  border: "1px solid var(--border)",
+  borderRadius: "6px",
+  background: "var(--card)",
+  color: "var(--text)",
+  fontSize: "0.9rem",
+  outline: "none",
+};
+
+export default function ContractInvoicesPage({ contractID, contractCurrency }) {
+  const {
+    data: invoices,
+    loading,
+    error,
+  } = useFetch(`invoices/?contract=${contractID}`);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [viewInvoiceId, setViewInvoiceId] = useState(null);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+
+  // --- Filter State ---
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
+
+  // --- Handlers ---
+  const handleOpenCreate = () => {
+    setSelectedInvoice(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (invoice) => {
+    setSelectedInvoice(invoice);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedInvoice(null);
+  };
+
+  const handleSuccess = () => {
+    handleCloseModal();
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("");
+    setDateRange({ start: "", end: "" });
+  };
+
+  // --- Advanced Filtering Logic ---
+  const filteredInvoices = useMemo(() => {
+    if (!invoices) return [];
+
+    // Pre-parse date range once per render
+    const start = dateRange.start ? new Date(dateRange.start) : null;
+    const end = dateRange.end ? new Date(dateRange.end) : null;
+
+    return invoices.filter((inv) => {
+      // 1. Status Filter
+      const matchesStatus = !statusFilter || inv.status === statusFilter;
+
+      // 2. Text Search
+      const q = searchQuery.toLowerCase().trim();
+      if (!q) {
+        // If no text query, check status + date
+        const invDate = new Date(inv.invoice_date);
+        let matchesDate = true;
+        if (start && invDate < start) matchesDate = false;
+        if (end) {
+          const endTime = new Date(end);
+          endTime.setHours(23, 59, 59, 999); // Include entire end day
+          if (invDate > endTime) matchesDate = false;
+        }
+        return matchesStatus && matchesDate;
+      }
+
+      // 3. Combined Text + Status + Date
+      const matchesSearch =
+        inv.invoice_number?.toLowerCase().includes(q) ||
+        inv.project_name?.toLowerCase().includes(q) ||
+        inv.subcontractor_name?.toLowerCase().includes(q);
+
+      const invDate = new Date(inv.invoice_date);
+      let matchesDate = true;
+      if (start && invDate < start) matchesDate = false;
+      if (end) {
+        const endTime = new Date(end);
+        endTime.setHours(23, 59, 59, 999);
+        if (invDate > endTime) matchesDate = false;
+      }
+
+      return matchesStatus && matchesSearch && matchesDate;
+    });
+  }, [invoices, searchQuery, statusFilter, dateRange]);
+
+  const hasActiveFilters =
+    searchQuery || statusFilter || dateRange.start || dateRange.end;
+  const emptyMessage = hasActiveFilters
+    ? "No matching invoices found for the selected criteria."
+    : "No invoices found for this contract.";
+
+  if (loading)
+    return (
+      <div
+        style={{ padding: "2rem", textAlign: "center", color: "var(--muted)" }}
+      >
+        Loading invoices...
+      </div>
+    );
+  if (error)
+    return (
+      <div
+        style={{ padding: "2rem", textAlign: "center", color: "var(--danger)" }}
+      >
+        Error: {typeof error === "object" ? JSON.stringify(error) : error}
+      </div>
+    );
+
+  return (
+    <div
+      style={{
+        padding: "2rem",
+        background: "var(--bg)",
+        color: "var(--text)",
+        minHeight: "100vh",
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1.5rem",
+          flexWrap: "wrap",
+          gap: "1rem",
+        }}
+      >
+        <h1 style={{ fontSize: "1.5rem", fontWeight: "bold", margin: 0 }}>
+          Contract Invoices
+        </h1>
+        <button
+          onClick={handleOpenCreate}
+          style={{
+            background: "var(--primary)",
+            color: "#fff",
+            border: "none",
+            padding: "0.6rem 1.2rem",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: "500",
+            fontSize: "0.9rem",
+          }}
+        >
+          + New Invoice
+        </button>
+      </div>
+
+      {/* Filter Bar */}
+      <div
+        style={{
+          display: "flex",
+          gap: "0.8rem",
+          marginBottom: "1rem",
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        {/* Search Input */}
+        <div style={{ flex: "1 1 200px" }}>
+          <input
+            type="text"
+            placeholder="Search by Invoice #, Project..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ ...inputStyle, width: "100%" }}
+          />
+        </div>
+
+        {/* Status Select */}
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          style={{ ...inputStyle, minWidth: "130px", cursor: "pointer" }}
+        >
+          {STATUS_FILTERS.map((s) => (
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+
+        {/* Start Date */}
+        <input
+          type="date"
+          value={dateRange.start}
+          onChange={(e) =>
+            setDateRange((prev) => ({ ...prev, start: e.target.value }))
+          }
+          placeholder="Start Date"
+          style={{ ...inputStyle, width: "150px", colorScheme: "dark" }} // colorScheme ensures dark mode date picker works
+        />
+
+        {/* End Date */}
+        <input
+          type="date"
+          value={dateRange.end}
+          onChange={(e) =>
+            setDateRange((prev) => ({ ...prev, end: e.target.value }))
+          }
+          placeholder="End Date"
+          style={{ ...inputStyle, width: "150px", colorScheme: "dark" }}
+        />
+
+        {/* Clear Button */}
+        {hasActiveFilters && (
+          <button
+            onClick={handleClearFilters}
+            style={{
+              background: "transparent",
+              border: "1px solid var(--danger)",
+              color: "var(--danger)",
+              padding: "0.5rem 0.8rem",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "0.85rem",
+              fontWeight: "500",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+            }}
+          >
+            ✕ Clear Filters
+          </button>
+        )}
+      </div>
+
+      {/* Results Count */}
+      <div
+        style={{
+          marginBottom: "0.5rem",
+          fontSize: "0.85rem",
+          color: "var(--muted)",
+        }}
+      >
+        Showing{" "}
+        <span style={{ color: "var(--text)", fontWeight: "bold" }}>
+          {filteredInvoices.length}
+        </span>{" "}
+        of {invoices?.length || 0} invoices
+      </div>
+
+      {/* Table */}
+      <div
+        style={{
+          overflowX: "auto",
+          background: "var(--card)",
+          borderRadius: "8px",
+          border: "1px solid var(--border)",
+          boxShadow: "0 2px 8px var(--shadow, rgba(0,0,0,0.05))",
+        }}
+      >
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            minWidth: "900px",
+          }}
+        >
+          <thead>
+            <tr style={{ borderBottom: "1px solid var(--border)" }}>
+              {[
+                "Invoice #",
+                "Project",
+                "Subcontractor",
+                "Date",
+                "Due Date",
+                "Amount",
+                "Status",
+                "Actions",
+              ].map((h) => (
+                <th
+                  key={h}
+                  style={{
+                    padding: "1rem",
+                    textAlign: "left",
+                    fontSize: "0.8rem",
+                    color: "var(--muted)",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filteredInvoices?.length === 0 ? (
+              <tr>
+                <td
+                  colSpan="8"
+                  style={{
+                    padding: "3rem",
+                    textAlign: "center",
+                    color: "var(--muted)",
+                    fontStyle: "italic",
+                  }}
+                >
+                  {emptyMessage}
+                </td>
+              </tr>
+            ) : (
+              filteredInvoices.map((inv) => (
+                <tr
+                  key={inv.id}
+                  style={{
+                    borderBottom: "1px solid var(--border)",
+                    transition: "background 0.2s",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.background = "var(--hover)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.background = "transparent")
+                  }
+                >
+                  <td style={{ padding: "1rem", fontWeight: "500" }}>
+                    {inv.invoice_number}
+                  </td>
+                  <td style={{ padding: "1rem" }}>{inv.project_name || "-"}</td>
+                  <td style={{ padding: "1rem" }}>
+                    {inv.subcontractor_name || "-"}
+                  </td>
+                  <td style={{ padding: "1rem" }}>
+                    {new Date(inv.invoice_date).toLocaleDateString()}
+                  </td>
+                  <td style={{ padding: "1rem" }}>
+                    {inv.due_date
+                      ? new Date(inv.due_date).toLocaleDateString()
+                      : "-"}
+                  </td>
+                  <td
+                    style={{
+                      padding: "1rem",
+                      fontWeight: "600",
+                      fontFamily: "monospace",
+                    }}
+                  >
+                    {contractCurrency || "$"}
+                    {Number(inv.amount).toFixed(2)}
+                  </td>
+                  <td style={{ padding: "1rem" }}>
+                    <span
+                      style={{
+                        background: STATUS_COLORS[inv.status] || "var(--muted)",
+                        color: "#fff",
+                        padding: "0.25rem 0.6rem",
+                        borderRadius: "9999px",
+                        fontSize: "0.75rem",
+                        fontWeight: "600",
+                        textTransform: "capitalize",
+                        display: "inline-block",
+                      }}
+                    >
+                      {inv.status.replace("_", " ")}
+                    </span>
+                  </td>
+                  <td style={{ padding: "1rem" }}>
+                    <button
+                      onClick={() => {
+                        setViewInvoiceId(inv.id);
+                        setIsViewOpen(true);
+                      }}
+                      style={{
+                        background: "transparent",
+                        border: "1px solid var(--border)",
+                        padding: "0.3rem 0.6rem",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        color: "var(--text)",
+                        fontSize: "0.8rem",
+                        marginRight: "0.5rem",
+                      }}
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => handleOpenEdit(inv)}
+                      style={{
+                        background: "transparent",
+                        border: "1px solid var(--border)",
+                        padding: "0.3rem 0.6rem",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        color: "var(--text)",
+                        fontSize: "0.8rem",
+                      }}
+                    >
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {isModalOpen && (
+        <InvoiceFormModal
+          invoice={selectedInvoice}
+          contractID={contractID}
+          onClose={handleCloseModal}
+          onSuccess={handleSuccess}
+        />
+      )}
+
+      {isViewOpen && (
+        <ContractInvoiceDetails
+          id={viewInvoiceId}
+          onClose={() => {
+            setIsViewOpen(false);
+            setViewInvoiceId(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}

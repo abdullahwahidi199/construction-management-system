@@ -1,0 +1,195 @@
+{
+  "managerNavbar": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "subContractors": "Sub Contractors",
+    "contracts": "Contracts",
+    "expenses": "Expenses",
+    "employees": "Employees",
+    "payrolls": "Payrolls",
+    "attendance": "Attendance",
+    "brand": "ManagerHub"
+  },
+
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of your construction management system",
+    "failedTitle": "Failed to load dashboard",
+    "failedMessage": "Something went wrong",
+    "tryAgain": "Try Again",
+    "lastUpdated": "Last updated",
+    "refresh": "Refresh"
+  },
+  "kpi": {
+    "totalProjects": "Total Projects",
+    "ongoing": "ongoing",
+    "completed": "completed",
+    "totalOutflow": "Total Outflow",
+    "activeContracts": "Active Contracts",
+    "activeEmployees": "Active Employees",
+    "thisMonthExpenses": "This Month Expenses",
+    "overdueProjects": "Overdue Projects",
+    "needAttention": "Need attention",
+    "allOnTrack": "All on track"
+  },
+  "alerts": {
+    "title": "Alerts & Notifications",
+    "empty": "No alerts — everything looks good!",
+    "criticalAlert": "Critical Alert",
+    "criticalAlerts": "Critical Alerts",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+
+  "financialOverview": {
+    "title": "Financial Overview",
+
+    "totalBudget": "Total Budget",
+
+    "expenses": "Expenses",
+    "expensesUsd": "Expenses (USD)",
+    "expensesAfn": "Expenses (AFN)",
+
+    "payroll": "Payroll",
+    "netPayrollUsd": "Net Payroll (USD)",
+    "netPayrollAfn": "Net Payroll (AFN)",
+    "grossPayrollUsd": "Gross Payroll (USD)",
+    "grossPayrollAfn": "Gross Payroll (AFN)",
+
+    "contracts": "Contracts",
+    "contractValueUsd": "Contract Value (USD)",
+    "contractValueAfn": "Contract Value (AFN)",
+    "paymentsMadeUsd": "Payments Made (USD)",
+    "paymentsMadeAfn": "Payments Made (AFN)",
+    "remainingUsd": "Remaining (USD)",
+    "remainingAfn": "Remaining (AFN)",
+
+    "grandTotalOutflowUsd": "Grand Total Outflow (USD)",
+    "grandTotalOutflowAfn": "Grand Total Outflow (AFN)"
+  },
+
+  "expenseSummary": {
+    "title": "Expense Summary",
+    "entries": "entries",
+    "monthlyTrend": "Monthly Trend (Last 12 Months)",
+    "noData": "No expense data available",
+    "byCategory": "By Category",
+    "byProject": "By Project",
+
+    "general": "General",
+    "materials": "Materials",
+    "staffSalary": "Staff Salary",
+    "dailyWages": "Daily Wages",
+    "contracts": "Contracts",
+    "equipment": "Equipment",
+    "utilities": "Utilities",
+    "other": "Other",
+
+    "jan": "Jan",
+    "feb": "Feb",
+    "mar": "Mar",
+    "apr": "Apr",
+    "may": "May",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Aug",
+    "sep": "Sep",
+    "oct": "Oct",
+    "nov": "Nov",
+    "dec": "Dec"
+  },
+
+  "budgetComparison": {
+    "title": "Budget vs Actual Spending",
+    "emptyTitle": "Budget vs Actual",
+    "noData": "No active projects with budget data",
+
+    "budget": "Budget",
+    "spent": "Spent",
+    "utilization": "Utilization",
+
+    "overBudget": "over budget",
+    "overBudgetProjects": "Over Budget Projects",
+    "used": "used"
+  },
+
+  "projectOverview": {
+    "title": "Project Overview",
+    "total": "total",
+
+    "byStatus": "By Status",
+    "statusBreakdown": "Status Breakdown",
+    "byPropertyType": "By Property Type",
+
+    "noProjects": "No projects yet",
+
+    "planning": "Planning",
+    "ongoing": "Ongoing",
+    "completed": "Completed",
+    "onHold": "On Hold",
+
+    "residential": "Residential",
+    "commercial": "Commercial",
+    "mixed": "Mixed",
+
+    "overdueProject": "overdue project",
+    "overdueProjects": "overdue projects",
+    "due": "Due"
+  },
+
+  "contractSection": {
+    "title": "Contracts & Subcontractors",
+    "contracts": "contracts",
+
+    "totalValue": "Total Value",
+    "totalPaid": "Total Paid",
+    "retentionHeld": "Retention Held",
+    "avgCompletion": "Avg Completion",
+
+    "contractStatus": "Contract Status",
+
+    "endingWithin30Days": "Ending Within 30 Days",
+
+    "subcontractors": "Subcontractors",
+    "active": "Active",
+    "inactive": "Inactive",
+
+    "draft": "Draft",
+    "activeStatus": "Active",
+    "completed": "Completed",
+    "terminated": "Terminated",
+    "cancelled": "Cancelled"
+  },
+
+  "workforceSection": {
+    "title": "Workforce & Attendance",
+
+    "active": "active",
+
+    "total": "Total",
+    "activeEmployees": "Active",
+    "inactiveEmployees": "Inactive",
+
+    "todayAttendance": "Today's Attendance",
+
+    "present": "Present",
+    "absent": "Absent",
+    "halfDay": "Half Day",
+    "leave": "Leave",
+    "unmarked": "Unmarked",
+
+    "weeklyTrend": "Weekly Trend",
+
+    "byDepartment": "By Department",
+
+    "management": "Management",
+    "engineering": "Engineering",
+    "construction": "Construction",
+    "administration": "Administration",
+    "finance": "Finance",
+    "hr": "Human Resources",
+    "procurement": "Procurement",
+    "safety": "Safety"
+  }
+}

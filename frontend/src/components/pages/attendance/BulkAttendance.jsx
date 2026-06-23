@@ -1,0 +1,518 @@
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import useAttendance from "../../../hooks/useAttendance";
+import instance from "../../../api/axiosInstance";
+
+// Compact status indicator dot
+const StatusDot = ({ status }) => {
+  const colors = {
+    present: "bg-green-500",
+    half_day: "bg-yellow-500",
+    leave: "bg-blue-500",
+    absent: "bg-red-500",
+  };
+  return (
+    <span
+      className={`inline-block h-2 w-2 rounded-full ${colors[status] || "bg-gray-300"}`}
+      title={status}
+    />
+  );
+};
+
+function BulkAttendance() {
+  const { bulkMarkAttendance, loading, error, setError } = useAttendance();
+
+  const [employees, setEmployees] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
+  const [attendanceData, setAttendanceData] = useState({});
+  const [isLoadingExisting, setIsLoadingExisting] = useState(false);
+  const [result, setResult] = useState(null);
+  const [activeDepartment, setActiveDepartment] = useState("all");
+
+  // Extract unique departments from employees
+  const departments = useMemo(() => {
+    const depts = new Set(employees.map((e) => e.department || "unassigned"));
+    return ["all", ...Array.from(depts).sort()];
+  }, [employees]);
+
+  // Filter employees by department
+  const filteredEmployees = useMemo(() => {
+    if (activeDepartment === "all") return employees;
+    return employees.filter(
+      (e) => (e.department || "unassigned") === activeDepartment,
+    );
+  }, [employees, activeDepartment]);
+
+  // Group employees by department for counts
+  const departmentCounts = useMemo(() => {
+    const counts = {};
+    employees.forEach((emp) => {
+      const dept = emp.department || "unassigned";
+      counts[dept] = (counts[dept] || 0) + 1;
+    });
+    return counts;
+  }, [employees]);
+
+  const loadEmployees = useCallback(async () => {
+    try {
+      const res = await instance.get("/employees");
+      const data = res?.data?.results ?? res?.data ?? [];
+      // Sort by name
+      data.sort((a, b) => {
+        const nameA = (
+          a.full_name || `${a.first_name} ${a.last_name}`
+        ).toLowerCase();
+        const nameB = (
+          b.full_name || `${b.first_name} ${b.last_name}`
+        ).toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+      setEmployees(data);
+    } catch (err) {
+      console.error("Failed to load employees:", err);
+      setError("Failed to load employees. Please try again.");
+    }
+  }, [setError]);
+
+  const loadExistingAttendance = useCallback(async () => {
+    setIsLoadingExisting(true);
+    setError(null);
+    try {
+      const res = await instance.get("/attendance/", {
+        params: { date: selectedDate },
+      });
+      const records = res?.data?.results ?? res?.data ?? [];
+      const mapped = records.reduce((acc, record) => {
+        const employeeId =
+          typeof record.employee === "object"
+            ? record.employee.id
+            : record.employee;
+        if (!employeeId) return acc;
+        acc[employeeId] = {
+          employee: employeeId,
+          status: record.status || "",
+          check_in: record.check_in || "",
+          check_out: record.check_out || "",
+          overtime_hours:
+            record.overtime_hours === 0 || record.overtime_hours
+              ? Number(record.overtime_hours)
+              : "",
+          note: record.note || "",
+          isExisting: true,
+        };
+        return acc;
+      }, {});
+      setAttendanceData(mapped);
+    } catch (err) {
+      console.error("Failed to load existing attendance:", err);
+      setError("Failed to load attendance for the selected date.");
+    } finally {
+      setIsLoadingExisting(false);
+    }
+  }, [selectedDate, setError]);
+
+  useEffect(() => {
+    loadEmployees();
+  }, [loadEmployees]);
+
+  useEffect(() => {
+    loadExistingAttendance();
+  }, [loadExistingAttendance]);
+
+  const handleFieldChange = (employeeId, field, value) => {
+    setAttendanceData((prev) => {
+      const current = prev[employeeId] || { employee: employeeId };
+      return {
+        ...prev,
+        [employeeId]: {
+          ...current,
+          [field]: value,
+          isModified: true,
+        },
+      };
+    });
+  };
+
+  const handleStatusChange = (employeeId, status) => {
+    handleFieldChange(employeeId, "status", status);
+    if (status === "absent") {
+      handleFieldChange(employeeId, "check_in", "");
+      handleFieldChange(employeeId, "check_out", "");
+      handleFieldChange(employeeId, "overtime_hours", "");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setResult(null);
+
+    const records = Object.values(attendanceData).filter((record) => {
+      return record?.status && record.status.trim() !== "";
+    });
+
+    if (records.length === 0) {
+      setError("Please mark attendance for at least one employee.");
+      return;
+    }
+
+    const normalized = records.map((record) => ({
+      employee: record.employee,
+      status: record.status,
+      check_in: record.check_in || null,
+      check_out: record.check_out || null,
+      overtime_hours:
+        record.overtime_hours === "" || record.overtime_hours === null
+          ? 0
+          : Number(record.overtime_hours) || 0,
+      note: record.note?.trim() || "",
+    }));
+
+    try {
+      const response = await bulkMarkAttendance({
+        date: selectedDate,
+        records: normalized,
+      });
+      setResult(response);
+      await loadExistingAttendance();
+    } catch (err) {
+      console.error("Failed to submit attendance:", err);
+    }
+  };
+
+  // Stats for current view
+  const stats = useMemo(() => {
+    const data = filteredEmployees.map((e) => attendanceData[e.id]);
+    return {
+      total: filteredEmployees.length,
+      marked: data.filter((d) => d?.status).length,
+      existing: data.filter((d) => d?.isExisting && !d?.isModified).length,
+      modified: data.filter((d) => d?.isModified).length,
+    };
+  }, [filteredEmployees, attendanceData]);
+
+  const getDisplayDept = (dept) => {
+    if (dept === "all") return `All Departments (${employees.length})`;
+    if (dept === "unassigned")
+      return `Unassigned (${departmentCounts[dept] || 0})`;
+    return `${dept.charAt(0).toUpperCase() + dept.slice(1)} (${departmentCounts[dept] || 0})`;
+  };
+
+  return (
+    <div className="space-y-4" style={{ backgroundColor: "var(--card)" }}>
+      {/* Header Section */}
+      <div
+        className="rounded-lg border p-4"
+        style={{ borderColor: "var(--border)" }}
+      >
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">Bulk Attendance</h2>
+            <p className="text-xs" style={{ color: "var(--muted)" }}>
+              {stats.marked}/{stats.total} marked in current view •{" "}
+              {stats.modified} modified
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="rounded border px-3 py-1.5 text-sm"
+              style={{
+                borderColor: "var(--border)",
+                backgroundColor: "var(--bg)",
+                color: "var(--text)",
+              }}
+            />
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={loading || isLoadingExisting}
+              className="rounded px-4 py-1.5 text-sm font-medium text-white disabled:opacity-60"
+              style={{ backgroundColor: "var(--primary)" }}
+            >
+              {loading ? "Saving..." : "Save All"}
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <div className="mt-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        {result && (
+          <div
+            className="mt-3 rounded border px-3 py-2 text-sm"
+            style={{
+              borderColor: "var(--border)",
+              backgroundColor: "var(--hover)",
+            }}
+          >
+            <span className="font-medium" style={{ color: "var(--success)" }}>
+              {result.created_count || 0} created
+            </span>
+            ,{" "}
+            <span className="font-medium" style={{ color: "var(--primary)" }}>
+              {result.updated_count || 0} updated
+            </span>
+            {result.error_count > 0 && (
+              <span
+                className="ml-2 font-medium"
+                style={{ color: "var(--danger)" }}
+              >
+                {result.error_count} errors
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Department Tabs */}
+      <div className="border-b" style={{ borderColor: "var(--border)" }}>
+        <div className="flex gap-1 overflow-x-auto pb-1">
+          {departments.map((dept) => (
+            <button
+              key={dept}
+              onClick={() => setActiveDepartment(dept)}
+              className="whitespace-nowrap rounded-t-lg px-4 py-2 text-sm font-medium transition-colors"
+              style={{
+                backgroundColor:
+                  activeDepartment === dept ? "var(--bg)" : "transparent",
+                color:
+                  activeDepartment === dept ? "var(--primary)" : "var(--muted)",
+                borderBottom:
+                  activeDepartment === dept
+                    ? "2px solid var(--primary)"
+                    : "none",
+              }}
+            >
+              {getDisplayDept(dept)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Compact Table */}
+      <div
+        className="rounded-lg border"
+        style={{ borderColor: "var(--border)", backgroundColor: "var(--bg)" }}
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead
+              className="sticky top-0 text-left text-xs uppercase"
+              style={{ backgroundColor: "var(--hover)", color: "var(--muted)" }}
+            >
+              <tr>
+                <th className="px-3 py-2 font-medium">Employee</th>
+                <th className="px-3 py-2 font-medium w-28">Status</th>
+                <th className="px-3 py-2 font-medium w-24">In</th>
+                <th className="px-3 py-2 font-medium w-24">Out</th>
+                <th className="px-3 py-2 font-medium w-20">OT</th>
+                <th className="px-3 py-2 font-medium">Note</th>
+                <th className="px-3 py-2 font-medium w-8"></th>
+              </tr>
+            </thead>
+            <tbody
+              className="divide-y"
+              style={{ borderColor: "var(--border)" }}
+            >
+              {filteredEmployees.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="px-3 py-8 text-center text-sm"
+                    style={{ color: "var(--muted)" }}
+                  >
+                    No employees in this department
+                  </td>
+                </tr>
+              ) : (
+                filteredEmployees.map((emp) => {
+                  const data = attendanceData[emp.id] || {};
+                  const isAbsent = data.status === "absent";
+                  const hasData = !!data.status;
+                  const isExisting = data.isExisting && !data.isModified;
+                  const isModified = data.isModified;
+
+                  return (
+                    <tr
+                      key={emp.id}
+                      className="hover:opacity-80 transition-opacity"
+                      style={{
+                        backgroundColor: isModified
+                          ? "rgba(251, 191, 36, 0.1)" // Light amber for modified
+                          : isExisting
+                            ? "rgba(34, 197, 94, 0.05)" // Very light green for existing
+                            : "transparent",
+                      }}
+                    >
+                      <td className="px-3 py-2">
+                        <div className="font-medium text-sm">
+                          {emp.full_name ||
+                            `${emp.first_name} ${emp.last_name}`}
+                        </div>
+                        <div
+                          className="text-xs"
+                          style={{ color: "var(--muted)" }}
+                        >
+                          {emp.employee_id}
+                        </div>
+                      </td>
+
+                      <td className="px-3 py-2">
+                        <select
+                          value={data.status || ""}
+                          onChange={(e) =>
+                            handleStatusChange(emp.id, e.target.value)
+                          }
+                          className="w-full rounded border px-2 py-1 text-xs"
+                          style={{
+                            borderColor: "var(--border)",
+                            backgroundColor: "var(--bg)",
+                            color: "var(--text)",
+                          }}
+                        >
+                          <option value="">-</option>
+                          <option value="present">P</option>
+                          <option value="absent">A</option>
+                          <option value="half_day">HD</option>
+                          <option value="leave">L</option>
+                        </select>
+                      </td>
+
+                      <td className="px-3 py-2">
+                        <input
+                          type="time"
+                          value={data.check_in || ""}
+                          onChange={(e) =>
+                            handleFieldChange(
+                              emp.id,
+                              "check_in",
+                              e.target.value,
+                            )
+                          }
+                          disabled={!hasData || isAbsent}
+                          className="w-full rounded border px-1 py-1 text-xs disabled:opacity-40"
+                          style={{
+                            borderColor: "var(--border)",
+                            backgroundColor: "var(--bg)",
+                            color: "var(--text)",
+                          }}
+                        />
+                      </td>
+
+                      <td className="px-3 py-2">
+                        <input
+                          type="time"
+                          value={data.check_out || ""}
+                          onChange={(e) =>
+                            handleFieldChange(
+                              emp.id,
+                              "check_out",
+                              e.target.value,
+                            )
+                          }
+                          disabled={!hasData || isAbsent || !data.check_in}
+                          className="w-full rounded border px-1 py-1 text-xs disabled:opacity-40"
+                          style={{
+                            borderColor: "var(--border)",
+                            backgroundColor: "var(--bg)",
+                            color: "var(--text)",
+                          }}
+                        />
+                      </td>
+
+                      <td className="px-3 py-2">
+                        <input
+                          type="number"
+                          step="0.5"
+                          min="0"
+                          value={data.overtime_hours ?? ""}
+                          onChange={(e) =>
+                            handleFieldChange(
+                              emp.id,
+                              "overtime_hours",
+                              e.target.value,
+                            )
+                          }
+                          disabled={!hasData || isAbsent}
+                          className="w-full rounded border px-1 py-1 text-xs disabled:opacity-40"
+                          style={{
+                            borderColor: "var(--border)",
+                            backgroundColor: "var(--bg)",
+                            color: "var(--text)",
+                          }}
+                          placeholder="0"
+                        />
+                      </td>
+
+                      <td className="px-3 py-2">
+                        <input
+                          type="text"
+                          value={data.note || ""}
+                          onChange={(e) =>
+                            handleFieldChange(emp.id, "note", e.target.value)
+                          }
+                          className="w-full rounded border px-2 py-1 text-xs"
+                          style={{
+                            borderColor: "var(--border)",
+                            backgroundColor: "var(--bg)",
+                            color: "var(--text)",
+                          }}
+                          placeholder="-"
+                        />
+                      </td>
+
+                      <td className="px-3 py-2 text-center">
+                        {isExisting && <StatusDot status={data.status} />}
+                        {isModified && (
+                          <span
+                            className="text-xs text-amber-600 font-bold"
+                            title="Modified"
+                          >
+                            *
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div
+        className="flex flex-wrap gap-4 text-xs"
+        style={{ color: "var(--muted)" }}
+      >
+        <span className="flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-green-500"></span> Present
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-red-500"></span> Absent
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-yellow-500"></span> Half Day
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-blue-500"></span> Leave
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-gray-300"></span> Not Marked
+        </span>
+        <span className="ml-auto">* Modified</span>
+      </div>
+    </div>
+  );
+}
+
+export default BulkAttendance;
