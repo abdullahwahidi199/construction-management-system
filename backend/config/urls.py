@@ -54,6 +54,7 @@ router.register(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/auth/', include("accounts.urls")),
     path('api/projects/', include("project.urls")),
     path('api/expenses/', include("expenses.urls")),
     path('api/dashboard/', include("dashboard.urls")),

@@ -28,7 +28,7 @@ import instance from "../../api/axiosInstance";
 import { use } from "react";
 import ExpenseCreateModal from "./ExpenseCreateModal";
 
-export default function ExpensesMain() {
+export default function ExpensesMain({ dataEntryMode = false }) {
   const [page, setPage] = useState(1);
 
   // Search & Filter State
@@ -662,9 +662,10 @@ export default function ExpensesMain() {
         /* ── Expenses List ────────────────────────── */
         <ExpenseList
           expenses={expenseList}
-          onDelete={handleExpenseDelete}
+          onDelete={dataEntryMode ? undefined : handleExpenseDelete}
           onUpdate={handleExpenseUpdate}
           onRefresh={handleRefresh}
+          canDelete={!dataEntryMode}
         />
       )}
 

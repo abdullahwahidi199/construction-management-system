@@ -20,9 +20,15 @@ from .serializers import (
     AlertsSummarySerializer,
     ActivitySerializer,
 )
+from accounts.permissions import RBACPermission
 
 
-class FullDashboardView(APIView):
+class DashboardAPIView(APIView):
+    permission_classes = [RBACPermission]
+    rbac_resource = "dashboard"
+
+
+class FullDashboardView(DashboardAPIView):
     """
     GET /api/dashboard/
     Returns the complete dashboard payload with all sections.
@@ -40,7 +46,7 @@ class FullDashboardView(APIView):
 # (for lazy-loading or refreshing specific widgets)
 # ════════════════════════════════════════════
 
-class ProjectOverviewView(APIView):
+class ProjectOverviewView(DashboardAPIView):
     """GET /api/dashboard/projects/"""
 
     def get(self, request):
@@ -49,7 +55,7 @@ class ProjectOverviewView(APIView):
         return Response(serializer.data)
 
 
-class FinancialOverviewView(APIView):
+class FinancialOverviewView(DashboardAPIView):
     """GET /api/dashboard/financial/"""
 
     def get(self, request):
@@ -58,7 +64,7 @@ class FinancialOverviewView(APIView):
         return Response(serializer.data)
 
 
-class ExpenseSummaryView(APIView):
+class ExpenseSummaryView(DashboardAPIView):
     """GET /api/dashboard/expenses/"""
 
     def get(self, request):
@@ -67,7 +73,7 @@ class ExpenseSummaryView(APIView):
         return Response(serializer.data)
 
 
-class ExpenseThisMonthView(APIView):
+class ExpenseThisMonthView(DashboardAPIView):
     """GET /api/dashboard/expenses/this-month/"""
 
     def get(self, request):
@@ -76,7 +82,7 @@ class ExpenseThisMonthView(APIView):
         return Response(serializer.data)
 
 
-class WorkforceSummaryView(APIView):
+class WorkforceSummaryView(DashboardAPIView):
     """GET /api/dashboard/workforce/"""
 
     def get(self, request):
@@ -85,7 +91,7 @@ class WorkforceSummaryView(APIView):
         return Response(serializer.data)
 
 
-class AttendanceSummaryView(APIView):
+class AttendanceSummaryView(DashboardAPIView):
     """GET /api/dashboard/attendance/"""
 
     def get(self, request):
@@ -94,7 +100,7 @@ class AttendanceSummaryView(APIView):
         return Response(serializer.data)
 
 
-class PayrollSummaryView(APIView):
+class PayrollSummaryView(DashboardAPIView):
     """GET /api/dashboard/payroll/"""
 
     def get(self, request):
@@ -103,7 +109,7 @@ class PayrollSummaryView(APIView):
         return Response(serializer.data)
 
 
-class ContractSummaryView(APIView):
+class ContractSummaryView(DashboardAPIView):
     """GET /api/dashboard/contracts/"""
 
     def get(self, request):
@@ -112,7 +118,7 @@ class ContractSummaryView(APIView):
         return Response(serializer.data)
 
 
-class SubcontractorSummaryView(APIView):
+class SubcontractorSummaryView(DashboardAPIView):
     """GET /api/dashboard/subcontractors/"""
 
     def get(self, request):
@@ -121,7 +127,7 @@ class SubcontractorSummaryView(APIView):
         return Response(serializer.data)
 
 
-class BudgetComparisonView(APIView):
+class BudgetComparisonView(DashboardAPIView):
     """GET /api/dashboard/budget-comparison/"""
 
     def get(self, request):
@@ -130,7 +136,7 @@ class BudgetComparisonView(APIView):
         return Response(serializer.data)
 
 
-class AlertsView(APIView):
+class AlertsView(DashboardAPIView):
     """GET /api/dashboard/alerts/"""
 
     def get(self, request):
@@ -139,7 +145,7 @@ class AlertsView(APIView):
         return Response(serializer.data)
 
 
-class RecentActivityView(APIView):
+class RecentActivityView(DashboardAPIView):
     """GET /api/dashboard/activity/"""
 
     def get(self, request):

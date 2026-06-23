@@ -58,6 +58,7 @@ export default function ExpenseList({
   searchTerm = "",
   selectedCategory = "all",
   onRefresh,
+  canDelete = true,
 }) {
   const [sortField, setSortField] = useState("date");
   const [sortDirection, setSortDirection] = useState("desc");
@@ -366,16 +367,20 @@ export default function ExpenseList({
                                 >
                                   <Printer className="h-4 w-4" /> Print Receipt
                                 </button>
-                                <div className="my-1 border-t border-[var(--border)]" />
-                                <button
-                                  onClick={() => {
-                                    onDelete?.(expense.id);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-500/10"
-                                >
-                                  <Trash2 className="h-4 w-4" /> Delete
-                                </button>
+                                {canDelete && (
+                                  <>
+                                    <div className="my-1 border-t border-[var(--border)]" />
+                                    <button
+                                      onClick={() => {
+                                        onDelete?.(expense.id);
+                                        setOpenDropdownId(null);
+                                      }}
+                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-500/10"
+                                    >
+                                      <Trash2 className="h-4 w-4" /> Delete
+                                    </button>
+                                  </>
+                                )}
                               </div>
                             </>
                           )}

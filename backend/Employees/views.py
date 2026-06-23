@@ -2,11 +2,14 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Sum
 from datetime import datetime
 
+from accounts.permissions import RBACPermission
+from accounts.services import has_permission
 from .models import Employee, Payroll
 from .serializers import (
     EmployeeSerializer,
@@ -29,7 +32,8 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     destroy: Delete an employee
     """
     queryset = Employee.objects.all()
-    # permission_classes = [IsAuthenticated]  # Add authentication if needed
+    permission_classes = [RBACPermission]
+    rbac_resource = "employees"
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -149,7 +153,8 @@ class PayrollViewSet(viewsets.ModelViewSet):
     bulk creation, payment status updates, and reporting.
     """
     queryset = Payroll.objects.all()
-    # permission_classes = [IsAuthenticated]  # Add authentication if needed
+    permission_classes = [RBACPermission]
+    rbac_resource = "payrolls"
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -184,6 +189,9 @@ class PayrollViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(payroll_period_end__lte=end_date)
         
         return queryset.select_related('employee')
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
     @action(detail=False, methods=['post'])
     @transaction.atomic
@@ -228,7 +236,8 @@ class PayrollViewSet(viewsets.ModelViewSet):
                     tax_deducted=tax_deducted,
                     social_security=social_security,
                     payment_method=data['payment_method'],
-                    notes=data.get('notes', '')
+                    notes=data.get('notes', ''),
+                    created_by=request.user,
                 )
                 
                 payroll.calculate_totals()
@@ -386,6 +395,8 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         GET  /attendance/summary/?employee=&month=&year= — monthly summary
     """
     queryset = Attendance.objects.all()
+    permission_classes = [RBACPermission]
+    rbac_resource = "attendance"
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -428,6 +439,16 @@ class AttendanceViewSet(viewsets.ModelViewSet):
 
         return queryset.select_related('employee')
 
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    def perform_update(self, serializer):
+        if not has_permission(self.request.user, "attendance.update"):
+            instance = self.get_object()
+            if instance.created_by_id != self.request.user.id:
+                raise PermissionDenied("You can only update your own attendance entries.")
+        serializer.save()
+
     
     
     @action(detail=False, methods=["post"])
@@ -459,6 +480,22 @@ class AttendanceViewSet(viewsets.ModelViewSet):
                 "overtime_hours": record.get("overtime_hours") or 0,
                 "note": (record.get("note") or "").strip(),
             }
+
+            existing = Attendance.objects.filter(
+                employee=employee,
+                date=attendance_date,
+            ).first()
+
+            if existing and not has_permission(request.user, "attendance.update"):
+                if existing.created_by_id != request.user.id:
+                    errors.append({
+                        "employee": record["employee"],
+                        "error": "You can only update your own attendance entries."
+                    })
+                    continue
+
+            if not existing:
+                defaults["created_by"] = request.user
 
             obj, was_created = Attendance.objects.update_or_create(
                 employee=employee,

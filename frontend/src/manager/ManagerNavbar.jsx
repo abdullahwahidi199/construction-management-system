@@ -9,16 +9,18 @@ import {
   CalendarCheck,
   Menu,
   X,
-  Sun,
-  Moon,
+  BarChart3,
+  LogOut,
 } from "lucide-react";
 import ThemeToggle from "../components/ui/ToggleButton";
 import { useLanguage } from "../hooks/useLanguage";
 import LanguageSwitcher from "../components/LanguageSwitcher";
+import { useAuth } from "../auth/AuthContext";
 
 export default function ManagerNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { t } = useLanguage();
+  const { logout, user } = useAuth();
 
   const options = [
     {
@@ -60,6 +62,11 @@ export default function ManagerNavbar() {
       name: t("managerNavbar.attendance"),
       path: "/manager/attendance",
       icon: CalendarCheck,
+    },
+    {
+      name: t("managerNavbar.reports"),
+      path: "/manager/reports",
+      icon: BarChart3,
     },
   ];
 
@@ -105,8 +112,15 @@ export default function ManagerNavbar() {
           <ThemeToggle />
           {/* Avatar */}
           <div className="hidden h-9 w-9 items-center justify-center rounded-full bg-(--primary) text-sm font-semibold text-white sm:flex">
-            M
+            {(user?.username || "M").slice(0, 1).toUpperCase()}
           </div>
+          <button
+            onClick={logout}
+            className="hidden h-9 w-9 items-center justify-center rounded-lg text-(--muted) transition-colors hover:bg-(--hover) hover:text-(--text) sm:flex"
+            title={t("auth.logout")}
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
 
           {/* Mobile Hamburger */}
           <button

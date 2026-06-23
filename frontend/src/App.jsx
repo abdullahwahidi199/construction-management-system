@@ -6,6 +6,15 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import RootLayout from "./RootLayout";
+import LoginPage from "./auth/LoginPage";
+import { ProtectedRoute, RoleRedirect } from "./auth/ProtectedRoute";
+import { ROLES } from "./auth/roles";
+import AdminRootLayout from "./admin/AdminRootLayout";
+import AdminDashboard from "./admin/AdminDashboard";
+import UserManagement from "./admin/UserManagement";
+import PermissionManagement from "./admin/PermissionManagement";
+import DataEntryRootLayout from "./dataEntry/DataEntryRootLayout";
+import DataEntryDashboard from "./dataEntry/DataEntryDashboard";
 import ManagerRootLayout from "./manager/ManagerRootLayout";
 import ProjectsBase from "./manager/Projects/ProjectsBase";
 import ProjectDetails from "./manager/Projects/ProjectDetails";
@@ -26,28 +35,52 @@ import ReportsPage from "./components/pages/reports/ReportsPage";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<RootLayout />}>
-      <Route path="manager" element={<ManagerRootLayout />}>
-        <Route path="dashboard" element={<Dashboard />} />
+      <Route index element={<RoleRedirect />} />
+      <Route path="login" element={<LoginPage />} />
 
-        <Route path="projects" element={<ProjectsBase />} />
-        <Route path="projects/:id" element={<ProjectDetails />} />
+      <Route element={<ProtectedRoute roles={[ROLES.ADMIN]} />}>
+        <Route path="admin" element={<AdminRootLayout />}>
+          <Route index element={<RoleRedirect />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="permissions" element={<PermissionManagement />} />
+        </Route>
+      </Route>
 
-        <Route path="expenses" element={<ExpensesMain />} />
-        <Route path="employees" element={<EmployeesPage />} />
-        <Route path="payrolls" element={<PayrollPage />} />
-        <Route path="attendance" element={<AttendanceLayout />} />
+      <Route element={<ProtectedRoute roles={[ROLES.ADMIN, ROLES.MANAGER]} />}>
+        <Route path="manager" element={<ManagerRootLayout />}>
+          <Route index element={<RoleRedirect />} />
+          <Route path="dashboard" element={<Dashboard />} />
 
-        <Route path="contracts" element={<ContractsPage />} />
-        <Route path="contracts/:id" element={<ContractDetailsPage />} />
-        <Route path="subcontractors" element={<SubcontractorsPage />} />
-        <Route path="subcontractors/:id" element={<SubcontractorDetails />} />
-        <Route path="contract-payments" element={<ContractPaymentsPage />} />
-        <Route
-          path="contract-variations"
-          element={<ContractVariationsPage />}
-        />
-        <Route path="contract-documents" element={<ContractDocumentsPage />} />
-        <Route path="reports" element={<ReportsPage />} />
+          <Route path="projects" element={<ProjectsBase />} />
+          <Route path="projects/:id" element={<ProjectDetails />} />
+
+          <Route path="expenses" element={<ExpensesMain />} />
+          <Route path="employees" element={<EmployeesPage />} />
+          <Route path="payrolls" element={<PayrollPage />} />
+          <Route path="attendance" element={<AttendanceLayout />} />
+
+          <Route path="contracts" element={<ContractsPage />} />
+          <Route path="contracts/:id" element={<ContractDetailsPage />} />
+          <Route path="subcontractors" element={<SubcontractorsPage />} />
+          <Route path="subcontractors/:id" element={<SubcontractorDetails />} />
+          <Route path="contract-payments" element={<ContractPaymentsPage />} />
+          <Route
+            path="contract-variations"
+            element={<ContractVariationsPage />}
+          />
+          <Route path="contract-documents" element={<ContractDocumentsPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+        </Route>
+      </Route>
+
+      <Route element={<ProtectedRoute roles={[ROLES.DATA_ENTRY]} />}>
+        <Route path="data-entry" element={<DataEntryRootLayout />}>
+          <Route index element={<RoleRedirect />} />
+          <Route path="dashboard" element={<DataEntryDashboard />} />
+          <Route path="expenses" element={<ExpensesMain dataEntryMode />} />
+          <Route path="attendance" element={<AttendanceLayout />} />
+        </Route>
       </Route>
     </Route>,
   ),

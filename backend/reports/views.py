@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from accounts.permissions import RBACPermission
 
 from .pdf_utils import generate_pdf
 from .reports.project_report import ProjectSummaryReport
@@ -28,7 +29,8 @@ class BaseReportView(APIView):
     Generic report view.
     Subclasses set: report_class, serializer_class, pdf_columns, filename.
     """
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [RBACPermission]
+    rbac_resource = "reports"
     report_class = None
     serializer_class = None
     pdf_columns = None          # list of (key, header) tuples

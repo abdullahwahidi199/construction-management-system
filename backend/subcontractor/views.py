@@ -49,6 +49,7 @@ from .filters import (
 from .permissions import IsAdminOrReadOnly
 from .pagination import StandardPagination
 from .services import ContractService
+from accounts.permissions import RBACPermission
 
 
 # ──────────────────────────────────────────────
@@ -60,7 +61,8 @@ class SubcontractorViewSet(viewsets.ModelViewSet):
     CRUD + soft-delete + nested contract list + financial summary.
     """
     queryset = Subcontractor.objects.all()
-    # permission_classes  = [IsAuthenticated, IsAdminOrReadOnly]
+    permission_classes  = [RBACPermission]
+    rbac_resource       = "subcontractors"
     pagination_class    = StandardPagination
     filter_backends     = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class     = SubcontractorFilter
@@ -123,7 +125,8 @@ class ContractViewSet(viewsets.ModelViewSet):
     CRUD + nested payments / variations / documents + financial summary.
     """
     queryset = Contract.objects.all()
-    # permission_classes  = [IsAuthenticated, IsAdminOrReadOnly]
+    permission_classes  = [RBACPermission]
+    rbac_resource       = "contracts"
     pagination_class    = StandardPagination
     filter_backends     = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class     = ContractFilter
@@ -252,7 +255,8 @@ class ContractViewSet(viewsets.ModelViewSet):
 
 class ContractDocumentViewSet(viewsets.ModelViewSet):
     queryset = ContractDocument.objects.select_related('contract')
-    # permission_classes  = [IsAuthenticated, IsAdminOrReadOnly]
+    permission_classes  = [RBACPermission]
+    rbac_resource       = "contract_documents"
     pagination_class    = StandardPagination
     filter_backends     = [DjangoFilterBackend, filters.OrderingFilter]
     ordering_fields     = ['uploaded_at', 'title']
@@ -267,7 +271,8 @@ class ContractDocumentViewSet(viewsets.ModelViewSet):
 
 class ContractPaymentViewSet(viewsets.ModelViewSet):
     queryset = ContractPayment.objects.select_related('contract')
-    # permission_classes  = [IsAuthenticated, IsAdminOrReadOnly]
+    permission_classes  = [RBACPermission]
+    rbac_resource       = "contract_payments"
     pagination_class    = StandardPagination
     filter_backends     = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class     = ContractPaymentFilter
@@ -289,7 +294,8 @@ class ContractPaymentViewSet(viewsets.ModelViewSet):
 
 class ContractVariationViewSet(viewsets.ModelViewSet):
     queryset = ContractVariation.objects.select_related('contract')
-    # permission_classes  = [IsAuthenticated, IsAdminOrReadOnly]
+    permission_classes  = [RBACPermission]
+    rbac_resource       = "contract_variations"
     pagination_class    = StandardPagination
     filter_backends     = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class     = ContractVariationFilter
@@ -318,6 +324,8 @@ class ContractVariationViewSet(viewsets.ModelViewSet):
 
 class ContractInvoiceViewSet(viewsets.ModelViewSet):
     serializer_class = ContractInvoiceSerializer
+    permission_classes = [RBACPermission]
+    rbac_resource = "contract_invoices"
 
     queryset = (
         ContractInvoice.objects
@@ -373,7 +381,8 @@ class ContractInvoiceDocumentViewSet(viewsets.ModelViewSet):
         )
     )
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [RBACPermission]
+    rbac_resource = "invoice_documents"
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:

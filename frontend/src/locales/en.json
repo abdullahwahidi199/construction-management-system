@@ -8,6 +8,7 @@
     "employees": "Employees",
     "payrolls": "Payrolls",
     "attendance": "Attendance",
+    "reports": "Reports",
     "brand": "ManagerHub"
   },
 
@@ -191,5 +192,84 @@
     "hr": "Human Resources",
     "procurement": "Procurement",
     "safety": "Safety"
+  },
+  "common": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "loading": "Loading...",
+    "remove": "Remove",
+    "save": "Save"
+  },
+  "language": {
+    "en": "EN",
+    "dr": "DR",
+    "ps": "PS"
+  },
+  "auth": {
+    "logout": "Log out",
+    "login": {
+      "title": "Construction CMS",
+      "subtitle": "Sign in to continue",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Sign in",
+      "signingIn": "Signing in...",
+      "error": "Unable to sign in with those credentials."
+    }
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "nav": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "permissions": "Permissions"
+    },
+    "dashboard": {
+      "title": "Admin Panel",
+      "subtitle": "Manage users, roles, and system access."
+    },
+    "cards": {
+      "users": "User management",
+      "usersText": "Create, disable, and update user access.",
+      "roles": "Role permissions",
+      "rolesText": "Override default access by role.",
+      "system": "System access",
+      "systemText": "Open operational areas with admin authority."
+    },
+    "users": {
+      "title": "User Management",
+      "subtitle": "Assign roles and control account status.",
+      "username": "Username",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "actions": "Actions",
+      "enable": "Enable",
+      "disable": "Disable"
+    },
+    "permissions": {
+      "title": "Permission Overrides",
+      "subtitle": "Enable or disable specific permissions per role.",
+      "allow": "Allow",
+      "deny": "Deny"
+    }
+  },
+  "dataEntry": {
+    "title": "Data Entry Panel",
+    "nav": {
+      "dashboard": "Dashboard",
+      "expenses": "Expenses",
+      "attendance": "Attendance"
+    },
+    "dashboard": {
+      "title": "Data Entry Panel",
+      "subtitle": "Add and update assigned project records."
+    },
+    "cards": {
+      "expenses": "Expense entries",
+      "expensesText": "Record expenses for assigned projects.",
+      "attendance": "Attendance entries",
+      "attendanceText": "Create and update attendance records."
+    }
   }
 }

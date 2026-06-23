@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { setLanguage, getLanguage } from "../i18n";
+import { useLanguage } from "../hooks/useLanguage";
 
 export default function LanguageSwitcher() {
   const [lang, setLang] = useState(getLanguage());
+  const { t } = useLanguage();
 
   const changeLang = (value) => {
     setLanguage(value);
@@ -19,7 +21,7 @@ export default function LanguageSwitcher() {
             : "text-(--text) hover:bg-(--hover)"
         }`}
       >
-        EN
+        {t("language.en")}
       </button>
 
       <button
@@ -30,7 +32,7 @@ export default function LanguageSwitcher() {
             : "text-(--text) hover:bg-(--hover)"
         }`}
       >
-        DR
+        {t("language.dr")}
       </button>
 
       <button
@@ -41,7 +43,7 @@ export default function LanguageSwitcher() {
             : "text-(--text) hover:bg-(--hover)"
         }`}
       >
-        PS
+        {t("language.ps")}
       </button>
     </div>
   );

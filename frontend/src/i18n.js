@@ -8,21 +8,24 @@ const resources = {
   ps,
 };
 
-let currentLang = "en";
+const LANGUAGE_KEY = "cms.language";
+let currentLang = localStorage.getItem(LANGUAGE_KEY) || "en";
+
+const applyDocumentDirection = (lang) => {
+  document.documentElement.lang = lang;
+  const isRTL = lang === "dr" || lang === "ps";
+  document.documentElement.dir = isRTL ? "rtl" : "ltr";
+};
 
 export const setLanguage = (lang) => {
   currentLang = lang;
-  document.documentElement.lang = lang;
+  localStorage.setItem(LANGUAGE_KEY, lang);
+  applyDocumentDirection(lang);
 
-  // RTL support (Dari + Pashto)
-  const isRTL = lang === "dr" || lang === "ps";
-  document.documentElement.dir = isRTL ? "rtl" : "ltr";
-
-  // force re-render trigger (simple event system)
   window.dispatchEvent(new Event("languageChange"));
 };
 
-export const t = (key) => {
+export const t = (key, params = {}) => {
   const keys = key.split(".");
   let value = resources[currentLang];
 
@@ -30,7 +33,15 @@ export const t = (key) => {
     value = value?.[k];
   }
 
-  return value || key;
+  if (typeof value !== "string") return key;
+
+  return Object.entries(params).reduce(
+    (text, [param, replacement]) =>
+      text.replaceAll(`{{${param}}}`, String(replacement)),
+    value,
+  );
 };
 
 export const getLanguage = () => currentLang;
+
+applyDocumentDirection(currentLang);
