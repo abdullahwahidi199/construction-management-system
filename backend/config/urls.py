@@ -30,10 +30,19 @@ from subcontractor.views import (
     ContractInvoiceViewSet,
     ContractInvoiceDocumentViewSet
 )
+from labour.views import (
+    DailyWorkerViewSet,
+    WorkerAttendanceViewSet,
+    WorkerPayrollViewSet
+)
 router = DefaultRouter()
 router.register(r'employees', EmployeeViewSet)
 router.register(r'payrolls', PayrollViewSet)
 router.register(r'attendance', AttendanceViewSet)
+
+router.register(r'daily-workers', DailyWorkerViewSet, basename='daily-worker')
+router.register(r'worker-attendance', WorkerAttendanceViewSet, basename='worker-attendance')
+router.register(r'worker-payroll', WorkerPayrollViewSet, basename='worker-payroll')
 
 router.register(r'subcontractors',      SubcontractorViewSet)
 router.register(r'contracts',           ContractViewSet)
@@ -57,6 +66,8 @@ urlpatterns = [
     path('api/auth/', include("accounts.urls")),
     path('api/projects/', include("project.urls")),
     path('api/expenses/', include("expenses.urls")),
+    path('api/employees/', include("Employees.urls")),
+    path('api/contracts/', include("subcontractor.urls")),
     path('api/dashboard/', include("dashboard.urls")),
     path('api/reports/', include("reports.urls")),
     path('api/', include(router.urls)),

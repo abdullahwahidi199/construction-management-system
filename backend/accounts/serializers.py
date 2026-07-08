@@ -2,8 +2,14 @@ from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from .constants import AVAILABLE_PERMISSIONS, Role
-from .models import ProjectAssignment, RolePermissionOverride, UserPermissionOverride, UserProfile
+from .constants import Role
+from .models import (
+    ProjectAssignment,
+    UserPermissionOverride,
+    UserProfile,
+    Permission,
+    RolePermission,
+)
 from .services import get_effective_permissions, get_user_role
 
 User = get_user_model()
@@ -86,19 +92,37 @@ class UserCreateSerializer(UserSerializer):
         return user
 
 
-class RolePermissionOverrideSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RolePermissionOverride
-        fields = ("id", "role", "permission", "effect", "updated_at")
-        read_only_fields = ("id", "updated_at")
+# class RolePermissionOverrideSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = RolePermissionOverride
+#         fields = ("id", "role", "permission", "effect", "updated_at")
+#         read_only_fields = ("id", "updated_at")
 
 
 class UserPermissionOverrideSerializer(serializers.ModelSerializer):
+
+    permission_code = serializers.CharField(
+        source="permission.code",
+        read_only=True,
+    )
+
     class Meta:
         model = UserPermissionOverride
-        fields = ("id", "user", "permission", "effect", "updated_at")
-        read_only_fields = ("id", "updated_at")
 
+        fields = (
+            "id",
+            "user",
+            "permission",
+            "permission_code",
+            "effect",
+            "updated_at",
+        )
+
+        read_only_fields = (
+            "id",
+            "updated_at",
+            "permission_code",
+        )
 
 class ProjectAssignmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -116,5 +140,56 @@ def role_payload():
     return [{"value": value, "label": str(label)} for value, label in Role.CHOICES]
 
 
+# def permissions_payload():
+#     return AVAILABLE_PERMISSIONS
 def permissions_payload():
-    return AVAILABLE_PERMISSIONS
+    return PermissionSerializer(
+        Permission.objects.all(),
+        many=True,
+    ).data
+
+class PermissionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Permission
+        fields = "__all__"
+
+
+class RolePermissionSerializer(serializers.ModelSerializer):
+
+    permission_code = serializers.CharField(
+        source="permission.code",
+        read_only=True,
+    )
+
+    permission_name = serializers.CharField(
+        source="permission.name",
+        read_only=True,
+    )
+
+    module = serializers.CharField(
+        source="permission.module",
+        read_only=True,
+    )
+
+    class Meta:
+        model = RolePermission
+
+        fields = (
+            "id",
+            "role",
+            "permission",
+            "permission_code",
+            "permission_name",
+            "module",
+        )
+
+class RolePermissionCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = RolePermission
+        fields = (
+            "id",
+            "role",
+            "permission",
+        )

@@ -1,18 +1,7 @@
-// src/components/contracts/SubcontractorTable.jsx
 import { Eye, Edit, Trash2, Building2 } from "lucide-react";
 import Button from "../ui/Button";
-
-const SPECIALIZATION_LABELS = {
-  concrete: "Concrete Works",
-  steel: "Steel Works",
-  electrical: "Electrical Works",
-  plumbing: "Plumbing Works",
-  finishing: "Finishing Works",
-  excavation: "Excavation Works",
-  hvac: "HVAC",
-  landscaping: "Landscaping",
-  other: "Other",
-};
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function SubcontractorTable({
   subcontractors = [],
@@ -21,11 +10,15 @@ export default function SubcontractorTable({
   onDelete,
   loading,
 }) {
+  const { t } = useLanguage();
+
   if (loading) {
     return (
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-12 text-center">
         <div className="animate-spin w-8 h-8 border-2 border-[var(--border)] border-t-[var(--primary)] rounded-full mx-auto" />
-        <p className="text-[var(--muted)] mt-4">Loading subcontractors...</p>
+        <p className="text-[var(--muted)] mt-4">
+          {t("SubcontractorTable.states.loading")}
+        </p>
       </div>
     );
   }
@@ -34,7 +27,9 @@ export default function SubcontractorTable({
     return (
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-12 text-center">
         <Building2 size={40} className="mx-auto text-[var(--muted)] mb-3" />
-        <p className="text-[var(--muted)]">No subcontractors found.</p>
+        <p className="text-[var(--muted)]">
+          {t("SubcontractorTable.states.empty")}
+        </p>
       </div>
     );
   }
@@ -46,26 +41,26 @@ export default function SubcontractorTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[var(--border)]">
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Name
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("SubcontractorTable.columns.name")}
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Contact
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("SubcontractorTable.columns.contact")}
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Phone
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("SubcontractorTable.columns.phone")}
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Specialization
-              </th>
-              <th className="text-center px-4 py-3 font-semibold text-[var(--muted)]">
-                Contracts
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("SubcontractorTable.columns.specialization")}
               </th>
               <th className="text-center px-4 py-3 font-semibold text-[var(--muted)]">
-                Status
+                {t("SubcontractorTable.columns.contracts")}
               </th>
-              <th className="text-right px-4 py-3 font-semibold text-[var(--muted)]">
-                Actions
+              <th className="text-center px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("SubcontractorTable.columns.status")}
+              </th>
+              <th className="text-end px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("SubcontractorTable.columns.actions")}
               </th>
             </tr>
           </thead>
@@ -75,19 +70,20 @@ export default function SubcontractorTable({
                 key={sub.id}
                 className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--hover)] transition-colors"
               >
-                <td className="px-4 py-3 text-[var(--text)] font-medium">
+                <td className="px-4 py-3 text-[var(--text)] font-medium text-start">
                   {sub.name}
                 </td>
-                <td className="px-4 py-3 text-[var(--text)]">
+                <td className="px-4 py-3 text-[var(--text)] text-start">
                   {sub.contact_person || "—"}
                 </td>
-                <td className="px-4 py-3 text-[var(--text)] text-sm">
+                <td className="px-4 py-3 text-[var(--text)] text-sm text-start">
                   {sub.phone || "—"}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 text-start">
                   <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-[var(--primary)]/10 text-[var(--primary)]">
-                    {SPECIALIZATION_LABELS[sub.specialization] ||
-                      sub.specialization}
+                    {t(
+                      `SubcontractorTable.specializations.${sub.specialization}`,
+                    ) || sub.specialization}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-center text-[var(--text)]">
@@ -101,32 +97,36 @@ export default function SubcontractorTable({
                         : "bg-[var(--muted)]/20 text-[var(--muted)]"
                     }`}
                   >
-                    {sub.is_active ? "Active" : "Inactive"}
+                    {sub.is_active
+                      ? t("SubcontractorTable.labels.active")
+                      : t("SubcontractorTable.labels.inactive")}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 text-end">
                   <div className="flex items-center justify-end gap-1">
                     <button
                       onClick={() => onView(sub)}
                       className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)] transition-colors"
-                      title="View Details"
+                      title={t("SubcontractorTable.actions.view")}
                     >
                       <Eye size={16} />
                     </button>
                     <button
                       onClick={() => onEdit(sub)}
                       className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)] transition-colors"
-                      title="Edit"
+                      title={t("SubcontractorTable.actions.edit")}
                     >
                       <Edit size={16} />
                     </button>
-                    <button
-                      onClick={() => onDelete(sub)}
-                      className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--danger)] transition-colors"
-                      title="Delete"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <PermissionWrapper permissions={["subcontractors.delete"]}>
+                      <button
+                        onClick={() => onDelete(sub)}
+                        className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--danger)] transition-colors"
+                        title={t("SubcontractorTable.actions.delete")}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </PermissionWrapper>
                   </div>
                 </td>
               </tr>
@@ -148,11 +148,14 @@ export default function SubcontractorTable({
                     : "bg-[var(--muted)]/20 text-[var(--muted)]"
                 }`}
               >
-                {sub.is_active ? "Active" : "Inactive"}
+                {sub.is_active
+                  ? t("SubcontractorTable.labels.active")
+                  : t("SubcontractorTable.labels.inactive")}
               </span>
             </div>
             <p className="text-sm text-[var(--muted)]">
-              {SPECIALIZATION_LABELS[sub.specialization] || sub.specialization}
+              {t(`SubcontractorTable.specializations.${sub.specialization}`) ||
+                sub.specialization}
             </p>
             <p className="text-sm text-[var(--muted)]">
               {sub.contact_person} &middot; {sub.phone}

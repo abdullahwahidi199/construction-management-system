@@ -6,14 +6,9 @@ import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 import useFetch from "../../hooks/useFetch";
-
-const STATUS_OPTIONS = [
-  { value: "draft", label: "Draft" },
-  { value: "active", label: "Active" },
-  { value: "completed", label: "Completed" },
-  { value: "terminated", label: "Terminated" },
-  { value: "cancelled", label: "Cancelled" },
-];
+import { hasAnyPermission } from "../../../utils/permissions";
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import { useLanguage } from "../../hooks/useLanguage";
 
 const emptyForm = {
   project: "",
@@ -38,6 +33,24 @@ export default function ContractFormModal({
   loading: submitLoading,
 }) {
   const isEdit = !!contract;
+  const { t } = useLanguage();
+
+  const STATUS_OPTIONS = [
+    { value: "draft", label: t("ContractFormModal.statusOptions.draft") },
+    { value: "active", label: t("ContractFormModal.statusOptions.active") },
+    {
+      value: "completed",
+      label: t("ContractFormModal.statusOptions.completed"),
+    },
+    {
+      value: "terminated",
+      label: t("ContractFormModal.statusOptions.terminated"),
+    },
+    {
+      value: "cancelled",
+      label: t("ContractFormModal.statusOptions.cancelled"),
+    },
+  ];
 
   const { data: projectsData } = useFetch("projects/");
   const { data: subcontractorsData } = useFetch("subcontractors/");
@@ -92,23 +105,35 @@ export default function ContractFormModal({
   const validate = () => {
     const newErrors = {};
 
-    if (!form.project) newErrors.project = "Project is required";
+    if (!form.project)
+      newErrors.project = t("ContractFormModal.validation.projectRequired");
     if (!form.subcontractor)
-      newErrors.subcontractor = "Subcontractor is required";
-    if (!form.title.trim()) newErrors.title = "Title is required";
-    if (!form.currency) newErrors.currency = "Currency is required";
+      newErrors.subcontractor = t(
+        "ContractFormModal.validation.subcontractorRequired",
+      );
+    if (!form.title.trim())
+      newErrors.title = t("ContractFormModal.validation.titleRequired");
+    if (!form.currency)
+      newErrors.currency = t("ContractFormModal.validation.currencyRequired");
     if (!form.contract_value || Number(form.contract_value) <= 0)
-      newErrors.contract_value = "Contract value must be positive";
-    if (!form.start_date) newErrors.start_date = "Start date is required";
-    if (!form.end_date) newErrors.end_date = "End date is required";
+      newErrors.contract_value = t(
+        "ContractFormModal.validation.contractValuePositive",
+      );
+    if (!form.start_date)
+      newErrors.start_date = t(
+        "ContractFormModal.validation.startDateRequired",
+      );
+    // if (!form.end_date) newErrors.end_date = "End date is required";
     if (form.start_date && form.end_date && form.start_date > form.end_date)
-      newErrors.end_date = "End date must be after start date";
+      newErrors.end_date = t("ContractFormModal.validation.endDateInvalid");
     if (
       form.completion_percentage !== "" &&
       (Number(form.completion_percentage) < 0 ||
         Number(form.completion_percentage) > 100)
     )
-      newErrors.completion_percentage = "Must be between 0 and 100";
+      newErrors.completion_percentage = t(
+        "ContractFormModal.validation.progressRange",
+      );
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -163,7 +188,9 @@ export default function ContractFormModal({
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
               <h2 className="text-lg font-semibold text-[var(--text)]">
-                {isEdit ? "Edit Contract" : "Create Contract"}
+                {isEdit
+                  ? t("ContractFormModal.titleEdit")
+                  : t("ContractFormModal.titleCreate")}
               </h2>
               <button
                 type="button"
@@ -178,36 +205,38 @@ export default function ContractFormModal({
             <div className="px-6 py-4 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Select
-                  label="Project"
+                  label={t("ContractFormModal.fields.project")}
                   value={form.project}
                   onChange={(val) => handleChange("project", val)}
                   options={projectOptions}
-                  placeholder="Select project"
-                  disabled={isEdit}
+                  placeholder={t("ContractFormModal.placeholders.project")}
+                  // disabled={isEdit}
                   error={errors.project}
                 />
                 <Select
-                  label="Subcontractor"
+                  label={t("ContractFormModal.fields.subcontractor")}
                   value={form.subcontractor}
                   onChange={(val) => handleChange("subcontractor", val)}
                   options={subcontractorOptions}
-                  placeholder="Select subcontractor"
-                  disabled={isEdit}
+                  placeholder={t(
+                    "ContractFormModal.placeholders.subcontractor",
+                  )}
+                  // disabled={isEdit}
                   error={errors.subcontractor}
                 />
               </div>
 
               <Input
-                label="Title"
+                label={t("ContractFormModal.fields.title")}
                 value={form.title}
                 onChange={(val) => handleChange("title", val)}
-                placeholder="Contract title"
+                placeholder={t("ContractFormModal.placeholders.title")}
                 error={errors.title}
               />
 
               <div>
                 <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  Scope of Work
+                  {t("ContractFormModal.fields.scopeOfWork")}
                 </label>
                 <textarea
                   value={form.scope_of_work}
@@ -215,45 +244,51 @@ export default function ContractFormModal({
                     handleChange("scope_of_work", e.target.value)
                   }
                   rows={3}
-                  placeholder="Describe the scope of work"
+                  placeholder={t("ContractFormModal.placeholders.scopeOfWork")}
                   className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <Select
-                  label="Currency"
+                  label={t("ContractFormModal.fields.currency")}
                   value={form.currency}
                   onChange={(value) => handleChange("currency", value)}
                   options={CURRENCY_OPTIONS}
                   error={errors.currency}
                 />
                 <Input
-                  label="Contract Value ($)"
+                  label={t("ContractFormModal.fields.contractValue")}
                   type="number"
                   value={form.contract_value}
                   onChange={(val) => handleChange("contract_value", val)}
-                  placeholder="0.00"
+                  placeholder={t(
+                    "ContractFormModal.placeholders.contractValue",
+                  )}
                   min="0"
                   step="0.01"
                   error={errors.contract_value}
                 />
                 <Input
-                  label="Retention %"
+                  label={t("ContractFormModal.fields.retentionPercentage")}
                   type="number"
                   value={form.retention_percentage}
                   onChange={(val) => handleChange("retention_percentage", val)}
-                  placeholder="5"
+                  placeholder={t(
+                    "ContractFormModal.placeholders.retentionPercentage",
+                  )}
                   min="0"
                   max="100"
                   step="0.01"
                 />
                 <Input
-                  label="Progress %"
+                  label={t("ContractFormModal.fields.completionPercentage")}
                   type="number"
                   value={form.completion_percentage}
                   onChange={(val) => handleChange("completion_percentage", val)}
-                  placeholder="0"
+                  placeholder={t(
+                    "ContractFormModal.placeholders.completionPercentage",
+                  )}
                   min="0"
                   max="100"
                   step="0.01"
@@ -263,14 +298,14 @@ export default function ContractFormModal({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                  label="Start Date"
+                  label={t("ContractFormModal.fields.startDate")}
                   type="date"
                   value={form.start_date}
                   onChange={(val) => handleChange("start_date", val)}
                   error={errors.start_date}
                 />
                 <Input
-                  label="End Date"
+                  label={t("ContractFormModal.fields.endDate")}
                   type="date"
                   value={form.end_date}
                   onChange={(val) => handleChange("end_date", val)}
@@ -279,7 +314,7 @@ export default function ContractFormModal({
               </div>
 
               <Select
-                label="Status"
+                label={t("ContractFormModal.fields.status")}
                 value={form.status}
                 onChange={(val) => handleChange("status", val)}
                 options={STATUS_OPTIONS}
@@ -287,13 +322,13 @@ export default function ContractFormModal({
 
               <div>
                 <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  Notes
+                  {t("ContractFormModal.fields.notes")}
                 </label>
                 <textarea
                   value={form.notes}
                   onChange={(e) => handleChange("notes", e.target.value)}
                   rows={2}
-                  placeholder="Additional notes..."
+                  placeholder={t("ContractFormModal.placeholders.notes")}
                   className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none"
                 />
               </div>
@@ -307,15 +342,35 @@ export default function ContractFormModal({
                 onClick={onClose}
                 disabled={submitLoading}
               >
-                Cancel
+                {t("ContractFormModal.buttons.cancel")}
               </Button>
-              <Button type="submit" variant="primary" disabled={submitLoading}>
-                {submitLoading
-                  ? "Saving..."
-                  : isEdit
-                    ? "Update Contract"
-                    : "Create Contract"}
-              </Button>
+              <PermissionWrapper
+                permissions={[isEdit ? "contracts.update" : "contracts.create"]}
+                fallback={
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    disabled
+                    title="You do not have permission for this action"
+                  >
+                    {isEdit
+                      ? t("ContractFormModal.buttons.update")
+                      : t("ContractFormModal.buttons.create")}
+                  </Button>
+                }
+              >
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={submitLoading}
+                >
+                  {submitLoading
+                    ? t("ContractFormModal.buttons.saving")
+                    : isEdit
+                      ? t("ContractFormModal.buttons.update")
+                      : t("ContractFormModal.buttons.create")}
+                </Button>
+              </PermissionWrapper>
             </div>
           </form>
         </Card>

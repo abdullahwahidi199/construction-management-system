@@ -1,8 +1,9 @@
-// src/components/contracts/ContractTable.jsx
 import { Eye, Edit, Trash2 } from "lucide-react";
 import Button from "../ui/Button";
 import ContractStatusBadge from "./ContractStatusBadge";
 import ProgressBar from "./ProgressBar";
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import { useLanguage } from "../../hooks/useLanguage";
 
 const formatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -16,11 +17,15 @@ export default function ContractTable({
   onDelete,
   loading,
 }) {
+  const { t } = useLanguage();
+
   if (loading) {
     return (
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-12 text-center">
         <div className="animate-spin w-8 h-8 border-2 border-[var(--border)] border-t-[var(--primary)] rounded-full mx-auto" />
-        <p className="text-[var(--muted)] mt-4">Loading contracts...</p>
+        <p className="text-[var(--muted)] mt-4">
+          {t("ContractTable.states.loading")}
+        </p>
       </div>
     );
   }
@@ -28,7 +33,7 @@ export default function ContractTable({
   if (!contracts.length) {
     return (
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-12 text-center">
-        <p className="text-[var(--muted)]">No contracts found.</p>
+        <p className="text-[var(--muted)]">{t("ContractTable.states.empty")}</p>
       </div>
     );
   }
@@ -40,29 +45,29 @@ export default function ContractTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[var(--border)]">
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Contract #
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("ContractTable.columns.contract_number")}
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Title
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("ContractTable.columns.title")}
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Subcontractor
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("ContractTable.columns.subcontractor")}
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Project
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("ContractTable.columns.project")}
               </th>
-              <th className="text-right px-4 py-3 font-semibold text-[var(--muted)]">
-                Value
+              <th className="text-end px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("ContractTable.columns.value")}
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Status
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("ContractTable.columns.status")}
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Progress
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("ContractTable.columns.progress")}
               </th>
-              <th className="text-right px-4 py-3 font-semibold text-[var(--muted)]">
-                Actions
+              <th className="text-end px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("ContractTable.columns.actions")}
               </th>
             </tr>
           </thead>
@@ -72,53 +77,46 @@ export default function ContractTable({
                 key={contract.id}
                 className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--hover)] transition-colors"
               >
-                <td className="px-4 py-3 font-mono text-xs text-[var(--text)]">
+                <td className="px-4 py-3 font-mono text-xs text-[var(--text)] text-start">
                   {contract.contract_number}
                 </td>
-                <td className="px-4 py-3 text-[var(--text)] font-medium max-w-[200px] truncate">
+                <td className="px-4 py-3 text-[var(--text)] font-medium max-w-[200px] truncate text-start">
                   {contract.title}
                 </td>
-                <td className="px-4 py-3 text-[var(--text)]">
+                <td className="px-4 py-3 text-[var(--text)] text-start">
                   {contract.subcontractor_name}
                 </td>
-                <td className="px-4 py-3 text-[var(--text)]">
+                <td className="px-4 py-3 text-[var(--text)] text-start">
                   {contract.project_name}
                 </td>
-                <td className="px-4 py-3 text-right text-[var(--text)] font-medium">
+                <td className="px-4 py-3 text-end text-[var(--text)] font-medium">
                   {formatter.format(contract.adjusted_contract_value)}
                   {contract.currency}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 text-start">
                   <ContractStatusBadge status={contract.status} />
                 </td>
-                <td className="px-4 py-3 min-w-[140px]">
+                <td className="px-4 py-3 min-w-[140px] text-start">
                   <ProgressBar
                     value={contract.completion_percentage}
                     size="sm"
                   />
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 text-end">
                   <div className="flex items-center justify-end gap-1">
                     <button
                       onClick={() => onView(contract)}
                       className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)] transition-colors"
-                      title="View Details"
+                      title={t("ContractTable.actions.view")}
                     >
                       <Eye size={16} />
                     </button>
                     <button
                       onClick={() => onEdit(contract)}
                       className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)] transition-colors"
-                      title="Edit"
+                      title={t("ContractTable.actions.edit")}
                     >
                       <Edit size={16} />
-                    </button>
-                    <button
-                      onClick={() => onDelete(contract)}
-                      className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--danger)] transition-colors"
-                      title="Delete"
-                    >
-                      <Trash2 size={16} />
                     </button>
                   </div>
                 </td>

@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import usePost from "../../hooks/usePost";
 import instance from "../../api/axiosInstance";
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import Button from "../ui/Button";
+import { useLanguage } from "../../hooks/useLanguage";
 
 const initialFormData = {
   employee: "",
@@ -16,6 +19,7 @@ const initialFormData = {
   tax_deducted: "0",
   social_security: "0",
   payment_method: "bank_transfer",
+  payment_date: "", // ADD THIS
   notes: "",
 };
 
@@ -28,6 +32,7 @@ export default function PayrollForm({
   const [formData, setFormData] = useState(initialFormData);
   const { postData, loading, error } = usePost();
   const [payroll, setPayroll] = useState(null);
+  const { t } = useLanguage();
 
   console.log(payrollId);
 
@@ -63,6 +68,7 @@ export default function PayrollForm({
       tax_deducted: payroll.tax_deducted || "0",
       social_security: payroll.social_security || "0",
       payment_method: payroll.payment_method || "bank_transfer",
+      payment_date: payroll.payment_date || "", // ADD THIS
       notes: payroll.notes || "",
     });
   }, [payroll]);
@@ -138,7 +144,7 @@ export default function PayrollForm({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Employee *
+            {t("PayrollForm.employee")} *
           </label>
           <select
             name="employee"
@@ -152,7 +158,7 @@ export default function PayrollForm({
             }}
             required
           >
-            <option value="">Select Employee</option>
+            <option value="">{t("PayrollForm.selectEmployee")}</option>
             {employees?.map((emp) => (
               <option key={emp.id} value={emp.id}>
                 {emp.full_name} ({emp.employee_id})
@@ -162,7 +168,7 @@ export default function PayrollForm({
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Basic Salary *
+            {t("PayrollForm.basicSalary")} *
           </label>
           <input
             type="number"
@@ -184,7 +190,7 @@ export default function PayrollForm({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Period Start *
+            {t("PayrollForm.periodStart")} *
           </label>
           <input
             type="date"
@@ -202,7 +208,7 @@ export default function PayrollForm({
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Period End *
+            {t("PayrollForm.periodEnd")} *
           </label>
           <input
             type="date"
@@ -223,7 +229,7 @@ export default function PayrollForm({
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Overtime Hours
+            {t("PayrollForm.overtimeHours")}
           </label>
           <input
             type="number"
@@ -241,7 +247,7 @@ export default function PayrollForm({
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Overtime Rate
+            {t("PayrollForm.overtimeRate")}
           </label>
           <input
             type="number"
@@ -259,7 +265,7 @@ export default function PayrollForm({
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Bonus
+            {t("PayrollForm.bonus")}
           </label>
           <input
             type="number"
@@ -280,7 +286,7 @@ export default function PayrollForm({
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Allowances
+            {t("PayrollForm.allowances")}
           </label>
           <input
             type="number"
@@ -298,7 +304,7 @@ export default function PayrollForm({
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Deductions
+            {t("PayrollForm.deductions")}
           </label>
           <input
             type="number"
@@ -316,7 +322,7 @@ export default function PayrollForm({
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Tax Deducted
+            {t("PayrollForm.taxDeducted")}
           </label>
           <input
             type="number"
@@ -337,7 +343,7 @@ export default function PayrollForm({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Currency
+            {t("PayrollForm.currency")}
           </label>
           <select
             name="currency"
@@ -354,31 +360,57 @@ export default function PayrollForm({
             <option value="USD">USD</option>
           </select>
         </div>
-        <div>
-          <label className={labelClass} style={{ color: "var(--text)" }}>
-            Payment Method
-          </label>
-          <select
-            name="payment_method"
-            value={formData.payment_method}
-            onChange={handleChange}
-            className={inputClass}
-            style={{
-              backgroundColor: "var(--bg)",
-              color: "var(--text)",
-              borderColor: "var(--border)",
-            }}
-          >
-            <option value="bank_transfer">Bank Transfer</option>
-            <option value="check">Check</option>
-            <option value="cash">Cash</option>
-          </select>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelClass} style={{ color: "var(--text)" }}>
+              {t("PayrollForm.paymentMethod")}
+            </label>
+            <select
+              name="payment_method"
+              value={formData.payment_method}
+              onChange={handleChange}
+              className={inputClass}
+              style={{
+                backgroundColor: "var(--bg)",
+                color: "var(--text)",
+                borderColor: "var(--border)",
+              }}
+            >
+              <option value="bank_transfer">
+                {t("PayrollForm.paymentMethods.bankTransfer")}
+              </option>
+              <option value="check">
+                {t("PayrollForm.paymentMethods.check")}
+              </option>
+              <option value="cash">
+                {t("PayrollForm.paymentMethods.cash")}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label className={labelClass} style={{ color: "var(--text)" }}>
+              {t("PayrollForm.paymentDate")}
+            </label>
+            <input
+              type="date"
+              name="payment_date"
+              value={formData.payment_date}
+              onChange={handleChange}
+              className={inputClass}
+              style={{
+                backgroundColor: "var(--bg)",
+                color: "var(--text)",
+                borderColor: "var(--border)",
+              }}
+            />
+          </div>
         </div>
       </div>
 
       <div>
         <label className={labelClass} style={{ color: "var(--text)" }}>
-          Notes
+          {t("PayrollForm.notes")}
         </label>
         <textarea
           name="notes"
@@ -404,20 +436,36 @@ export default function PayrollForm({
           className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           style={{ backgroundColor: "var(--hover)", color: "var(--text)" }}
         >
-          Cancel
+          {t("PayrollForm.buttons.cancel")}
         </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors disabled:opacity-50"
-          style={{ backgroundColor: "var(--primary)" }}
+        <PermissionWrapper
+          permissions={[payroll ? "payrolls.update" : "payrolls.create"]}
+          fallback={
+            <Button
+              type="submit"
+              variant="primary"
+              disabled
+              title={t("PayrollForm.permissions.noPermission")}
+            >
+              {payroll
+                ? t("PayrollForm.buttons.update")
+                : t("PayrollForm.buttons.create")}
+            </Button>
+          }
         >
-          {loading
-            ? "Processing..."
-            : payroll
-              ? "Update Payroll"
-              : "Create Payroll"}
-        </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors disabled:opacity-50"
+            style={{ backgroundColor: "var(--primary)" }}
+          >
+            {loading
+              ? t("PayrollForm.buttons.processing")
+              : payroll
+                ? t("PayrollForm.buttons.update")
+                : t("PayrollForm.buttons.create")}
+          </button>
+        </PermissionWrapper>
       </div>
     </form>
   );

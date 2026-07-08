@@ -21,11 +21,11 @@ const formatCell = (value, type) => {
 const badgeClass = (value) => {
   const v = String(value).toLowerCase();
   if (["completed", "active", "present", "paid"].some((s) => v.includes(s)))
-    return "bg-success/15 text-success";
+    return "bg-success/10 text-success";
   if (["cancelled", "terminated", "absent"].some((s) => v.includes(s)))
-    return "bg-danger/15 text-danger";
+    return "bg-danger/10 text-danger";
   if (["on hold", "pending", "draft", "leave"].some((s) => v.includes(s)))
-    return "bg-warning/15 text-warning";
+    return "bg-warning/10 text-warning";
   return "bg-hover text-muted";
 };
 
@@ -34,55 +34,57 @@ export default function ReportTable({ columns, rows }) {
 
   if (!rows || rows.length === 0) {
     return (
-      <div className="p-10 text-center text-muted bg-card border border-dashed border-border rounded-xl">
+      <div className="p-12 text-center text-sm text-muted bg-card border border-border rounded-lg">
         No records found.
       </div>
     );
   }
 
   return (
-    <div className="bg-card border border-border rounded-xl overflow-x-auto">
-      <table className="w-full border-collapse text-[13px]">
-        <thead>
-          <tr>
-            {columns.map((col) => (
-              <th
-                key={col.key}
-                className="bg-primary text-white text-left px-3.5 py-3 font-semibold whitespace-nowrap"
-              >
-                {col.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, idx) => (
-            <tr
-              key={row.id ?? idx}
-              className="hover:bg-hover transition-colors"
-            >
+    <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border">
               {columns.map((col) => (
-                <td
+                <th
                   key={col.key}
-                  className="px-3.5 py-2.5 border-b border-border text-text"
+                  className="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider whitespace-nowrap"
                 >
-                  {col.type === "badge" ? (
-                    <span
-                      className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold capitalize ${badgeClass(
-                        row[col.key],
-                      )}`}
-                    >
-                      {row[col.key]}
-                    </span>
-                  ) : (
-                    formatCell(row[col.key], col.type)
-                  )}
-                </td>
+                  {col.label}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((row, idx) => (
+              <tr
+                key={row.id ?? idx}
+                className="border-b border-border last:border-0 hover:bg-hover transition-colors"
+              >
+                {columns.map((col) => (
+                  <td
+                    key={col.key}
+                    className="px-4 py-3 text-text whitespace-nowrap"
+                  >
+                    {col.type === "badge" ? (
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${badgeClass(
+                          row[col.key],
+                        )}`}
+                      >
+                        {row[col.key] ?? "—"}
+                      </span>
+                    ) : (
+                      formatCell(row[col.key], col.type)
+                    )}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

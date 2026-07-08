@@ -1,12 +1,19 @@
 import { useState } from "react";
 import instance from "../../api/axiosInstance";
 import Loading from "../common/Loading";
+import { useLanguage } from "../../hooks/useLanguage";
+
+const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
 export default function EmployeeCard({ employee, onEdit, onView, onDelete }) {
+  const { t, lang } = useLanguage();
+  const isRTL = RTL_LANGS.includes(lang);
+
   const statusColor = employee.is_active ? "var(--success)" : "var(--danger)";
 
   return (
     <div
+      dir={isRTL ? "rtl" : "ltr"}
       className="rounded-xl border p-6 transition-all hover:shadow-lg cursor-pointer"
       style={{
         backgroundColor: "var(--card)",
@@ -45,29 +52,40 @@ export default function EmployeeCard({ employee, onEdit, onView, onDelete }) {
             color: statusColor,
           }}
         >
-          {employee.is_active ? "Active" : "Inactive"}
+          {employee.is_active
+            ? t("EmployeeCard.active")
+            : t("EmployeeCard.inactive")}
         </span>
       </div>
 
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <span style={{ color: "var(--muted)" }}>Department</span>
+          <span style={{ color: "var(--muted)" }}>
+            {t("EmployeeCard.department")}
+          </span>
           <span style={{ color: "var(--text)" }}>
             {employee.get_department_display || employee.department}
           </span>
         </div>
         <div className="flex justify-between text-sm">
-          <span style={{ color: "var(--muted)" }}>Position</span>
+          <span style={{ color: "var(--muted)" }}>
+            {t("EmployeeCard.position")}
+          </span>
           <span style={{ color: "var(--text)" }}>{employee.position}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span style={{ color: "var(--muted)" }}>Salary</span>
+          <span style={{ color: "var(--muted)" }}>
+            {t("EmployeeCard.salary")}
+          </span>
           <span className="font-medium" style={{ color: "var(--text)" }}>
-            AFN{parseFloat(employee.salary).toLocaleString()}
+            {t("EmployeeCard.currency")}
+            {parseFloat(employee.salary).toLocaleString()}
           </span>
         </div>
         <div className="flex justify-between text-sm">
-          <span style={{ color: "var(--muted)" }}>Hired</span>
+          <span style={{ color: "var(--muted)" }}>
+            {t("EmployeeCard.hired")}
+          </span>
           <span style={{ color: "var(--text)" }}>
             {new Date(employee.hire_date).toLocaleDateString()}
           </span>
@@ -87,7 +105,7 @@ export default function EmployeeCard({ employee, onEdit, onView, onDelete }) {
             color: "#fff",
           }}
         >
-          Edit
+          {t("EmployeeCard.edit")}
         </button>
       </div>
     </div>

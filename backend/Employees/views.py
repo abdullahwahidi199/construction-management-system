@@ -168,7 +168,7 @@ class PayrollViewSet(viewsets.ModelViewSet):
         
         # Filtering options
         employee_id = self.request.query_params.get('employee_id', None)
-        status = self.request.query_params.get('status', None)
+        # status = self.request.query_params.get('status', None)
         payment_method = self.request.query_params.get('payment_method', None)
         start_date = self.request.query_params.get('start_date', None)
         end_date = self.request.query_params.get('end_date', None)
@@ -176,17 +176,17 @@ class PayrollViewSet(viewsets.ModelViewSet):
         if employee_id:
             queryset = queryset.filter(employee_id=employee_id)
         
-        if status:
-            queryset = queryset.filter(payment_status=status)
+        # if status:
+        #     queryset = queryset.filter(payment_status=status)
         
         if payment_method:
             queryset = queryset.filter(payment_method=payment_method)
         
         if start_date:
-            queryset = queryset.filter(payroll_period_start__gte=start_date)
-        
+            queryset = queryset.filter(payment_date__gte=start_date)
+
         if end_date:
-            queryset = queryset.filter(payroll_period_end__lte=end_date)
+            queryset = queryset.filter(payment_date__lte=end_date)
         
         return queryset.select_related('employee')
 
@@ -620,3 +620,530 @@ class AttendanceViewSet(viewsets.ModelViewSet):
             'overtime_hours': total_overtime,
             'effective_working_days': effective_days,
         })
+
+
+from collections import defaultdict
+
+from django.http import HttpResponse
+from django.utils import timezone
+from rest_framework.views import APIView
+
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Table,
+    TableStyle,
+    Paragraph,
+    Spacer,
+    PageBreak,
+)
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+
+from .models import Payroll, Employee
+from accounts.permissions import RBACPermission
+
+
+class PayrollPDFExportView(APIView):
+    permission_classes = [RBACPermission]
+    rbac_resource = "payrolls"
+
+    def get(self, request):
+        queryset = Payroll.objects.select_related("employee")
+
+        employee_id = request.GET.get("employee_id")
+        payment_method = request.GET.get("payment_method")
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
+
+        # Apply filters
+        if employee_id:
+            queryset = queryset.filter(employee_id=employee_id)
+
+        if payment_method:
+            queryset = queryset.filter(payment_method=payment_method)
+
+        if start_date:
+            queryset = queryset.filter(payment_date__gte=start_date)
+
+        if end_date:
+            queryset = queryset.filter(payment_date__lte=end_date)
+
+        queryset = queryset.order_by(
+            "-payment_date",
+            "-payroll_period_start",
+        )
+
+        # Employee display
+        employee_name = "All Employees"
+
+        if employee_id:
+            try:
+                employee_name = Employee.objects.get(
+                    id=employee_id
+                ).full_name
+            except Employee.DoesNotExist:
+                pass
+
+        # Response
+        response = HttpResponse(content_type="application/pdf")
+
+        filename = (
+            f"payroll_report_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        )
+
+        response["Content-Disposition"] = (
+            f'attachment; filename="{filename}"'
+        )
+
+        doc = SimpleDocTemplate(
+            response,
+            leftMargin=20,
+            rightMargin=20,
+            topMargin=20,
+            bottomMargin=20,
+        )
+
+        styles = getSampleStyleSheet()
+        elements = []
+
+        # ==========================================
+        # HEADER
+        # ==========================================
+
+        elements.append(
+            Paragraph("Payroll Report", styles["Title"])
+        )
+
+        elements.append(
+            Paragraph(
+                f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}",
+                styles["Normal"],
+            )
+        )
+
+        elements.append(Spacer(1, 10))
+
+        filter_table = Table(
+            [
+                ["Employee", employee_name],
+                ["Payment Method", payment_method or "All"],
+                ["Start Date", start_date or "Any"],
+                ["End Date", end_date or "Any"],
+                ["Total Records", str(queryset.count())],
+            ],
+            colWidths=[130, 320],
+        )
+
+        filter_table.setStyle(
+            TableStyle(
+                [
+                    ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+                    ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
+                    ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
+                ]
+            )
+        )
+
+        elements.append(
+            Paragraph("Applied Filters", styles["Heading2"])
+        )
+
+        elements.append(filter_table)
+
+        elements.append(Spacer(1, 20))
+
+        # ==========================================
+        # SUMMARY BY CURRENCY
+        # ==========================================
+
+        currency_summary = defaultdict(
+            lambda: {
+                "gross": 0,
+                "net": 0,
+                "bonus": 0,
+                "allowances": 0,
+                "deductions": 0,
+                "tax": 0,
+                "overtime": 0,
+                "count": 0,
+            }
+        )
+
+        for payroll in queryset:
+            curr = payroll.currency
+
+            currency_summary[curr]["gross"] += float(
+                payroll.gross_pay or 0
+            )
+
+            currency_summary[curr]["net"] += float(
+                payroll.net_pay or 0
+            )
+
+            currency_summary[curr]["bonus"] += float(
+                payroll.bonus or 0
+            )
+
+            currency_summary[curr]["allowances"] += float(
+                payroll.allowances or 0
+            )
+
+            currency_summary[curr]["deductions"] += float(
+                payroll.deductions or 0
+            )
+
+            currency_summary[curr]["tax"] += float(
+                payroll.tax_deducted or 0
+            )
+
+            currency_summary[curr]["overtime"] += float(
+                payroll.overtime_amount or 0
+            )
+
+            currency_summary[curr]["count"] += 1
+
+        elements.append(
+            Paragraph("Payroll Summary", styles["Heading1"])
+        )
+
+        for currency, data in currency_summary.items():
+            elements.append(
+                Paragraph(
+                    f"Currency: {currency}",
+                    styles["Heading3"],
+                )
+            )
+
+            summary_table = Table(
+                [
+                    ["Metric", "Value"],
+                    ["Payroll Records", str(data["count"])],
+                    [
+                        "Total Gross Pay",
+                        f"{currency} {data['gross']:,.2f}",
+                    ],
+                    [
+                        "Total Net Pay",
+                        f"{currency} {data['net']:,.2f}",
+                    ],
+                    [
+                        "Total Bonus",
+                        f"{currency} {data['bonus']:,.2f}",
+                    ],
+                    [
+                        "Total Allowances",
+                        f"{currency} {data['allowances']:,.2f}",
+                    ],
+                    [
+                        "Total Deductions",
+                        f"{currency} {data['deductions']:,.2f}",
+                    ],
+                    [
+                        "Total Tax",
+                        f"{currency} {data['tax']:,.2f}",
+                    ],
+                    [
+                        "Total Overtime",
+                        f"{currency} {data['overtime']:,.2f}",
+                    ],
+                ],
+                colWidths=[220, 180],
+            )
+
+            summary_table.setStyle(
+                TableStyle(
+                    [
+                        ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+                        (
+                            "BACKGROUND",
+                            (0, 0),
+                            (-1, 0),
+                            colors.lightgrey,
+                        ),
+                        (
+                            "FONTNAME",
+                            (0, 0),
+                            (-1, 0),
+                            "Helvetica-Bold",
+                        ),
+                    ]
+                )
+            )
+
+            elements.append(summary_table)
+            elements.append(Spacer(1, 15))
+
+        # ==========================================
+        # DETAILS
+        # ==========================================
+
+        elements.append(PageBreak())
+
+        elements.append(
+            Paragraph("Payroll Details", styles["Heading1"])
+        )
+
+        payroll_data = [
+            [
+                "Employee",
+                "Employee ID",
+                "Period",
+                "Gross",
+                "Net",
+                "Currency",
+                "Method",
+            ]
+        ]
+
+        for payroll in queryset:
+            payroll_data.append(
+                [
+                    payroll.employee.full_name,
+                    payroll.employee.employee_id,
+                    (
+                        f"{payroll.payroll_period_start}"
+                        f"\n{payroll.payroll_period_end}"
+                    ),
+                    f"{float(payroll.gross_pay):,.2f}",
+                    f"{float(payroll.net_pay):,.2f}",
+                    payroll.currency,
+                    payroll.get_payment_method_display(),
+                ]
+            )
+
+        details_table = Table(
+            payroll_data,
+            repeatRows=1,
+            colWidths=[
+                120,
+                70,
+                90,
+                70,
+                70,
+                50,
+                80,
+            ],
+        )
+
+        details_table.setStyle(
+            TableStyle(
+                [
+                    ("GRID", (0, 0), (-1, -1), 0.4, colors.black),
+                    (
+                        "BACKGROUND",
+                        (0, 0),
+                        (-1, 0),
+                        colors.HexColor("#dbeafe"),
+                    ),
+                    (
+                        "FONTNAME",
+                        (0, 0),
+                        (-1, 0),
+                        "Helvetica-Bold",
+                    ),
+                    ("FONTSIZE", (0, 0), (-1, -1), 8),
+                    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ]
+            )
+        )
+
+        elements.append(details_table)
+
+        doc.build(elements)
+
+        return response
+    
+# apps/hr/views.py
+
+# apps/hr/views.py
+
+from django.db import models
+
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle,
+)
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+
+from .models import Attendance
+
+
+class AttendancePDFExportView(APIView):
+    def get(self, request):
+        queryset = Attendance.objects.select_related("employee")
+
+        employee = request.GET.get("employee")
+        status = request.GET.get("status")
+        date = request.GET.get("date")
+        month = request.GET.get("month")
+        year = request.GET.get("year")
+        search = request.GET.get("search")
+
+        if employee:
+            queryset = queryset.filter(employee__employee_id__icontains=employee)
+
+        if status:
+            queryset = queryset.filter(status=status)
+
+        if date:
+            queryset = queryset.filter(date=date)
+
+        if month:
+            queryset = queryset.filter(date__month=month)
+
+        if year:
+            queryset = queryset.filter(date__year=year)
+
+        if search:
+            queryset = queryset.filter(
+                employee__first_name__icontains=search
+            ) | queryset.filter(
+                employee__last_name__icontains=search
+            ) | queryset.filter(
+                employee__employee_id__icontains=search
+            )
+
+        response = HttpResponse(content_type="application/pdf")
+        response["Content-Disposition"] = (
+            f'attachment; filename="attendance-report-{timezone.now().date()}.pdf"'
+        )
+
+        doc = SimpleDocTemplate(response)
+        styles = getSampleStyleSheet()
+
+        elements = []
+
+        # Title
+        elements.append(
+            Paragraph("Attendance Report", styles["Title"])
+        )
+
+        elements.append(
+            Paragraph(
+                f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}",
+                styles["Normal"],
+            )
+        )
+
+        elements.append(Spacer(1, 12))
+
+        # Applied Filters
+        filter_data = [
+            ["Filter", "Value"],
+            ["Employee", employee or "All"],
+            ["Status", status or "All"],
+            ["Date", date or "All"],
+            ["Month", month or "All"],
+            ["Year", year or "All"],
+            ["Search", search or "All"],
+        ]
+
+        filter_table = Table(filter_data, colWidths=[120, 250])
+        filter_table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                    ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ]
+            )
+        )
+
+        elements.append(
+            Paragraph("Applied Filters", styles["Heading2"])
+        )
+        elements.append(filter_table)
+        elements.append(Spacer(1, 20))
+
+        # Summary
+        summary = queryset.aggregate(
+            total=Count("id"),
+            present=Count("id", filter=models.Q(status="present")),
+            absent=Count("id", filter=models.Q(status="absent")),
+            half_day=Count("id", filter=models.Q(status="half_day")),
+            leave=Count("id", filter=models.Q(status="leave")),
+            overtime=Sum("overtime_hours"),
+        )
+
+        summary_data = [
+            ["Metric", "Value"],
+            ["Total Records", summary["total"] or 0],
+            ["Present", summary["present"] or 0],
+            ["Absent", summary["absent"] or 0],
+            ["Half Day", summary["half_day"] or 0],
+            ["Leave", summary["leave"] or 0],
+            ["Total Overtime Hours", summary["overtime"] or 0],
+        ]
+
+        summary_table = Table(summary_data, colWidths=[200, 150])
+
+        summary_table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                    ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ]
+            )
+        )
+
+        elements.append(
+            Paragraph("Summary", styles["Heading2"])
+        )
+        elements.append(summary_table)
+        elements.append(Spacer(1, 20))
+
+        # Attendance Records
+        data = [
+            [
+                "Employee",
+                "Employee ID",
+                "Date",
+                "Status",
+                "Check In",
+                "Check Out",
+                "OT Hours",
+            ]
+        ]
+
+        for record in queryset.order_by("-date"):
+            data.append(
+                [
+                    record.employee.full_name,
+                    record.employee.employee_id,
+                    str(record.date),
+                    record.status,
+                    str(record.check_in or "-"),
+                    str(record.check_out or "-"),
+                    str(record.overtime_hours),
+                ]
+            )
+
+        attendance_table = Table(
+            data,
+            colWidths=[110, 70, 70, 60, 60, 60, 50],
+        )
+
+        attendance_table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+                    ("FONTSIZE", (0, 0), (-1, -1), 8),
+                ]
+            )
+        )
+
+        elements.append(
+            Paragraph("Attendance Records", styles["Heading2"])
+        )
+        elements.append(attendance_table)
+
+        doc.build(elements)
+
+        return response

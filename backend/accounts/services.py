@@ -1,5 +1,5 @@
-from .constants import DEFAULT_ROLE_PERMISSIONS, Effect, Role
-from .models import RolePermissionOverride, UserPermissionOverride, UserProfile
+from .constants import Effect, Role
+from .models import  UserPermissionOverride, UserProfile
 
 
 def get_user_role(user):
@@ -11,26 +11,37 @@ def get_user_role(user):
     return profile.role
 
 
+from .constants import Effect, Role
+from .models import RolePermission
+
+
 def get_effective_permissions(user):
+
     role = get_user_role(user)
+
     if role == Role.ADMIN:
         return {"*"}
 
-    permissions = set(DEFAULT_ROLE_PERMISSIONS.get(role, set()))
+    permissions = set(
+        RolePermission.objects.filter(
+            role=role
+        ).values_list(
+            "permission__code",
+            flat=True,
+        )
+    )
 
-    role_overrides = RolePermissionOverride.objects.filter(role=role)
-    for override in role_overrides:
-        if override.effect == Effect.ALLOW:
-            permissions.add(override.permission)
-        else:
-            permissions.discard(override.permission)
+    for override in user.permission_overrides.select_related(
+        "permission"
+    ):
 
-    user_overrides = UserPermissionOverride.objects.filter(user=user)
-    for override in user_overrides:
+        code = override.permission.code
+
         if override.effect == Effect.ALLOW:
-            permissions.add(override.permission)
+            permissions.add(code)
+
         else:
-            permissions.discard(override.permission)
+            permissions.discard(code)
 
     return permissions
 

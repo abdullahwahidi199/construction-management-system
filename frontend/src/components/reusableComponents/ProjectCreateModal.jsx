@@ -1,5 +1,22 @@
 import { useState } from "react";
+import { Building2, X, Plus, Loader2, AlertCircle, Info } from "lucide-react";
 import Input from "../ui/Input";
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import Button from "../ui/Button";
+import { useLanguage } from "../../hooks/useLanguage";
+
+const INITIAL_FORM = {
+  name: "",
+  description: "",
+  property_type: "residential",
+  location: "",
+  total_floors: 1,
+  start_date: "",
+  expected_completion_date: "",
+  estimated_budget: 0,
+  status: "planning",
+  notes: "",
+};
 
 export default function ProjectCreateModal({
   open,
@@ -8,302 +25,368 @@ export default function ProjectCreateModal({
   loading,
   error,
 }) {
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    property_type: "residential",
-    location: "",
-    total_floors: 1,
-    start_date: "",
-    estimated_budget: 0,
-    status: "planning",
-  });
+  const [form, setForm] = useState(INITIAL_FORM);
+  const { t } = useLanguage();
+
+  const PROPERTY_TYPE_OPTIONS = [
+    {
+      value: "residential",
+      label: t("ProjectCreateModal.options.property_type.residential"),
+    },
+    {
+      value: "commercial",
+      label: t("ProjectCreateModal.options.property_type.commercial"),
+    },
+    {
+      value: "mixed",
+      label: t("ProjectCreateModal.options.property_type.mixed"),
+    },
+  ];
+
+  const STATUS_OPTIONS = [
+    {
+      value: "planning",
+      label: t("ProjectCreateModal.options.status.planning"),
+    },
+    { value: "ongoing", label: t("ProjectCreateModal.options.status.ongoing") },
+    {
+      value: "completed",
+      label: t("ProjectCreateModal.options.status.completed"),
+    },
+    { value: "on_hold", label: t("ProjectCreateModal.options.status.on_hold") },
+  ];
 
   if (!open) return null;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]:
-        name === "total_floors" || name === "estimated_budget"
-          ? Number(value)
-          : value,
-    }));
+  const handleChange = (name, value) => {
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const sanitizeForm = (formData) => {
+    const sanitized = { ...formData };
+    [
+      "start_date",
+      "expected_completion_date",
+      "actual_completion_date",
+    ].forEach((field) => {
+      if (sanitized[field] === "" || sanitized[field] === undefined) {
+        sanitized[field] = null;
+      }
+    });
+    sanitized.total_floors = Number(sanitized.total_floors) || 1;
+    sanitized.estimated_budget = Number(sanitized.estimated_budget) || 0;
+    return sanitized;
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form);
+    onSubmit(sanitizeForm(form));
+  };
+
+  const handleClose = () => {
+    onClose();
   };
 
   // Shared select/textarea styles (Input handles its own)
-  const controlClass =
-    "w-full px-4 py-2.5 rounded-lg border bg-[var(--bg)] text-[var(--text)] placeholder:text-[var(--muted)] transition-colors duration-200 focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 border-[var(--border)]";
+  const baseControl =
+    "w-full px-4 py-2.5 rounded-lg border bg-[var(--bg)] text-[var(--text)] placeholder:text-[var(--muted)] transition-all duration-200 focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 border-[var(--border)] disabled:opacity-50 disabled:cursor-not-allowed";
 
   const labelClass = "block text-sm font-medium text-[var(--text)] mb-1.5";
-
+  const helperClass = "text-xs text-[var(--muted)] mt-1";
   const sectionTitleClass =
-    "text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-3";
+    "text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-3 flex items-center gap-2";
+
+  const errorMessage =
+    typeof error === "string" ? error : t("ProjectCreateModal.errors.default");
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in"
-      onClick={onClose}
+      onClick={handleClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="create-project-title"
     >
       <div
         className="bg-[var(--bg)] text-[var(--text)] w-full max-w-2xl max-h-[90vh] rounded-2xl shadow-2xl border border-[var(--border)] overflow-hidden flex flex-col animate-in zoom-in-95"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-7 py-5 border-b border-[var(--border)] flex items-center justify-between bg-[var(--card)]">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--primary)] flex items-center justify-center shadow-lg shadow-[var(--primary)]/30">
-              <svg
-                className="w-5 h-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+        <div className="px-7 py-5 border-b border-[var(--border)] bg-[var(--card)]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center">
+                <Building2
+                  className="w-5 h-5 text-[var(--primary)]"
                   strokeWidth={2}
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
                 />
-              </svg>
+              </div>
+              <div>
+                <h2
+                  id="create-project-title"
+                  className="text-lg font-semibold text-[var(--text)]"
+                >
+                  {t("ProjectCreateModal.title")}
+                </h2>
+                <p className="text-xs text-[var(--muted)] mt-0.5">
+                  {t("ProjectCreateModal.subtitle")}
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-[var(--text)]">
-                Create New Project
-              </h2>
-              <p className="text-xs text-[var(--muted)]">Add a new project</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--hover)] transition-colors"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            <button
+              type="button"
+              onClick={handleClose}
+              disabled={loading}
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--hover)] transition-colors disabled:opacity-50"
+              aria-label="Close"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <X className="w-5 h-5" strokeWidth={2} />
+            </button>
+          </div>
         </div>
 
         {/* Form Body */}
         <form
+          id="project-create-form"
           onSubmit={handleSubmit}
           className="flex-1 overflow-y-auto px-7 py-6"
+          noValidate
         >
           {error && (
             <div className="mb-5 p-3.5 rounded-lg flex items-start gap-2.5 border border-[var(--danger)]/30 bg-[var(--danger)]/10">
-              <svg
-                className="w-5 h-5 text-[var(--danger)] flex-shrink-0 mt-0.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <p className="text-sm text-[var(--danger)]">
-                {typeof error === "string"
-                  ? error
-                  : "Failed to create project. Please try again."}
+              <AlertCircle className="w-5 h-5 text-[var(--danger)] flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-[var(--danger)] leading-relaxed">
+                {errorMessage}
               </p>
             </div>
           )}
 
           {/* Section: Basic Information */}
-          <div className="mb-6">
-            <h3 className={sectionTitleClass}>Basic Information</h3>
+          <section className="mb-6">
+            <h3 className={sectionTitleClass}>
+              <Info size={12} className="text-[var(--primary)]" />
+              {t("ProjectCreateModal.sections.basic_information")}
+            </h3>
             <div className="space-y-4">
               <Input
-                label="Project Name *"
+                label={t("ProjectCreateModal.fields.name.label")}
                 name="name"
-                placeholder="e.g., Skyline Towers"
+                placeholder={t("ProjectCreateModal.fields.name.placeholder")}
                 value={form.name}
-                onChange={handleChange}
+                onChange={(v) => handleChange("name", v)}
+                required
               />
 
-              <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>Description</label>
+              <div className="w-full">
+                <label className={labelClass} htmlFor="description">
+                  {t("ProjectCreateModal.fields.description.label")}
+                </label>
                 <textarea
+                  id="description"
                   name="description"
-                  placeholder="What's this project about?"
+                  placeholder={t(
+                    "ProjectCreateModal.fields.description.placeholder",
+                  )}
                   value={form.description}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange("description", e.target.value)}
                   rows={3}
-                  className={`${controlClass} resize-none`}
+                  className={`${baseControl} resize-none`}
                 />
-                <span className="text-xs text-[var(--muted)]">
-                  A brief overview of the project
-                </span>
+                <p className={helperClass}>
+                  {t("ProjectCreateModal.fields.description.helper")}
+                </p>
               </div>
             </div>
-          </div>
+          </section>
 
           {/* Section: Property Details */}
-          <div className="mb-6">
-            <h3 className={sectionTitleClass}>Property Details</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>Property Type</label>
+          <section className="mb-6">
+            <h3 className={sectionTitleClass}>
+              <Info size={12} className="text-[var(--primary)]" />
+              {t("ProjectCreateModal.sections.property_details")}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="w-full">
+                <label className={labelClass} htmlFor="property_type">
+                  {t("ProjectCreateModal.fields.property_type")}
+                </label>
                 <select
+                  id="property_type"
                   name="property_type"
                   value={form.property_type}
-                  onChange={handleChange}
-                  className={`${controlClass} cursor-pointer`}
+                  onChange={(e) =>
+                    handleChange("property_type", e.target.value)
+                  }
+                  className={`${baseControl} cursor-pointer`}
                 >
-                  <option value="residential">Residential</option>
-                  <option value="commercial">Commercial</option>
-                  <option value="mixed">Mixed Use</option>
+                  {PROPERTY_TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>Status</label>
+              <div className="w-full">
+                <label className={labelClass} htmlFor="status">
+                  {t("ProjectCreateModal.fields.status")}
+                </label>
                 <select
+                  id="status"
                   name="status"
                   value={form.status}
-                  onChange={handleChange}
-                  className={`${controlClass} cursor-pointer`}
+                  onChange={(e) => handleChange("status", e.target.value)}
+                  className={`${baseControl} cursor-pointer`}
                 >
-                  <option value="planning">Planning</option>
-                  <option value="ongoing">Ongoing</option>
-                  <option value="completed">Completed</option>
-                  <option value="on_hold">On Hold</option>
+                  {STATUS_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <Input
-                label="Location *"
+                label={t("ProjectCreateModal.fields.location.label")}
                 name="location"
-                placeholder="City, State"
+                placeholder={t(
+                  "ProjectCreateModal.fields.location.placeholder",
+                )}
                 value={form.location}
-                onChange={handleChange}
+                onChange={(v) => handleChange("location", v)}
+                required
               />
 
               <Input
-                label="Total Floors"
+                label={t("ProjectCreateModal.fields.total_floors")}
                 name="total_floors"
                 type="number"
+                min="1"
                 value={form.total_floors}
-                onChange={handleChange}
+                onChange={(v) => handleChange("total_floors", v)}
               />
             </div>
-          </div>
+          </section>
 
           {/* Section: Timeline & Budget */}
-          <div className="mb-2">
-            <h3 className={sectionTitleClass}>Timeline & Budget</h3>
-            <div className="grid grid-cols-2 gap-4">
+          <section className="mb-6">
+            <h3 className={sectionTitleClass}>
+              <Info size={12} className="text-[var(--primary)]" />
+              {t("ProjectCreateModal.sections.timeline_budget")}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
-                label="Start Date *"
+                label={t("ProjectCreateModal.fields.start_date")}
                 name="start_date"
                 type="date"
                 value={form.start_date}
-                onChange={handleChange}
+                onChange={(v) => handleChange("start_date", v)}
+                required
               />
 
-              <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>Estimated Budget</label>
+              <Input
+                label={t("ProjectCreateModal.fields.expected_completion_date")}
+                name="expected_completion_date"
+                type="date"
+                value={form.expected_completion_date}
+                onChange={(v) => handleChange("expected_completion_date", v)}
+              />
+
+              <div className="w-full sm:col-span-2">
+                <label className={labelClass} htmlFor="estimated_budget">
+                  {t("ProjectCreateModal.fields.estimated_budget.label")}
+                </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)] text-sm z-10">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)] text-sm font-medium pointer-events-none">
                     $
                   </span>
-                  <Input
+                  <input
+                    id="estimated_budget"
                     name="estimated_budget"
                     type="number"
+                    min="0"
+                    step="0.01"
                     placeholder="0.00"
                     value={form.estimated_budget}
-                    onChange={handleChange}
-                    className="[&>input]:pl-7"
+                    onChange={(e) =>
+                      handleChange("estimated_budget", e.target.value)
+                    }
+                    className={`${baseControl} pl-7`}
                   />
                 </div>
-                <span className="text-xs text-[var(--muted)]">In USD</span>
+                <p className={helperClass}>
+                  {t("ProjectCreateModal.fields.estimated_budget.helper")}
+                </p>
               </div>
             </div>
-          </div>
+          </section>
+
+          {/* Section: Notes */}
+          <section className="mb-2">
+            <h3 className={sectionTitleClass}>
+              <Info size={12} className="text-[var(--primary)]" />
+              {t("ProjectCreateModal.sections.additional_notes")}
+            </h3>
+            <div className="w-full">
+              <textarea
+                name="notes"
+                placeholder={t("ProjectCreateModal.fields.notes.placeholder")}
+                value={form.notes}
+                onChange={(e) => handleChange("notes", e.target.value)}
+                rows={3}
+                className={`${baseControl} resize-none`}
+              />
+            </div>
+          </section>
         </form>
 
         {/* Footer */}
-        <div className="px-7 py-4 border-t border-[var(--border)] bg-[var(--card)] flex items-center justify-between">
+        <div className="px-7 py-4 border-t border-[var(--border)] bg-[var(--card)] flex items-center justify-between gap-3">
           <p className="text-xs text-[var(--muted)]">
             <span className="text-[var(--danger)]">*</span> Required fields
           </p>
           <div className="flex items-center gap-2.5">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={loading}
               className="px-4 py-2 text-sm font-medium text-[var(--text)] bg-[var(--bg)] border border-[var(--border)] rounded-lg hover:bg-[var(--hover)] transition-all disabled:opacity-50"
             >
-              Cancel
+              {t("ProjectCreateModal.buttons.cancel")}
             </button>
-            <button
-              type="submit"
-              onClick={handleSubmit}
-              disabled={loading}
-              className="px-5 py-2 text-sm font-medium text-white bg-[var(--primary)] rounded-lg hover:opacity-90 shadow-lg shadow-[var(--primary)]/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+
+            <PermissionWrapper
+              permissions={["projects.create"]}
+              fallback={
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled
+                  title="You do not have permission for this action"
+                >
+                  {t("ProjectCreateModal.buttons.create")}
+                </Button>
+              }
             >
-              {loading ? (
-                <>
-                  <svg
-                    className="animate-spin w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v16m8-8H4"
-                    />
-                  </svg>
-                  Create Project
-                </>
-              )}
-            </button>
+              <button
+                type="submit"
+                form="project-create-form"
+                disabled={loading}
+                className="px-5 py-2 text-sm font-medium text-white bg-[var(--primary)] rounded-lg hover:opacity-90 shadow-lg shadow-[var(--primary)]/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {t("ProjectCreateModal.buttons.creating")}
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4" strokeWidth={2} />
+                    {t("ProjectCreateModal.buttons.create")}
+                  </>
+                )}
+              </button>
+            </PermissionWrapper>
           </div>
         </div>
       </div>

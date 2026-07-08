@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Pencil, X, Loader2, Save, AlertCircle } from "lucide-react";
+import {
+  Pencil,
+  X,
+  Loader2,
+  Save,
+  AlertCircle,
+  RotateCcw,
+  Info,
+} from "lucide-react";
 import instance from "../../api/axiosInstance";
 import Input from "../ui/Input";
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import Button from "../ui/Button";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
   const [form, setForm] = useState({
@@ -23,11 +34,30 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
   const [hasChanges, setHasChanges] = useState(false);
   const [originalForm, setOriginalForm] = useState(null);
 
+  const { t } = useLanguage();
+
+  const PROPERTY_TYPE_OPTIONS = [
+    {
+      value: "residential",
+      label: t("ProjectEditView.propertyTypeOptions.residential"),
+    },
+    {
+      value: "commercial",
+      label: t("ProjectEditView.propertyTypeOptions.commercial"),
+    },
+    { value: "mixed", label: t("ProjectEditView.propertyTypeOptions.mixed") },
+  ];
+
+  const STATUS_OPTIONS = [
+    { value: "planning", label: t("ProjectEditView.statusOptions.planning") },
+    { value: "ongoing", label: t("ProjectEditView.statusOptions.ongoing") },
+    { value: "completed", label: t("ProjectEditView.statusOptions.completed") },
+    { value: "on_hold", label: t("ProjectEditView.statusOptions.onHold") },
+  ];
   /* ── Sanitize form before sending to API ──────── */
   const sanitizeForm = (formData) => {
     const sanitized = { ...formData };
 
-    // Convert empty date strings to null
     const dateFields = [
       "start_date",
       "expected_completion_date",
@@ -40,15 +70,6 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
       }
     });
 
-    // Convert empty strings to null for optional text fields
-    const optionalTextFields = ["description", "notes"];
-    optionalTextFields.forEach((field) => {
-      if (sanitized[field] === "") {
-        sanitized[field] = "";
-      }
-    });
-
-    // Ensure numeric fields are numbers
     sanitized.total_floors = Number(sanitized.total_floors) || 1;
     sanitized.estimated_budget = Number(sanitized.estimated_budget) || 0;
 
@@ -58,11 +79,13 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
   /* ── Format date from API to input value ──────── */
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
-    // Handle full ISO datetime strings like "2026-06-13T16:09:11.557832Z"
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return "";
-    // Return YYYY-MM-DD format
-    return date.toISOString().split("T")[0];
+    // Use local date components to avoid timezone shifting
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   /* ── Fetch project details ────────────────────── */
@@ -102,6 +125,7 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
     if (open && projectId) {
       fetchProjectDetails();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, projectId]);
 
   /* ── Track changes ────────────────────────────── */
@@ -116,15 +140,15 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
   if (!open) return null;
 
   /* ── Handlers ─────────────────────────────────── */
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]:
-        name === "total_floors" || name === "estimated_budget"
-          ? Number(value)
-          : value,
-    }));
+  const handleChange = (name, value) => {
+    setForm((prev) => {
+      let nextValue = value;
+      if (name === "total_floors" || name === "estimated_budget") {
+        // Keep as string while editing; sanitize on submit
+        nextValue = value;
+      }
+      return { ...prev, [name]: nextValue };
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -133,7 +157,6 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
       setLoading(true);
       setError(null);
 
-      // Sanitize before sending
       const payload = sanitizeForm(form);
       await instance.put(`/projects/${projectId}/`, payload);
       onSaved && onSaved();
@@ -159,70 +182,92 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
     if (originalForm) {
       setForm(originalForm);
       setHasChanges(false);
+      setError(null);
     }
   };
 
+  const handleClose = () => {
+    setError(null);
+    onClose();
+  };
+
   /* ── Shared styles ────────────────────────────── */
-  const controlClass =
-    "w-full px-4 py-2.5 rounded-lg border bg-[var(--bg)] text-[var(--text)] placeholder:text-[var(--muted)] transition-colors duration-200 focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 border-[var(--border)]";
+  const baseControl =
+    "w-full px-4 py-2.5 rounded-lg border bg-[var(--bg)] text-[var(--text)] placeholder:text-[var(--muted)] transition-all duration-200 focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 border-[var(--border)] disabled:opacity-50 disabled:cursor-not-allowed";
 
   const labelClass = "block text-sm font-medium text-[var(--text)] mb-1.5";
-
+  const helperClass = "text-xs text-[var(--muted)] mt-1";
   const sectionTitleClass =
-    "text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-3";
+    "text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-3 flex items-center gap-2";
 
   const isChanged = (fieldName) => {
     if (!originalForm) return false;
     return String(form[fieldName]) !== String(originalForm[fieldName]);
   };
 
+  // Use theme variable instead of hardcoded amber for changed field indicator
   const fieldHighlight = (fieldName) =>
-    isChanged(fieldName) ? "ring-2 ring-amber-400/30 border-amber-400/50" : "";
+    isChanged(fieldName)
+      ? "!border-[var(--warning)] !ring-2 !ring-[var(--warning)]/20"
+      : "";
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in"
-      onClick={onClose}
+      onClick={handleClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="edit-project-title"
     >
       <div
         className="bg-[var(--bg)] text-[var(--text)] w-full max-w-2xl max-h-[90vh] rounded-2xl shadow-2xl border border-[var(--border)] overflow-hidden flex flex-col animate-in zoom-in-95"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── Header ─────────────────────────────── */}
-        <div className="px-7 py-5 border-b border-[var(--border)] flex items-center justify-between bg-[var(--card)]">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <Pencil className="w-5 h-5 text-amber-500" strokeWidth={2} />
+        <div className="px-7 py-5 border-b border-[var(--border)] bg-[var(--card)]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center">
+                <Pencil
+                  className="w-5 h-5 text-[var(--primary)]"
+                  strokeWidth={2}
+                />
+              </div>
+              <div>
+                <h2
+                  id="edit-project-title"
+                  className="text-lg font-semibold text-[var(--text)]"
+                >
+                  {t("ProjectEditView.title")}
+                </h2>
+                <p className="text-xs text-[var(--muted)] mt-0.5">
+                  {fetching
+                    ? t("ProjectEditView.loading")
+                    : hasChanges
+                      ? t("ProjectEditView.unsavedChanges")
+                      : t("ProjectEditView.updateInfo")}
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-[var(--text)]">
-                Edit Project
-              </h2>
-              <p className="text-xs text-[var(--muted)]">
-                {fetching
-                  ? "Loading project details…"
-                  : hasChanges
-                    ? "You have unsaved changes"
-                    : "Update project information"}
-              </p>
+
+            <div className="flex items-center gap-2">
+              {hasChanges && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--warning)]/10 border border-[var(--warning)]/30 px-2.5 py-1 text-xs font-medium text-[var(--warning)]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--warning)] animate-pulse" />
+                  {t("ProjectEditView.modified")}
+                </span>
+              )}
+
+              <button
+                type="button"
+                onClick={handleClose}
+                disabled={loading}
+                className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--hover)] transition-colors disabled:opacity-50"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" strokeWidth={2} />
+              </button>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {hasChanges && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 text-xs font-medium text-amber-600 dark:text-amber-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
-                Modified
-              </span>
-            )}
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--hover)] transition-colors"
-            >
-              <X className="w-5 h-5" strokeWidth={2} />
-            </button>
           </div>
         </div>
 
@@ -232,228 +277,286 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
             <div className="flex flex-col items-center gap-3">
               <Loader2 className="h-8 w-8 animate-spin text-[var(--primary)]" />
               <p className="text-sm text-[var(--muted)]">
-                Loading project details…
+                {t("ProjectEditView.loading")}
               </p>
             </div>
           </div>
         ) : (
           <form
+            id="project-edit-form"
             onSubmit={handleSubmit}
             className="flex-1 overflow-y-auto px-7 py-6"
+            noValidate
           >
             {/* Error Alert */}
             {error && (
               <div className="mb-5 p-3.5 rounded-lg flex items-start gap-2.5 border border-[var(--danger)]/30 bg-[var(--danger)]/10">
                 <AlertCircle className="w-5 h-5 text-[var(--danger)] flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-[var(--danger)]">{error}</p>
+                <p className="text-sm text-[var(--danger)] leading-relaxed">
+                  {error}
+                </p>
               </div>
             )}
 
             {/* Section: Basic Information */}
-            <div className="mb-6">
-              <h3 className={sectionTitleClass}>Basic Information</h3>
+            <section className="mb-6">
+              <h3 className={sectionTitleClass}>
+                <Info size={12} className="text-[var(--primary)]" />
+                {t("ProjectEditView.basicInfo")}
+              </h3>
               <div className="space-y-4">
-                <div>
-                  <Input
-                    label="Project Name *"
-                    name="name"
-                    placeholder="e.g., Skyline Towers"
-                    value={form.name}
-                    onChange={handleChange}
-                    className={fieldHighlight("name")}
-                  />
-                </div>
+                <Input
+                  label={t("ProjectEditView.projectName")}
+                  name="name"
+                  placeholder="e.g., Skyline Towers"
+                  value={form.name}
+                  onChange={(v) => handleChange("name", v)}
+                  className={fieldHighlight("name")}
+                  required
+                />
 
-                <div className="flex flex-col gap-1.5">
-                  <label className={labelClass}>Description</label>
+                <div className="w-full">
+                  <label className={labelClass} htmlFor="description">
+                    {t("ProjectEditView.description")}
+                  </label>
                   <textarea
+                    id="description"
                     name="description"
-                    placeholder="What's this project about?"
+                    placeholder={t("ProjectEditView.projectDescription")}
                     value={form.description}
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      handleChange("description", e.target.value)
+                    }
                     rows={3}
-                    className={`${controlClass} resize-none ${fieldHighlight(
+                    className={`${baseControl} resize-none ${fieldHighlight(
                       "description",
                     )}`}
                   />
-                  <span className="text-xs text-[var(--muted)]">
-                    A brief overview of the project
-                  </span>
+                  <p className={helperClass}>
+                    {t("ProjectEditView.briefOverview")}
+                  </p>
                 </div>
               </div>
-            </div>
+            </section>
 
             {/* Section: Property Details */}
-            <div className="mb-6">
-              <h3 className={sectionTitleClass}>Property Details</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className={labelClass}>Property Type</label>
+            <section className="mb-6">
+              <h3 className={sectionTitleClass}>
+                <Info size={12} className="text-[var(--primary)]" />
+                {t("ProjectEditView.propertyDetails")}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="w-full">
+                  <label className={labelClass} htmlFor="property_type">
+                    {t("ProjectEditView.propertyType")}
+                  </label>
                   <select
+                    id="property_type"
                     name="property_type"
                     value={form.property_type}
-                    onChange={handleChange}
-                    className={`${controlClass} cursor-pointer ${fieldHighlight(
+                    onChange={(e) =>
+                      handleChange("property_type", e.target.value)
+                    }
+                    className={`${baseControl} cursor-pointer ${fieldHighlight(
                       "property_type",
                     )}`}
                   >
-                    <option value="residential">Residential</option>
-                    <option value="commercial">Commercial</option>
-                    <option value="mixed">Mixed Use</option>
+                    {PROPERTY_TYPE_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className={labelClass}>Status</label>
+                <div className="w-full">
+                  <label className={labelClass} htmlFor="status">
+                    {t("ProjectEditView.status")}
+                  </label>
                   <select
+                    id="status"
                     name="status"
                     value={form.status}
-                    onChange={handleChange}
-                    className={`${controlClass} cursor-pointer ${fieldHighlight(
+                    onChange={(e) => handleChange("status", e.target.value)}
+                    className={`${baseControl} cursor-pointer ${fieldHighlight(
                       "status",
                     )}`}
                   >
-                    <option value="planning">Planning</option>
-                    <option value="ongoing">Ongoing</option>
-                    <option value="completed">Completed</option>
-                    <option value="on_hold">On Hold</option>
+                    {STATUS_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <Input
-                  label="Location *"
+                  label={t("ProjectEditView.location")}
                   name="location"
                   placeholder="City, State"
                   value={form.location}
-                  onChange={handleChange}
+                  onChange={(v) => handleChange("location", v)}
                   className={fieldHighlight("location")}
+                  required
                 />
 
                 <Input
-                  label="Total Floors"
+                  label={t("ProjectEditView.totalFloors")}
                   name="total_floors"
                   type="number"
+                  min="1"
                   value={form.total_floors}
-                  onChange={handleChange}
+                  onChange={(v) => handleChange("total_floors", v)}
                   className={fieldHighlight("total_floors")}
                 />
               </div>
-            </div>
+            </section>
 
             {/* Section: Timeline & Budget */}
-            <div className="mb-6">
-              <h3 className={sectionTitleClass}>Timeline & Budget</h3>
-              <div className="grid grid-cols-2 gap-4">
+            <section className="mb-6">
+              <h3 className={sectionTitleClass}>
+                <Info size={12} className="text-[var(--primary)]" />
+                {t("ProjectEditView.timelineBudget")}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                  label="Start Date *"
+                  label={t("ProjectEditView.startDate")}
                   name="start_date"
                   type="date"
                   value={form.start_date}
-                  onChange={handleChange}
+                  onChange={(v) => handleChange("start_date", v)}
                   className={fieldHighlight("start_date")}
+                  required
                 />
 
                 <Input
-                  label="Expected Completion"
+                  label={t("ProjectEditView.expectedCompletion")}
                   name="expected_completion_date"
                   type="date"
                   value={form.expected_completion_date}
-                  onChange={handleChange}
+                  onChange={(v) => handleChange("expected_completion_date", v)}
                   className={fieldHighlight("expected_completion_date")}
                 />
 
-                <div className="flex flex-col gap-1.5 col-span-2 sm:col-span-1">
-                  <label className={labelClass}>Estimated Budget</label>
+                <div className="w-full sm:col-span-2">
+                  <label className={labelClass} htmlFor="estimated_budget">
+                    {t("ProjectEditView.estimatedBudget")}
+                  </label>
                   <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)] text-sm z-10">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)] text-sm font-medium pointer-events-none">
                       $
                     </span>
                     <input
+                      id="estimated_budget"
                       name="estimated_budget"
                       type="number"
+                      min="0"
+                      step="0.01"
                       placeholder="0.00"
                       value={form.estimated_budget}
-                      onChange={handleChange}
-                      className={`${controlClass} pl-7 ${fieldHighlight(
+                      onChange={(e) =>
+                        handleChange("estimated_budget", e.target.value)
+                      }
+                      className={`${baseControl} pl-7 ${fieldHighlight(
                         "estimated_budget",
                       )}`}
                     />
                   </div>
-                  <span className="text-xs text-[var(--muted)]">In USD</span>
+                  <p className={helperClass}>In USD</p>
                 </div>
               </div>
-            </div>
+            </section>
 
             {/* Section: Notes */}
-            <div className="mb-2">
-              <h3 className={sectionTitleClass}>Additional Notes</h3>
-              <div className="flex flex-col gap-1.5">
+            <section className="mb-2">
+              <h3 className={sectionTitleClass}>
+                <Info size={12} className="text-[var(--primary)]" />
+                {t("ProjectEditView.additionalNotes")}
+              </h3>
+              <div className="w-full">
                 <textarea
                   name="notes"
-                  placeholder="Any additional notes, remarks, or important details…"
+                  placeholder={t("ProjectEditView.notesPlaceholder")}
                   value={form.notes}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange("notes", e.target.value)}
                   rows={3}
-                  className={`${controlClass} resize-none ${fieldHighlight(
+                  className={`${baseControl} resize-none ${fieldHighlight(
                     "notes",
                   )}`}
                 />
               </div>
-            </div>
+            </section>
           </form>
         )}
 
         {/* ── Footer ─────────────────────────────── */}
         {!fetching && (
-          <div className="px-7 py-4 border-t border-[var(--border)] bg-[var(--card)] flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <p className="text-xs text-[var(--muted)]">
-                <span className="text-[var(--danger)]">*</span> Required fields
+          <div className="px-7 py-4 border-t border-[var(--border)] bg-[var(--card)] flex items-center justify-between gap-3">
+            <div className="flex items-center gap-4 min-w-0">
+              <p className="text-xs text-[var(--muted)] whitespace-nowrap">
+                <span className="text-[var(--danger)]">*</span>
+                {t("ProjectEditView.requiredFields")}
               </p>
 
               {hasChanges && (
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="text-xs font-medium text-[var(--muted)] hover:text-[var(--text)] underline underline-offset-2 transition-colors"
+                  disabled={loading}
+                  className="text-xs font-medium text-[var(--muted)] hover:text-[var(--primary)] underline underline-offset-2 transition-colors inline-flex items-center gap-1 disabled:opacity-50"
                 >
-                  Reset changes
+                  <RotateCcw size={12} />
+                  {t("ProjectEditView.resetChanges")}
                 </button>
               )}
             </div>
 
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 shrink-0">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 disabled={loading}
                 className="px-4 py-2 text-sm font-medium text-[var(--text)] bg-[var(--bg)] border border-[var(--border)] rounded-lg hover:bg-[var(--hover)] transition-all disabled:opacity-50"
               >
-                Cancel
+                {t("ProjectEditView.cancel")}
               </button>
 
-              <button
-                type="submit"
-                onClick={handleSubmit}
-                disabled={loading || !hasChanges}
-                className={`px-5 py-2 text-sm font-medium text-white rounded-lg shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
-                  hasChanges
-                    ? "bg-[var(--primary)] hover:opacity-90 shadow-[var(--primary)]/25"
-                    : "bg-[var(--muted)] shadow-none"
-                }`}
+              <PermissionWrapper
+                permissions={["projects.update"]}
+                fallback={
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    disabled
+                    title="You do not have permission for this action"
+                  >
+                    {t("ProjectEditView.saveChanges")}
+                  </Button>
+                }
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Saving…
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" strokeWidth={2} />
-                    Save Changes
-                  </>
-                )}
-              </button>
+                <button
+                  type="submit"
+                  form="project-edit-form"
+                  disabled={loading || !hasChanges}
+                  className={`px-5 py-2 text-sm font-medium text-white rounded-lg shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
+                    hasChanges
+                      ? "bg-[var(--primary)] hover:opacity-90 shadow-[var(--primary)]/25"
+                      : "bg-[var(--muted)] shadow-none"
+                  }`}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving…
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" strokeWidth={2} />
+                      {t("ProjectEditView.saveChanges")}
+                    </>
+                  )}
+                </button>
+              </PermissionWrapper>
             </div>
           </div>
         )}

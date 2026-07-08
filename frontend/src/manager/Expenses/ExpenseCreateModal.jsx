@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 import { X, Save, DollarSign, User, FileText, Calendar } from "lucide-react";
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import Button from "../../components/ui/Button";
+import { useLanguage } from "../../hooks/useLanguage";
+
+const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
 export default function ExpenseCreateModal({
   isOpen,
@@ -7,6 +12,9 @@ export default function ExpenseCreateModal({
   onCreate,
   projects = [],
 }) {
+  const { t, lang } = useLanguage();
+  const isRTL = RTL_LANGS.includes(lang);
+
   const [formData, setFormData] = useState({
     description: "",
     expense_date: "",
@@ -58,16 +66,16 @@ export default function ExpenseCreateModal({
     const newErrors = {};
 
     if (!formData.description?.trim()) {
-      newErrors.description = "Description is required";
+      newErrors.description = t("ExpenseCreateModal.descriptionRequired");
     }
     if (!formData.expense_date) {
-      newErrors.expense_date = "Date is required";
+      newErrors.expense_date = t("ExpenseCreateModal.dateRequired");
     }
     if (!formData.amount_usd && !formData.amount_afn) {
-      newErrors.amount = "At least one amount is required";
+      newErrors.amount = t("ExpenseCreateModal.amountRequired");
     }
     if (!formData.project) {
-      newErrors.project = "Project is required";
+      newErrors.project = t("ExpenseCreateModal.projectRequired");
     }
 
     setErrors(newErrors);
@@ -99,7 +107,7 @@ export default function ExpenseCreateModal({
     } catch (error) {
       console.error(error);
       setErrors({
-        submit: "Failed to create expense",
+        submit: t("ExpenseCreateModal.createFailed"),
       });
     } finally {
       setIsSubmitting(false);
@@ -116,15 +124,18 @@ export default function ExpenseCreateModal({
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-2xl">
+        <div
+          dir={isRTL ? "rtl" : "ltr"}
+          className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-2xl"
+        >
           {/* Header */}
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur-sm px-6 py-4">
             <div>
               <h2 className="text-xl font-semibold text-[var(--text)]">
-                Create Expense
+                {t("ExpenseCreateModal.title")}
               </h2>
               <p className="text-sm text-[var(--muted)] mt-0.5">
-                Create a new expense record
+                {t("ExpenseCreateModal.subtitle")}
               </p>
             </div>
             <button
@@ -140,7 +151,8 @@ export default function ExpenseCreateModal({
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                Description <span className="text-red-500">*</span>
+                {t("ExpenseCreateModal.description")}{" "}
+                <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={formData.description}
@@ -151,7 +163,7 @@ export default function ExpenseCreateModal({
                     ? "border-red-500"
                     : "border-[var(--border)]"
                 } bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] placeholder-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
-                placeholder="Enter expense description"
+                placeholder={t("ExpenseCreateModal.enterDescription")}
               />
               {errors.description && (
                 <p className="mt-1 text-xs text-red-500">
@@ -163,10 +175,11 @@ export default function ExpenseCreateModal({
             {/* Date */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                Expense Date <span className="text-red-500">*</span>
+                {t("ExpenseCreateModal.expenseDate")}{" "}
+                <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
+                <Calendar className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
                 <input
                   type="date"
                   value={formData.expense_date}
@@ -175,7 +188,7 @@ export default function ExpenseCreateModal({
                     errors.expense_date
                       ? "border-red-500"
                       : "border-[var(--border)]"
-                  } bg-[var(--bg)] pl-10 pr-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
+                  } bg-[var(--bg)] ps-10 pe-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
                 />
               </div>
               {errors.expense_date && (
@@ -189,10 +202,10 @@ export default function ExpenseCreateModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                  Amount in USD
+                  {t("ExpenseCreateModal.amountUsd")}
                 </label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
+                  <DollarSign className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
                   <input
                     type="number"
                     step="0.01"
@@ -202,7 +215,7 @@ export default function ExpenseCreateModal({
                       errors.amount
                         ? "border-red-500"
                         : "border-[var(--border)]"
-                    } bg-[var(--bg)] pl-10 pr-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
+                    } bg-[var(--bg)] ps-10 pe-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
                     placeholder="0.00"
                   />
                 </div>
@@ -210,10 +223,10 @@ export default function ExpenseCreateModal({
 
               <div>
                 <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                  Amount in AFN
+                  {t("ExpenseCreateModal.amountAfn")}
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)] font-medium">
+                  <span className="absolute start-3 top-1/2 -translate-y-1/2 text-[var(--muted)] font-medium">
                     ؋
                   </span>
                   <input
@@ -225,7 +238,7 @@ export default function ExpenseCreateModal({
                       errors.amount
                         ? "border-red-500"
                         : "border-[var(--border)]"
-                    } bg-[var(--bg)] pl-10 pr-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
+                    } bg-[var(--bg)] ps-10 pe-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
                     placeholder="0.00"
                   />
                 </div>
@@ -238,7 +251,7 @@ export default function ExpenseCreateModal({
             {/* Exchange Rate */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                Exchange Rate
+                {t("ExpenseCreateModal.exchangeRate")}
               </label>
               <input
                 type="number"
@@ -253,16 +266,16 @@ export default function ExpenseCreateModal({
             {/* Paid To */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                Paid To
+                {t("ExpenseCreateModal.paidTo")}
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
+                <User className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
                 <input
                   type="text"
                   value={formData.paid_to}
                   onChange={(e) => handleChange("paid_to", e.target.value)}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] pl-10 pr-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors"
-                  placeholder="Who was this paid to?"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] ps-10 pe-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors"
+                  placeholder={t("ExpenseCreateModal.paidToPlaceholder")}
                 />
               </div>
             </div>
@@ -270,26 +283,43 @@ export default function ExpenseCreateModal({
             {/* Expense Type */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                Expense Type
+                {t("ExpenseCreateModal.expenseType")}
               </label>
               <select
                 value={formData.expense_type}
                 onChange={(e) => handleChange("expense_type", e.target.value)}
                 className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors"
               >
-                <option value="general">General</option>
-                <option value="construction">Construction</option>
-                <option value="material">Material</option>
-                <option value="daily_wage">Daily wage</option>
-                <option value="equipment">Equipment</option>
-                <option value="utility">Utility</option>
-                <option value="contract_payment">Contract payment</option>
-                <option value="other">Other</option>
+                <option value="general">
+                  {t("ExpenseCreateModal.general")}
+                </option>
+                <option value="construction">
+                  {t("ExpenseCreateModal.construction")}
+                </option>
+                <option value="material">
+                  {t("ExpenseCreateModal.material")}
+                </option>
+                <option value="daily_wage">
+                  {t("ExpenseCreateModal.dailyWage")}
+                </option>
+                <option value="equipment">
+                  {t("ExpenseCreateModal.equipment")}
+                </option>
+                <option value="utility">
+                  {t("ExpenseCreateModal.utility")}
+                </option>
+                <option value="contract_payment">
+                  {t("ExpenseCreateModal.contractPayment")}
+                </option>
+                <option value="other">{t("ExpenseCreateModal.other")}</option>
               </select>
             </div>
+
+            {/* Project */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                Project <span className="text-red-500">*</span>
+                {t("ExpenseCreateModal.project")}{" "}
+                <span className="text-red-500">*</span>
               </label>
 
               <select
@@ -299,7 +329,9 @@ export default function ExpenseCreateModal({
                   errors.project ? "border-red-500" : "border-[var(--border)]"
                 } bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]`}
               >
-                <option value="">Select Project</option>
+                <option value="">
+                  {t("ExpenseCreateModal.selectProject")}
+                </option>
 
                 {projects.map((project) => (
                   <option key={project.id} value={project.id}>
@@ -312,17 +344,18 @@ export default function ExpenseCreateModal({
                 <p className="mt-1 text-xs text-red-500">{errors.project}</p>
               )}
             </div>
+
             {/* Remarks */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                Remarks
+                {t("ExpenseCreateModal.remarks")}
               </label>
               <textarea
                 value={formData.remarks}
                 onChange={(e) => handleChange("remarks", e.target.value)}
                 rows={2}
                 className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] placeholder-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors"
-                placeholder="Any additional notes..."
+                placeholder={t("ExpenseCreateModal.remarksPlaceholder")}
               />
             </div>
 
@@ -340,16 +373,32 @@ export default function ExpenseCreateModal({
                 onClick={onClose}
                 className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] px-6 py-2.5 text-sm font-medium text-[var(--text)] hover:bg-[var(--hover)] transition-colors"
               >
-                Cancel
+                {t("ExpenseCreateModal.cancel")}
               </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-6 py-2.5 text-sm font-medium text-white hover:bg-[var(--primary)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              <PermissionWrapper
+                permissions={["expenses.create"]}
+                fallback={
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    disabled
+                    title={t("ExpenseCreateModal.noPermission")}
+                  >
+                    {t("ExpenseCreateModal.createExpense")}
+                  </Button>
+                }
               >
-                <Save className="h-4 w-4" />
-                {isSubmitting ? "Creating..." : "Create Expense"}
-              </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-6 py-2.5 text-sm font-medium text-white hover:bg-[var(--primary)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Save className="h-4 w-4" />
+                  {isSubmitting
+                    ? t("ExpenseCreateModal.creating")
+                    : t("ExpenseCreateModal.createExpense")}
+                </button>
+              </PermissionWrapper>
             </div>
           </form>
         </div>

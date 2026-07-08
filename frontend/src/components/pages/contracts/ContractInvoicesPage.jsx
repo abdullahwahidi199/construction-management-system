@@ -1,7 +1,9 @@
+// src/pages/contracts/ContractInvoicesPage.jsx
 import React, { useState, useMemo } from "react";
 import useFetch from "../../../hooks/useFetch";
 import InvoiceFormModal from "./InvoiceFormModal";
 import ContractInvoiceDetails from "../../contracts/ContractInvoiceDetails";
+import { useLanguage } from "../../../hooks/useLanguage";
 
 const STATUS_COLORS = {
   pending: "var(--warning)",
@@ -10,15 +12,6 @@ const STATUS_COLORS = {
   paid: "var(--success)",
   cancelled: "var(--danger)",
 };
-
-const STATUS_FILTERS = [
-  { value: "", label: "All Statuses" },
-  { value: "pending", label: "Pending" },
-  { value: "approved", label: "Approved" },
-  { value: "partially_paid", label: "Partially Paid" },
-  { value: "paid", label: "Paid" },
-  { value: "cancelled", label: "Cancelled" },
-];
 
 // Shared input style for consistency
 const inputStyle = {
@@ -32,6 +25,17 @@ const inputStyle = {
 };
 
 export default function ContractInvoicesPage({ contractID, contractCurrency }) {
+  const { t } = useLanguage();
+
+  const STATUS_FILTERS = [
+    { value: "", label: t("ContractInvoicesPage.allStatuses") },
+    { value: "pending", label: t("ContractInvoicesPage.pending") },
+    { value: "approved", label: t("ContractInvoicesPage.approved") },
+    { value: "partially_paid", label: t("ContractInvoicesPage.partiallyPaid") },
+    { value: "paid", label: t("ContractInvoicesPage.paid") },
+    { value: "cancelled", label: t("ContractInvoicesPage.cancelled") },
+  ];
+
   const {
     data: invoices,
     loading,
@@ -123,15 +127,15 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
   const hasActiveFilters =
     searchQuery || statusFilter || dateRange.start || dateRange.end;
   const emptyMessage = hasActiveFilters
-    ? "No matching invoices found for the selected criteria."
-    : "No invoices found for this contract.";
+    ? t("ContractInvoicesPage.noMatchingInvoices")
+    : t("ContractInvoicesPage.noInvoicesForContract");
 
   if (loading)
     return (
       <div
         style={{ padding: "2rem", textAlign: "center", color: "var(--muted)" }}
       >
-        Loading invoices...
+        {t("ContractInvoicesPage.loadingInvoices")}
       </div>
     );
   if (error)
@@ -139,7 +143,8 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
       <div
         style={{ padding: "2rem", textAlign: "center", color: "var(--danger)" }}
       >
-        Error: {typeof error === "object" ? JSON.stringify(error) : error}
+        {t("ContractInvoicesPage.error")}:{" "}
+        {typeof error === "object" ? JSON.stringify(error) : error}
       </div>
     );
 
@@ -164,7 +169,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
         }}
       >
         <h1 style={{ fontSize: "1.5rem", fontWeight: "bold", margin: 0 }}>
-          Contract Invoices
+          {t("ContractInvoicesPage.contractInvoices")}
         </h1>
         <button
           onClick={handleOpenCreate}
@@ -179,7 +184,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
             fontSize: "0.9rem",
           }}
         >
-          + New Invoice
+          + {t("ContractInvoicesPage.newInvoice")}
         </button>
       </div>
 
@@ -197,7 +202,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
         <div style={{ flex: "1 1 200px" }}>
           <input
             type="text"
-            placeholder="Search by Invoice #, Project..."
+            placeholder={t("ContractInvoicesPage.searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ ...inputStyle, width: "100%" }}
@@ -224,7 +229,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
           onChange={(e) =>
             setDateRange((prev) => ({ ...prev, start: e.target.value }))
           }
-          placeholder="Start Date"
+          placeholder={t("ContractInvoicesPage.startDate")}
           style={{ ...inputStyle, width: "150px", colorScheme: "dark" }} // colorScheme ensures dark mode date picker works
         />
 
@@ -235,7 +240,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
           onChange={(e) =>
             setDateRange((prev) => ({ ...prev, end: e.target.value }))
           }
-          placeholder="End Date"
+          placeholder={t("ContractInvoicesPage.endDate")}
           style={{ ...inputStyle, width: "150px", colorScheme: "dark" }}
         />
 
@@ -257,7 +262,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
               gap: "4px",
             }}
           >
-            ✕ Clear Filters
+            ✕ {t("ContractInvoicesPage.clearFilters")}
           </button>
         )}
       </div>
@@ -270,11 +275,12 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
           color: "var(--muted)",
         }}
       >
-        Showing{" "}
+        {t("ContractInvoicesPage.showing")}{" "}
         <span style={{ color: "var(--text)", fontWeight: "bold" }}>
           {filteredInvoices.length}
         </span>{" "}
-        of {invoices?.length || 0} invoices
+        {t("ContractInvoicesPage.of")} {invoices?.length || 0}{" "}
+        {t("ContractInvoicesPage.invoices")}
       </div>
 
       {/* Table */}
@@ -297,14 +303,14 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border)" }}>
               {[
-                "Invoice #",
-                "Project",
-                "Subcontractor",
-                "Date",
-                "Due Date",
-                "Amount",
-                "Status",
-                "Actions",
+                t("ContractInvoicesPage.invoiceNumber"),
+                t("ContractInvoicesPage.project"),
+                t("ContractInvoicesPage.subcontractor"),
+                t("ContractInvoicesPage.date"),
+                t("ContractInvoicesPage.dueDate"),
+                t("ContractInvoicesPage.amount"),
+                t("ContractInvoicesPage.status"),
+                t("ContractInvoicesPage.actions"),
               ].map((h) => (
                 <th
                   key={h}
@@ -411,7 +417,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
                         marginRight: "0.5rem",
                       }}
                     >
-                      View
+                      {t("ContractInvoicesPage.view")}
                     </button>
                     <button
                       onClick={() => handleOpenEdit(inv)}
@@ -425,7 +431,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
                         fontSize: "0.8rem",
                       }}
                     >
-                      Edit
+                      {t("ContractInvoicesPage.edit")}
                     </button>
                   </td>
                 </tr>

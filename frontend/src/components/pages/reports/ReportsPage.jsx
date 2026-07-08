@@ -36,7 +36,7 @@ export default function ReportsPage() {
     <div className="flex flex-col md:flex-row min-h-screen bg-bg text-text">
       <ReportSidebar activeKey={activeKey} onSelect={setActiveKey} />
 
-      <main className="flex-1 px-5 md:px-7 py-6 overflow-x-hidden">
+      <main className="flex-1 px-6 py-8 max-w-[1400px] w-full mx-auto">
         <ReportToolbar
           report={report}
           onExportPdf={handleExport}
@@ -53,25 +53,25 @@ export default function ReportsPage() {
         />
 
         {loading && (
-          <div className="p-10 text-center text-muted bg-card border border-dashed border-border rounded-xl">
-            Loading report...
+          <div className="p-12 text-center text-sm text-muted bg-card border border-border rounded-lg">
+            Loading report…
           </div>
         )}
 
         {error && (
-          <div className="p-10 text-center text-danger bg-card border border-dashed border-danger rounded-xl">
+          <div className="p-12 text-center text-sm text-danger bg-card border border-border rounded-lg">
             Failed to load report. Please try again.
           </div>
         )}
 
         {!loading && !error && data && (
-          <>
+          <div className="space-y-8">
             <ReportSummary
               summary={data.summary}
               extraBlocks={<ReportBreakdowns summary={data.summary} />}
             />
             <ReportTable columns={report.columns} rows={data.rows} />
-          </>
+          </div>
         )}
       </main>
     </div>

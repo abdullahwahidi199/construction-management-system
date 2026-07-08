@@ -9,8 +9,14 @@ import ConfirmDialog from "../../components/common/ConfirmDialog";
 import EmployeeCard from "../../components/employees/EmployeeCard";
 import EmployeeForm from "../../components/employees/EmployeeForm";
 import EmployeeDetail from "../../components/employees/EmployeeDetail";
+import { useLanguage } from "../../hooks/useLanguage";
+
+const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
 export default function EmployeesPage() {
+  const { t, lang } = useLanguage();
+  const isRTL = RTL_LANGS.includes(lang);
+
   const { data: employees, loading, refetch } = useFetch("/employees/");
   const { deleteData } = useDelete();
   const [showForm, setShowForm] = useState(false);
@@ -19,8 +25,7 @@ export default function EmployeesPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [deptFilter, setDeptFilter] = useState("");
-  const [statusFilter, setStatusFilter  ] = useState("");
-
+  const [statusFilter, setStatusFilter] = useState("");
 
   const handleEdit = (employee) => {
     setSelectedEmployee(employee);
@@ -71,10 +76,12 @@ export default function EmployeesPage() {
   ];
 
   return (
-    <div>
+    <div dir={isRTL ? "rtl" : "ltr"}>
       <Header
-        title="Employees"
-        subtitle={`${filteredEmployees.length} total employees`}
+        title={t("EmployeesPage.title")}
+        subtitle={t("EmployeesPage.subtitle", {
+          count: filteredEmployees.length,
+        })}
       >
         <button
           onClick={() => {
@@ -84,7 +91,7 @@ export default function EmployeesPage() {
           className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
           style={{ backgroundColor: "var(--primary)" }}
         >
-          + Add Employee
+          + {t("EmployeesPage.addEmployee")}
         </button>
       </Header>
 
@@ -92,7 +99,7 @@ export default function EmployeesPage() {
       <div className="flex gap-4 mb-6">
         <input
           type="text"
-          placeholder="Search employees..."
+          placeholder={t("EmployeesPage.searchPlaceholder")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="flex-1 px-4 py-2 rounded-lg border text-sm"
@@ -113,7 +120,7 @@ export default function EmployeesPage() {
             borderColor: "var(--border)",
           }}
         >
-          <option value="">All Departments</option>
+          <option value="">{t("EmployeesPage.allDepartments")}</option>
           {departments.map((dept) => (
             <option key={dept} value={dept}>
               {dept.replace("_", " ").toUpperCase()}
@@ -130,19 +137,19 @@ export default function EmployeesPage() {
             borderColor: "var(--border)",
           }}
         >
-          <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
+          <option value="">{t("EmployeesPage.allStatus")}</option>
+          <option value="active">{t("EmployeesPage.active")}</option>
+          <option value="inactive">{t("EmployeesPage.inactive")}</option>
         </select>
       </div>
 
       {loading ? (
-        <Loading message="Loading employees..." />
+        <Loading message={t("EmployeesPage.loading")} />
       ) : filteredEmployees.length === 0 ? (
         <EmptyState
           icon="👥"
-          title="No employees found"
-          description="Get started by adding your first employee."
+          title={t("EmployeesPage.noEmployeesFound")}
+          description={t("EmployeesPage.noEmployeesDescription")}
           action={
             <button
               onClick={() => {
@@ -152,7 +159,7 @@ export default function EmployeesPage() {
               className="px-4 py-2 rounded-lg text-sm font-medium text-white"
               style={{ backgroundColor: "var(--primary)" }}
             >
-              Add Employee
+              {t("EmployeesPage.addEmployee")}
             </button>
           }
         />
@@ -177,7 +184,11 @@ export default function EmployeesPage() {
           setShowForm(false);
           setSelectedEmployee(null);
         }}
-        title={selectedEmployee ? "Edit Employee" : "Add New Employee"}
+        title={
+          selectedEmployee
+            ? t("EmployeesPage.editEmployee")
+            : t("EmployeesPage.addNewEmployee")
+        }
         size="lg"
       >
         <EmployeeForm
@@ -216,8 +227,10 @@ export default function EmployeesPage() {
         isOpen={!!deleteConfirm}
         onClose={() => setDeleteConfirm(null)}
         onConfirm={handleDelete}
-        title="Delete Employee"
-        message={`Are you sure you want to delete ${deleteConfirm?.full_name}? This action cannot be undone.`}
+        title={t("EmployeesPage.deleteTitle")}
+        message={t("EmployeesPage.deleteMessage", {
+          name: deleteConfirm?.full_name,
+        })}
       />
     </div>
   );

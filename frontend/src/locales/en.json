@@ -194,11 +194,26 @@
     "safety": "Safety"
   },
   "common": {
+    "cancel": "Cancel",
+    "create": "Create",
     "active": "Active",
     "inactive": "Inactive",
     "loading": "Loading...",
     "remove": "Remove",
-    "save": "Save"
+    "save": "Save",
+    "all": "All",
+    "clear": "Clear",
+    "clearFilters": "Clear filters",
+    "error": "Error",
+    "errorLoading": "Unable to load permissions. Please try again.",
+    "errorSaving": "Unable to save changes. Please try again.",
+    "module": "Module",
+    "noResults": "No results",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "saving": "Saving...",
+    "search": "Search",
+    "tryDifferentSearch": "Try a different search or clear filters."
   },
   "language": {
     "en": "EN",
@@ -237,9 +252,20 @@
       "systemText": "Open operational areas with admin authority."
     },
     "users": {
+      "edit": "Edit User",
+      "update": "Update",
+      "changePassword": "Change Password",
+      "newPassword": "New Password",
+      "confirmNewPassword": "Confirm New Password",
+      "leaveBlankPassword": "Leave blank to keep the current password.",
+      "errors": {
+        "passwordMatch": "Passwords do not match."
+      },
       "title": "User Management",
       "subtitle": "Assign roles and control account status.",
       "username": "Username",
+      "password": "Password",
+      "confirmPassword": "confirm password",
       "email": "Email",
       "role": "Role",
       "status": "Status",
@@ -248,18 +274,31 @@
       "disable": "Disable"
     },
     "permissions": {
-      "title": "Permission Overrides",
-      "subtitle": "Enable or disable specific permissions per role.",
-      "allow": "Allow",
-      "deny": "Deny"
+      "title": "Permission Management",
+      "subtitle": "Manage which roles can access specific actions across the system.",
+      "searchPlaceholder": "Search permissions by name, code, or module...",
+      "count": "Showing",
+      "permissions": "permissions",
+      "rolesShown": "Roles",
+      "permission": "Permission",
+      "tipClickBoxes": "Tip: Click a box to grant/revoke",
+      "grant": "Grant permission",
+      "revoke": "Revoke permission"
     }
   },
   "dataEntry": {
     "title": "Data Entry Panel",
     "nav": {
       "dashboard": "Dashboard",
+      "projects": "Projects",
+      "subContractors": "Sub Contractors",
+      "contracts": "Contracts",
       "expenses": "Expenses",
-      "attendance": "Attendance"
+      "employees": "Employees",
+      "payrolls": "Payrolls",
+      "attendance": "Attendance",
+      "reports": "Reports",
+      "brand": "ManagerHub"
     },
     "dashboard": {
       "title": "Data Entry Panel",
@@ -271,5 +310,1372 @@
       "attendance": "Attendance entries",
       "attendanceText": "Create and update attendance records."
     }
+  },
+
+  "payrollSummary": {
+    "title": "Payroll Summary",
+    "payrollsThisMonth": "{{count}} payrolls this month",
+
+    "thisMonthNet": "This Month (Net)",
+    "lastMonthNet": "Last Month (Net)",
+    "gross": "Gross",
+    "change": "{{percent}}% change",
+
+    "deductions": "Deductions",
+    "tax": "Tax",
+    "bonus": "Bonus",
+    "overtime": "Overtime",
+
+    "paymentMethods": "Payment Methods",
+    "recentPayrolls": "Recent Payrolls",
+
+    "count": "({{count}})"
+  },
+
+  "RecentActivity": {
+    "title": "Recent Activity",
+    "noRecentActivity": "No recent activity",
+    "items": "items",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago"
+  },
+  "ProjectsBase": {
+    "title": "Projects",
+    "subtitle": "Manage and track all your construction projects",
+    "refresh": "Refresh",
+    "newProject": "New Project",
+    "totalProjects": "Total Projects",
+    "active": "Active",
+    "planning": "Planning",
+    "completed": "Completed",
+    "loadingProjects": "Loading projects…",
+    "noProjectsTitle": "No projects yet",
+    "noProjectsDescription": "Get started by creating your first project. Track progress, budgets, and timelines all in one place.",
+    "createFirstProject": "Create First Project"
+  },
+  "ProjectsTable": {
+    "projectName": "Project Name",
+    "type": "Type",
+    "location": "Location",
+    "startDate": "Start Date",
+    "status": "Status",
+    "projects": "Projects",
+    "project": "project",
+    "projectsPlural": "projects",
+    "found": "found",
+    "searchProjects": "Search projects…",
+    "viewProject": "View project",
+    "deleteProject": "Delete project",
+    "noProjectsFound": "No projects found",
+    "adjustSearch": "Try adjusting your search query",
+    "createFirstProject": "Create your first project to get started",
+    "showing": "Showing",
+    "of": "of",
+    "thisProject": "this project"
+  },
+
+  "ProjectDetails": {
+    "loading": "Loading project…",
+    "failedToLoad": "Failed to load project",
+    "retry": "Retry",
+
+    "backToProjects": "Back to Projects",
+    "edit": "Edit",
+    "delete": "Delete",
+    "downloadPdf": "Download PDF",
+    "noPermission": "You do not have permission for this action",
+
+    "status": {
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "planning": "Planning",
+      "onHold": "On Hold",
+      "cancelled": "Cancelled",
+      "unknown": "Unknown"
+    },
+
+    "relativeDate": {
+      "daysAgo": "{{count}} days ago",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "inDays": "In {{count}} days"
+    },
+
+    "totalFloors": "Total Floors",
+    "estimatedBudget": "Estimated Budget",
+    "expensesUsd": "Expenses (USD)",
+    "expensesAfn": "Expenses (AFN)",
+    "startDate": "Start Date",
+    "expectedCompletion": "Expected Completion",
+
+    "contractFinancialSummary": "Contract Financial Summary",
+    "totalContractValue": "Total Contract Value",
+    "totalPayments": "Total Payments",
+    "remainingBalance": "Remaining Balance",
+
+    "timelineProgress": "Timeline Progress",
+
+    "projectInformation": "Project Information",
+    "projectName": "Project Name",
+    "propertyType": "Property Type",
+    "location": "Location",
+
+    "importantDates": "Important Dates",
+    "actualCompletion": "Actual Completion",
+    "created": "Created",
+    "lastUpdated": "Last Updated",
+
+    "notes": "Notes",
+
+    "notSet": "Not set",
+    "notYet": "Not yet",
+    "dash": "—",
+
+    "currency": {
+      "usd": "USD",
+      "afn": "AFN"
+    }
+  },
+  "ProjectEditView": {
+    "title": "Edit Project",
+    "loading": "Loading project details…",
+    "updateInfo": "Update project information",
+    "unsavedChanges": "You have unsaved changes",
+    "modified": "Modified",
+
+    "basicInfo": "Basic Information",
+    "projectName": "Project Name",
+    "description": "Description",
+
+    "propertyDetails": "Property Details",
+    "propertyType": "Property Type",
+    "briefOverview": "A brief overview of the project",
+    "projectDescription": "What's this project about?",
+    "status": "Status",
+    "location": "Location",
+    "totalFloors": "Total Floors",
+
+    "timelineBudget": "Timeline & Budget",
+    "startDate": "Start Date",
+    "expectedCompletion": "Expected Completion",
+    "estimatedBudget": "Estimated Budget",
+
+    "additionalNotes": "Additional Notes",
+    "notesPlaceholder": "Any additional notes, remarks, or important details…",
+
+    "cancel": "Cancel",
+    "saveChanges": "Save Changes",
+    "resetChanges": "Reset changes",
+    "requiredFields": "* Required fields",
+
+    "propertyTypeOptions": {
+      "residential": "Residential",
+      "commercial": "Commercial",
+      "mixed": "Mixed Use"
+    },
+
+    "statusOptions": {
+      "planning": "Planning",
+      "ongoing": "Ongoing",
+      "completed": "Completed",
+      "onHold": "On Hold"
+    }
+  },
+
+  "ProjectCreateModal": {
+    "title": "Create New Project",
+    "subtitle": "Add a new project to your portfolio",
+
+    "sections": {
+      "basic_information": "Basic Information",
+      "property_details": "Property Details",
+      "timeline_budget": "Timeline & Budget",
+      "additional_notes": "Additional Notes"
+    },
+
+    "fields": {
+      "name": {
+        "label": "Project Name",
+        "placeholder": "e.g., Skyline Towers"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "What's this project about?",
+        "helper": "A brief overview of the project"
+      },
+      "property_type": "Property Type",
+      "status": "Status",
+      "location": {
+        "label": "Location",
+        "placeholder": "City, State"
+      },
+      "total_floors": "Total Floors",
+      "start_date": "Start Date",
+      "expected_completion_date": "Expected Completion",
+      "estimated_budget": {
+        "label": "Estimated Budget",
+        "helper": "In USD"
+      },
+      "notes": {
+        "placeholder": "Any additional notes, remarks, or important details…"
+      }
+    },
+
+    "options": {
+      "property_type": {
+        "residential": "Residential",
+        "commercial": "Commercial",
+        "mixed": "Mixed Use"
+      },
+      "status": {
+        "planning": "Planning",
+        "ongoing": "Ongoing",
+        "completed": "Completed",
+        "on_hold": "On Hold"
+      }
+    },
+
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Project",
+      "creating": "Creating…"
+    },
+
+    "errors": {
+      "default": "Failed to create project. Please try again."
+    }
+  },
+
+  "SubcontractorsPage": {
+    "title": "Subcontractors",
+    "subtitle": "Manage subcontractor companies and their details",
+
+    "actions": {
+      "new": "New Subcontractor",
+      "clear_filters": "Clear"
+    },
+
+    "filters": {
+      "search_placeholder": "Search by name, email, tax number...",
+      "specialization_all": "All Specializations",
+      "status_all": "All Status",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+
+    "specializations": {
+      "concrete": "Concrete Works",
+      "steel": "Steel Works",
+      "electrical": "Electrical Works",
+      "plumbing": "Plumbing Works",
+      "finishing": "Finishing Works",
+      "excavation": "Excavation Works",
+      "hvac": "HVAC",
+      "landscaping": "Landscaping",
+      "other": "Other"
+    },
+
+    "messages": {
+      "error_load": "Failed to load subcontractors.",
+      "empty_state": "No subcontractors found."
+    },
+
+    "delete": {
+      "title": "Delete Subcontractor",
+      "message": "Are you sure you want to delete \"{{name}}\"? This cannot be undone."
+    },
+
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "showing": "Showing",
+      "of": "of"
+    }
+  },
+
+  "SubcontractorTable": {
+    "columns": {
+      "name": "Name",
+      "contact": "Contact",
+      "phone": "Phone",
+      "specialization": "Specialization",
+      "contracts": "Contracts",
+      "status": "Status",
+      "actions": "Actions"
+    },
+
+    "labels": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+
+    "states": {
+      "loading": "Loading subcontractors...",
+      "empty": "No subcontractors found."
+    },
+
+    "actions": {
+      "view": "View Details",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+
+    "specializations": {
+      "concrete": "Concrete Works",
+      "steel": "Steel Works",
+      "electrical": "Electrical Works",
+      "plumbing": "Plumbing Works",
+      "finishing": "Finishing Works",
+      "excavation": "Excavation Works",
+      "hvac": "HVAC",
+      "landscaping": "Landscaping",
+      "other": "Other"
+    }
+  },
+
+  "SubcontractorInfo": {
+    "labels": {
+      "contact_person": "Contact Person",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address",
+      "specialization": "Specialization",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
+
+  "SubConractorFinancialSummary": {
+    "titles": {
+      "total_contract_value": "Total Contract Value",
+      "total_paid": "Total Paid",
+      "remaining": "Remaining",
+      "contracts": "Contracts"
+    }
+  },
+
+  "ContractTable": {
+    "columns": {
+      "contract_number": "Contract #",
+      "title": "Title",
+      "subcontractor": "Subcontractor",
+      "project": "Project",
+      "value": "Value",
+      "status": "Status",
+      "progress": "Progress",
+      "actions": "Actions"
+    },
+
+    "states": {
+      "loading": "Loading contracts...",
+      "empty": "No contracts found."
+    },
+
+    "actions": {
+      "view": "View Details",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+
+  "SubcontractorFormModal": {
+    "title": {
+      "create": "Create Subcontractor",
+      "edit": "Edit Subcontractor"
+    },
+
+    "fields": {
+      "company_name": {
+        "label": "Company Name",
+        "placeholder": "e.g. ABC Construction Co."
+      },
+      "contact_person": {
+        "label": "Contact Person",
+        "placeholder": "Full name"
+      },
+      "specialization": {
+        "label": "Specialization"
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "+1-555-0100"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "contact@example.com"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Full address"
+      },
+      "tax_number": {
+        "label": "Tax Number",
+        "placeholder": "Tax ID"
+      },
+      "registration_number": {
+        "label": "Registration Number",
+        "placeholder": "Reg. number"
+      },
+      "active": {
+        "label": "Active"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Additional notes..."
+      }
+    },
+
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update",
+      "saving": "Saving...",
+      "update_permission": "Update Subcontractor",
+      "create_permission": "Create Subcontractor"
+    },
+
+    "errors": {
+      "name_required": "Name is required",
+      "invalid_email": "Invalid email format"
+    }
+  },
+
+  "ContractFormModal": {
+    "titleEdit": "Edit Contract",
+    "titleCreate": "Create Contract",
+
+    "fields": {
+      "project": "Project",
+      "subcontractor": "Subcontractor",
+      "title": "Title",
+      "scopeOfWork": "Scope of Work",
+      "currency": "Currency",
+      "contractValue": "Contract Value ($)",
+      "retentionPercentage": "Retention %",
+      "completionPercentage": "Progress %",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": "Status",
+      "notes": "Notes"
+    },
+
+    "placeholders": {
+      "project": "Select project",
+      "subcontractor": "Select subcontractor",
+      "title": "Contract title",
+      "scopeOfWork": "Describe the scope of work",
+      "contractValue": "0.00",
+      "retentionPercentage": "5",
+      "completionPercentage": "0",
+      "notes": "Additional notes..."
+    },
+
+    "buttons": {
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "update": "Update Contract",
+      "create": "Create Contract"
+    },
+
+    "validation": {
+      "projectRequired": "Project is required",
+      "subcontractorRequired": "Subcontractor is required",
+      "titleRequired": "Title is required",
+      "currencyRequired": "Currency is required",
+      "contractValuePositive": "Contract value must be positive",
+      "startDateRequired": "Start date is required",
+      "endDateInvalid": "End date must be after start date",
+      "progressRange": "Must be between 0 and 100"
+    },
+
+    "statusOptions": {
+      "draft": "Draft",
+      "active": "Active",
+      "completed": "Completed",
+      "terminated": "Terminated",
+      "cancelled": "Cancelled"
+    }
+  },
+
+  "ContractsPage": {
+    "title": "Contracts",
+    "subtitle": "Manage subcontractor agreements and contracts",
+
+    "buttons": {
+      "newContract": "New Contract",
+      "exportPdf": "Export PDF",
+      "clearFilters": "Clear",
+      "previous": "Previous",
+      "next": "Next"
+    },
+
+    "filters": {
+      "searchPlaceholder": "Search contracts based on project, contract number, contract name, scope of work or subcontractor...",
+      "allStatuses": "All Statuses",
+      "allProjects": "All Projects",
+      "allSubcontractors": "All Subcontractors"
+    },
+
+    "messages": {
+      "loadError": "Failed to load contracts. Please try again.",
+      "showing": "Showing",
+      "of": "of",
+      "page": "Page"
+    }
+  },
+
+  "ContractDetailsPage": {
+    "information": "Information",
+    "financial": "Financial",
+    "invoices": "Invoices",
+    "payments": "Payments",
+    "variations": "Variations",
+    "documents": "Documents",
+    "backToContracts": "Back to Contracts",
+    "progress": "Progress",
+    "downloadPdf": "Download PDF",
+    "failedToLoadContractDetails": "Failed to load contract details.",
+    "contractDetails": "Contract Details",
+    "project": "Project",
+    "subcontractor": "Subcontractor",
+    "scopeOfWork": "Scope of Work",
+    "notes": "Notes",
+    "timeline": "Timeline",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "adjustedEndDate": "Adjusted End Date",
+    "completion": "Completion",
+    "financialBreakdown": "Financial Breakdown",
+    "originalContractValue": "Original Contract Value",
+    "retentionPercentage": "Retention Percentage",
+    "retentionAmount": "Retention Amount",
+    "totalVariationAmount": "Total Variation Amount",
+    "adjustedContractValue": "Adjusted Contract Value",
+    "addPayment": "Add Payment",
+    "deletePayment": "Delete Payment",
+    "deletePaymentMessage": "Are you sure you want to delete this payment record?",
+    "variationsChangeOrders": "Variations / Change Orders",
+    "addVariation": "Add Variation",
+    "deleteVariation": "Delete Variation",
+    "deleteVariationMessage": "Are you sure you want to delete this variation?",
+    "uploadDocument": "Upload Document",
+    "deleteDocument": "Delete Document",
+    "deleteDocumentMessage": "Are you sure you want to delete \"{{title}}\"?",
+    "noData": "—"
+  },
+
+  "FinancialSummaryCard": {
+    "originalContractValue": "Original Contract Value",
+    "totalVariationAmount": "Total Variation Amount",
+    "adjustedContractValue": "Adjusted Contract Value",
+    "totalPaid": "Total Paid",
+    "remainingAmount": "Remaining Amount",
+    "retentionBalance": "Retention Balance",
+    "totalInvoiced": "Total Invoiced"
+  },
+  "ContractInvoicesPage": {
+    "allStatuses": "All Statuses",
+    "pending": "Pending",
+    "approved": "Approved",
+    "partiallyPaid": "Partially Paid",
+    "paid": "Paid",
+    "cancelled": "Cancelled",
+    "loadingInvoices": "Loading invoices...",
+    "contractInvoices": "Contract Invoices",
+    "newInvoice": "New Invoice",
+    "searchPlaceholder": "Search by Invoice #, Project...",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "clearFilters": "Clear Filters",
+    "showing": "Showing",
+    "of": "of",
+    "invoices": "invoices",
+    "invoiceNumber": "Invoice #",
+    "project": "Project",
+    "subcontractor": "Subcontractor",
+    "date": "Date",
+    "dueDate": "Due Date",
+    "amount": "Amount",
+    "status": "Status",
+    "actions": "Actions",
+    "view": "View",
+    "edit": "Edit",
+    "noMatchingInvoices": "No matching invoices found for the selected criteria.",
+    "noInvoicesForContract": "No invoices found for this contract.",
+    "error": "Error"
+  },
+  "ContractInvoiceDetails": {
+    "loadingInvoiceDetails": "Loading invoice details...",
+    "error": "Error",
+    "invoice": "Invoice",
+    "contract": "Contract",
+    "project": "Project",
+    "subcontractor": "Subcontractor",
+    "amount": "Amount",
+    "status": "Status",
+    "invoiceDate": "Invoice Date",
+    "dueDate": "Due Date",
+    "description": "Description",
+    "notes": "Notes",
+    "documents": "Documents",
+    "uploading": "Uploading...",
+    "dragDrop": "Drag & drop a file here, or",
+    "browse": "browse",
+    "supportedFiles": "Supports PDF, DOCX, XLSX, JPG, PNG",
+    "documentUploaded": "Document uploaded successfully!",
+    "uploadFailed": "Upload failed",
+    "viewDownload": "View / Download",
+    "noDocuments": "No documents uploaded yet.",
+    "document": "Document"
+  },
+
+  "InvoiceFormModal": {
+    "editInvoice": "Edit Invoice",
+    "newInvoice": "New Invoice",
+    "dateAndAmountRequired": "Date and Amount are required.",
+    "submissionFailed": "Submission failed",
+    "invoiceDate": "Invoice Date",
+    "dueDate": "Due Date",
+    "amount": "Amount",
+    "status": "Status",
+    "pending": "Pending",
+    "approved": "Approved",
+    "partiallyPaid": "Partially Paid",
+    "paid": "Paid",
+    "cancelled": "Cancelled",
+    "description": "Description",
+    "notes": "Notes",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "updateInvoice": "Update Invoice",
+    "createInvoice": "Create Invoice",
+    "noPermission": "You do not have permission for this action"
+  },
+
+  "PaymentTable": {
+    "loadingPayments": "Loading payments...",
+    "noPayments": "No payments recorded yet.",
+    "date": "Date",
+    "type": "Type",
+    "amount": "Amount",
+    "reference": "Reference",
+    "notes": "Notes",
+    "actions": "Actions",
+    "advance": "Advance",
+    "progress": "Progress",
+    "retentionRelease": "Retention Release",
+    "final": "Final",
+    "other": "Other",
+    "ref": "Ref"
+  },
+  "PaymentFormModal": {
+    "editPayment": "Edit Payment",
+    "addPayment": "Add Payment",
+    "amount": "Amount",
+    "paymentDate": "Payment Date",
+    "paymentType": "Payment Type",
+    "referenceNumber": "Reference Number",
+    "notes": "Notes",
+    "cancel": "Cancel",
+    "updatePayment": "Update Payment",
+    "createPayment": "Create Payment",
+    "addPaymentButton": "Add Payment",
+    "saving": "Saving...",
+    "permissionDenied": "You do not have permission for this action",
+    "progressPayment": "Progress Payment",
+    "retentionRelease": "Retention Release",
+    "finalPayment": "Final Payment",
+    "advance": "Advance",
+    "other": "Other",
+    "optionalNotes": "Optional notes...",
+    "referencePlaceholder": "e.g. INV-2024-001",
+    "amountPlaceholder": "0.00",
+    "amountMustBePositive": "Amount must be positive",
+    "amountExceedsRemaining": "Amount exceeds remaining balance of {{amount}}",
+    "paymentDateRequired": "Payment date is required"
+  },
+
+  "VariationTable": {
+    "loadingVariations": "Loading variations...",
+    "noVariations": "No variations recorded yet.",
+    "variationNumber": "Variation #",
+    "date": "Date",
+    "description": "Description",
+    "amountChange": "Amount Change",
+    "days": "Days",
+    "status": "Status",
+    "actions": "Actions",
+    "approved": "Approved",
+    "pending": "Pending",
+    "approve": "Approve",
+    "daysSuffix": "days"
+  },
+  "VariationFormModal": {
+    "editVariation": "Edit Variation",
+    "addVariation": "Add Variation",
+    "date": "Date",
+    "description": "Description",
+    "amountChange": "Amount Change",
+    "daysAdded": "Days Added",
+    "approved": "Approved",
+    "cancel": "Cancel",
+    "updateVariation": "Update Variation",
+    "updateVariations": "Update Variations",
+    "createVariation": "Create Variation",
+    "addVariationButton": "Add Variation",
+    "saving": "Saving...",
+    "permissionDenied": "You do not have permission for this action",
+    "descriptionPlaceholder": "Describe the change...",
+    "amountPlaceholder": "Use - for deductions",
+    "daysPlaceholder": "Use - for reductions",
+    "descriptionRequired": "Description is required",
+    "amountChangeRequired": "Amount change is required",
+    "dateRequired": "Date is required"
+  },
+
+  "DocumentTable": {
+    "loadingDocuments": "Loading documents...",
+    "noDocuments": "No documents uploaded yet.",
+    "title": "Title",
+    "type": "Type",
+    "file": "File",
+    "uploaded": "Uploaded",
+    "actions": "Actions",
+    "signedContract": "Signed Contract",
+    "billOfQuantities": "Bill of Quantities",
+    "drawings": "Drawings",
+    "invoice": "Invoice",
+    "quotation": "Quotation",
+    "supportingDocument": "Supporting Document",
+    "other": "Other",
+    "downloadPreview": "Download / Preview",
+    "delete": "Delete"
+  },
+  "DocumentUploadModal": {
+    "uploadDocument": "Upload Document",
+    "documentTitle": "Document Title",
+    "documentType": "Document Type",
+    "file": "File",
+    "cancel": "Cancel",
+    "uploading": "Uploading...",
+    "browse": "browse",
+    "dragAndDrop": "Drag and drop or",
+    "supportedFiles": "PDF, Images, Word, Excel — Max 50MB",
+    "removeFile": "Remove file",
+    "close": "Close",
+    "signedContract": "Signed Contract",
+    "billOfQuantities": "Bill of Quantities (BOQ)",
+    "drawings": "Drawings",
+    "invoice": "Invoice",
+    "quotation": "Quotation",
+    "supportingDocument": "Supporting Document",
+    "other": "Other",
+    "titlePlaceholder": "e.g. Signed Contract V1",
+    "titleRequired": "Title is required",
+    "fileRequired": "File is required",
+    "fileTooLarge": "File size must be under 50 MB"
+  },
+
+  "ExpensesMain": {
+    "title": "Expenses",
+    "subtitle": "Track and manage your spending",
+    "refresh": "Refresh",
+    "newExpense": "New Expense",
+    "exportPdf": "Export PDF",
+    "currencies": {
+      "usd": "USD",
+      "afn": "AFN"
+    },
+    "cards": {
+      "totalSpendingUsd": "Total Spending (USD)",
+      "totalSpendingAfn": "Total Spending (AFN)",
+      "count": "Count",
+      "totalEntries": "Total Entries",
+      "avg": "Avg",
+      "avgPerEntry": "Average per Entry (USD)"
+    },
+    "search": {
+      "placeholder": "Search by Serial #, description, remarks, or paid to..."
+    },
+    "filters": {
+      "button": "Filters",
+      "clearAll": "Clear All Filters",
+      "project": {
+        "label": "Project",
+        "all": "All Projects"
+      },
+      "type": {
+        "label": "Expense Type",
+        "all": "All Types"
+      },
+      "date": {
+        "from": "From Date",
+        "to": "To Date"
+      }
+    },
+    "activeFilters": {
+      "label": "Active filters:",
+      "search": "Search:",
+      "project": "Project:",
+      "type": "Type:",
+      "date": "Date:",
+      "sort": "Sort:"
+    },
+    "pagination": {
+      "found": "Found",
+      "resultsFor": "results for",
+      "showing": "Showing",
+      "of": "of",
+      "expenses": "expenses",
+      "firstPage": "First page",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "lastPage": "Last page"
+    },
+    "loading": "Loading expenses…",
+    "empty": {
+      "noMatch": "No matching expenses",
+      "noExpenses": "No expenses yet",
+      "messageMatch": "Try adjusting your search or filter criteria to find what you're looking for.",
+      "messageDefault": "Start tracking your expenses to see spending patterns, budgets, and financial insights all in one place.",
+      "clearFilters": "Clear Filters",
+      "addFirst": "Add First Expense"
+    },
+    "types": {
+      "general": "General Expense",
+      "material": "Construction Material",
+      "staffSalary": "Staff Salary",
+      "dailyWage": "Daily Worker Wage",
+      "contractPayment": "Contract/Subcontractor Payment",
+      "equipment": "Equipment Rental/Purchase",
+      "utility": "Utility Bill",
+      "other": "Other"
+    },
+    "sortOptions": {
+      "dateNewest": "Date (Newest)",
+      "dateOldest": "Date (Oldest)",
+      "serialHighLow": "Serial # (High to Low)",
+      "serialLowHigh": "Serial # (Low to High)",
+      "amountHighLow": "Amount (High to Low)",
+      "amountLowHigh": "Amount (Low to High)"
+    }
+  },
+
+  "ExpenseList": {
+    "serialNumber": "Serial #",
+    "description": "Description",
+    "type": "Type",
+    "date": "Date",
+    "amount": "Amount",
+    "actions": "Actions",
+
+    "noMatchingExpenses": "No matching expenses",
+    "adjustSearch": "Try adjusting your search or filter criteria",
+    "refresh": "Refresh",
+
+    "unnamedExpense": "Unnamed Expense",
+    "noVendor": "No vendor",
+    "general": "General",
+    "total": "Total",
+
+    "viewDetails": "View Details",
+    "editExpense": "Edit Expense",
+    "edit": "Edit",
+    "moreOptions": "More Options",
+    "printReceipt": "Print Receipt",
+    "delete": "Delete",
+
+    "foodDining": "Food & Dining",
+    "transportation": "Transportation",
+    "utilities": "Utilities",
+    "entertainment": "Entertainment",
+    "shopping": "Shopping",
+    "other": "Other"
+  },
+
+  "ExpenseCreateModal": {
+    "title": "Create Expense",
+    "subtitle": "Create a new expense record",
+
+    "description": "Description",
+    "expenseDate": "Expense Date",
+    "amountUsd": "Amount in USD",
+    "amountAfn": "Amount in AFN",
+    "exchangeRate": "Exchange Rate",
+    "paidTo": "Paid To",
+    "expenseType": "Expense Type",
+    "project": "Project",
+    "remarks": "Remarks",
+
+    "enterDescription": "Enter expense description",
+    "paidToPlaceholder": "Who was this paid to?",
+    "remarksPlaceholder": "Any additional notes...",
+    "selectProject": "Select Project",
+
+    "general": "General",
+    "construction": "Construction",
+    "material": "Material",
+    "dailyWage": "Daily Wage",
+    "equipment": "Equipment",
+    "utility": "Utility",
+    "contractPayment": "Contract Payment",
+    "other": "Other",
+
+    "cancel": "Cancel",
+    "createExpense": "Create Expense",
+    "creating": "Creating...",
+
+    "descriptionRequired": "Description is required",
+    "dateRequired": "Date is required",
+    "amountRequired": "At least one amount is required",
+    "projectRequired": "Project is required",
+    "createFailed": "Failed to create expense",
+
+    "noPermission": "You do not have permission for this action"
+  },
+
+  "ExpenseEdit": {
+    "title": "Edit Expense",
+
+    "description": "Description",
+    "expenseDate": "Expense Date",
+    "amountUsd": "Amount in USD",
+    "amountAfn": "Amount in AFN",
+    "exchangeRate": "Exchange Rate",
+    "paidTo": "Paid To",
+    "expenseType": "Expense Type",
+    "remarks": "Remarks",
+
+    "enterDescription": "Enter expense description",
+    "paidToPlaceholder": "Who was this paid to?",
+    "remarksPlaceholder": "Any additional notes...",
+
+    "general": "General",
+    "material": "Material",
+    "dailyWage": "Daily Wage",
+    "equipment": "Equipment",
+    "utility": "Utility",
+    "contractPayment": "Contract Payment",
+    "other": "Other",
+
+    "cancel": "Cancel",
+    "updateExpense": "Update Expense",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+
+    "descriptionRequired": "Description is required",
+    "dateRequired": "Date is required",
+    "amountRequired": "At least one amount is required",
+    "saveFailed": "Failed to save expense. Please try again.",
+
+    "noPermission": "You do not have permission for this action"
+  },
+
+  "ExpenseDetail": {
+    "title": "Expense Details",
+    "edit": "Edit",
+    "description": "Description",
+    "noDescription": "No description provided",
+    "general": "General",
+    "active": "Active",
+
+    "amountUsd": "Amount in USD",
+    "amountAfn": "Amount in AFN",
+    "exchangeRate": "Exchange Rate",
+
+    "totalUsd": "Total in USD",
+    "totalAfn": "Total in AFN",
+
+    "expenseDate": "Expense Date",
+    "created": "Created",
+    "updated": "Updated",
+    "paidTo": "Paid To",
+    "notAvailable": "N/A",
+
+    "remarks": "Remarks"
+  },
+
+  "EmployeesPage": {
+    "title": "Employees",
+    "subtitle": "{{count}} total employees",
+
+    "addEmployee": "Add Employee",
+    "addNewEmployee": "Add New Employee",
+    "editEmployee": "Edit Employee",
+
+    "searchPlaceholder": "Search employees...",
+    "allDepartments": "All Departments",
+    "allStatus": "All Status",
+    "active": "Active",
+    "inactive": "Inactive",
+
+    "loading": "Loading employees...",
+
+    "noEmployeesFound": "No employees found",
+    "noEmployeesDescription": "Get started by adding your first employee.",
+
+    "deleteTitle": "Delete Employee",
+    "deleteMessage": "Are you sure you want to delete {{name}}? This action cannot be undone."
+  },
+
+  "EmployeeCard": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "department": "Department",
+    "position": "Position",
+    "salary": "Salary",
+    "hired": "Hired",
+    "edit": "Edit",
+    "currency": "AFN"
+  },
+
+  "EmployeeForm": {
+    "email": "Email",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone",
+    "address": "Address",
+    "department": "Department",
+    "position": "Position",
+    "employmentType": "Employment Type",
+    "hireDate": "Hire Date",
+    "salary": "Salary",
+    "hourlyRate": "Hourly Rate",
+    "emergencyContact": "Emergency Contact",
+    "emergencyPhone": "Emergency Phone",
+    "notes": "Notes",
+    "activeEmployee": "Active Employee",
+
+    "departments": {
+      "management": "Management",
+      "engineering": "Engineering",
+      "construction": "Construction",
+      "administration": "Administration",
+      "finance": "Finance",
+      "hr": "Human Resources",
+      "procurement": "Procurement",
+      "safety": "Safety"
+    },
+
+    "employmentTypes": {
+      "fullTime": "Full Time",
+      "partTime": "Part Time",
+      "contract": "Contract",
+      "temporary": "Temporary"
+    },
+
+    "cancel": "Cancel",
+    "addEmployee": "Add Employee",
+    "updateEmployee": "Update Employee",
+    "createEmployee": "Create Employee",
+    "saving": "Saving...",
+    "noPermission": "You do not have permission for this action"
+  },
+
+  "EmployeeDetail": {
+    "tabs": {
+      "info": "Info",
+      "payroll": "Payroll",
+      "documents": "Documents"
+    },
+
+    "active": "Active",
+    "inactive": "Inactive",
+
+    "personalInformation": "Personal Information",
+    "employmentDetails": "Employment Details",
+
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "emergencyContact": "Emergency Contact",
+    "emergencyPhone": "Emergency Phone",
+
+    "department": "Department",
+    "employmentType": "Employment Type",
+    "hireDate": "Hire Date",
+    "salary": "Salary",
+    "hourlyRate": "Hourly Rate",
+
+    "notAvailable": "N/A",
+    "emptyValue": "-",
+    "currency": "AFN",
+
+    "payrollHistory": "Payroll History",
+    "loadingPayrollHistory": "Loading payroll history...",
+    "noPayrollRecords": "No payroll records found",
+
+    "status": "Status",
+    "to": "to",
+    "netPay": "Net Pay"
+  },
+
+  "PayrollPage": {
+    "title": "Payroll",
+    "records": "{{count}} records",
+
+    "downloadPdf": "Download PDF",
+    "newPayroll": "New Payroll",
+
+    "filters": {
+      "allStatus": "All Status",
+      "pending": "Pending",
+      "processed": "Processed",
+      "paid": "Paid",
+      "cancelled": "Cancelled",
+      "allEmployees": "All Employees",
+      "clearFilters": "Clear Filters"
+    },
+
+    "summary": {
+      "currency": "Currency",
+      "totalGross": "Total Gross",
+      "totalNet": "Total Net",
+      "records": "Records",
+      "paid": "Paid"
+    },
+
+    "loading": "Loading payroll records...",
+
+    "empty": {
+      "title": "No payroll records",
+      "description": "Create your first payroll record to get started.",
+      "create": "Create Payroll"
+    },
+
+    "table": {
+      "employee": "Employee",
+      "period": "Period",
+      "paymentDate": "Payment Date",
+      "grossPay": "Gross Pay",
+      "netPay": "Net Pay",
+      "actions": "Actions",
+      "to": "to",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+
+    "modal": {
+      "editPayroll": "Edit Payroll",
+      "createPayroll": "Create Payroll"
+    },
+
+    "deleteDialog": {
+      "title": "Delete Payroll",
+      "message": "Are you sure you want to delete this payroll record for {{employee}}?"
+    }
+  },
+
+  "PayrollForm": {
+    "employee": "Employee",
+    "selectEmployee": "Select Employee",
+    "basicSalary": "Basic Salary",
+    "periodStart": "Period Start",
+    "periodEnd": "Period End",
+    "overtimeHours": "Overtime Hours",
+    "overtimeRate": "Overtime Rate",
+    "bonus": "Bonus",
+    "allowances": "Allowances",
+    "deductions": "Deductions",
+    "taxDeducted": "Tax Deducted",
+    "currency": "Currency",
+    "paymentMethod": "Payment Method",
+    "paymentDate": "Payment Date",
+    "notes": "Notes",
+
+    "paymentMethods": {
+      "bankTransfer": "Bank Transfer",
+      "check": "Check",
+      "cash": "Cash"
+    },
+
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Payroll",
+      "update": "Update Payroll",
+      "processing": "Processing..."
+    },
+
+    "permissions": {
+      "noPermission": "You do not have permission for this action"
+    }
+  },
+
+  "AttendanceLayout": {
+    "title": "Attendance Management",
+    "subtitle": "Manage employee attendance efficiently",
+    "tabs": {
+      "list": "Attendance List",
+      "bulk": "Bulk Mark",
+      "daily": "Daily View",
+      "summary": "Monthly Summary"
+    }
+  },
+  "AttendanceList": {
+    "exportPdf": "Export PDF",
+
+    "filters": "Filters",
+    "showFilters": "Show Filters",
+    "hideFilters": "Hide Filters",
+
+    "employeeId": "Employee ID",
+    "enterEmployeeId": "Enter employee ID",
+
+    "status": "Status",
+    "allStatuses": "All Statuses",
+    "present": "Present",
+    "absent": "Absent",
+    "halfDay": "Half Day",
+    "leave": "Leave",
+
+    "date": "Date",
+
+    "month": "Month",
+    "allMonths": "All Months",
+
+    "year": "Year",
+    "allYears": "All Years",
+
+    "search": "Search",
+    "searchPlaceholder": "Search by name or ID",
+
+    "clearFilters": "Clear Filters",
+
+    "deleteConfirmation": "Are you sure you want to delete this record?",
+    "pdfDownloadFailed": "PDF download failed",
+
+    "employee": "Employee",
+    "checkIn": "Check In",
+    "checkOut": "Check Out",
+    "overtime": "Overtime",
+    "note": "Note",
+
+    "loading": "Loading...",
+    "noAttendanceRecords": "No attendance records found"
+  },
+
+  "BulkAttendance": {
+    "title": "Bulk Attendance",
+    "save": "Save",
+    "saveAll": "Save All",
+    "saving": "Saving...",
+    "noPermission": "You do not have permission for this action",
+
+    "markedStats": "{{marked}}/{{total}} marked in current view • {{modified}} modified",
+
+    "failedLoadEmployees": "Failed to load employees. Please try again.",
+    "failedLoadAttendance": "Failed to load attendance for the selected date.",
+    "failedSubmitAttendance": "Failed to submit attendance.",
+    "markAtLeastOne": "Please mark attendance for at least one employee.",
+
+    "created": "created",
+    "updated": "updated",
+    "errors": "errors",
+
+    "allDepartments": "All Departments ({{count}})",
+    "unassigned": "Unassigned ({{count}})",
+    "departmentWithCount": "{{department}} ({{count}})",
+
+    "employee": "Employee",
+    "status": "Status",
+    "in": "In",
+    "out": "Out",
+    "ot": "OT",
+    "note": "Note",
+
+    "noEmployees": "No employees in this department",
+
+    "present": "Present",
+    "absent": "Absent",
+    "halfDay": "Half Day",
+    "leave": "Leave",
+    "notMarked": "Not Marked",
+    "modified": "Modified",
+
+    "statusOptions": {
+      "empty": "-",
+      "present": "P",
+      "absent": "A",
+      "halfDay": "HD",
+      "leave": "L"
+    },
+
+    "placeholderOvertime": "0",
+    "placeholderNote": "-"
+  },
+
+  "DailyAttendance": {
+    "title": "Daily Attendance View",
+    "selectDate": "Select Date",
+
+    "loading": "Loading...",
+
+    "totalMarked": "Total Marked",
+    "unmarked": "Unmarked",
+    "present": "Present",
+    "absent": "Absent",
+    "leave": "Leave",
+
+    "markedEmployees": "Marked Employees",
+    "unmarkedEmployees": "Unmarked Employees",
+    "unmarkedCount": "Unmarked Employees ({{count}})",
+
+    "employee": "Employee",
+    "employeeId": "Employee ID",
+    "name": "Name",
+    "department": "Department",
+
+    "checkIn": "Check In",
+    "checkOut": "Check Out",
+    "overtime": "Overtime",
+    "note": "Note",
+
+    "status": {
+      "present": "Present",
+      "absent": "Absent",
+      "halfDay": "Half Day",
+      "leave": "Leave"
+    },
+
+    "empty": "-"
+  },
+
+  "MonthlySummary": {
+    "title": "Monthly Attendance Summary",
+    "selectEmployee": "Select Employee",
+    "selectMonth": "Month",
+    "selectYear": "Year",
+
+    "loading": "Loading...",
+
+    "employeeInfo": {
+      "id": "ID",
+      "effectiveWorkingDays": "Effective Working Days"
+    },
+
+    "stats": {
+      "totalDays": "Total Days",
+      "present": "Present",
+      "absent": "Absent",
+      "halfDay": "Half Day",
+      "leave": "Leave",
+      "overtime": "Overtime"
+    },
+
+    "attendanceBreakdown": "Attendance Breakdown",
+
+    "emptyState": "Select an employee, month, and year to view summary"
+  },
+
+  "DeleteConfirmModal": {
+    "title": "Confirm Deletion",
+    "messageStart": "Are you absolutely sure? This action cannot be undone. This will permanently delete",
+    "messageEnd": ".",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting..."
   }
 }

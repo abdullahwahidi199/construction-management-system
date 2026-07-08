@@ -5,6 +5,28 @@ from django.utils.translation import gettext_lazy as _
 from .constants import Effect, Role
 
 
+class Permission(models.Model):
+    code = models.CharField(max_length=120, unique=True)
+    name = models.CharField(max_length=255)
+
+    module = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+    
+class RolePermission(models.Model):
+    role = models.CharField(
+        max_length=32,
+        choices=Role.CHOICES,
+    )
+
+    permission = models.ForeignKey(
+        Permission,
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        unique_together = ("role", "permission")
 class UserProfile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -28,24 +50,7 @@ class UserProfile(models.Model):
         return f"{self.user.get_username()} ({self.get_role_display()})"
 
 
-class RolePermissionOverride(models.Model):
-    role = models.CharField(max_length=32, choices=Role.CHOICES, db_index=True)
-    permission = models.CharField(max_length=120, db_index=True)
-    effect = models.CharField(
-        max_length=10,
-        choices=Effect.CHOICES,
-        default=Effect.ALLOW,
-    )
-    updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        unique_together = ("role", "permission")
-        ordering = ("role", "permission")
-        verbose_name = _("Role permission override")
-        verbose_name_plural = _("Role permission overrides")
-
-    def __str__(self):
-        return f"{self.role}:{self.permission}:{self.effect}"
 
 
 class UserPermissionOverride(models.Model):
@@ -54,7 +59,11 @@ class UserPermissionOverride(models.Model):
         on_delete=models.CASCADE,
         related_name="permission_overrides",
     )
-    permission = models.CharField(max_length=120, db_index=True)
+    permission = models.ForeignKey(
+    Permission,
+    on_delete=models.CASCADE,
+    related_name="user_overrides",
+)
     effect = models.CharField(
         max_length=10,
         choices=Effect.CHOICES,

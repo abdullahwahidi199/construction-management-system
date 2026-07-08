@@ -6,7 +6,9 @@ from .views import (
     LogoutView,
     MeView,
     ProjectAssignmentViewSet,
-    RolePermissionOverrideViewSet,
+    # RolePermissionOverrideViewSet,
+    PermissionViewSet,
+    RolePermissionViewSet,
     UserPermissionOverrideViewSet,
     UserViewSet,
     roles_and_permissions,
@@ -14,7 +16,12 @@ from .views import (
 
 router = DefaultRouter()
 router.register("users", UserViewSet, basename="users")
-router.register("role-permissions", RolePermissionOverrideViewSet, basename="role-permissions")
+router.register(
+    "permissions",
+    PermissionViewSet
+)
+
+router.register("role-permissions", RolePermissionViewSet, basename="role-permissions")
 router.register("user-permissions", UserPermissionOverrideViewSet, basename="user-permissions")
 router.register("project-assignments", ProjectAssignmentViewSet, basename="project-assignments")
 

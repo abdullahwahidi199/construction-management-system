@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import useAttendance from "../../../hooks/useAttendance";
+import { Download } from "lucide-react";
+import instance from "../../../api/axiosInstance";
+import { useLanguage } from "../../../hooks/useLanguage";
 
 function AttendanceList() {
   const { loading, error, setError, fetchAttendance, deleteAttendance } =
@@ -18,6 +21,13 @@ function AttendanceList() {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
 
+  const { t, language, lang, isRTL: isRtlHook } = useLanguage();
+  const currentLang = (language || lang || "").toLowerCase();
+  const isRTL =
+    isRtlHook ??
+    ["dari", "pashto", "fa", "ps", "dr", "ar"].includes(currentLang);
+  const textAlignment = isRTL ? "text-right" : "text-left";
+
   useEffect(() => {
     loadAttendance();
   }, [filters]);
@@ -30,9 +40,45 @@ function AttendanceList() {
       console.error(err);
     }
   };
+  const handleDownloadAttendancePDF = async () => {
+    try {
+      const params = new URLSearchParams();
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) {
+          params.append(key, value);
+        }
+      });
+
+      const response = await instance.get(
+        `employees/attendance/export-pdf/?${params.toString()}`,
+        {
+          responseType: "blob",
+        },
+      );
+
+      const url = window.URL.createObjectURL(
+        new Blob([response.data], { type: "application/pdf" }),
+      );
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `attendance-report-${new Date()
+        .toISOString()
+        .slice(0, 10)}.pdf`;
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(t("AttendanceList.pdfDownloadFailed"), error);
+    }
+  };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this record?")) {
+    if (window.confirm(t("AttendanceList.deleteConfirmation"))) {
       try {
         await deleteAttendance(id);
         loadAttendance();
@@ -97,6 +143,14 @@ function AttendanceList() {
     };
     const style = styles[status] || styles.present;
     const isDark = document.documentElement.classList.contains("dark");
+
+    const badgeLabels = {
+      present: t("AttendanceList.present"),
+      absent: t("AttendanceList.absent"),
+      half_day: t("AttendanceList.halfDay"),
+      leave: t("AttendanceList.leave"),
+    };
+
     return (
       <span
         className="px-3 py-1 rounded-full text-xs font-semibold capitalize"
@@ -105,26 +159,37 @@ function AttendanceList() {
           color: isDark ? style.darkColor : style.color,
         }}
       >
-        {status}
+        {badgeLabels[status] || status}
       </span>
     );
   };
 
   return (
     <div className="space-y-6">
+      <button
+        onClick={handleDownloadAttendancePDF}
+        className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] px-4 py-2"
+      >
+        <Download className="h-4 w-4" />
+        {t("AttendanceList.exportPdf")}
+      </button>
       {/* Filters */}
       <div
         className="rounded-lg border p-6"
         style={{ backgroundColor: "var(--card)", borderColor: "var(--border)" }}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Filters</h2>
+          <h2 className="text-lg font-semibold">
+            {t("AttendanceList.filters")}
+          </h2>
           <button
             onClick={() => setShowFilters(!showFilters)}
             className="text-sm px-4 py-2 rounded-lg border"
             style={{ borderColor: "var(--border)", color: "var(--text)" }}
           >
-            {showFilters ? "Hide Filters" : "Show Filters"}
+            {showFilters
+              ? t("AttendanceList.hideFilters")
+              : t("AttendanceList.showFilters")}
           </button>
         </div>
 
@@ -135,7 +200,7 @@ function AttendanceList() {
                 className="block text-sm font-medium mb-2"
                 style={{ color: "var(--muted)" }}
               >
-                Employee ID
+                {t("AttendanceList.employeeId")}
               </label>
               <input
                 type="text"
@@ -149,7 +214,7 @@ function AttendanceList() {
                   backgroundColor: "var(--bg)",
                   color: "var(--text)",
                 }}
-                placeholder="Enter employee ID"
+                placeholder={t("AttendanceList.enterEmployeeId")}
               />
             </div>
 
@@ -158,7 +223,7 @@ function AttendanceList() {
                 className="block text-sm font-medium mb-2"
                 style={{ color: "var(--muted)" }}
               >
-                Status
+                {t("AttendanceList.status")}
               </label>
               <select
                 value={filters.status}
@@ -172,11 +237,11 @@ function AttendanceList() {
                   color: "var(--text)",
                 }}
               >
-                <option value="">All Statuses</option>
-                <option value="present">Present</option>
-                <option value="absent">Absent</option>
-                <option value="half_day">Half Day</option>
-                <option value="leave">Leave</option>
+                <option value="">{t("AttendanceList.allStatuses")}</option>
+                <option value="present">{t("AttendanceList.present")}</option>
+                <option value="absent">{t("AttendanceList.absent")}</option>
+                <option value="half_day">{t("AttendanceList.halfDay")}</option>
+                <option value="leave">{t("AttendanceList.leave")}</option>
               </select>
             </div>
 
@@ -185,7 +250,7 @@ function AttendanceList() {
                 className="block text-sm font-medium mb-2"
                 style={{ color: "var(--muted)" }}
               >
-                Date
+                {t("AttendanceList.date")}
               </label>
               <input
                 type="date"
@@ -207,7 +272,7 @@ function AttendanceList() {
                 className="block text-sm font-medium mb-2"
                 style={{ color: "var(--muted)" }}
               >
-                Month
+                {t("AttendanceList.month")}
               </label>
               <select
                 value={filters.month}
@@ -221,7 +286,7 @@ function AttendanceList() {
                   color: "var(--text)",
                 }}
               >
-                <option value="">All Months</option>
+                <option value="">{t("AttendanceList.allMonths")}</option>
                 {Array.from({ length: 12 }, (_, i) => (
                   <option key={i + 1} value={i + 1}>
                     {new Date(2024, i).toLocaleString("default", {
@@ -237,7 +302,7 @@ function AttendanceList() {
                 className="block text-sm font-medium mb-2"
                 style={{ color: "var(--muted)" }}
               >
-                Year
+                {t("AttendanceList.year")}
               </label>
               <select
                 value={filters.year}
@@ -251,7 +316,7 @@ function AttendanceList() {
                   color: "var(--text)",
                 }}
               >
-                <option value="">All Years</option>
+                <option value="">{t("AttendanceList.allYears")}</option>
                 {[2024, 2025, 2026].map((year) => (
                   <option key={year} value={year}>
                     {year}
@@ -265,7 +330,7 @@ function AttendanceList() {
                 className="block text-sm font-medium mb-2"
                 style={{ color: "var(--muted)" }}
               >
-                Search
+                {t("AttendanceList.search")}
               </label>
               <input
                 type="text"
@@ -279,7 +344,7 @@ function AttendanceList() {
                   backgroundColor: "var(--bg)",
                   color: "var(--text)",
                 }}
-                placeholder="Search by name or ID"
+                placeholder={t("AttendanceList.searchPlaceholder")}
               />
             </div>
 
@@ -298,7 +363,7 @@ function AttendanceList() {
                 className="px-4 py-2 rounded-lg border"
                 style={{ borderColor: "var(--border)", color: "var(--text)" }}
               >
-                Clear Filters
+                {t("AttendanceList.clearFilters")}
               </button>
             </div>
           </div>
@@ -316,52 +381,53 @@ function AttendanceList() {
       <div
         className="rounded-lg border overflow-hidden"
         style={{ borderColor: "var(--border)" }}
+        dir={isRTL ? "rtl" : "ltr"}
       >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr style={{ backgroundColor: "var(--card)" }}>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                  className={`px-6 py-3 ${textAlignment} text-xs font-medium uppercase tracking-wider`}
                   style={{ color: "var(--muted)" }}
                 >
-                  Employee
+                  {t("AttendanceList.employee")}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                  className={`px-6 py-3 ${textAlignment} text-xs font-medium uppercase tracking-wider`}
                   style={{ color: "var(--muted)" }}
                 >
-                  Date
+                  {t("AttendanceList.date")}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                  className={`px-6 py-3 ${textAlignment} text-xs font-medium uppercase tracking-wider`}
                   style={{ color: "var(--muted)" }}
                 >
-                  Status
+                  {t("AttendanceList.status")}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                  className={`px-6 py-3 ${textAlignment} text-xs font-medium uppercase tracking-wider`}
                   style={{ color: "var(--muted)" }}
                 >
-                  Check In
+                  {t("AttendanceList.checkIn")}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                  className={`px-6 py-3 ${textAlignment} text-xs font-medium uppercase tracking-wider`}
                   style={{ color: "var(--muted)" }}
                 >
-                  Check Out
+                  {t("AttendanceList.checkOut")}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                  className={`px-6 py-3 ${textAlignment} text-xs font-medium uppercase tracking-wider`}
                   style={{ color: "var(--muted)" }}
                 >
-                  Overtime
+                  {t("AttendanceList.overtime")}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                  className={`px-6 py-3 ${textAlignment} text-xs font-medium uppercase tracking-wider`}
                   style={{ color: "var(--muted)" }}
                 >
-                  Note
+                  {t("AttendanceList.note")}
                 </th>
               </tr>
             </thead>
@@ -372,21 +438,21 @@ function AttendanceList() {
               {loading ? (
                 <tr>
                   <td
-                    colSpan="8"
+                    colSpan="7"
                     className="px-6 py-8 text-center"
                     style={{ color: "var(--muted)" }}
                   >
-                    Loading...
+                    {t("AttendanceList.loading")}
                   </td>
                 </tr>
               ) : attendance.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="8"
+                    colSpan="7"
                     className="px-6 py-8 text-center"
                     style={{ color: "var(--muted)" }}
                   >
-                    No attendance records found
+                    {t("AttendanceList.noAttendanceRecords")}
                   </td>
                 </tr>
               ) : (
@@ -396,7 +462,7 @@ function AttendanceList() {
                     style={{ backgroundColor: "var(--bg)" }}
                     className="hover:opacity-80 transition-opacity"
                   >
-                    <td className="px-6 py-4">
+                    <td className={`px-6 py-4 ${textAlignment}`}>
                       <div>
                         <div className="font-medium">
                           {record.employee_name}
@@ -409,20 +475,24 @@ function AttendanceList() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm">{record.date}</td>
-                    <td className="px-6 py-4">
+                    <td className={`px-6 py-4 text-sm ${textAlignment}`}>
+                      {record.date}
+                    </td>
+                    <td className={`px-6 py-4 ${textAlignment}`}>
                       {getStatusBadge(record.status)}
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className={`px-6 py-4 text-sm ${textAlignment}`}>
                       {record.check_in || "-"}
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className={`px-6 py-4 text-sm ${textAlignment}`}>
                       {record.check_out || "-"}
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className={`px-6 py-4 text-sm ${textAlignment}`}>
                       {record.overtime_hours || 0}h
                     </td>
-                    <td className="px-6 py-4 text-sm max-w-xs truncate">
+                    <td
+                      className={`px-6 py-4 text-sm max-w-xs truncate ${textAlignment}`}
+                    >
                       {record.note || "-"}
                     </td>
                   </tr>

@@ -31,6 +31,7 @@ import ContractDocumentsPage from "./components/pages/contracts/ContractDocument
 import SubcontractorDetails from "./components/pages/contracts/SubctractorsDetailsPage";
 import Dashboard from "./components/pages/Dashboard";
 import ReportsPage from "./components/pages/reports/ReportsPage";
+import DailyWorkersLayout from "./components/pages/DailyWorkersLayout";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -57,6 +58,8 @@ const router = createBrowserRouter(
 
           <Route path="expenses" element={<ExpensesMain />} />
           <Route path="employees" element={<EmployeesPage />} />
+          <Route path="daily-workers" element={<DailyWorkersLayout />} />
+
           <Route path="payrolls" element={<PayrollPage />} />
           <Route path="attendance" element={<AttendanceLayout />} />
 
@@ -69,7 +72,10 @@ const router = createBrowserRouter(
             path="contract-variations"
             element={<ContractVariationsPage />}
           />
-          <Route path="contract-documents" element={<ContractDocumentsPage />} />
+          <Route
+            path="contract-documents"
+            element={<ContractDocumentsPage />}
+          />
           <Route path="reports" element={<ReportsPage />} />
         </Route>
       </Route>
@@ -77,9 +83,39 @@ const router = createBrowserRouter(
       <Route element={<ProtectedRoute roles={[ROLES.DATA_ENTRY]} />}>
         <Route path="data-entry" element={<DataEntryRootLayout />}>
           <Route index element={<RoleRedirect />} />
+
           <Route path="dashboard" element={<DataEntryDashboard />} />
+
+          <Route path="projects" element={<ProjectsBase />} />
+          <Route path="projects/:id" element={<ProjectDetails />} />
+
           <Route path="expenses" element={<ExpensesMain dataEntryMode />} />
+
+          <Route path="employees" element={<EmployeesPage />} />
+          <Route path="daily-workers" element={<DailyWorkersLayout />} />
+          <Route path="payrolls" element={<PayrollPage />} />
+
           <Route path="attendance" element={<AttendanceLayout />} />
+
+          <Route path="contracts" element={<ContractsPage />} />
+          <Route path="contracts/:id" element={<ContractDetailsPage />} />
+
+          <Route path="subcontractors" element={<SubcontractorsPage />} />
+          <Route path="subcontractors/:id" element={<SubcontractorDetails />} />
+
+          <Route path="contract-payments" element={<ContractPaymentsPage />} />
+
+          <Route
+            path="contract-variations"
+            element={<ContractVariationsPage />}
+          />
+
+          <Route
+            path="contract-documents"
+            element={<ContractDocumentsPage />}
+          />
+
+          <Route path="reports" element={<ReportsPage />} />
         </Route>
       </Route>
     </Route>,

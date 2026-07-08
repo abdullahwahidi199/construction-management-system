@@ -2,7 +2,6 @@ from django.contrib import admin
 
 from .models import (
     ProjectAssignment,
-    RolePermissionOverride,
     UserPermissionOverride,
     UserProfile,
 )
@@ -15,6 +14,5 @@ class UserProfileAdmin(admin.ModelAdmin):
     search_fields = ("user__username", "user__email")
 
 
-admin.site.register(RolePermissionOverride)
 admin.site.register(UserPermissionOverride)
 admin.site.register(ProjectAssignment)

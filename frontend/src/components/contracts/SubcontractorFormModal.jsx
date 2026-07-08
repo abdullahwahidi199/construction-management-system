@@ -5,6 +5,8 @@ import Card from "../ui/Card";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import { useLanguage } from "../../hooks/useLanguage";
 
 const SPECIALIZATION_OPTIONS = [
   { value: "concrete", label: "Concrete Works" },
@@ -41,6 +43,38 @@ export default function SubcontractorFormModal({
   const isEdit = !!subcontractor;
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
+  const { t } = useLanguage();
+
+  const SPECIALIZATION_OPTIONS = [
+    { value: "", label: t("SubcontractorsPage.filters.specialization_all") },
+    {
+      value: "concrete",
+      label: t("SubcontractorsPage.specializations.concrete"),
+    },
+    { value: "steel", label: t("SubcontractorsPage.specializations.steel") },
+    {
+      value: "electrical",
+      label: t("SubcontractorsPage.specializations.electrical"),
+    },
+    {
+      value: "plumbing",
+      label: t("SubcontractorsPage.specializations.plumbing"),
+    },
+    {
+      value: "finishing",
+      label: t("SubcontractorsPage.specializations.finishing"),
+    },
+    {
+      value: "excavation",
+      label: t("SubcontractorsPage.specializations.excavation"),
+    },
+    { value: "hvac", label: t("SubcontractorsPage.specializations.hvac") },
+    {
+      value: "landscaping",
+      label: t("SubcontractorsPage.specializations.landscaping"),
+    },
+    { value: "other", label: t("SubcontractorsPage.specializations.other") },
+  ];
 
   useEffect(() => {
     if (subcontractor) {
@@ -69,9 +103,10 @@ export default function SubcontractorFormModal({
 
   const validate = () => {
     const e = {};
-    if (!form.name.trim()) e.name = "Name is required";
+    if (!form.name.trim())
+      e.name = t("SubcontractorFormModal.errors.name_required");
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      e.email = "Invalid email format";
+      e.email = t("SubcontractorFormModal.errors.invalid_email");
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -85,17 +120,16 @@ export default function SubcontractorFormModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <div className="fixed inset-0  z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0  backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <Card className="p-0">
           <form onSubmit={handleSubmit}>
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
               <h2 className="text-lg font-semibold text-[var(--text)]">
-                {isEdit ? "Edit Subcontractor" : "Create Subcontractor"}
+                {isEdit
+                  ? t("SubcontractorFormModal.title.edit")
+                  : t("SubcontractorFormModal.title.create")}
               </h2>
               <button
                 type="button"
@@ -108,22 +142,30 @@ export default function SubcontractorFormModal({
 
             <div className="px-6 py-4 space-y-4">
               <Input
-                label="Company Name"
+                label={t("SubcontractorFormModal.fields.company_name.label")}
                 value={form.name}
                 onChange={(val) => handleChange("name", val)}
-                placeholder="e.g. ABC Construction Co."
+                placeholder={t(
+                  "SubcontractorFormModal.fields.company_name.placeholder",
+                )}
                 error={errors.name}
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                  label="Contact Person"
+                  label={t(
+                    "SubcontractorFormModal.fields.contact_person.label",
+                  )}
                   value={form.contact_person}
                   onChange={(val) => handleChange("contact_person", val)}
-                  placeholder="Full name"
+                  placeholder={t(
+                    "SubcontractorFormModal.fields.contact_person.placeholder",
+                  )}
                 />
                 <Select
-                  label="Specialization"
+                  label={t(
+                    "SubcontractorFormModal.fields.specialization.label",
+                  )}
                   value={form.specialization}
                   onChange={(val) => handleChange("specialization", val)}
                   options={SPECIALIZATION_OPTIONS}
@@ -132,52 +174,64 @@ export default function SubcontractorFormModal({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                  label="Phone"
+                  label={t("SubcontractorFormModal.fields.phone.label")}
                   value={form.phone}
                   onChange={(val) => handleChange("phone", val)}
-                  placeholder="+1-555-0100"
+                  placeholder={t(
+                    "SubcontractorFormModal.fields.phone.placeholder",
+                  )}
                 />
                 <Input
-                  label="Email"
+                  label={t("SubcontractorFormModal.fields.email.label")}
                   type="email"
                   value={form.email}
                   onChange={(val) => handleChange("email", val)}
-                  placeholder="contact@example.com"
+                  placeholder={t(
+                    "SubcontractorFormModal.fields.email.placeholder",
+                  )}
                   error={errors.email}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  Address
+                  {t("SubcontractorFormModal.fields.address.label")}
                 </label>
                 <textarea
                   value={form.address}
                   onChange={(e) => handleChange("address", e.target.value)}
                   rows={2}
-                  placeholder="Full address"
+                  placeholder={t(
+                    "SubcontractorFormModal.fields.address.placeholder",
+                  )}
                   className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                  label="Tax Number"
+                  label={t("SubcontractorFormModal.fields.tax_number.label")}
                   value={form.tax_number}
                   onChange={(val) => handleChange("tax_number", val)}
-                  placeholder="Tax ID"
+                  placeholder={t(
+                    "SubcontractorFormModal.fields.tax_number.placeholder",
+                  )}
                 />
                 <Input
-                  label="Registration Number"
+                  label={t(
+                    "SubcontractorFormModal.fields.registration_number.label",
+                  )}
                   value={form.registration_number}
                   onChange={(val) => handleChange("registration_number", val)}
-                  placeholder="Reg. number"
+                  placeholder={t(
+                    "SubcontractorFormModal.fields.registration_number.placeholder",
+                  )}
                 />
               </div>
 
               <div className="flex items-center gap-3">
                 <label className="text-sm font-medium text-[var(--text)]">
-                  Active
+                  {t("SubcontractorFormModal.fields.active.label")}
                 </label>
                 <button
                   type="button"
@@ -196,13 +250,15 @@ export default function SubcontractorFormModal({
 
               <div>
                 <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  Notes
+                  {t("SubcontractorFormModal.fields.notes.label")}
                 </label>
                 <textarea
                   value={form.notes}
                   onChange={(e) => handleChange("notes", e.target.value)}
                   rows={2}
-                  placeholder="Additional notes..."
+                  placeholder={t(
+                    "SubcontractorFormModal.fields.notes.placeholder",
+                  )}
                   className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none"
                 />
               </div>
@@ -215,11 +271,37 @@ export default function SubcontractorFormModal({
                 onClick={onClose}
                 disabled={submitLoading}
               >
-                Cancel
+                {t("SubcontractorFormModal.buttons.cancel")}
               </Button>
-              <Button type="submit" variant="primary" disabled={submitLoading}>
-                {submitLoading ? "Saving..." : isEdit ? "Update" : "Create"}
-              </Button>
+              <PermissionWrapper
+                permissions={[
+                  isEdit ? "subcontractors.update" : "subcontractors.create",
+                ]}
+                fallback={
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    disabled
+                    title="You do not have permission for this action"
+                  >
+                    {isEdit
+                      ? t("SubcontractorFormModal.buttons.update_permission")
+                      : t("SubcontractorFormModal.buttons.create_permission")}
+                  </Button>
+                }
+              >
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={submitLoading}
+                >
+                  {submitLoading
+                    ? t("SubcontractorFormModal.buttons.saving")
+                    : isEdit
+                      ? t("SubcontractorFormModal.buttons.update")
+                      : t("SubcontractorFormModal.buttons.create")}
+                </Button>
+              </PermissionWrapper>
             </div>
           </form>
         </Card>

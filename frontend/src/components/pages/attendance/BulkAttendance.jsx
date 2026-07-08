@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import useAttendance from "../../../hooks/useAttendance";
 import instance from "../../../api/axiosInstance";
+import PermissionWrapper from "../../../auth/PermissionWrapper";
+import Button from "../../ui/Button";
+import { useLanguage } from "../../../hooks/useLanguage";
 
 // Compact status indicator dot
 const StatusDot = ({ status }) => {
@@ -29,6 +32,13 @@ function BulkAttendance() {
   const [isLoadingExisting, setIsLoadingExisting] = useState(false);
   const [result, setResult] = useState(null);
   const [activeDepartment, setActiveDepartment] = useState("all");
+
+  const { t, language, lang, isRTL: isRtlHook } = useLanguage();
+  const currentLang = (language || lang || "").toLowerCase();
+  const isRTL =
+    isRtlHook ??
+    ["dari", "pashto", "fa", "ps", "dr", "ar"].includes(currentLang);
+  const textAlignment = isRTL ? "text-right" : "text-left";
 
   // Extract unique departments from employees
   const departments = useMemo(() => {
@@ -71,9 +81,9 @@ function BulkAttendance() {
       setEmployees(data);
     } catch (err) {
       console.error("Failed to load employees:", err);
-      setError("Failed to load employees. Please try again.");
+      setError(t("BulkAttendance.failedLoadEmployees"));
     }
-  }, [setError]);
+  }, [setError, t]);
 
   const loadExistingAttendance = useCallback(async () => {
     setIsLoadingExisting(true);
@@ -106,11 +116,11 @@ function BulkAttendance() {
       setAttendanceData(mapped);
     } catch (err) {
       console.error("Failed to load existing attendance:", err);
-      setError("Failed to load attendance for the selected date.");
+      setError(t("BulkAttendance.failedLoadAttendance"));
     } finally {
       setIsLoadingExisting(false);
     }
-  }, [selectedDate, setError]);
+  }, [selectedDate, setError, t]);
 
   useEffect(() => {
     loadEmployees();
@@ -153,7 +163,7 @@ function BulkAttendance() {
     });
 
     if (records.length === 0) {
-      setError("Please mark attendance for at least one employee.");
+      setError(t("BulkAttendance.markAtLeastOne"));
       return;
     }
 
@@ -193,10 +203,16 @@ function BulkAttendance() {
   }, [filteredEmployees, attendanceData]);
 
   const getDisplayDept = (dept) => {
-    if (dept === "all") return `All Departments (${employees.length})`;
+    if (dept === "all")
+      return t("BulkAttendance.allDepartments", { count: employees.length });
     if (dept === "unassigned")
-      return `Unassigned (${departmentCounts[dept] || 0})`;
-    return `${dept.charAt(0).toUpperCase() + dept.slice(1)} (${departmentCounts[dept] || 0})`;
+      return t("BulkAttendance.unassigned", {
+        count: departmentCounts[dept] || 0,
+      });
+    return t("BulkAttendance.departmentWithCount", {
+      department: dept.charAt(0).toUpperCase() + dept.slice(1),
+      count: departmentCounts[dept] || 0,
+    });
   };
 
   return (
@@ -208,10 +224,15 @@ function BulkAttendance() {
       >
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-lg font-semibold">Bulk Attendance</h2>
+            <h2 className="text-lg font-semibold">
+              {t("BulkAttendance.title")}
+            </h2>
             <p className="text-xs" style={{ color: "var(--muted)" }}>
-              {stats.marked}/{stats.total} marked in current view •{" "}
-              {stats.modified} modified
+              {t("BulkAttendance.markedStats", {
+                marked: stats.marked,
+                total: stats.total,
+                modified: stats.modified,
+              })}
             </p>
           </div>
 
@@ -227,15 +248,31 @@ function BulkAttendance() {
                 color: "var(--text)",
               }}
             />
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading || isLoadingExisting}
-              className="rounded px-4 py-1.5 text-sm font-medium text-white disabled:opacity-60"
-              style={{ backgroundColor: "var(--primary)" }}
+            <PermissionWrapper
+              permissions={["attendance.create"]}
+              fallback={
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled
+                  title={t("BulkAttendance.noPermission")}
+                >
+                  {t("BulkAttendance.save")}
+                </Button>
+              }
             >
-              {loading ? "Saving..." : "Save All"}
-            </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading || isLoadingExisting}
+                className="rounded px-4 py-1.5 text-sm font-medium text-white disabled:opacity-60"
+                style={{ backgroundColor: "var(--primary)" }}
+              >
+                {loading
+                  ? t("BulkAttendance.saving")
+                  : t("BulkAttendance.saveAll")}
+              </button>
+            </PermissionWrapper>
           </div>
         </div>
 
@@ -254,18 +291,18 @@ function BulkAttendance() {
             }}
           >
             <span className="font-medium" style={{ color: "var(--success)" }}>
-              {result.created_count || 0} created
+              {result.created_count || 0} {t("BulkAttendance.created")}
             </span>
             ,{" "}
             <span className="font-medium" style={{ color: "var(--primary)" }}>
-              {result.updated_count || 0} updated
+              {result.updated_count || 0} {t("BulkAttendance.updated")}
             </span>
             {result.error_count > 0 && (
               <span
                 className="ml-2 font-medium"
                 style={{ color: "var(--danger)" }}
               >
-                {result.error_count} errors
+                {result.error_count} {t("BulkAttendance.errors")}
               </span>
             )}
           </div>
@@ -301,20 +338,33 @@ function BulkAttendance() {
       <div
         className="rounded-lg border"
         style={{ borderColor: "var(--border)", backgroundColor: "var(--bg)" }}
+        dir={isRTL ? "rtl" : "ltr"}
       >
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead
-              className="sticky top-0 text-left text-xs uppercase"
+              className={`sticky top-0 ${textAlignment} text-xs uppercase`}
               style={{ backgroundColor: "var(--hover)", color: "var(--muted)" }}
             >
               <tr>
-                <th className="px-3 py-2 font-medium">Employee</th>
-                <th className="px-3 py-2 font-medium w-28">Status</th>
-                <th className="px-3 py-2 font-medium w-24">In</th>
-                <th className="px-3 py-2 font-medium w-24">Out</th>
-                <th className="px-3 py-2 font-medium w-20">OT</th>
-                <th className="px-3 py-2 font-medium">Note</th>
+                <th className={`px-3 py-2 font-medium ${textAlignment}`}>
+                  {t("BulkAttendance.employee")}
+                </th>
+                <th className={`px-3 py-2 font-medium w-28 ${textAlignment}`}>
+                  {t("BulkAttendance.status")}
+                </th>
+                <th className={`px-3 py-2 font-medium w-24 ${textAlignment}`}>
+                  {t("BulkAttendance.in")}
+                </th>
+                <th className={`px-3 py-2 font-medium w-24 ${textAlignment}`}>
+                  {t("BulkAttendance.out")}
+                </th>
+                <th className={`px-3 py-2 font-medium w-20 ${textAlignment}`}>
+                  {t("BulkAttendance.ot")}
+                </th>
+                <th className={`px-3 py-2 font-medium ${textAlignment}`}>
+                  {t("BulkAttendance.note")}
+                </th>
                 <th className="px-3 py-2 font-medium w-8"></th>
               </tr>
             </thead>
@@ -329,7 +379,7 @@ function BulkAttendance() {
                     className="px-3 py-8 text-center text-sm"
                     style={{ color: "var(--muted)" }}
                   >
-                    No employees in this department
+                    {t("BulkAttendance.noEmployees")}
                   </td>
                 </tr>
               ) : (
@@ -352,7 +402,7 @@ function BulkAttendance() {
                             : "transparent",
                       }}
                     >
-                      <td className="px-3 py-2">
+                      <td className={`px-3 py-2 ${textAlignment}`}>
                         <div className="font-medium text-sm">
                           {emp.full_name ||
                             `${emp.first_name} ${emp.last_name}`}
@@ -365,7 +415,7 @@ function BulkAttendance() {
                         </div>
                       </td>
 
-                      <td className="px-3 py-2">
+                      <td className={`px-3 py-2 ${textAlignment}`}>
                         <select
                           value={data.status || ""}
                           onChange={(e) =>
@@ -378,15 +428,25 @@ function BulkAttendance() {
                             color: "var(--text)",
                           }}
                         >
-                          <option value="">-</option>
-                          <option value="present">P</option>
-                          <option value="absent">A</option>
-                          <option value="half_day">HD</option>
-                          <option value="leave">L</option>
+                          <option value="">
+                            {t("BulkAttendance.statusOptions.empty")}
+                          </option>
+                          <option value="present">
+                            {t("BulkAttendance.statusOptions.present")}
+                          </option>
+                          <option value="absent">
+                            {t("BulkAttendance.statusOptions.absent")}
+                          </option>
+                          <option value="half_day">
+                            {t("BulkAttendance.statusOptions.halfDay")}
+                          </option>
+                          <option value="leave">
+                            {t("BulkAttendance.statusOptions.leave")}
+                          </option>
                         </select>
                       </td>
 
-                      <td className="px-3 py-2">
+                      <td className={`px-3 py-2 ${textAlignment}`}>
                         <input
                           type="time"
                           value={data.check_in || ""}
@@ -407,7 +467,7 @@ function BulkAttendance() {
                         />
                       </td>
 
-                      <td className="px-3 py-2">
+                      <td className={`px-3 py-2 ${textAlignment}`}>
                         <input
                           type="time"
                           value={data.check_out || ""}
@@ -428,7 +488,7 @@ function BulkAttendance() {
                         />
                       </td>
 
-                      <td className="px-3 py-2">
+                      <td className={`px-3 py-2 ${textAlignment}`}>
                         <input
                           type="number"
                           step="0.5"
@@ -448,11 +508,11 @@ function BulkAttendance() {
                             backgroundColor: "var(--bg)",
                             color: "var(--text)",
                           }}
-                          placeholder="0"
+                          placeholder={t("BulkAttendance.placeholderOvertime")}
                         />
                       </td>
 
-                      <td className="px-3 py-2">
+                      <td className={`px-3 py-2 ${textAlignment}`}>
                         <input
                           type="text"
                           value={data.note || ""}
@@ -465,7 +525,7 @@ function BulkAttendance() {
                             backgroundColor: "var(--bg)",
                             color: "var(--text)",
                           }}
-                          placeholder="-"
+                          placeholder={t("BulkAttendance.placeholderNote")}
                         />
                       </td>
 
@@ -474,7 +534,7 @@ function BulkAttendance() {
                         {isModified && (
                           <span
                             className="text-xs text-amber-600 font-bold"
-                            title="Modified"
+                            title={t("BulkAttendance.modified")}
                           >
                             *
                           </span>
@@ -495,21 +555,26 @@ function BulkAttendance() {
         style={{ color: "var(--muted)" }}
       >
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-green-500"></span> Present
+          <span className="h-2 w-2 rounded-full bg-green-500"></span>{" "}
+          {t("BulkAttendance.present")}
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-red-500"></span> Absent
+          <span className="h-2 w-2 rounded-full bg-red-500"></span>{" "}
+          {t("BulkAttendance.absent")}
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-yellow-500"></span> Half Day
+          <span className="h-2 w-2 rounded-full bg-yellow-500"></span>{" "}
+          {t("BulkAttendance.halfDay")}
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-blue-500"></span> Leave
+          <span className="h-2 w-2 rounded-full bg-blue-500"></span>{" "}
+          {t("BulkAttendance.leave")}
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-gray-300"></span> Not Marked
+          <span className="h-2 w-2 rounded-full bg-gray-300"></span>{" "}
+          {t("BulkAttendance.notMarked")}
         </span>
-        <span className="ml-auto">* Modified</span>
+        <span className="ml-auto">* {t("BulkAttendance.modified")}</span>
       </div>
     </div>
   );

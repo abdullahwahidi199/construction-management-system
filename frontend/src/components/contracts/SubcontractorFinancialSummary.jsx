@@ -1,4 +1,5 @@
 import { DollarSign, Wallet, TrendingUp, FileText } from "lucide-react";
+import { useLanguage } from "../../hooks/useLanguage";
 
 function formatNumber(value, currency) {
   return new Intl.NumberFormat("en-US", {
@@ -10,6 +11,8 @@ function formatNumber(value, currency) {
 }
 
 export default function SubConractorFinancialSummary({ summary }) {
+  const { t } = useLanguage();
+
   if (!summary) return null;
 
   return (
@@ -17,22 +20,24 @@ export default function SubConractorFinancialSummary({ summary }) {
       {Object.entries(summary).map(([currency, data]) => {
         const cards = [
           {
-            title: "Total Contract Value",
+            title: t(
+              "SubConractorFinancialSummary.titles.total_contract_value",
+            ),
             value: data.total_contract_value,
             icon: DollarSign,
           },
           {
-            title: "Total Paid",
+            title: t("SubConractorFinancialSummary.titles.total_paid"),
             value: data.total_paid,
             icon: Wallet,
           },
           {
-            title: "Remaining",
+            title: t("SubConractorFinancialSummary.titles.remaining"),
             value: data.remaining_amount,
             icon: TrendingUp,
           },
           {
-            title: "Contracts",
+            title: t("SubConractorFinancialSummary.titles.contracts"),
             value: data.total_contracts,
             icon: FileText,
           },

@@ -5,7 +5,7 @@ from django.db import transaction
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
-
+from .utils.file_compress import compress_image,compress_pdf
 
 # ──────────────────────────────────────────────
 # Choice Classes
@@ -67,7 +67,7 @@ class Subcontractor(models.Model):
     email               = models.EmailField(blank=True, default='')
     address             = models.TextField(blank=True, default='')
     tax_number          = models.CharField(max_length=100, blank=True, default='')
-    registration_number = models.CharField(max_length=100, blank=True, default='', unique=True)
+    registration_number = models.CharField(max_length=100, blank=True, default='')
     specialization      = models.CharField(
         max_length=50,
         choices=SpecializationChoices.choices,
@@ -368,6 +368,18 @@ class ContractDocument(models.Model):
             validate_file_extension(self.file)
             validate_file_size(self.file)
 
+    def save(self, *args, **kwargs):
+        if self.file:
+            content_type = getattr(self.file, "content_type", "")
+
+            if content_type.startswith("image"):
+                self.file = compress_image(self.file, quality=70)
+
+            elif content_type == "application/pdf":
+                self.file = compress_pdf(self.file)
+
+        super().save(*args, **kwargs)
+
 
 # ──────────────────────────────────────────────
 # Contract Payment
@@ -548,3 +560,14 @@ class ContractInvoiceDocument(models.Model):
     uploaded_at = models.DateTimeField(
         auto_now_add=True
     )
+    def save(self, *args, **kwargs):
+        if self.file:
+            content_type = getattr(self.file, "content_type", "")
+
+            if content_type.startswith("image"):
+                self.file = compress_image(self.file, quality=70)
+
+            elif content_type == "application/pdf":
+                self.file = compress_pdf(self.file)
+
+        super().save(*args, **kwargs)

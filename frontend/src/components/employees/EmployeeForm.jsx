@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import usePost from "../../hooks/usePost";
 import instance from "../../api/axiosInstance";
 import Loading from "../common/Loading";
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import Button from "../ui/Button";
+import { useLanguage } from "../../hooks/useLanguage";
+
+const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
 const initialFormData = {
   first_name: "",
@@ -22,6 +27,9 @@ const initialFormData = {
 };
 
 export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
+  const { t, lang } = useLanguage();
+  const isRTL = RTL_LANGS.includes(lang);
+
   const [formData, setFormData] = useState(initialFormData);
   const { postData, loading, error } = usePost();
   const [employee, setEmployee] = useState("");
@@ -91,12 +99,17 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
   if (fetchloading) {
     return <Loading />;
   }
+
   const inputClass =
-    "w-full px-3 py-2 rounded-lg border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
-  const labelClass = "block text-sm font-medium mb-1";
+    "w-full px-3 py-2.5 rounded-xl border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/30 focus:border-[var(--primary)]";
+  const labelClass = "block text-sm font-medium mb-1.5";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      dir={isRTL ? "rtl" : "ltr"}
+      onSubmit={handleSubmit}
+      className="space-y-5"
+    >
       {error && (
         <div
           className="p-3 rounded-lg text-sm"
@@ -106,31 +119,31 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className={labelClass} style={{ color: "var(--text)" }}>
-            Email *
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={inputClass}
-            style={{
-              backgroundColor: "var(--bg)",
-              color: "var(--text)",
-              borderColor: "var(--border)",
-            }}
-            required
-          />
-        </div>
+      {/* Email — full width */}
+      <div>
+        <label className={labelClass} style={{ color: "var(--text)" }}>
+          {t("EmployeeForm.email")}
+        </label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          className={inputClass}
+          style={{
+            backgroundColor: "var(--bg)",
+            color: "var(--text)",
+            borderColor: "var(--border)",
+          }}
+        />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* First Name / Last Name */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            First Name *
+            {t("EmployeeForm.firstName")}{" "}
+            <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -148,7 +161,7 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Last Name *
+            {t("EmployeeForm.lastName")} <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -166,10 +179,11 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* Phone / Address */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Phone *
+            {t("EmployeeForm.phone")} <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -187,7 +201,7 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Address
+            {t("EmployeeForm.address")}
           </label>
           <input
             type="text"
@@ -204,10 +218,11 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      {/* Department / Position / Employment Type */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Department
+            {t("EmployeeForm.department")}
           </label>
           <select
             name="department"
@@ -220,19 +235,33 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
               borderColor: "var(--border)",
             }}
           >
-            <option value="management">Management</option>
-            <option value="engineering">Engineering</option>
-            <option value="construction">Construction</option>
-            <option value="administration">Administration</option>
-            <option value="finance">Finance</option>
-            <option value="hr">Human Resources</option>
-            <option value="procurement">Procurement</option>
-            <option value="safety">Safety</option>
+            <option value="management">
+              {t("EmployeeForm.departments.management")}
+            </option>
+            <option value="engineering">
+              {t("EmployeeForm.departments.engineering")}
+            </option>
+            <option value="construction">
+              {t("EmployeeForm.departments.construction")}
+            </option>
+            <option value="administration">
+              {t("EmployeeForm.departments.administration")}
+            </option>
+            <option value="finance">
+              {t("EmployeeForm.departments.finance")}
+            </option>
+            <option value="hr">{t("EmployeeForm.departments.hr")}</option>
+            <option value="procurement">
+              {t("EmployeeForm.departments.procurement")}
+            </option>
+            <option value="safety">
+              {t("EmployeeForm.departments.safety")}
+            </option>
           </select>
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Position *
+            {t("EmployeeForm.position")} <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -250,7 +279,7 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Employment Type
+            {t("EmployeeForm.employmentType")}
           </label>
           <select
             name="employment_type"
@@ -263,18 +292,27 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
               borderColor: "var(--border)",
             }}
           >
-            <option value="full_time">Full Time</option>
-            <option value="part_time">Part Time</option>
-            <option value="contract">Contract</option>
-            <option value="temporary">Temporary</option>
+            <option value="full_time">
+              {t("EmployeeForm.employmentTypes.fullTime")}
+            </option>
+            <option value="part_time">
+              {t("EmployeeForm.employmentTypes.partTime")}
+            </option>
+            <option value="contract">
+              {t("EmployeeForm.employmentTypes.contract")}
+            </option>
+            <option value="temporary">
+              {t("EmployeeForm.employmentTypes.temporary")}
+            </option>
           </select>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      {/* Hire Date / Salary / Hourly Rate */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Hire Date *
+            {t("EmployeeForm.hireDate")} <span className="text-red-500">*</span>
           </label>
           <input
             type="date"
@@ -292,7 +330,7 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Salary *
+            {t("EmployeeForm.salary")} <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -311,7 +349,7 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Hourly Rate
+            {t("EmployeeForm.hourlyRate")}
           </label>
           <input
             type="number"
@@ -329,10 +367,11 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* Emergency Contact / Emergency Phone */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Emergency Contact
+            {t("EmployeeForm.emergencyContact")}
           </label>
           <input
             type="text"
@@ -349,7 +388,7 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
-            Emergency Phone
+            {t("EmployeeForm.emergencyPhone")}
           </label>
           <input
             type="text"
@@ -366,9 +405,10 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         </div>
       </div>
 
+      {/* Notes — full width */}
       <div>
         <label className={labelClass} style={{ color: "var(--text)" }}>
-          Notes
+          {t("EmployeeForm.notes")}
         </label>
         <textarea
           name="notes"
@@ -384,19 +424,21 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         />
       </div>
 
+      {/* Active checkbox */}
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
           name="is_active"
           checked={formData.is_active}
           onChange={handleChange}
-          className="w-4 h-4"
+          className="w-4 h-4 rounded border-[var(--border)] text-[var(--primary)] focus:ring-[var(--primary)]"
         />
         <label className="text-sm font-medium" style={{ color: "var(--text)" }}>
-          Active Employee
+          {t("EmployeeForm.activeEmployee")}
         </label>
       </div>
 
+      {/* Actions */}
       <div
         className="flex gap-3 justify-end pt-4 border-t"
         style={{ borderColor: "var(--border)" }}
@@ -404,23 +446,39 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="px-5 py-2.5 rounded-xl text-sm font-medium transition-colors"
           style={{ backgroundColor: "var(--hover)", color: "var(--text)" }}
         >
-          Cancel
+          {t("EmployeeForm.cancel")}
         </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors disabled:opacity-50"
-          style={{ backgroundColor: "var(--primary)" }}
+        <PermissionWrapper
+          permissions={[employeeId ? "employees.update" : "employees.create"]}
+          fallback={
+            <Button
+              type="submit"
+              variant="primary"
+              disabled
+              title={t("EmployeeForm.noPermission")}
+            >
+              {employeeId
+                ? t("EmployeeForm.updateEmployee")
+                : t("EmployeeForm.createEmployee")}
+            </Button>
+          }
         >
-          {loading
-            ? "Saving..."
-            : employee
-              ? "Update Employee"
-              : "Add Employee"}
-        </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-colors disabled:opacity-50"
+            style={{ backgroundColor: "var(--primary)" }}
+          >
+            {loading
+              ? t("EmployeeForm.saving")
+              : employee
+                ? t("EmployeeForm.updateEmployee")
+                : t("EmployeeForm.addEmployee")}
+          </button>
+        </PermissionWrapper>
       </div>
     </form>
   );

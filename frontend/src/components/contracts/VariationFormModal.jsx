@@ -4,6 +4,8 @@ import { X } from "lucide-react";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import { useLanguage } from "../../hooks/useLanguage";
 
 const emptyForm = {
   description: "",
@@ -24,6 +26,7 @@ export default function VariationFormModal({
   const isEdit = !!variation;
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (variation) {
@@ -47,10 +50,11 @@ export default function VariationFormModal({
 
   const validate = () => {
     const e = {};
-    if (!form.description.trim()) e.description = "Description is required";
+    if (!form.description.trim())
+      e.description = t("VariationFormModal.descriptionRequired");
     if (form.amount_change === "" || form.amount_change === null)
-      e.amount_change = "Amount change is required";
-    if (!form.date) e.date = "Date is required";
+      e.amount_change = t("VariationFormModal.amountChangeRequired");
+    if (!form.date) e.date = t("VariationFormModal.dateRequired");
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -78,7 +82,9 @@ export default function VariationFormModal({
           <form onSubmit={handleSubmit}>
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
               <h2 className="text-lg font-semibold text-[var(--text)]">
-                {isEdit ? "Edit Variation" : "Add Variation"}
+                {isEdit
+                  ? t("VariationFormModal.editVariation")
+                  : t("VariationFormModal.addVariation")}
               </h2>
               <button
                 type="button"
@@ -92,7 +98,7 @@ export default function VariationFormModal({
             <div className="px-6 py-4 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label="Date"
+                  label={t("VariationFormModal.date")}
                   type="date"
                   value={form.date}
                   onChange={(val) => handleChange("date", val)}
@@ -102,13 +108,13 @@ export default function VariationFormModal({
 
               <div>
                 <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  Description
+                  {t("VariationFormModal.description")}
                 </label>
                 <textarea
                   value={form.description}
                   onChange={(e) => handleChange("description", e.target.value)}
                   rows={3}
-                  placeholder="Describe the change..."
+                  placeholder={t("VariationFormModal.descriptionPlaceholder")}
                   className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none"
                 />
                 {errors.description && (
@@ -120,27 +126,27 @@ export default function VariationFormModal({
 
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label={`Amount Change (${currency})`}
+                  label={`${t("VariationFormModal.amountChange")} (${currency})`}
                   type="number"
                   value={form.amount_change}
                   onChange={(val) => handleChange("amount_change", val)}
-                  placeholder="Use - for deductions"
+                  placeholder={t("VariationFormModal.amountPlaceholder")}
                   step="0.01"
                   error={errors.amount_change}
                 />
                 <Input
-                  label="Days Added"
+                  label={t("VariationFormModal.daysAdded")}
                   type="number"
                   value={form.days_added}
                   onChange={(val) => handleChange("days_added", val)}
-                  placeholder="Use - for reductions"
+                  placeholder={t("VariationFormModal.daysPlaceholder")}
                 />
               </div>
 
               {isEdit && (
                 <div className="flex items-center gap-3">
                   <label className="text-sm font-medium text-[var(--text)]">
-                    Approved
+                    {t("VariationFormModal.approved")}
                   </label>
                   <button
                     type="button"
@@ -168,15 +174,39 @@ export default function VariationFormModal({
                 onClick={onClose}
                 disabled={submitLoading}
               >
-                Cancel
+                {t("VariationFormModal.cancel")}
               </Button>
-              <Button type="submit" variant="primary" disabled={submitLoading}>
-                {submitLoading
-                  ? "Saving..."
-                  : isEdit
-                    ? "Update Variation"
-                    : "Add Variation"}
-              </Button>
+              <PermissionWrapper
+                permissions={[
+                  isEdit
+                    ? "contract_variations.update"
+                    : "contract_variations.create",
+                ]}
+                fallback={
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    disabled
+                    title={t("VariationFormModal.permissionDenied")}
+                  >
+                    {isEdit
+                      ? t("VariationFormModal.updateVariations")
+                      : t("VariationFormModal.createVariation")}
+                  </Button>
+                }
+              >
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={submitLoading}
+                >
+                  {submitLoading
+                    ? t("VariationFormModal.saving")
+                    : isEdit
+                      ? t("VariationFormModal.updateVariation")
+                      : t("VariationFormModal.addVariationButton")}
+                </Button>
+              </PermissionWrapper>
             </div>
           </form>
         </Card>

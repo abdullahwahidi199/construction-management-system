@@ -3,15 +3,16 @@ import AttendanceList from "./AttendanceList";
 import BulkAttendance from "./BulkAttendance";
 import DailyAttendance from "./DailyAttendance";
 import MonthlySummary from "./MonthlySummary";
-
+import { useLanguage } from "../../../hooks/useLanguage";
 function AttendanceLayout() {
   const [activeTab, setActiveTab] = useState("list");
+  const { t } = useLanguage();
 
   const tabs = [
-    { id: "list", label: "Attendance List", icon: "📋" },
-    { id: "bulk", label: "Bulk Mark", icon: "👥" },
-    { id: "daily", label: "Daily View", icon: "📅" },
-    { id: "summary", label: "Monthly Summary", icon: "📊" },
+    { id: "list", label: t("AttendanceLayout.tabs.list"), icon: "📋" },
+    { id: "bulk", label: t("AttendanceLayout.tabs.bulk"), icon: "👥" },
+    { id: "daily", label: t("AttendanceLayout.tabs.daily"), icon: "📅" },
+    { id: "summary", label: t("AttendanceLayout.tabs.summary"), icon: "📊" },
   ];
 
   return (
@@ -27,9 +28,11 @@ function AttendanceLayout() {
         <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Attendance Management</h1>
+              <h1 className="text-2xl font-bold">
+                {t("AttendanceLayout.title")}
+              </h1>
               <p className="text-sm" style={{ color: "var(--muted)" }}>
-                Manage employee attendance efficiently
+                {t("AttendanceLayout.subtitle")}
               </p>
             </div>
           </div>

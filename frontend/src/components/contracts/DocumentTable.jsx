@@ -1,15 +1,5 @@
-// src/components/contracts/DocumentTable.jsx"
-import { FileText, Download, Trash2, Eye } from "lucide-react";
-
-const TYPE_LABELS = {
-  signed_contract: "Signed Contract",
-  boq: "Bill of Quantities",
-  drawings: "Drawings",
-  invoice: "Invoice",
-  quotation: "Quotation",
-  supporting: "Supporting Document",
-  other: "Other",
-};
+import { FileText, Download, Trash2 } from "lucide-react";
+import { useLanguage } from "../../hooks/useLanguage";
 
 const TYPE_COLORS = {
   signed_contract: "bg-[var(--success)]/15 text-[var(--success)]",
@@ -32,12 +22,27 @@ const getFileUrl = (file) => {
   if (file.startsWith("http")) return file;
   return `${BASE_URL}${file}`;
 };
+
 export default function DocumentTable({ documents = [], onDelete, loading }) {
+  const { t } = useLanguage();
+
+  const TYPE_LABELS = {
+    signed_contract: t("DocumentTable.signedContract"),
+    boq: t("DocumentTable.billOfQuantities"),
+    drawings: t("DocumentTable.drawings"),
+    invoice: t("DocumentTable.invoice"),
+    quotation: t("DocumentTable.quotation"),
+    supporting: t("DocumentTable.supportingDocument"),
+    other: t("DocumentTable.other"),
+  };
+
   if (loading) {
     return (
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-12 text-center">
         <div className="animate-spin w-8 h-8 border-2 border-[var(--border)] border-t-[var(--primary)] rounded-full mx-auto" />
-        <p className="text-[var(--muted)] mt-4">Loading documents...</p>
+        <p className="text-[var(--muted)] mt-4">
+          {t("DocumentTable.loadingDocuments")}
+        </p>
       </div>
     );
   }
@@ -46,7 +51,7 @@ export default function DocumentTable({ documents = [], onDelete, loading }) {
     return (
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-12 text-center">
         <FileText size={40} className="mx-auto text-[var(--muted)] mb-3" />
-        <p className="text-[var(--muted)]">No documents uploaded yet.</p>
+        <p className="text-[var(--muted)]">{t("DocumentTable.noDocuments")}</p>
       </div>
     );
   }
@@ -58,20 +63,20 @@ export default function DocumentTable({ documents = [], onDelete, loading }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[var(--border)]">
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Title
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("DocumentTable.title")}
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Type
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("DocumentTable.type")}
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                File
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("DocumentTable.file")}
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-[var(--muted)]">
-                Uploaded
+              <th className="text-start px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("DocumentTable.uploaded")}
               </th>
-              <th className="text-right px-4 py-3 font-semibold text-[var(--muted)]">
-                Actions
+              <th className="text-end px-4 py-3 font-semibold text-[var(--muted)]">
+                {t("DocumentTable.actions")}
               </th>
             </tr>
           </thead>
@@ -81,10 +86,10 @@ export default function DocumentTable({ documents = [], onDelete, loading }) {
                 key={doc.id}
                 className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--hover)] transition-colors"
               >
-                <td className="px-4 py-3 text-[var(--text)] font-medium">
+                <td className="px-4 py-3 text-[var(--text)] font-medium text-start">
                   {doc.title}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 text-start">
                   <span
                     className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${
                       TYPE_COLORS[doc.document_type] || TYPE_COLORS.other
@@ -93,19 +98,19 @@ export default function DocumentTable({ documents = [], onDelete, loading }) {
                     {TYPE_LABELS[doc.document_type] || doc.document_type}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 text-start">
                   <div className="flex items-center gap-2">
                     <span className="text-[var(--muted)] text-xs font-mono">
                       {getFileExtension(doc.file_url || doc.file)}
                     </span>
                   </div>
                 </td>
-                <td className="px-4 py-3 text-[var(--muted)] text-sm">
+                <td className="px-4 py-3 text-[var(--muted)] text-sm text-start">
                   {doc.uploaded_at
                     ? new Date(doc.uploaded_at).toLocaleDateString()
                     : "—"}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 text-end">
                   <div className="flex items-center justify-end gap-1">
                     {doc.file && (
                       <a
@@ -113,7 +118,7 @@ export default function DocumentTable({ documents = [], onDelete, loading }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)] transition-colors"
-                        title="Download / Preview"
+                        title={t("DocumentTable.downloadPreview")}
                       >
                         <Download size={16} />
                       </a>
@@ -121,7 +126,7 @@ export default function DocumentTable({ documents = [], onDelete, loading }) {
                     <button
                       onClick={() => onDelete(doc)}
                       className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--danger)] transition-colors"
-                      title="Delete"
+                      title={t("DocumentTable.delete")}
                     >
                       <Trash2 size={16} />
                     </button>

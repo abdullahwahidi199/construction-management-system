@@ -16,6 +16,7 @@ import usePost from "../../hooks/usePost";
 import useDelete from "../../hooks/useDelete";
 import ProjectCreateModal from "../../components/reusableComponents/ProjectCreateModal";
 import ProjectsTable from "./ProjectsTable";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function ProjectsBase() {
   const { data: projects, loading: fetching, refetch } = useFetch("projects/");
@@ -53,6 +54,7 @@ export default function ProjectsBase() {
   /* ── Stat helpers ─────────────────────────────── */
   const projectList = Array.isArray(projects) ? projects : [];
   const totalProjects = projectList.length;
+  const { t } = useLanguage();
   const activeProjects = projectList.filter((p) =>
     ["active", "in progress", "ongoing"].includes(p.status?.toLowerCase()),
   ).length;
@@ -65,25 +67,25 @@ export default function ProjectsBase() {
 
   const stats = [
     {
-      label: "Total Projects",
+      label: t("ProjectsBase.totalProjects"),
       value: totalProjects,
       color: "bg-[var(--primary)]/10 text-[var(--primary)]",
       dotColor: "bg-[var(--primary)]",
     },
     {
-      label: "Active",
+      label: t("ProjectsBase.active"),
       value: activeProjects,
       color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
       dotColor: "bg-emerald-500",
     },
     {
-      label: "Planning",
+      label: t("ProjectsBase.planning"),
       value: planningProjects,
       color: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
       dotColor: "bg-violet-500",
     },
     {
-      label: "Completed",
+      label: t("ProjectsBase.completed"),
       value: completedProjects,
       color: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
       dotColor: "bg-blue-500",
@@ -104,10 +106,10 @@ export default function ProjectsBase() {
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-[var(--text)">
-              Projects
+              {t("ProjectsBase.title")}
             </h1>
             <p className="text-sm text-[var(--muted)">
-              Manage and track all your construction projects
+              {t("ProjectsBase.subtitle")}
             </p>
           </div>
         </div>
@@ -119,7 +121,7 @@ export default function ProjectsBase() {
             onClick={handleRefresh}
             disabled={refreshing}
             className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border) bg-[var(--card) text-[var(--muted) shadow-sm transition-all hover:bg-[var(--hover) hover:text-[var(--text) disabled:opacity-50"
-            title="Refresh"
+            title={t("ProjectsBase.refresh")}
           >
             <RefreshCw
               className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
@@ -133,7 +135,7 @@ export default function ProjectsBase() {
             className="inline-flex items-center gap-2 rounded-xl bg-[var(--primary) px-5 py-2.5 text-sm font-semibold text-(--text) shadow-lg shadow-[var(--primary)/25 transition-all hover:opacity-90 active:scale-[0.98"
           >
             <Plus className="h-4 w-4" strokeWidth={2.5} />
-            New Project
+            {t("ProjectsBase.newProject")}
           </button>
         </div>
       </div>
@@ -172,7 +174,9 @@ export default function ProjectsBase() {
         <div className="flex items-center justify-center rounded-xl border border-[var(--border) bg-[var(--card) py-20 shadow-sm">
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-[var(--primary)" />
-            <p className="text-sm text-[var(--muted)">Loading projects…</p>
+            <p className="text-sm text-[var(--muted)">
+              {t("ProjectsBase.loadingProjects")}
+            </p>
           </div>
         </div>
       ) : (
@@ -190,18 +194,17 @@ export default function ProjectsBase() {
             />
           </div>
           <h3 className="text-lg font-semibold text-[var(--text) mb-1">
-            No projects yet
+            {t("ProjectsBase.noProjectsTitle")}
           </h3>
           <p className="max-w-sm text-sm text-[var(--muted) mb-5">
-            Get started by creating your first project. Track progress, budgets,
-            and timelines all in one place.
+            {t("ProjectsBase.noProjectsDescription")}
           </p>
           <button
             onClick={() => setOpen(true)}
             className="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[var(--primary)]/25 transition-all hover:opacity-90"
           >
             <Plus className="h-4 w-4" strokeWidth={2.5} />
-            Create First Project
+            {t("ProjectsBase.createFirstProject")}
           </button>
         </div>
       )}

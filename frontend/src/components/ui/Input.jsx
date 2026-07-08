@@ -11,9 +11,9 @@ export default function Input({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-[var(--text)] mb-1.5">
+        <div className="mb-1.5 text-sm font-medium text-[var(--text)]">
           {label}
-        </label>
+        </div>
       )}
 
       <input

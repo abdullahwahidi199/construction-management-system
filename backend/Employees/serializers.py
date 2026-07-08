@@ -54,7 +54,7 @@ class EmployeeListSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'employee_id', 'first_name', 'last_name', 'full_name',
             'department', 'position', 'employment_type', 'is_active',
-            'salary', 'hire_date'
+            'salary', 'hire_date',
         ]
         read_only_fields = ["employee_id"]
 

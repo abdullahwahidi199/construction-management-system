@@ -389,3 +389,497 @@ class ContractInvoiceDocumentViewSet(viewsets.ModelViewSet):
             return ContractInvoiceDocumentCreateSerializer
 
         return ContractInvoiceDocumentSerializer
+
+
+from django.http import HttpResponse
+from django.utils import timezone
+from rest_framework.views import APIView
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Table,
+    TableStyle,
+    Paragraph,
+    Spacer,
+)
+
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+from subcontractor.models import Contract
+from project.models import Project
+from subcontractor.models import Subcontractor
+
+
+# ---------------------------------------------------
+# FONT REGISTRATION (DARI / PASHTO FIX)
+# ---------------------------------------------------
+pdfmetrics.registerFont(
+    TTFont(
+        "NotoArabic",
+        "fonts/NotoNaskhArabic-VariableFont_wght.ttf",
+    )
+)
+
+
+# ---------------------------------------------------
+# RTL HELPER
+# ---------------------------------------------------
+def rtl(text):
+    if not text:
+        return ""
+    return get_display(arabic_reshaper.reshape(str(text)))
+
+
+class ContractPDFExportView(APIView):
+
+    def get_queryset(self):
+        qs = Contract.objects.select_related(
+            "project",
+            "subcontractor",
+        )
+
+        search = self.request.GET.get("search")
+        status = self.request.GET.get("status")
+        project = self.request.GET.get("project")
+        subcontractor = self.request.GET.get("subcontractor")
+
+        if search:
+            qs = qs.filter(
+                contract_number__icontains=search
+            ) | qs.filter(
+                title__icontains=search
+            ) | qs.filter(
+                scope_of_work__icontains=search
+            )
+
+        if status:
+            qs = qs.filter(status=status)
+
+        if project:
+            qs = qs.filter(project_id=project)
+
+        if subcontractor:
+            qs = qs.filter(subcontractor_id=subcontractor)
+
+        return qs.order_by("-created_at")
+
+    def get_currency_symbol(self, currency):
+        return {
+            "AFN": "؋",
+            "USD": "$",
+            "EUR": "€",
+        }.get(currency, currency)
+
+    def get(self, request):
+
+        response = HttpResponse(content_type="application/pdf")
+        response["Content-Disposition"] = 'attachment; filename="contracts_report.pdf"'
+
+        doc = SimpleDocTemplate(
+            response,
+            pagesize=landscape(A4),
+            leftMargin=15,
+            rightMargin=15,
+            topMargin=15,
+            bottomMargin=15,
+        )
+
+        styles = getSampleStyleSheet()
+
+        title_style = ParagraphStyle(
+            "title",
+            parent=styles["Title"],
+            fontName="NotoArabic",
+            fontSize=14,
+        )
+
+        normal = ParagraphStyle(
+            "normal",
+            parent=styles["BodyText"],
+            fontName="NotoArabic",
+            fontSize=7,
+            leading=10,
+        )
+
+        qs = self.get_queryset()
+
+        elements = []
+
+        # ---------------------------------------------------
+        # HEADER
+        # ---------------------------------------------------
+        elements.append(Paragraph(rtl("Contracts Report"), title_style))
+        elements.append(
+            Paragraph(
+                rtl(f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}"),
+                normal,
+            )
+        )
+        elements.append(Spacer(1, 10))
+
+        # ---------------------------------------------------
+        # RESOLVE FILTER VALUES
+        # ---------------------------------------------------
+        search = request.GET.get("search", "None")
+        status = request.GET.get("status", "All")
+        project_id = request.GET.get("project")
+        subcontractor_id = request.GET.get("subcontractor")
+
+        project_name = "All"
+        subcontractor_name = "All"
+
+        if project_id:
+            project_name = (
+                Project.objects.filter(id=project_id)
+                .values_list("name", flat=True)
+                .first()
+                or "Unknown"
+            )
+
+        if subcontractor_id:
+            subcontractor_name = (
+                Subcontractor.objects.filter(id=subcontractor_id)
+                .values_list("name", flat=True)
+                .first()
+                or "Unknown"
+            )
+
+        # ---------------------------------------------------
+        # FILTER TABLE (FULL FIX)
+        # ---------------------------------------------------
+        filter_table = Table(
+            [
+                ["Search", search],
+                ["Status", status],
+                ["Project", project_name],
+                ["Subcontractor", subcontractor_name],
+                ["Ordering", request.GET.get("ordering", "-created_at")],
+                ["Total Results", str(qs.count())],
+            ],
+            colWidths=[140, 300],
+        )
+
+        filter_table.setStyle(
+            TableStyle([
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+                ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
+                ("FONTNAME", (0, 0), (-1, -1), "NotoArabic"),
+                ("FONTSIZE", (0, 0), (-1, -1), 8),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ])
+        )
+
+        elements.append(filter_table)
+        elements.append(Spacer(1, 12))
+
+        # ---------------------------------------------------
+        # TABLE HEADER
+        # ---------------------------------------------------
+        data = [[
+            "Contract #",
+            "Title",
+            "Project",
+            "Subcontractor",
+            "Status",
+            "Currency",
+            "Value",
+            "Paid",
+            "Remaining",
+            "%",
+        ]]
+
+        totals = {}
+
+        # ---------------------------------------------------
+        # ROWS
+        # ---------------------------------------------------
+        for c in qs:
+
+            currency = c.currency
+            symbol = self.get_currency_symbol(currency)
+
+            value = float(c.contract_value or 0)
+            paid = float(c.total_paid or 0)
+            remaining = float(c.remaining_amount or 0)
+
+            totals.setdefault(currency, {"v": 0, "p": 0, "r": 0})
+
+            totals[currency]["v"] += value
+            totals[currency]["p"] += paid
+            totals[currency]["r"] += remaining
+
+            data.append([
+                c.contract_number,
+                rtl(c.title),
+                rtl(getattr(c.project, "name", "")),
+                rtl(getattr(c.subcontractor, "name", "")),
+                rtl(c.status),
+                currency,
+                f"{symbol}{value:,.2f}",
+                f"{symbol}{paid:,.2f}",
+                f"{symbol}{remaining:,.2f}",
+                f"{c.completion_percentage}%",
+            ])
+
+        # ---------------------------------------------------
+        # TOTALS SECTION
+        # ---------------------------------------------------
+        data.append([""] * 10)
+
+        for cur, t in totals.items():
+            symbol = self.get_currency_symbol(cur)
+
+            data.append([
+                "",
+                "",
+                "",
+                "",
+                rtl(f"TOTAL ({cur})"),
+                "",
+                f"{symbol}{t['v']:,.2f}",
+                f"{symbol}{t['p']:,.2f}",
+                f"{symbol}{t['r']:,.2f}",
+                "",
+            ])
+
+        # ---------------------------------------------------
+        # TABLE STYLE
+        # ---------------------------------------------------
+        table = Table(
+            data,
+            repeatRows=1,
+            colWidths=[70, 120, 90, 110, 60, 60, 80, 80, 80, 40],
+        )
+
+        table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#111827")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("GRID", (0, 0), (-1, -1), 0.4, colors.black),
+            ("FONTSIZE", (0, 0), (-1, -1), 7),
+            ("FONTNAME", (0, 0), (-1, -1), "NotoArabic"),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("BACKGROUND", (0, -1), (-1, -1), colors.lightgrey),
+        ]))
+
+        elements.append(table)
+
+        doc.build(elements)
+        return response
+    
+
+from django.http import HttpResponse
+from django.utils import timezone
+from rest_framework.views import APIView
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Table,
+    TableStyle,
+    Paragraph,
+    Spacer,
+)
+
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+
+# ---------------- FONT ----------------
+pdfmetrics.registerFont(
+    TTFont(
+        "NotoArabic",
+        "fonts/NotoNaskhArabic-VariableFont_wght.ttf",
+    )
+)
+
+
+# ---------------- RTL ----------------
+def rtl(text):
+    if not text:
+        return ""
+    return get_display(arabic_reshaper.reshape(str(text)))
+
+
+class ContractDetailPDFView(APIView):
+
+    def get_object(self, pk):
+        return Contract.objects.select_related(
+            "project",
+            "subcontractor"
+        ).get(pk=pk)
+
+    def get_currency(self, c):
+        return {
+            "AFN": "؋",
+            "USD": "$",
+            "EUR": "€",
+        }.get(c, c)
+
+    def get(self, request, pk):
+
+        contract = self.get_object(pk)
+
+        response = HttpResponse(content_type="application/pdf")
+        response["Content-Disposition"] = (
+            f'attachment; filename="contract_{contract.contract_number}.pdf"'
+        )
+
+        doc = SimpleDocTemplate(
+            response,
+            pagesize=A4,
+            leftMargin=20,
+            rightMargin=20,
+            topMargin=20,
+            bottomMargin=20,
+        )
+
+        styles = getSampleStyleSheet()
+
+        title_style = ParagraphStyle(
+            "title",
+            parent=styles["Title"],
+            fontName="NotoArabic",
+            fontSize=14,
+        )
+
+        normal = ParagraphStyle(
+            "normal",
+            parent=styles["BodyText"],
+            fontName="NotoArabic",
+            fontSize=9,
+            leading=12,
+        )
+
+        elements = []
+
+        currency_symbol = self.get_currency(contract.currency)
+
+        # ---------------------------------------------------
+        # HEADER
+        # ---------------------------------------------------
+        elements.append(
+            Paragraph(rtl("CONTRACT DETAIL REPORT"), title_style)
+        )
+        elements.append(
+            Paragraph(
+                rtl(f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}"),
+                normal,
+            )
+        )
+        elements.append(Spacer(1, 10))
+
+        # ---------------------------------------------------
+        # BASIC INFO
+        # ---------------------------------------------------
+        info_table = Table([
+            [rtl("Contract No"), contract.contract_number],
+            [rtl("Title"), rtl(contract.title)],
+            [rtl("Status"), rtl(contract.status)],
+            [rtl("Project"), rtl(contract.project.name)],
+            [rtl("Subcontractor"), rtl(contract.subcontractor.name)],
+            [rtl("Start Date"), str(contract.start_date)],
+            [rtl("End Date"), str(contract.end_date)],
+            [rtl("Adjusted End"), str(contract.adjusted_end_date)],
+        ], colWidths=[140, 340])
+
+        info_table.setStyle(TableStyle([
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+            ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
+            ("FONTNAME", (0, 0), (-1, -1), "NotoArabic"),
+            ("FONTSIZE", (0, 0), (-1, -1), 9),
+        ]))
+
+        elements.append(info_table)
+        elements.append(Spacer(1, 12))
+
+        # ---------------------------------------------------
+        # FINANCIAL SUMMARY
+        # ---------------------------------------------------
+        financial_table = Table([
+            [rtl("Contract Value"), f"{currency_symbol}{contract.contract_value:,.2f}"],
+            [rtl("Variation"), f"{currency_symbol}{contract.total_variation_amount:,.2f}"],
+            [rtl("Adjusted Value"), f"{currency_symbol}{contract.adjusted_contract_value:,.2f}"],
+            [rtl("Total Invoiced"), f"{currency_symbol}{contract.total_invoiced:,.2f}"],
+            [rtl("Total Paid"), f"{currency_symbol}{contract.total_paid:,.2f}"],
+            [rtl("Remaining"), f"{currency_symbol}{contract.remaining_amount:,.2f}"],
+            [rtl("Retention"), f"{currency_symbol}{contract.retention_amount:,.2f}"],
+            [rtl("Retention Balance"), f"{currency_symbol}{contract.retention_balance:,.2f}"],
+        ], colWidths=[200, 280])
+
+        financial_table.setStyle(TableStyle([
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+            ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
+            ("FONTNAME", (0, 0), (-1, -1), "NotoArabic"),
+            ("FONTSIZE", (0, 0), (-1, -1), 9),
+        ]))
+
+        elements.append(financial_table)
+        elements.append(Spacer(1, 12))
+
+        # ---------------------------------------------------
+        # SCOPE OF WORK
+        # ---------------------------------------------------
+        elements.append(Paragraph(rtl("Scope of Work"), title_style))
+        elements.append(Paragraph(rtl(contract.scope_of_work), normal))
+        elements.append(Spacer(1, 10))
+
+        # ---------------------------------------------------
+        # NOTES
+        # ---------------------------------------------------
+        if contract.notes:
+            elements.append(Paragraph(rtl("Notes"), title_style))
+            elements.append(Paragraph(rtl(contract.notes), normal))
+            elements.append(Spacer(1, 10))
+
+        # ---------------------------------------------------
+        # PAYMENTS (simple)
+        # ---------------------------------------------------
+        payments_data = [[
+            rtl("Date"),
+            rtl("Type"),
+            rtl("Amount"),
+            rtl("Reference"),
+        ]]
+
+        for p in contract.payments.all().order_by("-payment_date"):
+            payments_data.append([
+                str(p.payment_date),
+                rtl(p.payment_type),
+                f"{currency_symbol}{p.amount:,.2f}",
+                p.reference_number,
+            ])
+
+        payments_table = Table(
+            payments_data,
+            repeatRows=1,
+            colWidths=[100, 120, 120, 200],
+        )
+
+        payments_table.setStyle(TableStyle([
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#111827")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("FONTNAME", (0, 0), (-1, -1), "NotoArabic"),
+            ("FONTSIZE", (0, 0), (-1, -1), 8),
+        ]))
+
+        elements.append(Paragraph(rtl("Payments"), title_style))
+        elements.append(payments_table)
+
+        # ---------------------------------------------------
+        # BUILD PDF
+        # ---------------------------------------------------
+        doc.build(elements)
+        return response

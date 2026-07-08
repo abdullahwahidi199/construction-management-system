@@ -14,15 +14,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import DeleteConfirmModal from "../../components/ui/DeleteConfirmModal";
-
-const columns = [
-  { key: "name", label: "Project Name", icon: FolderKanban },
-  { key: "property_type", label: "Type", icon: Building2 },
-  { key: "location", label: "Location", icon: MapPin },
-  { key: "start_date", label: "Start Date", icon: Calendar },
-  { key: "status", label: "Status" },
-  { key: "actions", label: "" },
-];
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import { useLanguage } from "../../hooks/useLanguage";
 
 const formatDate = (dateString) => {
   if (!dateString) return "—";
@@ -87,6 +80,16 @@ export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
   // ✅ Store the full project object so we can show the name in the modal
   const [projectToDelete, setProjectToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const { t } = useLanguage();
+
+  const columns = [
+    { key: "name", label: t("ProjectsTable.projectName"), icon: FolderKanban },
+    { key: "property_type", label: t("ProjectsTable.type"), icon: Building2 },
+    { key: "location", label: t("ProjectsTable.location"), icon: MapPin },
+    { key: "start_date", label: t("ProjectsTable.startDate"), icon: Calendar },
+    { key: "status", label: t("ProjectsTable.status") },
+    { key: "actions", label: "" },
+  ];
 
   const rowsPerPage = 8;
   const navigate = useNavigate();
@@ -153,11 +156,14 @@ export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
           </div>
           <div>
             <h2 className="text-sm font-semibold text-[var(--text)]">
-              Projects
+              {t("ProjectsTable.project")}
             </h2>
             <p className="text-xs text-[var(--muted)]">
-              {filtered.length} {filtered.length === 1 ? "project" : "projects"}{" "}
-              found
+              {filtered.length}{" "}
+              {filtered.length === 1
+                ? t("ProjectsTable.project")
+                : t("ProjectsTable.projectsPlural")}{" "}
+              {t("ProjectsTable.found")}
             </p>
           </div>
         </div>
@@ -166,7 +172,7 @@ export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
           <input
             type="text"
-            placeholder="Search projects…"
+            placeholder={t("ProjectsTable.searchProjects")}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -279,17 +285,19 @@ export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
                             navigate(`/manager/projects/${project.id}`)
                           }
                           className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] transition-all hover:bg-[var(--primary)]/10 hover:text-[var(--primary)]"
-                          title="View project"
+                          title={t("ProjectsTable.viewProject")}
                         >
                           <Eye size={15} strokeWidth={1.8} />
                         </button>
-                        <button
-                          onClick={() => setProjectToDelete(project)}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] transition-all hover:bg-red-500/10 hover:text-[var(--danger)]"
-                          title="Delete project"
-                        >
-                          <Trash2 size={15} strokeWidth={1.8} />
-                        </button>
+                        <PermissionWrapper permissions={["projects.delete"]}>
+                          <button
+                            onClick={() => setProjectToDelete(project)}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] transition-all hover:bg-red-500/10 hover:text-[var(--danger)]"
+                            title={t("ProjectsTable.deleteProject")}
+                          >
+                            <Trash2 size={15} strokeWidth={1.8} />
+                          </button>
+                        </PermissionWrapper>
                       </div>
                     </td>
                   </tr>
@@ -306,12 +314,12 @@ export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
                       />
                     </div>
                     <p className="text-sm font-medium text-[var(--text)]">
-                      No projects found
+                      {t("ProjectsTable.noProjectsFound")}
                     </p>
                     <p className="text-xs text-[var(--muted)]">
                       {searchQuery
-                        ? "Try adjusting your search query"
-                        : "Create your first project to get started"}
+                        ? t("ProjectsTable.adjustSearch")
+                        : t("ProjectsTable.createFirstProject")}
                     </p>
                   </div>
                 </td>
@@ -325,7 +333,7 @@ export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
       {filtered.length > rowsPerPage && (
         <div className="flex items-center justify-between border-t border-[var(--border)] px-4 py-3">
           <p className="text-xs text-[var(--muted)]">
-            Showing{" "}
+            {t("ProjectsTable.showing")}{" "}
             <span className="font-medium text-[var(--text)]">
               {(currentPage - 1) * rowsPerPage + 1}
             </span>
@@ -333,7 +341,7 @@ export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
             <span className="font-medium text-[var(--text)]">
               {Math.min(currentPage * rowsPerPage, filtered.length)}
             </span>{" "}
-            of{" "}
+            {t("ProjectsTable.of")}{" "}
             <span className="font-medium text-[var(--text)]">
               {filtered.length}
             </span>
@@ -378,7 +386,7 @@ export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
         open={!!projectToDelete}
         onClose={() => setProjectToDelete(null)}
         onConfirm={handleDeleteConfirm}
-        itemName={projectToDelete?.name || "this project"}
+        itemName={projectToDelete?.name || t("ProjectsTable.thisProject")}
         loading={deleteLoading}
       />
     </div>

@@ -1,6 +1,11 @@
+// src/pages/contracts/InvoiceFormModal.jsx
 import React, { useState, useEffect } from "react";
 import usePost from "../../../hooks/usePost";
 import instance from "../../../api/axiosInstance";
+import PermissionWrapper from "../../../auth/PermissionWrapper";
+import Button from "../../ui/Button";
+import { useLanguage } from "../../../hooks/useLanguage";
+
 const INITIAL_STATE = {
   invoice_date: "",
   due_date: "",
@@ -16,6 +21,7 @@ export default function InvoiceFormModal({
   onSuccess,
   contractID,
 }) {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState(INITIAL_STATE);
   const [formError, setFormError] = useState("");
   const { postData, loading: submitting, error: postError } = usePost();
@@ -45,23 +51,28 @@ export default function InvoiceFormModal({
     setFormError("");
 
     if (!formData.invoice_date || !formData.amount) {
-      setFormError("Date, and Amount are required.");
+      setFormError(t("InvoiceFormModal.dateAndAmountRequired"));
       return;
     }
 
+    const payload = {
+      ...formData,
+      due_date: formData.due_date || null,
+    };
+
     try {
       if (invoice) {
-        // Edit mode: PATCH
-        await instance.patch(`invoices/${invoice.id}/`, formData);
+        await instance.patch(`invoices/${invoice.id}/`, payload);
       } else {
-        // Create mode: POST using reusable hook
-        await postData("invoices/", { ...formData, contract: contractID });
+        await postData("invoices/", {
+          ...payload,
+          contract: contractID,
+        });
       }
+
       onSuccess?.();
       onClose();
-    } catch (err) {
-      // Error is handled by usePost hook or caught here for UI feedback
-    }
+    } catch (err) {}
   };
 
   const inputStyle = {
@@ -131,7 +142,9 @@ export default function InvoiceFormModal({
               color: "var(--text)",
             }}
           >
-            {invoice ? "Edit Invoice" : "New Invoice"}
+            {invoice
+              ? t("InvoiceFormModal.editInvoice")
+              : t("InvoiceFormModal.newInvoice")}
           </h2>
           <button
             onClick={onClose}
@@ -160,7 +173,9 @@ export default function InvoiceFormModal({
             }}
           >
             {formError ||
-              (typeof postError === "string" ? postError : "Submission failed")}
+              (typeof postError === "string"
+                ? postError
+                : t("InvoiceFormModal.submissionFailed"))}
           </div>
         )}
 
@@ -173,7 +188,9 @@ export default function InvoiceFormModal({
           }}
         >
           <div>
-            <label style={labelStyle}>Invoice Date *</label>
+            <label style={labelStyle}>
+              {t("InvoiceFormModal.invoiceDate")} *
+            </label>
             <input
               name="invoice_date"
               type="date"
@@ -184,7 +201,7 @@ export default function InvoiceFormModal({
             />
           </div>
           <div>
-            <label style={labelStyle}>Due Date</label>
+            <label style={labelStyle}>{t("InvoiceFormModal.dueDate")}</label>
             <input
               name="due_date"
               type="date"
@@ -194,7 +211,7 @@ export default function InvoiceFormModal({
             />
           </div>
           <div>
-            <label style={labelStyle}>Amount *</label>
+            <label style={labelStyle}>{t("InvoiceFormModal.amount")} *</label>
             <input
               name="amount"
               type="number"
@@ -207,22 +224,28 @@ export default function InvoiceFormModal({
             />
           </div>
           <div>
-            <label style={labelStyle}>Status</label>
+            <label style={labelStyle}>{t("InvoiceFormModal.status")}</label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
               style={inputStyle}
             >
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="partially_paid">Partially Paid</option>
-              <option value="paid">Paid</option>
-              <option value="cancelled">Cancelled</option>
+              <option value="pending">{t("InvoiceFormModal.pending")}</option>
+              <option value="approved">{t("InvoiceFormModal.approved")}</option>
+              <option value="partially_paid">
+                {t("InvoiceFormModal.partiallyPaid")}
+              </option>
+              <option value="paid">{t("InvoiceFormModal.paid")}</option>
+              <option value="cancelled">
+                {t("InvoiceFormModal.cancelled")}
+              </option>
             </select>
           </div>
           <div style={{ gridColumn: "1 / -1" }}>
-            <label style={labelStyle}>Description</label>
+            <label style={labelStyle}>
+              {t("InvoiceFormModal.description")}
+            </label>
             <textarea
               name="description"
               value={formData.description}
@@ -232,7 +255,7 @@ export default function InvoiceFormModal({
             />
           </div>
           <div style={{ gridColumn: "1 / -1" }}>
-            <label style={labelStyle}>Notes</label>
+            <label style={labelStyle}>{t("InvoiceFormModal.notes")}</label>
             <textarea
               name="notes"
               value={formData.notes}
@@ -264,29 +287,49 @@ export default function InvoiceFormModal({
                 fontSize: "0.9rem",
               }}
             >
-              Cancel
+              {t("InvoiceFormModal.cancel")}
             </button>
-            <button
-              type="submit"
-              disabled={submitting}
-              style={{
-                padding: "0.6rem 1.2rem",
-                border: "none",
-                borderRadius: "6px",
-                background: "var(--primary)",
-                color: "#fff",
-                cursor: submitting ? "not-allowed" : "pointer",
-                opacity: submitting ? 0.7 : 1,
-                fontSize: "0.9rem",
-                fontWeight: "500",
-              }}
+            <PermissionWrapper
+              permissions={[
+                invoice
+                  ? "contract_invoices.update"
+                  : "contract_invoices.create",
+              ]}
+              fallback={
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled
+                  title={t("InvoiceFormModal.noPermission")}
+                >
+                  {invoice
+                    ? t("InvoiceFormModal.updateInvoice")
+                    : t("InvoiceFormModal.createInvoice")}
+                </Button>
+              }
             >
-              {submitting
-                ? "Saving..."
-                : invoice
-                  ? "Update Invoice"
-                  : "Create Invoice"}
-            </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                style={{
+                  padding: "0.6rem 1.2rem",
+                  border: "none",
+                  borderRadius: "6px",
+                  background: "var(--primary)",
+                  color: "#fff",
+                  cursor: submitting ? "not-allowed" : "pointer",
+                  opacity: submitting ? 0.7 : 1,
+                  fontSize: "0.9rem",
+                  fontWeight: "500",
+                }}
+              >
+                {submitting
+                  ? t("InvoiceFormModal.saving")
+                  : invoice
+                    ? t("InvoiceFormModal.updateInvoice")
+                    : t("InvoiceFormModal.createInvoice")}
+              </button>
+            </PermissionWrapper>
           </div>
         </form>
       </div>

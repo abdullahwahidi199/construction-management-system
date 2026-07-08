@@ -160,7 +160,7 @@
     "terminated": "لغوه شوی",
     "cancelled": "فسخ شوی"
   },
-  
+
   "workforceSection": {
     "title": "کاري ځواک او حاضري",
 
@@ -192,6 +192,21 @@
     "safety": "خوندیتوب"
   },
   "common": {
+    "all": "ټول",
+    "clear": "پاکول",
+    "clearFilters": "فلټرونه پاک کړئ",
+    "error": "تېروتنه",
+    "errorLoading": "اجازې/صلاحیتونه نه شي بار کېدای. مهرباني وکړئ بیا هڅه وکړئ.",
+    "errorSaving": "بدلونونه خوندي نه شول. مهرباني وکړئ بیا هڅه وکړئ.",
+    "module": "ماډیول",
+    "noResults": "پایله ونه موندل شوه",
+    "refresh": "بیا تازه کول",
+    "retry": "بیا هڅه",
+    "saving": "خوندي کېږي...",
+    "search": "لټون",
+    "tryDifferentSearch": "بل لټون وکړئ یا فلټرونه پاک کړئ.",
+    "cancel": "لغوه",
+    "create": "جوړول",
     "active": "فعال",
     "inactive": "غیرفعال",
     "loading": "بارېږي...",
@@ -235,9 +250,20 @@
       "systemText": "عملیاتي برخې د مدیر صلاحیت سره پرانیزئ."
     },
     "users": {
+      "edit": "کارن سمول",
+      "update": "تازه کول",
+      "changePassword": "پاسورډ بدلول",
+      "newPassword": "نوی پاسورډ",
+      "confirmNewPassword": "نوی پاسورډ تایید کړئ",
+      "leaveBlankPassword": "د اوسني پاسورډ ساتلو لپاره دا برخه تشه پریږدئ.",
+      "errors": {
+        "passwordMatch": "پاسورډونه سره ورته والی نلري."
+      },
       "title": "د کارن مدیریت",
       "subtitle": "رولونه وټاکئ او د حساب حالت کنټرول کړئ.",
       "username": "کارن نوم",
+      "password": "پاسورډ",
+      "confirmPassword": "د پاسورډ تایید",
       "email": "برېښنالیک",
       "role": "رول",
       "status": "حالت",
@@ -246,18 +272,31 @@
       "disable": "غیرفعالول"
     },
     "permissions": {
-      "title": "د اجازو بدلونونه",
-      "subtitle": "د هر رول ځانګړې اجازې فعالې یا غیرفعالې کړئ.",
-      "allow": "اجازه",
-      "deny": "منع"
+      "title": "د اجازو مدیریت",
+      "subtitle": "مدیریت کړئ چې کوم رولونه په سیستم کې کومو کړنو ته لاسرسی لري.",
+      "searchPlaceholder": "اجازې د نوم، کوډ یا ماډیول له مخې ولټوئ...",
+      "count": "ښودل کېږي",
+      "permissions": "اجازې",
+      "rolesShown": "رولونه",
+      "permission": "اجازه",
+      "tipClickBoxes": "لارښوونه: د ورکړې/بېرته اخیستلو لپاره کلیک وکړئ",
+      "grant": "اجازه ورکول",
+      "revoke": "اجازه بېرته اخیستل"
     }
   },
   "dataEntry": {
     "title": "د معلوماتو ثبت پینل",
     "nav": {
       "dashboard": "ډشبورډ",
+      "projects": "پروژې",
+      "subContractors": "فرعي قراردادیان",
+      "contracts": "قراردادونه",
       "expenses": "لګښتونه",
-      "attendance": "حاضري"
+      "employees": "کارکوونکي",
+      "payrolls": "معاشونه",
+      "attendance": "حاضري",
+      "reports": "راپورونه",
+      "brand": "منیجر هب"
     },
     "dashboard": {
       "title": "د معلوماتو ثبت پینل",
@@ -269,6 +308,1372 @@
       "attendance": "د حاضري ثبتونه",
       "attendanceText": "د حاضري ثبتونه جوړ او تازه کړئ."
     }
-  }
+  },
 
+  "payrollSummary": {
+    "title": "د معاشونو لنډیز",
+    "payrollsThisMonth": "په دې میاشت کې {{count}} معاشونه",
+
+    "thisMonthNet": "دا میاشت (خالص)",
+    "lastMonthNet": "تېره میاشت (خالص)",
+    "gross": "ناخالص",
+    "change": "{{percent}}٪ بدلون",
+
+    "deductions": "کسرونه",
+    "tax": "مالیه",
+    "bonus": "انعام",
+    "overtime": "اضافي وخت",
+
+    "paymentMethods": "د تادیې طریقې",
+    "recentPayrolls": "وروستي معاشونه",
+
+    "count": "({{count}})"
+  },
+  "RecentActivity": {
+    "title": "وروستي فعالیتونه",
+    "noRecentActivity": "وروستی فعالیت نشته",
+    "items": "توکي",
+    "justNow": "همدا اوس",
+    "minutesAgo": "{{count}} دقیقې مخکې",
+    "hoursAgo": "{{count}} ساعته مخکې",
+    "daysAgo": "{{count}} ورځې مخکې"
+  },
+  "ProjectsBase": {
+    "title": "پروژې",
+    "subtitle": "خپلې ټولې ساختماني پروژې مدیریت او تعقیب کړئ",
+    "refresh": "تازه کول",
+    "newProject": "نوې پروژه",
+    "totalProjects": "ټولې پروژې",
+    "active": "فعال",
+    "planning": "د پلان په حالت کې",
+    "completed": "بشپړې شوې",
+    "loadingProjects": "پروژې بارېږي…",
+    "noProjectsTitle": "تر اوسه کومه پروژه نشته",
+    "noProjectsDescription": "د خپلې لومړۍ پروژې په جوړولو پیل وکړئ. پرمختګ، بودیجه او مهالویش ټول په یوه ځای کې تعقیب کړئ.",
+    "createFirstProject": "لومړۍ پروژه جوړه کړئ"
+  },
+  "ProjectsTable": {
+    "projectName": "د پروژې نوم",
+    "type": "ډول",
+    "location": "ځای",
+    "startDate": "د پیل نېټه",
+    "status": "حالت",
+    "projects": "پروژې",
+    "project": "پروژه",
+    "projectsPlural": "پروژې",
+    "found": "وموندل شوې",
+    "searchProjects": "پروژې ولټوئ...",
+    "viewProject": "پروژه وګورئ",
+    "deleteProject": "پروژه حذف کړئ",
+    "noProjectsFound": "هیڅ پروژه ونه موندل شوه",
+    "adjustSearch": "د لټون عبارت بدل کړئ",
+    "createFirstProject": "د پیل لپاره خپله لومړۍ پروژه جوړه کړئ",
+    "showing": "ښودل",
+    "of": "له",
+    "thisProject": "دا پروژه"
+  },
+
+  "ProjectDetails": {
+    "loading": "پروژه بارېږي...",
+    "failedToLoad": "د پروژې بارول ناکام شول",
+    "retry": "بیا هڅه وکړئ",
+
+    "backToProjects": "پروژو ته بېرته",
+    "edit": "سمول",
+    "delete": "ړنګول",
+    "downloadPdf": "PDF ډاونلوډ",
+    "noPermission": "تاسو د دې عمل اجازه نه لرئ",
+
+    "status": {
+      "inProgress": "د کار په حال کې",
+      "completed": "بشپړ شوی",
+      "planning": "د پلان په حال کې",
+      "onHold": "ځنډول شوی",
+      "cancelled": "لغوه شوی",
+      "unknown": "نامعلوم"
+    },
+
+    "relativeDate": {
+      "daysAgo": "{{count}} ورځې مخکې",
+      "today": "نن",
+      "tomorrow": "سبا",
+      "inDays": "په {{count}} ورځو کې"
+    },
+
+    "totalFloors": "ټول پوړونه",
+    "estimatedBudget": "اټکلي بودیجه",
+    "expensesUsd": "لګښتونه (ډالر)",
+    "expensesAfn": "لګښتونه (افغانۍ)",
+    "startDate": "د پیل نېټه",
+    "expectedCompletion": "د بشپړېدو اټکل شوې نېټه",
+
+    "contractFinancialSummary": "د قرارداد مالي لنډیز",
+    "totalContractValue": "د قرارداد ټول ارزښت",
+    "totalPayments": "ټولې ورکړې",
+    "remainingBalance": "پاتې بیلانس",
+
+    "timelineProgress": "د مهالویش پرمختګ",
+
+    "projectInformation": "د پروژې معلومات",
+    "projectName": "د پروژې نوم",
+    "propertyType": "د ملکیت ډول",
+    "location": "ځای",
+
+    "importantDates": "مهمې نېټې",
+    "actualCompletion": "د بشپړېدو اصلي نېټه",
+    "created": "جوړ شوی",
+    "lastUpdated": "وروستی تازه کول",
+
+    "notes": "یادښتونه",
+
+    "notSet": "نه دی ټاکل شوی",
+    "notYet": "لا نه دی بشپړ شوی",
+    "dash": "—",
+
+    "currency": {
+      "usd": "ډالر",
+      "afn": "افغانۍ"
+    }
+  },
+
+  "ProjectEditView": {
+    "title": "د پروژې سمون",
+    "loading": "د پروژې جزئیات بارېږي…",
+    "updateInfo": "د پروژې معلومات تازه کړئ",
+    "unsavedChanges": "ناخوندي شوي بدلونونه لرئ",
+    "modified": "بدلون شوی",
+
+    "basicInfo": "اساسي معلومات",
+    "projectName": "د پروژې نوم",
+    "description": "تشریح",
+
+    "propertyDetails": "د ملکیت جزئیات",
+    "propertyType": "د ملکیت ډول",
+    "briefOverview": "د پروژې لنډه کتنه",
+    "projectDescription": "دا پروژه د څه په اړه ده؟",
+    "status": "حالت",
+    "location": "موقعیت",
+    "totalFloors": "ټول پوړونه",
+
+    "timelineBudget": "مهالوېش او بودیجه",
+    "startDate": "د پیل نېټه",
+    "expectedCompletion": "د بشپړېدو اټکل شوې نېټه",
+    "estimatedBudget": "اټکلي بودیجه",
+
+    "additionalNotes": "اضافي یادښتونه",
+    "notesPlaceholder": "هر ډول اضافي یادښتونه، څرګندونې یا مهم جزئیات…",
+
+    "cancel": "لغوه",
+    "saveChanges": "بدلونونه خوندي کړئ",
+    "resetChanges": "بدلونونه بېرته تنظیم کړئ",
+    "requiredFields": "* اړین فیلډونه",
+
+    "propertyTypeOptions": {
+      "residential": "استوګنیز",
+      "commercial": "تجارتي",
+      "mixed": "مختلط"
+    },
+
+    "statusOptions": {
+      "planning": "د پلان په حال کې",
+      "ongoing": "د کار په حال کې",
+      "completed": "بشپړ شوی",
+      "onHold": "ځنډول شوی"
+    }
+  },
+
+  "ProjectCreateModal": {
+    "title": "نوې پروژه جوړه کړئ",
+    "subtitle": "خپل پورټفولیو ته نوې پروژه اضافه کړئ",
+
+    "sections": {
+      "basic_information": "بنسټیز معلومات",
+      "property_details": "د ملکیت معلومات",
+      "timeline_budget": "وخت او بودیجه",
+      "additional_notes": "اضافي یادښتونه"
+    },
+
+    "fields": {
+      "name": {
+        "label": "د پروژې نوم",
+        "placeholder": "لکه: Skyline Towers"
+      },
+      "description": {
+        "label": "توضیحات",
+        "placeholder": "دا پروژه د څه په اړه ده؟",
+        "helper": "د پروژې لنډه کتنه"
+      },
+      "property_type": "د ملکیت ډول",
+      "status": "حالت",
+      "location": {
+        "label": "موقعیت",
+        "placeholder": "ښار، ولایت"
+      },
+      "total_floors": "ټول پوړونه",
+      "start_date": "د پیل نېټه",
+      "expected_completion_date": "تمه شوې د بشپړېدو نېټه",
+      "estimated_budget": {
+        "label": "اټکل شوې بودیجه",
+        "helper": "په امریکايي ډالرو"
+      },
+      "notes": {
+        "placeholder": "هر ډول اضافي یادښتونه، څرګندونې یا مهم جزئیات…"
+      }
+    },
+
+    "options": {
+      "property_type": {
+        "residential": "استوګنیز",
+        "commercial": "سوداګریز",
+        "mixed": "ګډ"
+      },
+      "status": {
+        "planning": "پلان جوړونه",
+        "ongoing": "روان",
+        "completed": "بشپړ شوی",
+        "on_hold": "ځنډول شوی"
+      }
+    },
+
+    "buttons": {
+      "cancel": "لغوه",
+      "create": "پروژه جوړه کړئ",
+      "creating": "جوړېږي…"
+    },
+
+    "errors": {
+      "default": "د پروژې جوړول ناکام شول. مهرباني وکړئ بیا هڅه وکړئ."
+    }
+  },
+
+  "SubcontractorsPage": {
+    "title": "فرعي قراردادیان",
+    "subtitle": "د فرعي قراردادی شرکتونو او جزئیاتو مدیریت",
+
+    "actions": {
+      "new": "نوی فرعي قراردادی",
+      "clear_filters": "پاکول"
+    },
+
+    "filters": {
+      "search_placeholder": "د نوم، ایمیل، مالی نمبر له مخې لټون...",
+      "specialization_all": "ټول تخصصونه",
+      "status_all": "ټول حالتونه",
+      "active": "فعال",
+      "inactive": "غیرفعال"
+    },
+
+    "specializations": {
+      "concrete": "کانکریټ کارونه",
+      "steel": "د فولادو کارونه",
+      "electrical": "برقي کارونه",
+      "plumbing": "پلمبنګ کارونه",
+      "finishing": "بشپړ کارونه",
+      "excavation": "کیندنې کارونه",
+      "hvac": "HVAC",
+      "landscaping": "باغداري",
+      "other": "نور"
+    },
+
+    "messages": {
+      "error_load": "د فرعي قراردادیانو بارول ناکام شول.",
+      "empty_state": "هیڅ فرعي قراردادی ونه موندل شو."
+    },
+
+    "delete": {
+      "title": "فرعي قراردادی حذف کړئ",
+      "message": "آیا تاسو ډاډه یاست چې \"{{name}}\" حذف کړئ؟ دا عمل نه بدلیږي."
+    },
+
+    "pagination": {
+      "previous": "مخکینی",
+      "next": "راتلونکی",
+      "showing": "ښودل",
+      "of": "له"
+    }
+  },
+
+  "SubcontractorTable": {
+    "columns": {
+      "name": "نوم",
+      "contact": "د اړیکې کس",
+      "phone": "تلیفون",
+      "specialization": "تخصص",
+      "contracts": "قراردادونه",
+      "status": "حالت",
+      "actions": "عملیات"
+    },
+
+    "labels": {
+      "active": "فعال",
+      "inactive": "غیرفعال"
+    },
+
+    "states": {
+      "loading": "فرعي قراردادیان بارېږي...",
+      "empty": "هیڅ فرعي قراردادی ونه موندل شو."
+    },
+
+    "actions": {
+      "view": "تفصیل وګورئ",
+      "edit": "سمول",
+      "delete": "حذف"
+    },
+
+    "specializations": {
+      "concrete": "کانکریټ کارونه",
+      "steel": "د فولادو کارونه",
+      "electrical": "برقي کارونه",
+      "plumbing": "پلمبنګ کارونه",
+      "finishing": "بشپړ کارونه",
+      "excavation": "کیندنې کارونه",
+      "hvac": "HVAC",
+      "landscaping": "باغداري",
+      "other": "نور"
+    }
+  },
+
+  "SubcontractorInfo": {
+    "labels": {
+      "contact_person": "د اړیکې کس",
+      "phone": "تلیفون",
+      "email": "ایمیل",
+      "address": "پته",
+      "specialization": "تخصص",
+      "status": "حالت",
+      "active": "فعال",
+      "inactive": "غیرفعال"
+    }
+  },
+
+  "SubConractorFinancialSummary": {
+    "titles": {
+      "total_contract_value": "ټوله د قرارداد ارزښت",
+      "total_paid": "ټول ورکړل شوي",
+      "remaining": "پاتې",
+      "contracts": "قراردادونه"
+    }
+  },
+
+  "ContractTable": {
+    "columns": {
+      "contract_number": "د قرارداد نمبر",
+      "title": "عنوان",
+      "subcontractor": "فرعي قراردادی",
+      "project": "پروژه",
+      "value": "ارزښت",
+      "status": "حالت",
+      "progress": "پرمختګ",
+      "actions": "عملیات"
+    },
+
+    "states": {
+      "loading": "قراردادونه بارېږي...",
+      "empty": "هیڅ قرارداد ونه موندل شو."
+    },
+
+    "actions": {
+      "view": "کتل",
+      "edit": "سمول",
+      "delete": "حذف"
+    }
+  },
+
+  "SubcontractorFormModal": {
+    "title": {
+      "create": "فرعي قراردادی جوړ کړئ",
+      "edit": "فرعي قراردادی سم کړئ"
+    },
+
+    "fields": {
+      "company_name": {
+        "label": "د شرکت نوم",
+        "placeholder": "لکه ABC Construction Co."
+      },
+      "contact_person": {
+        "label": "د اړیکې کس",
+        "placeholder": "بشپړ نوم"
+      },
+      "specialization": {
+        "label": "تخصص"
+      },
+      "phone": {
+        "label": "تلیفون",
+        "placeholder": "+1-555-0100"
+      },
+      "email": {
+        "label": "ایمیل",
+        "placeholder": "contact@example.com"
+      },
+      "address": {
+        "label": "پته",
+        "placeholder": "بشپړ پته"
+      },
+      "tax_number": {
+        "label": "د مالیې نمبر",
+        "placeholder": "Tax ID"
+      },
+      "registration_number": {
+        "label": "د ثبت نمبر",
+        "placeholder": "د ثبت نمبر"
+      },
+      "active": {
+        "label": "فعال"
+      },
+      "notes": {
+        "label": "یادښتونه",
+        "placeholder": "اضافي یادښتونه..."
+      }
+    },
+
+    "buttons": {
+      "cancel": "لغوه",
+      "create": "جوړول",
+      "update": "سمول",
+      "saving": "ساتل کېږي...",
+      "update_permission": "فرعي قراردادی سمول",
+      "create_permission": "فرعي قراردادی جوړول"
+    },
+
+    "errors": {
+      "name_required": "نوم اړین دی",
+      "invalid_email": "ناسم ایمیل"
+    }
+  },
+
+  "ContractFormModal": {
+    "titleEdit": "د قرارداد سمون",
+    "titleCreate": "نوی قرارداد جوړول",
+
+    "fields": {
+      "project": "پروژه",
+      "subcontractor": "فرعي قراردادي",
+      "title": "عنوان",
+      "scopeOfWork": "د کار ساحه",
+      "currency": "پیسې واحد",
+      "contractValue": "د قرارداد ارزښت ($)",
+      "retentionPercentage": "ساتنې سلنه",
+      "completionPercentage": "پرمختګ %",
+      "startDate": "د پیل نېټه",
+      "endDate": "د پای نېټه",
+      "status": "حالت",
+      "notes": "یادښتونه"
+    },
+
+    "placeholders": {
+      "project": "پروژه وټاکئ",
+      "subcontractor": "فرعي قراردادي وټاکئ",
+      "title": "د قرارداد عنوان",
+      "scopeOfWork": "د کار تفصیل ولیکئ",
+      "contractValue": "0.00",
+      "retentionPercentage": "5",
+      "completionPercentage": "0",
+      "notes": "اضافي یادښتونه..."
+    },
+
+    "buttons": {
+      "cancel": "لغوه",
+      "saving": "خوندي کېږي...",
+      "update": "قرارداد تازه کول",
+      "create": "قرارداد جوړول"
+    },
+
+    "validation": {
+      "projectRequired": "پروژه اړینه ده",
+      "subcontractorRequired": "فرعي قراردادي اړین دی",
+      "titleRequired": "عنوان اړین دی",
+      "currencyRequired": "پیسې واحد اړین دی",
+      "contractValuePositive": "د قرارداد ارزښت باید مثبت وي",
+      "startDateRequired": "د پیل نېټه اړینه ده",
+      "endDateInvalid": "د پای نېټه باید د پیل وروسته وي",
+      "progressRange": "باید د 0 او 100 ترمنځ وي"
+    },
+
+    "statusOptions": {
+      "draft": "مسوده",
+      "active": "فعال",
+      "completed": "بشپړ شوی",
+      "terminated": "ختم شوی",
+      "cancelled": "لغوه شوی"
+    }
+  },
+
+  "ContractsPage": {
+    "title": "قراردادونه",
+    "subtitle": "د فرعي قراردادیانو تړونونه او قراردادونه اداره کړئ",
+
+    "buttons": {
+      "newContract": "نوی قرارداد",
+      "exportPdf": "PDF صادرول",
+      "clearFilters": "پاکول",
+      "previous": "مخکینی",
+      "next": "بل"
+    },
+
+    "filters": {
+      "searchPlaceholder": "د پروژې، قرارداد شمېره، نوم، د کار ساحه یا فرعي قراردادي له مخې لټون...",
+      "allStatuses": "ټول حالتونه",
+      "allProjects": "ټولې پروژې",
+      "allSubcontractors": "ټول فرعي قراردادیان"
+    },
+
+    "messages": {
+      "loadError": "د قراردادونو بارول ناکام شول. بیا هڅه وکړئ.",
+      "showing": "ښودل کېږي",
+      "of": "له",
+      "page": "پاڼه"
+    }
+  },
+
+  "ContractDetailsPage": {
+    "information": "معلومات",
+    "financial": "مالي",
+    "invoices": "بلونه",
+    "payments": "تادیات",
+    "variations": "بدلونونه",
+    "documents": "اسناد",
+    "backToContracts": "بېرته قراردادونو ته",
+    "progress": "پرمختګ",
+    "downloadPdf": "PDF ډاونلوډ",
+    "failedToLoadContractDetails": "د قرارداد جزئیات پورته نه شول.",
+    "contractDetails": "د قرارداد جزئیات",
+    "project": "پروژه",
+    "subcontractor": "فرعي قراردادي",
+    "scopeOfWork": "د کار ساحه",
+    "notes": "یادښتونه",
+    "timeline": "مهالوېش",
+    "startDate": "د پیل نېټه",
+    "endDate": "د پای نېټه",
+    "adjustedEndDate": "تعدیل شوې د پای نېټه",
+    "completion": "بشپړتیا",
+    "financialBreakdown": "مالي جزئیات",
+    "originalContractValue": "د قرارداد اصلي ارزښت",
+    "retentionPercentage": "د ساتنې سلنه",
+    "retentionAmount": "د ساتنې مبلغ",
+    "totalVariationAmount": "د بدلونونو ټول مبلغ",
+    "adjustedContractValue": "تعدیل شوی د قرارداد ارزښت",
+    "addPayment": "تادیه اضافه کړئ",
+    "deletePayment": "تادیه حذف کړئ",
+    "deletePaymentMessage": "ایا تاسو ډاډه یاست چې دا د تادیې ریکارډ حذف کړئ؟",
+    "variationsChangeOrders": "بدلونونه / د بدلون امرونه",
+    "addVariation": "بدلون اضافه کړئ",
+    "deleteVariation": "بدلون حذف کړئ",
+    "deleteVariationMessage": "ایا تاسو ډاډه یاست چې دا بدلون حذف کړئ؟",
+    "uploadDocument": "سند پورته کړئ",
+    "deleteDocument": "سند حذف کړئ",
+    "deleteDocumentMessage": "ایا تاسو ډاډه یاست چې \"{{title}}\" حذف کړئ؟",
+    "noData": "—"
+  },
+
+  "FinancialSummaryCard": {
+    "originalContractValue": "د قرارداد اصلي ارزښت",
+    "totalVariationAmount": "د بدلونونو ټول مبلغ",
+    "adjustedContractValue": "د قرارداد تعدیل شوی ارزښت",
+    "totalPaid": "ټولې ورکړې",
+    "remainingAmount": "پاتې مبلغ",
+    "retentionBalance": "د ساتنې بیلانس",
+    "totalInvoiced": "ټول بل شوي"
+  },
+  "ContractInvoicesPage": {
+    "allStatuses": "ټول حالتونه",
+    "pending": "په تمه",
+    "approved": "تأیید شوی",
+    "partiallyPaid": "یوه برخه ورکړل شوې",
+    "paid": "ورکړل شوی",
+    "cancelled": "لغوه شوی",
+    "loadingInvoices": "بلونه پورته کېږي...",
+    "contractInvoices": "د قرارداد بلونه",
+    "newInvoice": "نوی بل",
+    "searchPlaceholder": "د بل شمېره، پروژه ... ولټوئ",
+    "startDate": "د پیل نېټه",
+    "endDate": "د پای نېټه",
+    "clearFilters": "فلټرونه پاک کړئ",
+    "showing": "ښودل",
+    "of": "له",
+    "invoices": "بلونو",
+    "invoiceNumber": "د بل شمېره",
+    "project": "پروژه",
+    "subcontractor": "فرعي قراردادي",
+    "date": "نېټه",
+    "dueDate": "د پای نېټه",
+    "amount": "مبلغ",
+    "status": "حالت",
+    "actions": "عملیات",
+    "view": "لیدل",
+    "edit": "سمول",
+    "noMatchingInvoices": "د ټاکل شوو معیارونو مطابق هېڅ بل ونه موندل شو.",
+    "noInvoicesForContract": "د دې قرارداد لپاره هېڅ بل ونه موندل شو.",
+    "error": "تېروتنه"
+  },
+  "ContractInvoiceDetails": {
+    "loadingInvoiceDetails": "د بل جزئیات پورته کېږي...",
+    "error": "تېروتنه",
+    "invoice": "بل",
+    "contract": "قرارداد",
+    "project": "پروژه",
+    "subcontractor": "فرعي قراردادي",
+    "amount": "مبلغ",
+    "status": "حالت",
+    "invoiceDate": "د بل نېټه",
+    "dueDate": "د پای نېټه",
+    "description": "تشریح",
+    "notes": "یادښتونه",
+    "documents": "اسناد",
+    "uploading": "پورته کېږي...",
+    "dragDrop": "فایل دلته راکش کړئ او خوشې یې کړئ، یا",
+    "browse": "انتخاب کړئ",
+    "supportedFiles": "PDF، DOCX، XLSX، JPG، PNG ملاتړ کېږي",
+    "documentUploaded": "سند په بریالیتوب سره پورته شو!",
+    "uploadFailed": "پورته کول ناکام شول",
+    "viewDownload": "لیدل / ډاونلوډ",
+    "noDocuments": "تر اوسه هېڅ سند نه دی پورته شوی.",
+    "document": "سند"
+  },
+
+  "InvoiceFormModal": {
+    "editInvoice": "بل سمول",
+    "newInvoice": "نوی بل",
+    "dateAndAmountRequired": "نېټه او مبلغ اړین دي.",
+    "submissionFailed": "سپارل ناکام شول",
+    "invoiceDate": "د بل نېټه",
+    "dueDate": "د پای نېټه",
+    "amount": "مبلغ",
+    "status": "حالت",
+    "pending": "په تمه",
+    "approved": "تأیید شوی",
+    "partiallyPaid": "یوه برخه ورکړل شوې",
+    "paid": "ورکړل شوی",
+    "cancelled": "لغوه شوی",
+    "description": "تشریح",
+    "notes": "یادښتونه",
+    "cancel": "لغوه",
+    "saving": "خوندي کېږي...",
+    "updateInvoice": "بل تازه کړئ",
+    "createInvoice": "بل جوړ کړئ",
+    "noPermission": "تاسو د دې عمل لپاره اجازه نه لرئ"
+  },
+
+  "PaymentTable": {
+    "loadingPayments": "تادیات بارېږي...",
+    "noPayments": "تر اوسه هېڅ تادیه نه ده ثبت شوې.",
+    "date": "نېټه",
+    "type": "ډول",
+    "amount": "مبلغ",
+    "reference": "مرجع",
+    "notes": "یادښت",
+    "actions": "عملیات",
+    "advance": "مخکینۍ تادیه",
+    "progress": "مرحلېزه تادیه",
+    "retentionRelease": "د تضمین خوشې کول",
+    "final": "وروستۍ تادیه",
+    "other": "نور",
+    "ref": "مرجع"
+  },
+  "PaymentFormModal": {
+    "editPayment": "تادیه سمول",
+    "addPayment": "تادیه اضافه کول",
+    "amount": "مبلغ",
+    "paymentDate": "د تادیې نېټه",
+    "paymentType": "د تادیې ډول",
+    "referenceNumber": "د مرجع شمېره",
+    "notes": "یادښت",
+    "cancel": "لغوه",
+    "updatePayment": "تادیه تازه کول",
+    "createPayment": "تادیه جوړول",
+    "addPaymentButton": "تادیه اضافه کول",
+    "saving": "خوندي کېږي...",
+    "permissionDenied": "تاسو د دې عمل اجازه نه لرئ",
+    "progressPayment": "مرحلېزه تادیه",
+    "retentionRelease": "د تضمین خوشې کول",
+    "finalPayment": "وروستۍ تادیه",
+    "advance": "مخکینۍ تادیه",
+    "other": "نور",
+    "optionalNotes": "اختیاري یادښت...",
+    "referencePlaceholder": "لکه INV-2024-001",
+    "amountPlaceholder": "0.00",
+    "amountMustBePositive": "مبلغ باید له صفر څخه زیات وي",
+    "amountExceedsRemaining": "مبلغ د پاتې بیلانس {{amount}} څخه زیات دی",
+    "paymentDateRequired": "د تادیې نېټه اړینه ده"
+  },
+
+  "VariationTable": {
+    "loadingVariations": "بدلونونه بارېږي...",
+    "noVariations": "تر اوسه هېڅ بدلون نه دی ثبت شوی.",
+    "variationNumber": "د بدلون شمېره",
+    "date": "نېټه",
+    "description": "تشریح",
+    "amountChange": "د مبلغ بدلون",
+    "days": "ورځې",
+    "status": "حالت",
+    "actions": "عملیات",
+    "approved": "تأیید شوی",
+    "pending": "په تمه",
+    "approve": "تأیید",
+    "daysSuffix": "ورځې"
+  },
+  "VariationFormModal": {
+    "editVariation": "بدلون سمول",
+    "addVariation": "بدلون اضافه کول",
+    "date": "نېټه",
+    "description": "تشریح",
+    "amountChange": "د مبلغ بدلون",
+    "daysAdded": "زیاتې شوې ورځې",
+    "approved": "تأیید شوی",
+    "cancel": "لغوه",
+    "updateVariation": "بدلون تازه کول",
+    "updateVariations": "بدلونونه تازه کول",
+    "createVariation": "بدلون جوړول",
+    "addVariationButton": "بدلون اضافه کول",
+    "saving": "خوندي کېږي...",
+    "permissionDenied": "تاسو د دې عمل اجازه نه لرئ",
+    "descriptionPlaceholder": "بدلون تشریح کړئ...",
+    "amountPlaceholder": "د کسر لپاره - وکاروئ",
+    "daysPlaceholder": "د کمښت لپاره - وکاروئ",
+    "descriptionRequired": "تشریح اړینه ده",
+    "amountChangeRequired": "د مبلغ بدلون اړین دی",
+    "dateRequired": "نېټه اړینه ده"
+  },
+
+  "DocumentTable": {
+    "loadingDocuments": "اسناد بارېږي...",
+    "noDocuments": "تر اوسه هېڅ سند نه دی پورته شوی.",
+    "title": "عنوان",
+    "type": "ډول",
+    "file": "فایل",
+    "uploaded": "د پورته کولو نېټه",
+    "actions": "عملیات",
+    "signedContract": "لاسلیک شوی قرارداد",
+    "billOfQuantities": "د مقدارونو جدول",
+    "drawings": "نقشې",
+    "invoice": "بل",
+    "quotation": "نرخ‌پاڼه",
+    "supportingDocument": "ملاتړی سند",
+    "other": "نور",
+    "downloadPreview": "ډاونلوډ / مخکتنه",
+    "delete": "ړنګول"
+  },
+  "DocumentUploadModal": {
+    "uploadDocument": "سند پورته کول",
+    "documentTitle": "د سند عنوان",
+    "documentType": "د سند ډول",
+    "file": "فایل",
+    "cancel": "لغوه",
+    "uploading": "پورته کېږي...",
+    "browse": "غوره کړئ",
+    "dragAndDrop": "فایل راکش او خوشې کړئ یا",
+    "supportedFiles": "PDF، انځورونه، Word، Excel — اعظمي 50MB",
+    "removeFile": "فایل لرې کړئ",
+    "close": "بندول",
+    "signedContract": "لاسلیک شوی قرارداد",
+    "billOfQuantities": "د مقدارونو جدول (BOQ)",
+    "drawings": "نقشې",
+    "invoice": "بل",
+    "quotation": "نرخ‌پاڼه",
+    "supportingDocument": "ملاتړی سند",
+    "other": "نور",
+    "titlePlaceholder": "لکه: لاسلیک شوی قرارداد V1",
+    "titleRequired": "عنوان اړین دی",
+    "fileRequired": "فایل اړین دی",
+    "fileTooLarge": "د فایل اندازه باید له 50MB څخه کمه وي"
+  },
+
+  "ExpensesMain": {
+    "title": "هراجې",
+    "subtitle": "د هراجو تعقیب او مدیریت",
+    "refresh": "نوی بارول",
+    "newExpense": "نوې هراجې",
+    "exportPdf": "PDF صادرول",
+    "currencies": {
+      "usd": "ډالره",
+      "afn": "افغانۍ"
+    },
+    "cards": {
+      "totalSpendingUsd": "ټول تفریخ (ډالره)",
+      "totalSpendingAfn": "ټول تفریخ (افغانۍ)",
+      "count": "شمیر",
+      "totalEntries": "ټولې هراجې",
+      "avg": "اوسط",
+      "avgPerEntry": "اوسط فی هراجې (ډالره)"
+    },
+    "search": {
+      "placeholder": "د سریال نمبر، تشریح، یادداشت، یا پیسو ترلاسه کونکی په واسطه ولټوئ"
+    },
+    "filters": {
+      "button": "فلټرونه",
+      "clearAll": "ټول فلټرونه پاک کړئ",
+      "project": {
+        "label": "پروژ",
+        "all": "ټولې پروژې"
+      },
+      "type": {
+        "label": "د هراجو ډول",
+        "all": "ټول ډولونه"
+      },
+      "date": {
+        "from": "له نیټې",
+        "to": "تر نیټې"
+      }
+    },
+    "activeFilters": {
+      "label": "فعال فلټرونه:",
+      "search": "لټون:",
+      "project": "پروژ:",
+      "type": "ډول:",
+      "date": "نیټه:",
+      "sort": "ترتیب:"
+    },
+    "pagination": {
+      "found": "موندل شوې",
+      "resultsFor": "پایلې د",
+      "showing": "ښودل کیږي",
+      "of": "څخه",
+      "expenses": "هراجې",
+      "firstPage": "لومړۍ پاڼه",
+      "prevPage": "مخکینۍ پاڼه",
+      "nextPage": "راتلونکې پاڼه",
+      "lastPage": "وروستۍ پاڼه"
+    },
+    "loading": "هراجې بارول کیږي…",
+    "empty": {
+      "noMatch": "هیڅ سمون لرونکې هراجې ونه موندل شوې",
+      "noExpenses": "لا هیڅ هراجې نشته",
+      "messageMatch": "د لټون یا فلټر معیارونه تعدیل کړئ ترڅو هغه ومومئ چې لټوئ یې.",
+      "messageDefault": "د هراجو تعقیب پیل کړئ ترڅو تفریخ، بودیجه، او مالی پوهاوی په یوه ځای کې ووینئ.",
+      "clearFilters": "فلټرونه پاک کړئ",
+      "addFirst": "لومړۍ هراجې اضافه کړئ"
+    },
+    "types": {
+      "general": "عمومي هراجې",
+      "material": "د جوړښت مواد",
+      "staffSalary": "د کارکوونکو تنخوا",
+      "dailyWage": "د ورځنیو کارکوونکو مزد",
+      "contractPayment": "د قرارداد/فرعي کنټرکټور تادیه",
+      "equipment": "د پرمندو ډالۍ/پیرود",
+      "utility": "د خدماتو بیلیټ",
+      "other": "نور"
+    },
+    "sortOptions": {
+      "dateNewest": "نیټه (تر ټولو نوی)",
+      "dateOldest": "نیټه (تر ټولو زوړ)",
+      "serialHighLow": "سریال # (لوړ څخه ټیټ)",
+      "serialLowHigh": "سریال # (ټیټ څخه لوړ)",
+      "amountHighLow": "اندازه (لوړ څخه ټیټ)",
+      "amountLowHigh": "اندازه (ټیټ څخه لوړ)"
+    }
+  },
+
+  "ExpenseList": {
+    "serialNumber": "مسلسل شمېره",
+    "description": "تشریح",
+    "type": "ډول",
+    "date": "نېټه",
+    "amount": "مبلغ",
+    "actions": "کړنې",
+
+    "noMatchingExpenses": "هیڅ برابر لګښت ونه موندل شو",
+    "adjustSearch": "مهرباني وکړئ د لټون یا فلټر معیارونه بدل کړئ",
+    "refresh": "بیا تازه کول",
+
+    "unnamedExpense": "بې نومه لګښت",
+    "noVendor": "عرضه کوونکی نشته",
+    "general": "عمومي",
+    "total": "ټول",
+
+    "viewDetails": "جزئیات وګورئ",
+    "editExpense": "لګښت سمول",
+    "edit": "سمول",
+    "moreOptions": "نور انتخابونه",
+    "printReceipt": "رسید چاپ کړئ",
+    "delete": "ړنګول",
+
+    "foodDining": "خواړه او رستورانت",
+    "transportation": "ترانسپورت",
+    "utilities": "خدمتونه",
+    "entertainment": "تفریح",
+    "shopping": "پېرود",
+    "other": "نور"
+  },
+
+  "ExpenseCreateModal": {
+    "title": "لګښت جوړول",
+    "subtitle": "د نوي لګښت ثبتول",
+
+    "description": "تشریح",
+    "expenseDate": "د لګښت نېټه",
+    "amountUsd": "په ډالرو مبلغ",
+    "amountAfn": "په افغانیو مبلغ",
+    "exchangeRate": "د تبادلې نرخ",
+    "paidTo": "چا ته ورکړل شو",
+    "expenseType": "د لګښت ډول",
+    "project": "پروژه",
+    "remarks": "یادښتونه",
+
+    "enterDescription": "د لګښت تشریح ولیکئ",
+    "paidToPlaceholder": "دا چا ته ورکړل شوي؟",
+    "remarksPlaceholder": "نور یادښتونه...",
+    "selectProject": "پروژه وټاکئ",
+
+    "general": "عمومي",
+    "construction": "ساختماني",
+    "material": "مواد",
+    "dailyWage": "ورځنی مزد",
+    "equipment": "تجهیزات",
+    "utility": "خدمتونه",
+    "contractPayment": "د قرارداد تادیه",
+    "other": "نور",
+
+    "cancel": "لغوه",
+    "createExpense": "لګښت جوړ کړئ",
+    "creating": "د جوړولو په حال کې...",
+
+    "descriptionRequired": "تشریح اړینه ده",
+    "dateRequired": "نېټه اړینه ده",
+    "amountRequired": "لږ تر لږه یو مبلغ باید داخل شي",
+    "projectRequired": "پروژه اړینه ده",
+    "createFailed": "د لګښت جوړول ناکام شول",
+
+    "noPermission": "تاسو د دې عمل اجازه نه لرئ"
+  },
+
+  "ExpenseEdit": {
+    "title": "لګښت سمول",
+
+    "description": "تشریح",
+    "expenseDate": "د لګښت نېټه",
+    "amountUsd": "په ډالرو مبلغ",
+    "amountAfn": "په افغانیو مبلغ",
+    "exchangeRate": "د تبادلې نرخ",
+    "paidTo": "چا ته ورکړل شو",
+    "expenseType": "د لګښت ډول",
+    "remarks": "یادښتونه",
+
+    "enterDescription": "د لګښت تشریح ولیکئ",
+    "paidToPlaceholder": "دا چا ته ورکړل شوي؟",
+    "remarksPlaceholder": "نور یادښتونه...",
+
+    "general": "عمومي",
+    "material": "مواد",
+    "dailyWage": "ورځنی مزد",
+    "equipment": "تجهیزات",
+    "utility": "خدمتونه",
+    "contractPayment": "د قرارداد تادیه",
+    "other": "نور",
+
+    "cancel": "لغوه",
+    "updateExpense": "لګښت تازه کړئ",
+    "saveChanges": "بدلونونه خوندي کړئ",
+    "saving": "د خوندي کولو په حال کې...",
+
+    "descriptionRequired": "تشریح اړینه ده",
+    "dateRequired": "نېټه اړینه ده",
+    "amountRequired": "لږ تر لږه یو مبلغ باید داخل شي",
+    "saveFailed": "د لګښت خوندي کول ناکام شول. مهرباني وکړئ بیا هڅه وکړئ.",
+
+    "noPermission": "تاسو د دې عمل اجازه نه لرئ"
+  },
+
+  "ExpenseDetail": {
+    "title": "د لګښت جزئیات",
+    "edit": "سمول",
+    "description": "تشریح",
+    "noDescription": "هیڅ تشریح نه ده ورکړل شوې",
+    "general": "عمومي",
+    "active": "فعال",
+
+    "amountUsd": "په ډالرو کې اندازه",
+    "amountAfn": "په افغانیو کې اندازه",
+    "exchangeRate": "د تبادلې نرخ",
+
+    "totalUsd": "ټول په ډالرو",
+    "totalAfn": "ټول په افغانیو",
+
+    "expenseDate": "د لګښت نېټه",
+    "created": "جوړ شوی",
+    "updated": "تازه شوی",
+    "paidTo": "ورکړل شوی",
+    "notAvailable": "شته نه",
+
+    "remarks": "یادښتونه"
+  },
+
+  "EmployeesPage": {
+    "title": "کارکوونکي",
+    "subtitle": "{{count}} ټول کارکوونکي",
+
+    "addEmployee": "کارکوونکی اضافه کړئ",
+    "addNewEmployee": "نوی کارکوونکی اضافه کړئ",
+    "editEmployee": "کارکوونکی سمول",
+
+    "searchPlaceholder": "کارکوونکي ولټوئ...",
+    "allDepartments": "ټولې څانګې",
+    "allStatus": "ټول حالتونه",
+    "active": "فعال",
+    "inactive": "غیرفعال",
+
+    "loading": "کارکوونکي بارېږي...",
+
+    "noEmployeesFound": "هیڅ کارکوونکی ونه موندل شو",
+    "noEmployeesDescription": "د خپل لومړي کارکوونکي په اضافه کولو پیل وکړئ.",
+
+    "deleteTitle": "کارکوونکی حذف کړئ",
+    "deleteMessage": "ایا ډاډه یاست چې غواړئ {{name}} حذف کړئ؟ دا عمل بېرته نه شي راګرځېدلی."
+  },
+
+  "EmployeeCard": {
+    "active": "فعال",
+    "inactive": "غیرفعال",
+    "department": "څانګه",
+    "position": "دنده",
+    "salary": "معاش",
+    "hired": "د استخدام نېټه",
+    "edit": "سمول",
+    "currency": "افغانۍ"
+  },
+
+  "EmployeeForm": {
+    "email": "برېښنالیک",
+    "firstName": "لومړی نوم",
+    "lastName": "وروستی نوم",
+    "phone": "د اړیکې شمېره",
+    "address": "پته",
+    "department": "څانګه",
+    "position": "دنده",
+    "employmentType": "د استخدام ډول",
+    "hireDate": "د استخدام نېټه",
+    "salary": "معاش",
+    "hourlyRate": "ساعتي مزد",
+    "emergencyContact": "بیړنی اړیکه",
+    "emergencyPhone": "د بیړني اړیکې شمېره",
+    "notes": "یادښتونه",
+    "activeEmployee": "فعال کارکوونکی",
+
+    "departments": {
+      "management": "مدیریت",
+      "engineering": "انجنیري",
+      "construction": "ساختماني",
+      "administration": "اداري",
+      "finance": "مالي",
+      "hr": "بشري سرچینې",
+      "procurement": "تدارکات",
+      "safety": "خوندیتوب"
+    },
+
+    "employmentTypes": {
+      "fullTime": "بشپړ وخت",
+      "partTime": "نیمه وخت",
+      "contract": "قراردادي",
+      "temporary": "موقتي"
+    },
+
+    "cancel": "لغوه",
+    "addEmployee": "کارکوونکی اضافه کړئ",
+    "updateEmployee": "کارکوونکی تازه کړئ",
+    "createEmployee": "کارکوونکی جوړ کړئ",
+    "saving": "ساتل کېږي...",
+    "noPermission": "تاسو د دې عمل اجازه نه لرئ"
+  },
+
+  "EmployeeDetail": {
+    "tabs": {
+      "info": "معلومات",
+      "payroll": "معاش",
+      "documents": "اسناد"
+    },
+
+    "active": "فعال",
+    "inactive": "غیرفعال",
+
+    "personalInformation": "شخصي معلومات",
+    "employmentDetails": "د استخدام معلومات",
+
+    "email": "برېښنالیک",
+    "phone": "د اړیکې شمېره",
+    "address": "پته",
+    "emergencyContact": "د بیړني تماس کس",
+    "emergencyPhone": "د بیړني تماس شمېره",
+
+    "department": "څانګه",
+    "employmentType": "د استخدام ډول",
+    "hireDate": "د استخدام نېټه",
+    "salary": "معاش",
+    "hourlyRate": "په ساعت معاش",
+
+    "notAvailable": "شته نه",
+    "emptyValue": "-",
+    "currency": "افغانۍ",
+
+    "payrollHistory": "د معاش سابقه",
+    "loadingPayrollHistory": "د معاش سابقه بارېږي...",
+    "noPayrollRecords": "د معاش هېڅ سابقه ونه موندل شوه",
+
+    "status": "حالت",
+    "to": "تر",
+    "netPay": "خالص معاش"
+  },
+
+  "PayrollPage": {
+    "title": "معاشونه",
+    "records": "{{count}} ریکارډونه",
+
+    "downloadPdf": "PDF ډاونلوډ کړئ",
+    "newPayroll": "نوی معاش",
+
+    "filters": {
+      "allStatus": "ټول حالتونه",
+      "pending": "په تمه",
+      "processed": "پروسس شوی",
+      "paid": "ورکړل شوی",
+      "cancelled": "لغوه شوی",
+      "allEmployees": "ټول کارکوونکي",
+      "clearFilters": "فلټرونه پاک کړئ"
+    },
+
+    "summary": {
+      "currency": "اسعار",
+      "totalGross": "ټول ناخالص معاش",
+      "totalNet": "ټول خالص معاش",
+      "records": "ریکارډونه",
+      "paid": "ورکړل شوي"
+    },
+
+    "loading": "د معاشونو ریکارډونه لوډ کېږي...",
+
+    "empty": {
+      "title": "د معاشونو هېڅ ریکارډ نشته",
+      "description": "د پیل لپاره خپل لومړی معاش ثبت کړئ.",
+      "create": "معاش جوړ کړئ"
+    },
+
+    "table": {
+      "employee": "کارکوونکی",
+      "period": "موده",
+      "paymentDate": "د تادیې نېټه",
+      "grossPay": "ناخالص معاش",
+      "netPay": "خالص معاش",
+      "actions": "کړنې",
+      "to": "تر",
+      "edit": "سمول",
+      "delete": "ړنګول"
+    },
+
+    "modal": {
+      "editPayroll": "معاش سمول",
+      "createPayroll": "معاش جوړول"
+    },
+
+    "deleteDialog": {
+      "title": "معاش ړنګول",
+      "message": "ایا تاسو ډاډه یاست چې د {{employee}} د معاش ریکارډ ړنګ کړئ؟"
+    }
+  },
+
+  "PayrollForm": {
+    "employee": "کارکوونکی",
+    "selectEmployee": "کارکوونکی وټاکئ",
+    "basicSalary": "اساسي معاش",
+    "periodStart": "د مودې پیل",
+    "periodEnd": "د مودې پای",
+    "overtimeHours": "د اضافي کار ساعتونه",
+    "overtimeRate": "د اضافي کار نرخ",
+    "bonus": "انعام",
+    "allowances": "امتیازات",
+    "deductions": "کسرونه",
+    "taxDeducted": "کسر شوی مالیه",
+    "currency": "اسعار",
+    "paymentMethod": "د تادیې طریقه",
+    "paymentDate": "د تادیې نېټه",
+    "notes": "یادښتونه",
+
+    "paymentMethods": {
+      "bankTransfer": "بانکي انتقال",
+      "check": "چک",
+      "cash": "نغدې"
+    },
+
+    "buttons": {
+      "cancel": "لغوه",
+      "create": "معاش جوړ کړئ",
+      "update": "معاش تازه کړئ",
+      "processing": "پروسس کېږي..."
+    },
+
+    "permissions": {
+      "noPermission": "تاسو د دې عمل اجازه نه لرئ"
+    }
+  },
+
+  "AttendanceLayout": {
+    "title": "د حاضرۍ مدیریت",
+    "subtitle": "د کارکوونکو حاضري په مؤثر ډول اداره کړئ",
+    "tabs": {
+      "list": "د حاضرۍ لست",
+      "bulk": "ډله‌ییز ثبت",
+      "daily": "ورځنی لید",
+      "summary": "میاشتنی لنډیز"
+    }
+  },
+  "AttendanceList": {
+    "exportPdf": "PDF صادرول",
+
+    "filters": "فلټرونه",
+    "showFilters": "فلټرونه ښکاره کړئ",
+    "hideFilters": "فلټرونه پټ کړئ",
+
+    "employeeId": "د کارکوونکي پېژندپاڼه",
+    "enterEmployeeId": "د کارکوونکي پېژندپاڼه دننه کړئ",
+
+    "status": "حالت",
+    "allStatuses": "ټول حالتونه",
+    "present": "حاضر",
+    "absent": "غایب",
+    "halfDay": "نیمه ورځ",
+    "leave": "رخصتي",
+
+    "date": "نېټه",
+
+    "month": "میاشت",
+    "allMonths": "ټولې میاشتې",
+
+    "year": "کال",
+    "allYears": "ټول کلونه",
+
+    "search": "لټون",
+    "searchPlaceholder": "د نوم یا پېژندپاڼې له مخې لټون",
+
+    "clearFilters": "فلټرونه پاک کړئ",
+
+    "deleteConfirmation": "ایا ډاډه یاست چې دا ریکارډ حذف کړئ؟",
+    "pdfDownloadFailed": "د PDF ډاونلوډ ناکام شو",
+
+    "employee": "کارکوونکی",
+    "checkIn": "د ننوتلو وخت",
+    "checkOut": "د وتلو وخت",
+    "overtime": "اضافي وخت",
+    "note": "یادښت",
+
+    "loading": "په بارېدو کې...",
+    "noAttendanceRecords": "د حاضرۍ هېڅ ریکارډ ونه موندل شو"
+  },
+
+  "BulkAttendance": {
+    "title": "ثبت گروهی حاضری",
+    "save": "ذخیره",
+    "saveAll": "ذخیره همه",
+    "saving": "در حال ذخیره...",
+    "noPermission": "شما اجازه انجام این عمل را ندارید",
+
+    "markedStats": "{{marked}}/{{total}} در نمای فعلی ثبت شده • {{modified}} ویرایش شده",
+
+    "failedLoadEmployees": "بارگذاری کارمندان ناموفق بود. لطفاً دوباره تلاش کنید.",
+    "failedLoadAttendance": "بارگذاری حاضری برای تاریخ انتخاب‌شده ناموفق بود.",
+    "failedSubmitAttendance": "ثبت حاضری ناموفق بود.",
+    "markAtLeastOne": "لطفاً حداقل برای یک کارمند حاضری ثبت کنید.",
+
+    "created": "ایجاد شد",
+    "updated": "به‌روزرسانی شد",
+    "errors": "خطا",
+
+    "allDepartments": "همه بخش‌ها ({{count}})",
+    "unassigned": "بدون بخش ({{count}})",
+    "departmentWithCount": "{{department}} ({{count}})",
+
+    "employee": "کارمند",
+    "status": "وضعیت",
+    "in": "ورود",
+    "out": "خروج",
+    "ot": "اضافه‌کاری",
+    "note": "یادداشت",
+
+    "noEmployees": "در این بخش هیچ کارمندی وجود ندارد",
+
+    "present": "حاضر",
+    "absent": "غایب",
+    "halfDay": "نیمه‌وقت",
+    "leave": "رخصتی",
+    "notMarked": "ثبت نشده",
+    "modified": "ویرایش شده",
+
+    "statusOptions": {
+      "empty": "-",
+      "present": "ح",
+      "absent": "غ",
+      "halfDay": "ن",
+      "leave": "ر"
+    },
+
+    "placeholderOvertime": "0",
+    "placeholderNote": "-"
+  },
+
+  "DailyAttendance": {
+    "title": "د حاضرۍ ورځنی لید",
+    "selectDate": "نېټه وټاکئ",
+
+    "loading": "په بارېدو کې...",
+
+    "totalMarked": "ټول ثبت شوي",
+    "unmarked": "ثبت شوي نه دي",
+    "present": "حاضر",
+    "absent": "غایب",
+    "leave": "رخصتي",
+
+    "markedEmployees": "ثبت شوي کارکوونکي",
+    "unmarkedEmployees": "ثبت شوي نه کارکوونکي",
+    "unmarkedCount": "ثبت شوي نه کارکوونکي ({{count}})",
+
+    "employee": "کارکوونکی",
+    "employeeId": "د کارکوونکي پېژندپاڼه",
+    "name": "نوم",
+    "department": "څانګه",
+
+    "checkIn": "ننوتل",
+    "checkOut": "وتل",
+    "overtime": "اضافي وخت",
+    "note": "یادښت",
+
+    "status": {
+      "present": "حاضر",
+      "absent": "غایب",
+      "halfDay": "نیمه ورځ",
+      "leave": "رخصتي"
+    },
+
+    "empty": "-"
+  },
+
+  "MonthlySummary": {
+    "title": "د حاضرۍ میاشتنی لنډیز",
+    "selectEmployee": "کارکوونکی وټاکئ",
+    "selectMonth": "میاشت",
+    "selectYear": "کال",
+
+    "loading": "په بارېدو کې...",
+
+    "employeeInfo": {
+      "id": "پېژندپاڼه",
+      "effectiveWorkingDays": "اغېزمن کاري ورځې"
+    },
+
+    "stats": {
+      "totalDays": "ټولې ورځې",
+      "present": "حاضر",
+      "absent": "غایب",
+      "halfDay": "نیمه ورځ",
+      "leave": "رخصتي",
+      "overtime": "اضافي وخت"
+    },
+
+    "attendanceBreakdown": "د حاضرۍ وېش",
+
+    "emptyState": "د لنډیز لیدو لپاره کارکوونکی، میاشت او کال وټاکئ"
+  },
+
+  "DeleteConfirmModal": {
+    "title": "د حذف تایید",
+    "messageStart": "ایا تاسو ډاډه یاست؟ دا عمل د بېرته ګرځېدو وړ نه دی. دا به په بشپړ ډول حذف کړي",
+    "messageEnd": ".",
+    "cancel": "لغوه",
+    "delete": "ړنګول",
+    "deleting": "ړنګول کېږي..."
+  }
 }

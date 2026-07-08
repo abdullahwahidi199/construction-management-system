@@ -193,11 +193,26 @@
     "safety": "ایمنی"
   },
   "common": {
+    "cancel": "لغو",
+    "create": "یجاد کردن",
     "active": "فعال",
     "inactive": "غیرفعال",
     "loading": "در حال بارگذاری...",
     "remove": "حذف",
-    "save": "ذخیره"
+    "save": "ذخیره",
+    "all": "همه",
+    "clear": "پاک کردن",
+    "clearFilters": "پاک کردن فیلترها",
+    "error": "خطا",
+    "errorLoading": "بارگذاری صلاحیت‌ها ممکن نشد. لطفاً دوباره تلاش کنید.",
+    "errorSaving": "ثبت تغییرات ممکن نشد. لطفاً دوباره تلاش کنید.",
+    "module": "ماژول",
+    "noResults": "نتیجه‌ای یافت نشد",
+    "refresh": "تازه‌سازی",
+    "retry": "تلاش دوباره",
+    "saving": "در حال ذخیره...",
+    "search": "جستجو",
+    "tryDifferentSearch": "جستجوی دیگری را امتحان کنید یا فیلترها را پاک کنید."
   },
   "language": {
     "en": "EN",
@@ -236,9 +251,21 @@
       "systemText": "بخش‌های عملیاتی را با صلاحیت مدیر باز کنید."
     },
     "users": {
+      "edit": "ویرایش کاربر",
+      "update": "به‌روزرسانی",
+      "changePassword": "تغییر رمز عبور",
+      "newPassword": "رمز عبور جدید",
+      "confirmNewPassword": "تایید رمز عبور جدید",
+      "leaveBlankPassword": "برای حفظ رمز عبور فعلی، این بخش را خالی بگذارید.",
+      "errors": {
+        "passwordMatch": "رمزهای عبور مطابقت ندارند."
+      },
       "title": "مدیریت کاربران",
       "subtitle": "نقش‌ها را تعیین و وضعیت حساب را کنترل کنید.",
       "username": "نام کاربری",
+      "password": "رمز عبور",
+      "confirmPassword": "تأیید رمز عبور",
+
       "email": "ایمیل",
       "role": "نقش",
       "status": "وضعیت",
@@ -247,18 +274,31 @@
       "disable": "غیرفعال‌سازی"
     },
     "permissions": {
-      "title": "تغییرات اجازه‌ها",
-      "subtitle": "اجازه‌های مشخص را برای هر نقش فعال یا غیرفعال کنید.",
-      "allow": "اجازه",
-      "deny": "منع"
+      "title": "مدیریت صلاحیت‌ها",
+      "subtitle": "تعیین کنید کدام نقش‌ها به اقدامات مشخص در سراسر سیستم دسترسی داشته باشند.",
+      "searchPlaceholder": "جستجوی صلاحیت‌ها براساس نام، کُد یا ماژول...",
+      "count": "نمایش",
+      "permissions": "صلاحیت",
+      "rolesShown": "نقش‌ها",
+      "permission": "صلاحیت",
+      "tipClickBoxes": "راهنما: برای اعطا/لغو کلیک کنید",
+      "grant": "اعطای صلاحیت",
+      "revoke": "لغو صلاحیت"
     }
   },
   "dataEntry": {
     "title": "پنل ثبت معلومات",
     "nav": {
       "dashboard": "داشبورد",
+      "projects": "پروژه‌ها",
+      "subContractors": "قراردادکاران فرعی",
+      "contracts": "قراردادها",
       "expenses": "مصارف",
-      "attendance": "حاضری"
+      "employees": "کارمندان",
+      "payrolls": "معاشات",
+      "attendance": "حاضری",
+      "reports": "گزارش‌ها",
+      "brand": "منیجر هاب"
     },
     "dashboard": {
       "title": "پنل ثبت معلومات",
@@ -270,5 +310,1370 @@
       "attendance": "ثبت حاضری",
       "attendanceText": "رکوردهای حاضری را ایجاد و به‌روزرسانی کنید."
     }
+  },
+
+  "payrollSummary": {
+    "title": "خلاصه معاشات",
+    "payrollsThisMonth": "{{count}} معاش در این ماه",
+
+    "thisMonthNet": "این ماه (خالص)",
+    "lastMonthNet": "ماه گذشته (خالص)",
+    "gross": "ناخالص",
+    "change": "تغییر {{percent}}٪",
+
+    "deductions": "کسورات",
+    "tax": "مالیات",
+    "bonus": "پاداش",
+    "overtime": "اضافه‌کاری",
+
+    "paymentMethods": "روش‌های پرداخت",
+    "recentPayrolls": "معاشات اخیر",
+
+    "count": "({{count}})"
+  },
+  "RecentActivity": {
+    "title": "فعالیت‌های اخیر",
+    "noRecentActivity": "هیچ فعالیت اخیر وجود ندارد",
+    "items": "مورد",
+    "justNow": "همین حالا",
+    "minutesAgo": "{{count}} دقیقه پیش",
+    "hoursAgo": "{{count}} ساعت پیش",
+    "daysAgo": "{{count}} روز پیش"
+  },
+  "ProjectsBase": {
+    "title": "پروژه‌ها",
+    "subtitle": "تمام پروژه‌های ساختمانی خود را مدیریت و پیگیری کنید",
+    "refresh": "تازه‌سازی",
+    "newProject": "پروژه جدید",
+    "totalProjects": "مجموع پروژه‌ها",
+    "active": "فعال",
+    "planning": "در حال برنامه‌ریزی",
+    "completed": "تکمیل‌شده",
+    "loadingProjects": "در حال بارگذاری پروژه‌ها…",
+    "noProjectsTitle": "هنوز پروژه‌ای وجود ندارد",
+    "noProjectsDescription": "با ایجاد اولین پروژه خود شروع کنید. پیشرفت، بودجه و زمان‌بندی را همگی در یک مکان مدیریت کنید.",
+    "createFirstProject": "ایجاد اولین پروژه"
+  },
+  "ProjectsTable": {
+    "projectName": "نام پروژه",
+    "type": "نوع",
+    "location": "موقعیت",
+    "startDate": "تاریخ شروع",
+    "status": "وضعیت",
+    "projects": "پروژه‌ها",
+    "project": "پروژه",
+    "projectsPlural": "پروژه",
+    "found": "یافت شد",
+    "searchProjects": "جستجوی پروژه‌ها...",
+    "viewProject": "مشاهده پروژه",
+    "deleteProject": "حذف پروژه",
+    "noProjectsFound": "هیچ پروژه‌ای یافت نشد",
+    "adjustSearch": "عبارت جستجو را تغییر دهید",
+    "createFirstProject": "برای شروع اولین پروژه خود را ایجاد کنید",
+    "showing": "نمایش",
+    "of": "از",
+    "thisProject": "این پروژه"
+  },
+
+  "ProjectDetails": {
+    "loading": "در حال بارگذاری پروژه...",
+    "failedToLoad": "بارگذاری پروژه ناموفق بود",
+    "retry": "تلاش دوباره",
+
+    "backToProjects": "بازگشت به پروژه‌ها",
+    "edit": "ویرایش",
+    "delete": "حذف",
+    "downloadPdf": "دانلود PDF",
+    "noPermission": "شما اجازه انجام این عملیات را ندارید",
+
+    "status": {
+      "inProgress": "در حال اجرا",
+      "completed": "تکمیل شده",
+      "planning": "در حال برنامه‌ریزی",
+      "onHold": "متوقف شده",
+      "cancelled": "لغو شده",
+      "unknown": "نامشخص"
+    },
+
+    "relativeDate": {
+      "daysAgo": "{{count}} روز پیش",
+      "today": "امروز",
+      "tomorrow": "فردا",
+      "inDays": "{{count}} روز دیگر"
+    },
+
+    "totalFloors": "تعداد طبقات",
+    "estimatedBudget": "بودجه تخمینی",
+    "expensesUsd": "مصارف (دالر)",
+    "expensesAfn": "مصارف (افغانی)",
+    "startDate": "تاریخ شروع",
+    "expectedCompletion": "تاریخ تکمیل مورد انتظار",
+
+    "contractFinancialSummary": "خلاصه مالی قرارداد",
+    "totalContractValue": "ارزش مجموعی قرارداد",
+    "totalPayments": "مجموع پرداخت‌ها",
+    "remainingBalance": "موجودی باقی‌مانده",
+
+    "timelineProgress": "پیشرفت زمانی",
+
+    "projectInformation": "اطلاعات پروژه",
+    "projectName": "نام پروژه",
+    "propertyType": "نوع ملک",
+    "location": "موقعیت",
+
+    "importantDates": "تاریخ‌های مهم",
+    "actualCompletion": "تاریخ تکمیل واقعی",
+    "created": "ایجاد شده",
+    "lastUpdated": "آخرین بروزرسانی",
+
+    "notes": "یادداشت‌ها",
+
+    "notSet": "تنظیم نشده",
+    "notYet": "هنوز تکمیل نشده",
+    "dash": "—",
+
+    "currency": {
+      "usd": "دالر",
+      "afn": "افغانی"
+    }
+  },
+
+  "ProjectEditView": {
+    "title": "ویرایش پروژه",
+    "loading": "در حال بارگذاری جزئیات پروژه…",
+    "updateInfo": "به‌روزرسانی معلومات پروژه",
+    "unsavedChanges": "تغییرات ذخیره‌نشده دارید",
+    "modified": "تغییر یافته",
+
+    "basicInfo": "اطلاعات ابتدایی",
+    "projectName": "نام پروژه",
+    "description": "توضیحات",
+
+    "propertyDetails": "جزئیات ملک",
+    "propertyType": "نوع ملک",
+    "briefOverview": "یک نگاه کوتاه بر پروژه",
+    "projectDescription": "این پروژه درباره چیست؟",
+    "status": "وضعیت",
+    "location": "موقعیت",
+    "totalFloors": "تعداد طبقات",
+
+    "timelineBudget": "زمان‌بندی و بودجه",
+    "startDate": "تاریخ شروع",
+    "expectedCompletion": "تاریخ تکمیل مورد انتظار",
+    "estimatedBudget": "بودجه تخمینی",
+
+    "additionalNotes": "یادداشت‌های اضافی",
+    "notesPlaceholder": "هرگونه یادداشت اضافی، توضیحات یا جزئیات مهم…",
+
+    "cancel": "لغو",
+    "saveChanges": "ذخیره تغییرات",
+    "resetChanges": "بازنشانی تغییرات",
+    "requiredFields": "* فیلدهای ضروری",
+
+    "propertyTypeOptions": {
+      "residential": "مسکونی",
+      "commercial": "تجاری",
+      "mixed": "مختلط"
+    },
+
+    "statusOptions": {
+      "planning": "در حال برنامه‌ریزی",
+      "ongoing": "در حال اجرا",
+      "completed": "تکمیل شده",
+      "onHold": "متوقف شده"
+    }
+  },
+
+  "ProjectCreateModal": {
+    "title": "ایجاد پروژه جدید",
+    "subtitle": "یک پروژه جدید به مجموعه خود اضافه کنید",
+
+    "sections": {
+      "basic_information": "اطلاعات اساسی",
+      "property_details": "جزئیات ملک",
+      "timeline_budget": "زمان‌بندی و بودجه",
+      "additional_notes": "یادداشت‌های اضافی"
+    },
+
+    "fields": {
+      "name": {
+        "label": "نام پروژه",
+        "placeholder": "مثلاً: برج اسکای‌لاین"
+      },
+      "description": {
+        "label": "توضیحات",
+        "placeholder": "این پروژه درباره چیست؟",
+        "helper": "یک مرور کوتاه از پروژه"
+      },
+      "property_type": "نوع ملک",
+      "status": "وضعیت",
+      "location": {
+        "label": "موقعیت",
+        "placeholder": "شهر، ولایت"
+      },
+      "total_floors": "تعداد طبقات",
+      "start_date": "تاریخ شروع",
+      "expected_completion_date": "تاریخ تکمیل پیش‌بینی‌شده",
+      "estimated_budget": {
+        "label": "بودجه تخمینی",
+        "helper": "به دالر امریکایی"
+      },
+      "notes": {
+        "placeholder": "هرگونه یادداشت اضافی، توضیحات یا جزئیات مهم…"
+      }
+    },
+
+    "options": {
+      "property_type": {
+        "residential": "مسکونی",
+        "commercial": "تجاری",
+        "mixed": "مختلط"
+      },
+      "status": {
+        "planning": "در حال برنامه‌ریزی",
+        "ongoing": "در حال اجرا",
+        "completed": "تکمیل‌شده",
+        "on_hold": "متوقف"
+      }
+    },
+
+    "buttons": {
+      "cancel": "لغو",
+      "create": "ایجاد پروژه",
+      "creating": "در حال ایجاد…"
+    },
+
+    "errors": {
+      "default": "ایجاد پروژه ناموفق بود. لطفاً دوباره تلاش کنید."
+    }
+  },
+  "SubcontractorsPage": {
+    "title": "پیمانکاران فرعی",
+    "subtitle": "مدیریت شرکت‌های پیمانکاری و جزئیات آن‌ها",
+
+    "actions": {
+      "new": "پیمانکار جدید",
+      "clear_filters": "پاک کردن"
+    },
+
+    "filters": {
+      "search_placeholder": "جستجو بر اساس نام، ایمیل، نمبر مالیاتی...",
+      "specialization_all": "همه تخصص‌ها",
+      "status_all": "همه وضعیت‌ها",
+      "active": "فعال",
+      "inactive": "غیرفعال"
+    },
+
+    "specializations": {
+      "concrete": "کارهای کانکریت",
+      "steel": "کارهای فولاد",
+      "electrical": "کارهای برق",
+      "plumbing": "کارهای لوله‌کشی",
+      "finishing": "کارهای نهایی",
+      "excavation": "کارهای حفاری",
+      "hvac": "سیستم تهویه",
+      "landscaping": "محوطه‌سازی",
+      "other": "دیگر"
+    },
+
+    "messages": {
+      "error_load": "بارگیری پیمانکاران ناموفق بود.",
+      "empty_state": "هیچ پیمانکاری یافت نشد."
+    },
+
+    "delete": {
+      "title": "حذف پیمانکار",
+      "message": "آیا مطمئن هستید که \"{{name}}\" حذف شود؟ این عمل برگشت‌ناپذیر است."
+    },
+
+    "pagination": {
+      "previous": "قبلی",
+      "next": "بعدی",
+      "showing": "نمایش",
+      "of": "از"
+    }
+  },
+
+  "SubcontractorTable": {
+    "columns": {
+      "name": "نام",
+      "contact": "مسئول تماس",
+      "phone": "تلیفون",
+      "specialization": "تخصص",
+      "contracts": "قراردادها",
+      "status": "وضعیت",
+      "actions": "عملیات"
+    },
+
+    "labels": {
+      "active": "فعال",
+      "inactive": "غیرفعال"
+    },
+
+    "states": {
+      "loading": "در حال بارگیری پیمانکاران...",
+      "empty": "هیچ پیمانکاری یافت نشد."
+    },
+
+    "actions": {
+      "view": "مشاهده جزئیات",
+      "edit": "ویرایش",
+      "delete": "حذف"
+    },
+
+    "specializations": {
+      "concrete": "کارهای کانکریت",
+      "steel": "کارهای فولاد",
+      "electrical": "کارهای برق",
+      "plumbing": "کارهای لوله‌کشی",
+      "finishing": "کارهای نهایی",
+      "excavation": "کارهای حفاری",
+      "hvac": "سیستم تهویه",
+      "landscaping": "محوطه‌سازی",
+      "other": "دیگر"
+    }
+  },
+
+  "SubcontractorInfo": {
+    "labels": {
+      "contact_person": "مسئول تماس",
+      "phone": "تلیفون",
+      "email": "ایمیل",
+      "address": "آدرس",
+      "specialization": "تخصص",
+      "status": "وضعیت",
+      "active": "فعال",
+      "inactive": "غیرفعال"
+    }
+  },
+
+  "SubConractorFinancialSummary": {
+    "titles": {
+      "total_contract_value": "مجموع ارزش قرارداد",
+      "total_paid": "پرداخت شده",
+      "remaining": "باقی‌مانده",
+      "contracts": "قراردادها"
+    }
+  },
+
+  "ContractTable": {
+    "columns": {
+      "contract_number": "شماره قرارداد",
+      "title": "عنوان",
+      "subcontractor": "پیمانکار فرعی",
+      "project": "پروژه",
+      "value": "ارزش",
+      "status": "وضعیت",
+      "progress": "پیشرفت",
+      "actions": "عملیات"
+    },
+
+    "states": {
+      "loading": "در حال بارگیری قراردادها...",
+      "empty": "هیچ قراردادی یافت نشد."
+    },
+
+    "actions": {
+      "view": "مشاهده",
+      "edit": "ویرایش",
+      "delete": "حذف"
+    }
+  },
+  "SubcontractorFormModal": {
+    "title": {
+      "create": "ایجاد پیمانکار فرعی",
+      "edit": "ویرایش پیمانکار فرعی"
+    },
+
+    "fields": {
+      "company_name": {
+        "label": "نام شرکت",
+        "placeholder": "مثلاً ABC Construction Co."
+      },
+      "contact_person": {
+        "label": "مسئول تماس",
+        "placeholder": "نام کامل"
+      },
+      "specialization": {
+        "label": "تخصص"
+      },
+      "phone": {
+        "label": "تلیفون",
+        "placeholder": "+1-555-0100"
+      },
+      "email": {
+        "label": "ایمیل",
+        "placeholder": "contact@example.com"
+      },
+      "address": {
+        "label": "آدرس",
+        "placeholder": "آدرس کامل"
+      },
+      "tax_number": {
+        "label": "نمبر مالیاتی",
+        "placeholder": "شناسه مالیاتی"
+      },
+      "registration_number": {
+        "label": "نمبر ثبت",
+        "placeholder": "نمبر ثبت"
+      },
+      "active": {
+        "label": "فعال"
+      },
+      "notes": {
+        "label": "یادداشت‌ها",
+        "placeholder": "یادداشت‌های اضافی..."
+      }
+    },
+
+    "buttons": {
+      "cancel": "لغو",
+      "create": "ایجاد",
+      "update": "ویرایش",
+      "saving": "در حال ذخیره...",
+      "update_permission": "ویرایش پیمانکار فرعی",
+      "create_permission": "ایجاد پیمانکار فرعی"
+    },
+
+    "errors": {
+      "name_required": "نام الزامی است",
+      "invalid_email": "ایمیل نامعتبر است"
+    }
+  },
+
+  "ContractFormModal": {
+    "titleEdit": "ویرایش قرارداد",
+    "titleCreate": "ایجاد قرارداد",
+
+    "fields": {
+      "project": "پروژه",
+      "subcontractor": "پیمانکار فرعی",
+      "title": "عنوان",
+      "scopeOfWork": "محدوده کار",
+      "currency": "واحد پول",
+      "contractValue": "ارزش قرارداد ($)",
+      "retentionPercentage": "درصد نگهداری",
+      "completionPercentage": "پیشرفت %",
+      "startDate": "تاریخ شروع",
+      "endDate": "تاریخ پایان",
+      "status": "وضعیت",
+      "notes": "یادداشت‌ها"
+    },
+
+    "placeholders": {
+      "project": "انتخاب پروژه",
+      "subcontractor": "انتخاب پیمانکار فرعی",
+      "title": "عنوان قرارداد",
+      "scopeOfWork": "شرح محدوده کار",
+      "contractValue": "0.00",
+      "retentionPercentage": "5",
+      "completionPercentage": "0",
+      "notes": "یادداشت‌های اضافی..."
+    },
+
+    "buttons": {
+      "cancel": "لغو",
+      "saving": "در حال ذخیره...",
+      "update": "به‌روزرسانی قرارداد",
+      "create": "ایجاد قرارداد"
+    },
+
+    "validation": {
+      "projectRequired": "پروژه الزامی است",
+      "subcontractorRequired": "پیمانکار فرعی الزامی است",
+      "titleRequired": "عنوان الزامی است",
+      "currencyRequired": "واحد پول الزامی است",
+      "contractValuePositive": "ارزش قرارداد باید مثبت باشد",
+      "startDateRequired": "تاریخ شروع الزامی است",
+      "endDateInvalid": "تاریخ پایان باید بعد از تاریخ شروع باشد",
+      "progressRange": "باید بین 0 تا 100 باشد"
+    },
+
+    "statusOptions": {
+      "draft": "پیش‌نویس",
+      "active": "فعال",
+      "completed": "تکمیل شده",
+      "terminated": "خاتمه یافته",
+      "cancelled": "لغو شده"
+    }
+  },
+
+  "ContractsPage": {
+    "title": "قراردادها",
+    "subtitle": "مدیریت قراردادها و توافق‌نامه‌های پیمانکاران فرعی",
+
+    "buttons": {
+      "newContract": "قرارداد جدید",
+      "exportPdf": "خروجی PDF",
+      "clearFilters": "پاک کردن",
+      "previous": "قبلی",
+      "next": "بعدی"
+    },
+
+    "filters": {
+      "searchPlaceholder": "جستجوی قراردادها بر اساس پروژه، شماره قرارداد، نام قرارداد، محدوده کار یا پیمانکار فرعی...",
+      "allStatuses": "همه وضعیت‌ها",
+      "allProjects": "همه پروژه‌ها",
+      "allSubcontractors": "همه پیمانکاران فرعی"
+    },
+
+    "messages": {
+      "loadError": "بارگذاری قراردادها ناموفق بود. دوباره تلاش کنید.",
+      "showing": "نمایش",
+      "of": "از",
+      "page": "صفحه"
+    }
+  },
+
+  "ContractDetailsPage": {
+    "information": "اطلاعات",
+    "financial": "مالی",
+    "invoices": "فاکتورها",
+    "payments": "پرداخت‌ها",
+    "variations": "تغییرات",
+    "documents": "اسناد",
+    "backToContracts": "بازگشت به قراردادها",
+    "progress": "پیشرفت",
+    "downloadPdf": "دانلود PDF",
+    "failedToLoadContractDetails": "بارگذاری جزئیات قرارداد ناموفق بود.",
+    "contractDetails": "جزئیات قرارداد",
+    "project": "پروژه",
+    "subcontractor": "پیمانکار فرعی",
+    "scopeOfWork": "محدوده کار",
+    "notes": "یادداشت‌ها",
+    "timeline": "جدول زمانی",
+    "startDate": "تاریخ شروع",
+    "endDate": "تاریخ پایان",
+    "adjustedEndDate": "تاریخ پایان تعدیل‌شده",
+    "completion": "تکمیل",
+    "financialBreakdown": "جزئیات مالی",
+    "originalContractValue": "ارزش اولیه قرارداد",
+    "retentionPercentage": "درصد نگهداری",
+    "retentionAmount": "مبلغ نگهداری",
+    "totalVariationAmount": "مجموع مبلغ تغییرات",
+    "adjustedContractValue": "ارزش تعدیل‌شده قرارداد",
+    "addPayment": "افزودن پرداخت",
+    "deletePayment": "حذف پرداخت",
+    "deletePaymentMessage": "آیا مطمئن هستید که می‌خواهید این رکورد پرداخت را حذف کنید؟",
+    "variationsChangeOrders": "تغییرات / دستورات تغییر",
+    "addVariation": "افزودن تغییر",
+    "deleteVariation": "حذف تغییر",
+    "deleteVariationMessage": "آیا مطمئن هستید که می‌خواهید این تغییر را حذف کنید؟",
+    "uploadDocument": "بارگذاری سند",
+    "deleteDocument": "حذف سند",
+    "deleteDocumentMessage": "آیا مطمئن هستید که می‌خواهید \"{{title}}\" را حذف کنید؟",
+    "noData": "—"
+  },
+
+  "FinancialSummaryCard": {
+    "originalContractValue": "ارزش اولیه قرارداد",
+    "totalVariationAmount": "مجموع مبلغ تغییرات",
+    "adjustedContractValue": "ارزش تعدیل‌شده قرارداد",
+    "totalPaid": "مجموع پرداخت‌شده",
+    "remainingAmount": "مبلغ باقی‌مانده",
+    "retentionBalance": "موجودی نگهداری",
+    "totalInvoiced": "مجموع فاکتور شده"
+  },
+  "ContractInvoicesPage": {
+    "allStatuses": "همه وضعیت‌ها",
+    "pending": "در انتظار",
+    "approved": "تأیید شده",
+    "partiallyPaid": "بخشی پرداخت شده",
+    "paid": "پرداخت شده",
+    "cancelled": "لغو شده",
+    "loadingInvoices": "در حال بارگذاری فاکتورها...",
+    "contractInvoices": "فاکتورهای قرارداد",
+    "newInvoice": "فاکتور جدید",
+    "searchPlaceholder": "جستجو بر اساس شماره فاکتور، پروژه...",
+    "startDate": "تاریخ شروع",
+    "endDate": "تاریخ پایان",
+    "clearFilters": "پاک کردن فیلترها",
+    "showing": "نمایش",
+    "of": "از",
+    "invoices": "فاکتور",
+    "invoiceNumber": "شماره فاکتور",
+    "project": "پروژه",
+    "subcontractor": "پیمانکار فرعی",
+    "date": "تاریخ",
+    "dueDate": "تاریخ سررسید",
+    "amount": "مبلغ",
+    "status": "وضعیت",
+    "actions": "عملیات",
+    "view": "مشاهده",
+    "edit": "ویرایش",
+    "noMatchingInvoices": "هیچ فاکتوری مطابق معیارهای انتخاب‌شده یافت نشد.",
+    "noInvoicesForContract": "هیچ فاکتوری برای این قرارداد یافت نشد.",
+    "error": "خطا"
+  },
+  "ContractInvoiceDetails": {
+    "loadingInvoiceDetails": "در حال بارگذاری جزئیات فاکتور...",
+    "error": "خطا",
+    "invoice": "فاکتور",
+    "contract": "قرارداد",
+    "project": "پروژه",
+    "subcontractor": "پیمانکار فرعی",
+    "amount": "مبلغ",
+    "status": "وضعیت",
+    "invoiceDate": "تاریخ فاکتور",
+    "dueDate": "تاریخ سررسید",
+    "description": "توضیحات",
+    "notes": "یادداشت‌ها",
+    "documents": "اسناد",
+    "uploading": "در حال بارگذاری...",
+    "dragDrop": "فایل را اینجا بکشید و رها کنید یا",
+    "browse": "انتخاب کنید",
+    "supportedFiles": "پشتیبانی از PDF، DOCX، XLSX، JPG، PNG",
+    "documentUploaded": "سند با موفقیت بارگذاری شد!",
+    "uploadFailed": "بارگذاری ناموفق بود",
+    "viewDownload": "مشاهده / دانلود",
+    "noDocuments": "هنوز هیچ سندی بارگذاری نشده است.",
+    "document": "سند"
+  },
+
+  "InvoiceFormModal": {
+    "editInvoice": "ویرایش فاکتور",
+    "newInvoice": "فاکتور جدید",
+    "dateAndAmountRequired": "تاریخ و مبلغ الزامی هستند.",
+    "submissionFailed": "ارسال ناموفق بود",
+    "invoiceDate": "تاریخ فاکتور",
+    "dueDate": "تاریخ سررسید",
+    "amount": "مبلغ",
+    "status": "وضعیت",
+    "pending": "در انتظار",
+    "approved": "تأیید شده",
+    "partiallyPaid": "بخشی پرداخت شده",
+    "paid": "پرداخت شده",
+    "cancelled": "لغو شده",
+    "description": "توضیحات",
+    "notes": "یادداشت‌ها",
+    "cancel": "لغو",
+    "saving": "در حال ذخیره...",
+    "updateInvoice": "به‌روزرسانی فاکتور",
+    "createInvoice": "ایجاد فاکتور",
+    "noPermission": "شما اجازه انجام این عملیات را ندارید"
+  },
+
+  "PaymentTable": {
+    "loadingPayments": "در حال بارگذاری پرداخت‌ها...",
+    "noPayments": "هنوز هیچ پرداختی ثبت نشده است.",
+    "date": "تاریخ",
+    "type": "نوع",
+    "amount": "مبلغ",
+    "reference": "مرجع",
+    "notes": "یادداشت",
+    "actions": "عملیات",
+    "advance": "پیش‌پرداخت",
+    "progress": "پرداخت مرحله‌ای",
+    "retentionRelease": "آزادسازی تضمین",
+    "final": "پرداخت نهایی",
+    "other": "سایر",
+    "ref": "مرجع"
+  },
+  "PaymentFormModal": {
+    "editPayment": "ویرایش پرداخت",
+    "addPayment": "افزودن پرداخت",
+    "amount": "مبلغ",
+    "paymentDate": "تاریخ پرداخت",
+    "paymentType": "نوع پرداخت",
+    "referenceNumber": "شماره مرجع",
+    "notes": "یادداشت",
+    "cancel": "لغو",
+    "updatePayment": "بروزرسانی پرداخت",
+    "createPayment": "ایجاد پرداخت",
+    "addPaymentButton": "افزودن پرداخت",
+    "saving": "در حال ذخیره...",
+    "permissionDenied": "شما اجازه انجام این عمل را ندارید",
+    "progressPayment": "پرداخت مرحله‌ای",
+    "retentionRelease": "آزادسازی تضمین",
+    "finalPayment": "پرداخت نهایی",
+    "advance": "پیش‌پرداخت",
+    "other": "سایر",
+    "optionalNotes": "یادداشت اختیاری...",
+    "referencePlaceholder": "مثلاً INV-2024-001",
+    "amountPlaceholder": "0.00",
+    "amountMustBePositive": "مبلغ باید بیشتر از صفر باشد",
+    "amountExceedsRemaining": "مبلغ از مانده قابل پرداخت {{amount}} بیشتر است",
+    "paymentDateRequired": "تاریخ پرداخت الزامی است"
+  },
+
+  "VariationTable": {
+    "loadingVariations": "در حال بارگذاری تغییرات...",
+    "noVariations": "هنوز هیچ تغییر قراردادی ثبت نشده است.",
+    "variationNumber": "شماره تغییر",
+    "date": "تاریخ",
+    "description": "توضیحات",
+    "amountChange": "تغییر مبلغ",
+    "days": "روزها",
+    "status": "وضعیت",
+    "actions": "عملیات",
+    "approved": "تأیید شده",
+    "pending": "در انتظار",
+    "approve": "تأیید",
+    "daysSuffix": "روز"
+  },
+  "VariationFormModal": {
+    "editVariation": "ویرایش تغییر",
+    "addVariation": "افزودن تغییر",
+    "date": "تاریخ",
+    "description": "توضیحات",
+    "amountChange": "تغییر مبلغ",
+    "daysAdded": "روزهای اضافه شده",
+    "approved": "تأیید شده",
+    "cancel": "لغو",
+    "updateVariation": "بروزرسانی تغییر",
+    "updateVariations": "بروزرسانی تغییرات",
+    "createVariation": "ایجاد تغییر",
+    "addVariationButton": "افزودن تغییر",
+    "saving": "در حال ذخیره...",
+    "permissionDenied": "شما اجازه انجام این عمل را ندارید",
+    "descriptionPlaceholder": "تغییر را توضیح دهید...",
+    "amountPlaceholder": "برای کسر از علامت - استفاده کنید",
+    "daysPlaceholder": "برای کاهش از علامت - استفاده کنید",
+    "descriptionRequired": "توضیحات الزامی است",
+    "amountChangeRequired": "تغییر مبلغ الزامی است",
+    "dateRequired": "تاریخ الزامی است"
+  },
+
+  "DocumentTable": {
+    "loadingDocuments": "در حال بارگذاری اسناد...",
+    "noDocuments": "هنوز هیچ سندی بارگذاری نشده است.",
+    "title": "عنوان",
+    "type": "نوع",
+    "file": "فایل",
+    "uploaded": "تاریخ بارگذاری",
+    "actions": "عملیات",
+    "signedContract": "قرارداد امضا شده",
+    "billOfQuantities": "صورت مقادیر",
+    "drawings": "نقشه‌ها",
+    "invoice": "فاکتور",
+    "quotation": "نرخ‌نامه",
+    "supportingDocument": "سند حمایوی",
+    "other": "سایر",
+    "downloadPreview": "دانلود / پیش‌نمایش",
+    "delete": "حذف"
+  },
+  "DocumentUploadModal": {
+    "uploadDocument": "بارگذاری سند",
+    "documentTitle": "عنوان سند",
+    "documentType": "نوع سند",
+    "file": "فایل",
+    "cancel": "لغو",
+    "uploading": "در حال بارگذاری...",
+    "browse": "انتخاب فایل",
+    "dragAndDrop": "فایل را بکشید و رها کنید یا",
+    "supportedFiles": "PDF، تصاویر، Word، Excel — حداکثر 50 مگابایت",
+    "removeFile": "حذف فایل",
+    "close": "بستن",
+    "signedContract": "قرارداد امضا شده",
+    "billOfQuantities": "صورت مقادیر (BOQ)",
+    "drawings": "نقشه‌ها",
+    "invoice": "فاکتور",
+    "quotation": "نرخ‌نامه",
+    "supportingDocument": "سند حمایوی",
+    "other": "سایر",
+    "titlePlaceholder": "مثلاً قرارداد امضا شده نسخه ۱",
+    "titleRequired": "عنوان الزامی است",
+    "fileRequired": "فایل الزامی است",
+    "fileTooLarge": "حجم فایل باید کمتر از 50 مگابایت باشد"
+  },
+
+  "ExpensesMain": {
+    "title": "مصارف",
+    "subtitle": "مصارف خود را مدیریت و پیگیری کنید",
+    "refresh": "تازه‌سازی",
+    "newExpense": "مصرف جدید",
+    "exportPdf": "صدور PDF",
+    "currencies": {
+      "usd": "دالر آمریکا",
+      "afn": "افغانی"
+    },
+    "cards": {
+      "totalSpendingUsd": "مجموع مصارف (دالر)",
+      "totalSpendingAfn": "مجموع مصارف (افغانی)",
+      "count": "تعداد",
+      "totalEntries": "مجموع ثبت‌ها",
+      "avg": "میانگین",
+      "avgPerEntry": "میانگین هر ثبت (دالر)"
+    },
+    "search": {
+      "placeholder": "جستجو بر اساس شماره مسلسل، توضیحات، ملاحظات یا پرداخت‌شونده..."
+    },
+    "filters": {
+      "button": "فیلترها",
+      "clearAll": "پاک کردن تمام فیلترها",
+      "project": {
+        "label": "پروژه",
+        "all": "همه پروژه‌ها"
+      },
+      "type": {
+        "label": "نوع مصرف",
+        "all": "همه انواع"
+      },
+      "date": {
+        "from": "از تاریخ",
+        "to": "تا تاریخ"
+      }
+    },
+    "activeFilters": {
+      "label": "فیلترهای فعال:",
+      "search": "جستجو:",
+      "project": "پروژه:",
+      "type": "نوع:",
+      "date": "تاریخ:",
+      "sort": "مرتب‌سازی:"
+    },
+    "pagination": {
+      "found": "یافت شد",
+      "resultsFor": "نتیجه برای",
+      "showing": "نمایش",
+      "of": "از",
+      "expenses": "مصرف",
+      "firstPage": "صفحه اول",
+      "prevPage": "صفحه قبلی",
+      "nextPage": "صفحه بعدی",
+      "lastPage": "صفحه آخر"
+    },
+    "loading": "در حال بارگذاری مصارف...",
+    "empty": {
+      "noMatch": "هیچ مصرفی مطابق جستجو یافت نشد",
+      "noExpenses": "هنوز هیچ مصرفی ثبت نشده است",
+      "messageMatch": "برای یافتن نتیجه، معیارهای جستجو یا فیلترهای خود را تغییر دهید.",
+      "messageDefault": "برای مشاهده الگوهای مصرف، بودجه و گزارش‌های مالی، اولین مصرف خود را ثبت کنید.",
+      "clearFilters": "پاک کردن فیلترها",
+      "addFirst": "ثبت اولین مصرف"
+    },
+    "types": {
+      "general": "مصرف عمومی",
+      "material": "مصالح ساختمانی",
+      "staffSalary": "معاش کارمندان",
+      "dailyWage": "دستمزد کارگر روزمزد",
+      "contractPayment": "پرداخت قرارداد / قراردادی فرعی",
+      "equipment": "کرایه / خرید تجهیزات",
+      "utility": "قبض خدمات",
+      "other": "سایر"
+    },
+    "sortOptions": {
+      "dateNewest": "تاریخ (جدیدترین)",
+      "dateOldest": "تاریخ (قدیمی‌ترین)",
+      "serialHighLow": "شماره مسلسل (بیشترین به کمترین)",
+      "serialLowHigh": "شماره مسلسل (کمترین به بیشترین)",
+      "amountHighLow": "مبلغ (بیشترین به کمترین)",
+      "amountLowHigh": "مبلغ (کمترین به بیشترین)"
+    }
+  },
+
+  "ExpenseList": {
+    "serialNumber": "شماره مسلسل",
+    "description": "توضیحات",
+    "type": "نوع",
+    "date": "تاریخ",
+    "amount": "مبلغ",
+    "actions": "عملیات",
+
+    "noMatchingExpenses": "هیچ مصرف مطابقی یافت نشد",
+    "adjustSearch": "لطفاً جستجو یا فیلتر خود را تغییر دهید",
+    "refresh": "تازه‌سازی",
+
+    "unnamedExpense": "مصرف بدون نام",
+    "noVendor": "فروشنده موجود نیست",
+    "general": "عمومی",
+    "total": "مجموع",
+
+    "viewDetails": "مشاهده جزئیات",
+    "editExpense": "ویرایش مصرف",
+    "edit": "ویرایش",
+    "moreOptions": "گزینه‌های بیشتر",
+    "printReceipt": "چاپ رسید",
+    "delete": "حذف",
+
+    "foodDining": "غذا و رستوران",
+    "transportation": "ترانسپورت",
+    "utilities": "خدمات",
+    "entertainment": "سرگرمی",
+    "shopping": "خرید",
+    "other": "سایر"
+  },
+
+  "ExpenseCreateModal": {
+    "title": "ایجاد مصرف",
+    "subtitle": "ثبت یک مصرف جدید",
+
+    "description": "توضیحات",
+    "expenseDate": "تاریخ مصرف",
+    "amountUsd": "مبلغ به دالر",
+    "amountAfn": "مبلغ به افغانی",
+    "exchangeRate": "نرخ تبادله",
+    "paidTo": "پرداخت به",
+    "expenseType": "نوع مصرف",
+    "project": "پروژه",
+    "remarks": "ملاحظات",
+
+    "enterDescription": "توضیحات مصرف را وارد کنید",
+    "paidToPlaceholder": "پرداخت به چه کسی انجام شده است؟",
+    "remarksPlaceholder": "یادداشت‌های اضافی...",
+    "selectProject": "انتخاب پروژه",
+
+    "general": "عمومی",
+    "construction": "ساختمانی",
+    "material": "مواد",
+    "dailyWage": "دستمزد روزانه",
+    "equipment": "تجهیزات",
+    "utility": "خدمات",
+    "contractPayment": "پرداخت قرارداد",
+    "other": "سایر",
+
+    "cancel": "لغو",
+    "createExpense": "ایجاد مصرف",
+    "creating": "در حال ایجاد...",
+
+    "descriptionRequired": "توضیحات الزامی است",
+    "dateRequired": "تاریخ الزامی است",
+    "amountRequired": "حداقل یکی از مبلغ‌ها باید وارد شود",
+    "projectRequired": "پروژه الزامی است",
+    "createFailed": "ایجاد مصرف ناموفق بود",
+
+    "noPermission": "شما اجازه انجام این عمل را ندارید"
+  },
+
+  "ExpenseEdit": {
+    "title": "ویرایش مصرف",
+
+    "description": "توضیحات",
+    "expenseDate": "تاریخ مصرف",
+    "amountUsd": "مبلغ به دالر",
+    "amountAfn": "مبلغ به افغانی",
+    "exchangeRate": "نرخ تبادله",
+    "paidTo": "پرداخت به",
+    "expenseType": "نوع مصرف",
+    "remarks": "ملاحظات",
+
+    "enterDescription": "توضیحات مصرف را وارد کنید",
+    "paidToPlaceholder": "پرداخت به چه کسی انجام شده است؟",
+    "remarksPlaceholder": "یادداشت‌های اضافی...",
+
+    "general": "عمومی",
+    "material": "مواد",
+    "dailyWage": "دستمزد روزانه",
+    "equipment": "تجهیزات",
+    "utility": "خدمات",
+    "contractPayment": "پرداخت قرارداد",
+    "other": "سایر",
+
+    "cancel": "لغو",
+    "updateExpense": "ویرایش مصرف",
+    "saveChanges": "ذخیره تغییرات",
+    "saving": "در حال ذخیره...",
+
+    "descriptionRequired": "توضیحات الزامی است",
+    "dateRequired": "تاریخ الزامی است",
+    "amountRequired": "حداقل یکی از مبلغ‌ها باید وارد شود",
+    "saveFailed": "ذخیره مصرف ناموفق بود. لطفاً دوباره تلاش کنید.",
+
+    "noPermission": "شما اجازه انجام این عمل را ندارید"
+  },
+
+  "ExpenseDetail": {
+    "title": "جزئیات مصرف",
+    "edit": "ویرایش",
+    "description": "توضیحات",
+    "noDescription": "هیچ توضیحی ارائه نشده است",
+    "general": "عمومی",
+    "active": "فعال",
+
+    "amountUsd": "مبلغ به دالر",
+    "amountAfn": "مبلغ به افغانی",
+    "exchangeRate": "نرخ تبدیل",
+
+    "totalUsd": "مجموع به دالر",
+    "totalAfn": "مجموع به افغانی",
+
+    "expenseDate": "تاریخ مصرف",
+    "created": "ایجاد شده",
+    "updated": "به‌روزرسانی شده",
+    "paidTo": "پرداخت شده به",
+    "notAvailable": "موجود نیست",
+
+    "remarks": "ملاحظات"
+  },
+
+  "EmployeesPage": {
+    "title": "کارمندان",
+    "subtitle": "{{count}} کارمند",
+
+    "addEmployee": "افزودن کارمند",
+    "addNewEmployee": "افزودن کارمند جدید",
+    "editEmployee": "ویرایش کارمند",
+
+    "searchPlaceholder": "جستجوی کارمندان...",
+    "allDepartments": "همه بخش‌ها",
+    "allStatus": "همه وضعیت‌ها",
+    "active": "فعال",
+    "inactive": "غیرفعال",
+
+    "loading": "در حال بارگذاری کارمندان...",
+
+    "noEmployeesFound": "هیچ کارمندی یافت نشد",
+    "noEmployeesDescription": "با افزودن اولین کارمند شروع کنید.",
+
+    "deleteTitle": "حذف کارمند",
+    "deleteMessage": "آیا مطمئن هستید که می‌خواهید {{name}} را حذف کنید؟ این عمل قابل برگشت نیست."
+  },
+
+  "EmployeeCard": {
+    "active": "فعال",
+    "inactive": "غیرفعال",
+    "department": "بخش",
+    "position": "سمت",
+    "salary": "معاش",
+    "hired": "تاریخ استخدام",
+    "edit": "ویرایش",
+    "currency": "افغانی"
+  },
+
+  "EmployeeForm": {
+    "email": "ایمیل",
+    "firstName": "نام",
+    "lastName": "نام خانوادگی",
+    "phone": "شماره تماس",
+    "address": "آدرس",
+    "department": "بخش",
+    "position": "سمت",
+    "employmentType": "نوع استخدام",
+    "hireDate": "تاریخ استخدام",
+    "salary": "معاش",
+    "hourlyRate": "دستمزد ساعتی",
+    "emergencyContact": "شخص تماس اضطراری",
+    "emergencyPhone": "شماره تماس اضطراری",
+    "notes": "یادداشت",
+    "activeEmployee": "کارمند فعال",
+
+    "departments": {
+      "management": "مدیریت",
+      "engineering": "انجنیری",
+      "construction": "ساختمان",
+      "administration": "اداره",
+      "finance": "مالی",
+      "hr": "منابع بشری",
+      "procurement": "تدارکات",
+      "safety": "ایمنی"
+    },
+
+    "employmentTypes": {
+      "fullTime": "تمام وقت",
+      "partTime": "نیمه وقت",
+      "contract": "قراردادی",
+      "temporary": "موقت"
+    },
+
+    "cancel": "لغو",
+    "addEmployee": "افزودن کارمند",
+    "updateEmployee": "ویرایش کارمند",
+    "createEmployee": "ایجاد کارمند",
+    "saving": "در حال ذخیره...",
+    "noPermission": "شما اجازه انجام این عمل را ندارید"
+  },
+
+  "EmployeeDetail": {
+    "tabs": {
+      "info": "اطلاعات",
+      "payroll": "معاش",
+      "documents": "اسناد"
+    },
+
+    "active": "فعال",
+    "inactive": "غیرفعال",
+
+    "personalInformation": "اطلاعات شخصی",
+    "employmentDetails": "جزئیات استخدام",
+
+    "email": "ایمیل",
+    "phone": "شماره تماس",
+    "address": "آدرس",
+    "emergencyContact": "شخص تماس اضطراری",
+    "emergencyPhone": "شماره تماس اضطراری",
+
+    "department": "بخش",
+    "employmentType": "نوع استخدام",
+    "hireDate": "تاریخ استخدام",
+    "salary": "معاش",
+    "hourlyRate": "دستمزد ساعتی",
+
+    "notAvailable": "موجود نیست",
+    "emptyValue": "-",
+    "currency": "افغانی",
+
+    "payrollHistory": "سوابق معاش",
+    "loadingPayrollHistory": "در حال بارگذاری سوابق معاش...",
+    "noPayrollRecords": "هیچ سابقه معاش یافت نشد",
+
+    "status": "وضعیت",
+    "to": "تا",
+    "netPay": "معاش خالص"
+  },
+
+  "PayrollPage": {
+    "title": "حقوق معاش",
+    "records": "{{count}} رکورد",
+
+    "downloadPdf": "دانلود PDF",
+    "newPayroll": "حقوق جدید",
+
+    "filters": {
+      "allStatus": "همه وضعیت‌ها",
+      "pending": "در انتظار",
+      "processed": "پردازش شده",
+      "paid": "پرداخت شده",
+      "cancelled": "لغو شده",
+      "allEmployees": "همه کارمندان",
+      "clearFilters": "پاک کردن فیلترها"
+    },
+
+    "summary": {
+      "currency": "واحد پول",
+      "totalGross": "مجموع حقوق ناخالص",
+      "totalNet": "مجموع حقوق خالص",
+      "records": "رکوردها",
+      "paid": "پرداخت شده"
+    },
+
+    "loading": "در حال بارگذاری سوابق حقوق...",
+
+    "empty": {
+      "title": "هیچ سابقه حقوقی موجود نیست",
+      "description": "اولین سابقه حقوق را ایجاد کنید.",
+      "create": "ایجاد حقوق"
+    },
+
+    "table": {
+      "employee": "کارمند",
+      "period": "دوره",
+      "paymentDate": "تاریخ پرداخت",
+      "grossPay": "حقوق ناخالص",
+      "netPay": "حقوق خالص",
+      "actions": "عملیات",
+      "to": "تا",
+      "edit": "ویرایش",
+      "delete": "حذف"
+    },
+
+    "modal": {
+      "editPayroll": "ویرایش حقوق",
+      "createPayroll": "ایجاد حقوق"
+    },
+
+    "deleteDialog": {
+      "title": "حذف حقوق",
+      "message": "آیا مطمئن هستید که می‌خواهید سابقه حقوق {{employee}} را حذف کنید؟"
+    }
+  },
+
+  "PayrollForm": {
+    "employee": "کارمند",
+    "selectEmployee": "انتخاب کارمند",
+    "basicSalary": "حقوق پایه",
+    "periodStart": "شروع دوره",
+    "periodEnd": "پایان دوره",
+    "overtimeHours": "ساعات اضافه‌کاری",
+    "overtimeRate": "نرخ اضافه‌کاری",
+    "bonus": "پاداش",
+    "allowances": "مزایا",
+    "deductions": "کسورات",
+    "taxDeducted": "مالیات کسر شده",
+    "currency": "واحد پول",
+    "paymentMethod": "روش پرداخت",
+    "paymentDate": "تاریخ پرداخت",
+    "notes": "یادداشت‌ها",
+
+    "paymentMethods": {
+      "bankTransfer": "انتقال بانکی",
+      "check": "چک",
+      "cash": "نقدی"
+    },
+
+    "buttons": {
+      "cancel": "لغو",
+      "create": "ایجاد حقوق",
+      "update": "ویرایش حقوق",
+      "processing": "در حال پردازش..."
+    },
+
+    "permissions": {
+      "noPermission": "شما اجازه انجام این عملیات را ندارید"
+    }
+  },
+
+  "AttendanceLayout": {
+    "title": "مدیریت حاضری",
+    "subtitle": "حاضری کارمندان را به‌صورت مؤثر مدیریت کنید",
+    "tabs": {
+      "list": "لست حاضری",
+      "bulk": "ثبت گروهی",
+      "daily": "نمای روزانه",
+      "summary": "خلاصه ماهانه"
+    }
+  },
+  "AttendanceList": {
+    "exportPdf": "دریافت PDF",
+
+    "filters": "فیلترها",
+    "showFilters": "نمایش فیلترها",
+    "hideFilters": "پنهان کردن فیلترها",
+
+    "employeeId": "شناسه کارمند",
+    "enterEmployeeId": "شناسه کارمند را وارد کنید",
+
+    "status": "وضعیت",
+    "allStatuses": "همه وضعیت‌ها",
+    "present": "حاضر",
+    "absent": "غایب",
+    "halfDay": "نیمه‌وقت",
+    "leave": "رخصتی",
+
+    "date": "تاریخ",
+
+    "month": "ماه",
+    "allMonths": "همه ماه‌ها",
+
+    "year": "سال",
+    "allYears": "همه سال‌ها",
+
+    "search": "جستجو",
+    "searchPlaceholder": "جستجو بر اساس نام یا شناسه",
+
+    "clearFilters": "پاک کردن فیلترها",
+
+    "deleteConfirmation": "آیا مطمئن هستید که می‌خواهید این رکورد را حذف کنید؟",
+    "pdfDownloadFailed": "دانلود فایل PDF ناموفق بود",
+
+    "employee": "کارمند",
+    "checkIn": "ورود",
+    "checkOut": "خروج",
+    "overtime": "اضافه‌کاری",
+    "note": "یادداشت",
+
+    "loading": "در حال بارگذاری...",
+    "noAttendanceRecords": "هیچ رکورد حاضری یافت نشد"
+  },
+
+  "BulkAttendance": {
+    "title": "ثبت گروهی حاضری",
+    "save": "ذخیره",
+    "saveAll": "ذخیره همه",
+    "saving": "در حال ذخیره...",
+    "noPermission": "شما اجازه انجام این عمل را ندارید",
+
+    "markedStats": "{{marked}}/{{total}} در نمای فعلی ثبت شده • {{modified}} ویرایش شده",
+
+    "failedLoadEmployees": "بارگذاری کارمندان ناموفق بود. لطفاً دوباره تلاش کنید.",
+    "failedLoadAttendance": "بارگذاری حاضری برای تاریخ انتخاب‌شده ناموفق بود.",
+    "failedSubmitAttendance": "ثبت حاضری ناموفق بود.",
+    "markAtLeastOne": "لطفاً حداقل برای یک کارمند حاضری ثبت کنید.",
+
+    "created": "ایجاد شد",
+    "updated": "به‌روزرسانی شد",
+    "errors": "خطا",
+
+    "allDepartments": "همه بخش‌ها ({{count}})",
+    "unassigned": "بدون بخش ({{count}})",
+    "departmentWithCount": "{{department}} ({{count}})",
+
+    "employee": "کارمند",
+    "status": "وضعیت",
+    "in": "ورود",
+    "out": "خروج",
+    "ot": "اضافه‌کاری",
+    "note": "یادداشت",
+
+    "noEmployees": "در این بخش هیچ کارمندی وجود ندارد",
+
+    "present": "حاضر",
+    "absent": "غایب",
+    "halfDay": "نیمه‌وقت",
+    "leave": "رخصتی",
+    "notMarked": "ثبت نشده",
+    "modified": "ویرایش شده",
+
+    "statusOptions": {
+      "empty": "-",
+      "present": "ح",
+      "absent": "غ",
+      "halfDay": "ن",
+      "leave": "ر"
+    },
+
+    "placeholderOvertime": "0",
+    "placeholderNote": "-"
+  },
+
+  "DailyAttendance": {
+    "title": "نمایش روزانه حاضری",
+    "selectDate": "انتخاب تاریخ",
+
+    "loading": "در حال بارگذاری...",
+
+    "totalMarked": "کل ثبت‌شده",
+    "unmarked": "ثبت‌نشده",
+    "present": "حاضر",
+    "absent": "غایب",
+    "leave": "رخصتی",
+
+    "markedEmployees": "کارمندان ثبت‌شده",
+    "unmarkedEmployees": "کارمندان ثبت‌نشده",
+    "unmarkedCount": "کارمندان ثبت‌نشده ({{count}})",
+
+    "employee": "کارمند",
+    "employeeId": "شناسه کارمند",
+    "name": "نام",
+    "department": "بخش",
+
+    "checkIn": "ورود",
+    "checkOut": "خروج",
+    "overtime": "اضافی‌کاری",
+    "note": "یادداشت",
+
+    "status": {
+      "present": "حاضر",
+      "absent": "غایب",
+      "halfDay": "نیمه‌وقت",
+      "leave": "رخصتی"
+    },
+
+    "empty": "-"
+  },
+
+  "MonthlySummary": {
+    "title": "خلاصه ماهانه حاضری",
+    "selectEmployee": "انتخاب کارمند",
+    "selectMonth": "ماه",
+    "selectYear": "سال",
+
+    "loading": "در حال بارگذاری...",
+
+    "employeeInfo": {
+      "id": "شناسه",
+      "effectiveWorkingDays": "روزهای کاری مؤثر"
+    },
+
+    "stats": {
+      "totalDays": "کل روزها",
+      "present": "حاضر",
+      "absent": "غایب",
+      "halfDay": "نیمه‌وقت",
+      "leave": "رخصتی",
+      "overtime": "اضافی‌کاری"
+    },
+
+    "attendanceBreakdown": "تجزیه حاضر‌ی",
+
+    "emptyState": "برای دیدن خلاصه، کارمند، ماه و سال را انتخاب کنید"
+  },
+
+  "DeleteConfirmModal": {
+    "title": "تأیید حذف",
+    "messageStart": "آیا مطمئن هستید؟ این عمل قابل بازگشت نیست. این کار به طور کامل حذف خواهد کرد",
+    "messageEnd": ".",
+    "cancel": "لغو",
+    "delete": "حذف",
+    "deleting": "در حال حذف..."
   }
 }

@@ -2,8 +2,14 @@ import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import Loading from "../common/Loading";
 import instance from "../../api/axiosInstance";
+import { useLanguage } from "../../hooks/useLanguage";
+
+const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
 export default function EmployeeDetail({ employeeId, onClose }) {
+  const { t, lang } = useLanguage();
+  const isRTL = RTL_LANGS.includes(lang);
+
   const [activeTab, setActiveTab] = useState("info");
   const [employee, setEmployee] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,17 +37,21 @@ export default function EmployeeDetail({ employeeId, onClose }) {
     `/employees/${employeeId}/payroll_history/`,
   );
 
-  const tabs = ["info", "payroll", "documents"];
+  const tabs = [
+    { key: "info", label: t("EmployeeDetail.tabs.info") },
+    { key: "payroll", label: t("EmployeeDetail.tabs.payroll") },
+    { key: "documents", label: t("EmployeeDetail.tabs.documents") },
+  ];
 
   return (
-    <div className="space-y-6">
+    <div dir={isRTL ? "rtl" : "ltr"} className="space-y-6">
       {/* Employee Header */}
       <div
         className="flex items-center gap-6 pb-6 border-b"
         style={{ borderColor: "var(--border)" }}
       >
         <div
-          className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold"
+          className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold shrink-0"
           style={{ backgroundColor: "var(--primary)", color: "#fff" }}
         >
           {employee.first_name}
@@ -63,7 +73,9 @@ export default function EmployeeDetail({ employeeId, onClose }) {
               color: employee.is_active ? "var(--success)" : "var(--danger)",
             }}
           >
-            {employee.is_active ? "Active" : "Inactive"}
+            {employee.is_active
+              ? t("EmployeeDetail.active")
+              : t("EmployeeDetail.inactive")}
           </span>
         </div>
       </div>
@@ -75,40 +87,50 @@ export default function EmployeeDetail({ employeeId, onClose }) {
       >
         {tabs.map((tab) => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className="px-4 py-2 text-sm font-medium capitalize border-b-2 transition-colors"
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
             style={{
-              color: activeTab === tab ? "var(--primary)" : "var(--muted)",
-              borderColor: activeTab === tab ? "var(--primary)" : "transparent",
+              color: activeTab === tab.key ? "var(--primary)" : "var(--muted)",
+              borderColor:
+                activeTab === tab.key ? "var(--primary)" : "transparent",
             }}
           >
-            {tab}
+            {tab.label}
           </button>
         ))}
       </div>
 
       {/* Tab Content */}
       {activeTab === "info" && (
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
             <h3
               className="text-sm font-semibold mb-4"
               style={{ color: "var(--text)" }}
             >
-              Personal Information
+              {t("EmployeeDetail.personalInformation")}
             </h3>
             <div className="space-y-3">
               {[
-                { label: "Email", value: employee.email },
-                { label: "Phone", value: employee.phone },
-                { label: "Address", value: employee.address },
                 {
-                  label: "Emergency Contact",
+                  label: t("EmployeeDetail.email"),
+                  value: employee.email,
+                },
+                {
+                  label: t("EmployeeDetail.phone"),
+                  value: employee.phone,
+                },
+                {
+                  label: t("EmployeeDetail.address"),
+                  value: employee.address,
+                },
+                {
+                  label: t("EmployeeDetail.emergencyContact"),
                   value: employee.emergency_contact_name,
                 },
                 {
-                  label: "Emergency Phone",
+                  label: t("EmployeeDetail.emergencyPhone"),
                   value: employee.emergency_contact_phone,
                 },
               ].map((item) => (
@@ -117,7 +139,7 @@ export default function EmployeeDetail({ employeeId, onClose }) {
                     {item.label}
                   </label>
                   <p className="text-sm" style={{ color: "var(--text)" }}>
-                    {item.value || "-"}
+                    {item.value || t("EmployeeDetail.emptyValue")}
                   </p>
                 </div>
               ))}
@@ -128,25 +150,31 @@ export default function EmployeeDetail({ employeeId, onClose }) {
               className="text-sm font-semibold mb-4"
               style={{ color: "var(--text)" }}
             >
-              Employment Details
+              {t("EmployeeDetail.employmentDetails")}
             </h3>
             <div className="space-y-3">
               {[
-                { label: "Department", value: employee.department },
-                { label: "Employment Type", value: employee.employment_type },
                 {
-                  label: "Hire Date",
+                  label: t("EmployeeDetail.department"),
+                  value: employee.department,
+                },
+                {
+                  label: t("EmployeeDetail.employmentType"),
+                  value: employee.employment_type,
+                },
+                {
+                  label: t("EmployeeDetail.hireDate"),
                   value: new Date(employee.hire_date).toLocaleDateString(),
                 },
                 {
-                  label: "Salary",
-                  value: `AFN${parseFloat(employee.salary).toLocaleString()}`,
+                  label: t("EmployeeDetail.salary"),
+                  value: `${t("EmployeeDetail.currency")}${parseFloat(employee.salary).toLocaleString()}`,
                 },
                 {
-                  label: "Hourly Rate",
+                  label: t("EmployeeDetail.hourlyRate"),
                   value: employee.hourly_rate
-                    ? `AFN${employee.hourly_rate}`
-                    : "N/A",
+                    ? `${t("EmployeeDetail.currency")}${employee.hourly_rate}`
+                    : t("EmployeeDetail.notAvailable"),
                 },
               ].map((item) => (
                 <div key={item.label}>
@@ -154,7 +182,7 @@ export default function EmployeeDetail({ employeeId, onClose }) {
                     {item.label}
                   </label>
                   <p className="text-sm" style={{ color: "var(--text)" }}>
-                    {item.value || "-"}
+                    {item.value || t("EmployeeDetail.emptyValue")}
                   </p>
                 </div>
               ))}
@@ -169,12 +197,16 @@ export default function EmployeeDetail({ employeeId, onClose }) {
             className="text-sm font-semibold mb-4"
             style={{ color: "var(--text)" }}
           >
-            Payroll History
+            {t("EmployeeDetail.payrollHistory")}
           </h3>
           {loading ? (
-            <p style={{ color: "var(--muted)" }}>Loading payroll history...</p>
+            <p style={{ color: "var(--muted)" }}>
+              {t("EmployeeDetail.loadingPayrollHistory")}
+            </p>
           ) : payrollHistory?.length === 0 ? (
-            <p style={{ color: "var(--muted)" }}>No payroll records found</p>
+            <p style={{ color: "var(--muted)" }}>
+              {t("EmployeeDetail.noPayrollRecords")}
+            </p>
           ) : (
             <div className="space-y-3">
               {Array.isArray(payrollHistory) &&
@@ -189,19 +221,20 @@ export default function EmployeeDetail({ employeeId, onClose }) {
                         className="font-medium"
                         style={{ color: "var(--text)" }}
                       >
-                        {payroll.payroll_period_start} to{" "}
+                        {payroll.payroll_period_start} {t("EmployeeDetail.to")}{" "}
                         {payroll.payroll_period_end}
                       </p>
                       <p className="text-xs" style={{ color: "var(--muted)" }}>
-                        Status: {payroll.payment_status}
+                        {t("EmployeeDetail.status")}: {payroll.payment_status}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className={isRTL ? "text-left" : "text-right"}>
                       <p className="font-bold" style={{ color: "var(--text)" }}>
-                        AFN{parseFloat(payroll.net_pay).toLocaleString()}
+                        {t("EmployeeDetail.currency")}
+                        {parseFloat(payroll.net_pay).toLocaleString()}
                       </p>
                       <p className="text-xs" style={{ color: "var(--muted)" }}>
-                        Net Pay
+                        {t("EmployeeDetail.netPay")}
                       </p>
                     </div>
                   </div>

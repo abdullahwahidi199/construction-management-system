@@ -1,6 +1,7 @@
 // components/dashboard/RecentActivity.jsx
 
 import Card from "../ui/Card";
+import { useLanguage } from "../../hooks/useLanguage";
 
 const ACTIVITY_CONFIG = {
   expense: {
@@ -24,8 +25,7 @@ const ACTIVITY_CONFIG = {
     bgColor: "var(--primary)",
   },
 };
-
-function formatTimeAgo(isoString) {
+function formatTimeAgo(isoString, t) {
   const now = new Date();
   const then = new Date(isoString);
   const diffMs = now - then;
@@ -33,20 +33,22 @@ function formatTimeAgo(isoString) {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffMins < 1) return t("RecentActivity.justNow");
+  if (diffMins < 60) return t("RecentActivity.minutesAgo", { count: diffMins });
+  if (diffHours < 24) return t("RecentActivity.hoursAgo", { count: diffHours });
+  if (diffDays < 7) return t("RecentActivity.daysAgo", { count: diffDays });
   return then.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 export default function RecentActivity({ activities }) {
+  const { t } = useLanguage();
+
   if (!activities || activities.length === 0) {
     return (
-      <Card title="Recent Activity">
+      <Card title={t("RecentActivity.title")}>
         <div className="flex flex-col items-center justify-center py-8 text-[var(--muted)]">
           <span className="text-4xl mb-2">📭</span>
-          <p className="text-sm">No recent activity</p>
+          <p className="text-sm">{t("RecentActivity.noRecentActivity")}</p>
         </div>
       </Card>
     );
@@ -54,10 +56,10 @@ export default function RecentActivity({ activities }) {
 
   return (
     <Card
-      title="Recent Activity"
+      title={t("RecentActivity.title")}
       right={
         <span className="text-sm text-[var(--muted)]">
-          {activities.length} items
+          {activities.length} {t("RecentActivity.items")}
         </span>
       }
     >
@@ -109,7 +111,7 @@ export default function RecentActivity({ activities }) {
                     </div>
                   </div>
                   <span className="text-[10px] text-[var(--muted)] whitespace-nowrap shrink-0 mt-0.5">
-                    {formatTimeAgo(activity.timestamp)}
+                    {formatTimeAgo(activity.timestamp, t)}
                   </span>
                 </div>
               </div>

@@ -1,18 +1,12 @@
 // src/components/contracts/PaymentFormModal.jsx
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { useLanguage } from "../../hooks/useLanguage";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
-
-const PAYMENT_TYPE_OPTIONS = [
-  { value: "advance", label: "Advance" },
-  { value: "progress", label: "Progress Payment" },
-  { value: "retention_release", label: "Retention Release" },
-  { value: "final", label: "Final Payment" },
-  { value: "other", label: "Other" },
-];
+import PermissionWrapper from "../../auth/PermissionWrapper";
 
 const emptyForm = {
   amount: "",
@@ -31,9 +25,21 @@ export default function PaymentFormModal({
   maxAmount = null,
   currency,
 }) {
+  const { t } = useLanguage();
   const isEdit = !!payment;
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
+
+  const PAYMENT_TYPE_OPTIONS = [
+    { value: "advance", label: t("PaymentFormModal.advance") },
+    { value: "progress", label: t("PaymentFormModal.progressPayment") },
+    {
+      value: "retention_release",
+      label: t("PaymentFormModal.retentionRelease"),
+    },
+    { value: "final", label: t("PaymentFormModal.finalPayment") },
+    { value: "other", label: t("PaymentFormModal.other") },
+  ];
 
   useEffect(() => {
     if (payment) {
@@ -58,10 +64,13 @@ export default function PaymentFormModal({
   const validate = () => {
     const e = {};
     if (!form.amount || Number(form.amount) <= 0)
-      e.amount = "Amount must be positive";
+      e.amount = t("PaymentFormModal.amountMustBePositive");
     if (maxAmount !== null && Number(form.amount) > maxAmount)
-      e.amount = `Amount exceeds remaining balance of $${maxAmount.toLocaleString()}`;
-    if (!form.payment_date) e.payment_date = "Payment date is required";
+      e.amount = t("PaymentFormModal.amountExceedsRemaining", {
+        amount: `$${maxAmount.toLocaleString()}`,
+      });
+    if (!form.payment_date)
+      e.payment_date = t("PaymentFormModal.paymentDateRequired");
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -88,7 +97,9 @@ export default function PaymentFormModal({
           <form onSubmit={handleSubmit}>
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
               <h2 className="text-lg font-semibold text-[var(--text)]">
-                {isEdit ? "Edit Payment" : "Add Payment"}
+                {isEdit
+                  ? t("PaymentFormModal.editPayment")
+                  : t("PaymentFormModal.addPayment")}
               </h2>
               <button
                 type="button"
@@ -101,18 +112,18 @@ export default function PaymentFormModal({
 
             <div className="px-6 py-4 space-y-4">
               <Input
-                label={`Amount (${currency})`}
+                label={`${t("PaymentFormModal.amount")} (${currency})`}
                 type="number"
                 value={form.amount}
                 onChange={(val) => handleChange("amount", val)}
-                placeholder="0.00"
+                placeholder={t("PaymentFormModal.amountPlaceholder")}
                 min="0"
                 step="0.01"
                 error={errors.amount}
               />
 
               <Input
-                label="Payment Date"
+                label={t("PaymentFormModal.paymentDate")}
                 type="date"
                 value={form.payment_date}
                 onChange={(val) => handleChange("payment_date", val)}
@@ -120,28 +131,28 @@ export default function PaymentFormModal({
               />
 
               <Select
-                label="Payment Type"
+                label={t("PaymentFormModal.paymentType")}
                 value={form.payment_type}
                 onChange={(val) => handleChange("payment_type", val)}
                 options={PAYMENT_TYPE_OPTIONS}
               />
 
               <Input
-                label="Reference Number"
+                label={t("PaymentFormModal.referenceNumber")}
                 value={form.reference_number}
                 onChange={(val) => handleChange("reference_number", val)}
-                placeholder="e.g. INV-2024-001"
+                placeholder={t("PaymentFormModal.referencePlaceholder")}
               />
 
               <div>
                 <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  Notes
+                  {t("PaymentFormModal.notes")}
                 </label>
                 <textarea
                   value={form.notes}
                   onChange={(e) => handleChange("notes", e.target.value)}
                   rows={2}
-                  placeholder="Optional notes..."
+                  placeholder={t("PaymentFormModal.optionalNotes")}
                   className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none"
                 />
               </div>
@@ -154,15 +165,39 @@ export default function PaymentFormModal({
                 onClick={onClose}
                 disabled={submitLoading}
               >
-                Cancel
+                {t("PaymentFormModal.cancel")}
               </Button>
-              <Button type="submit" variant="primary" disabled={submitLoading}>
-                {submitLoading
-                  ? "Saving..."
-                  : isEdit
-                    ? "Update Payment"
-                    : "Add Payment"}
-              </Button>
+              <PermissionWrapper
+                permissions={[
+                  payment
+                    ? "contract_payments.update"
+                    : "contract_payments.create",
+                ]}
+                fallback={
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    disabled
+                    title={t("PaymentFormModal.permissionDenied")}
+                  >
+                    {payment
+                      ? t("PaymentFormModal.updatePayment")
+                      : t("PaymentFormModal.createPayment")}
+                  </Button>
+                }
+              >
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={submitLoading}
+                >
+                  {submitLoading
+                    ? t("PaymentFormModal.saving")
+                    : isEdit
+                      ? t("PaymentFormModal.updatePayment")
+                      : t("PaymentFormModal.addPaymentButton")}
+                </Button>
+              </PermissionWrapper>
             </div>
           </form>
         </Card>

@@ -7,9 +7,13 @@ import Loading from "../../components/common/Loading";
 import EmptyState from "../../components/common/EmptyState";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import PayrollForm from "../../components/payroll/PayrollForm";
+import instance from "../../api/axiosInstance";
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import { useLanguage } from "../../hooks/useLanguage";
+import PayrollPrintModal from "./payrollPrintModal";
 
 export default function PayrollPage() {
-  const { data: payrolls, loading, refetch } = useFetch("/payrolls/");
+  // const { data: payrolls, loading, refetch } = useFetch("/payrolls/");
   const { data: employees } = useFetch("/employees/");
   const { deleteData } = useDelete();
   const [showForm, setShowForm] = useState(false);
@@ -17,7 +21,25 @@ export default function PayrollPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [employeeFilter, setEmployeeFilter] = useState("");
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDateFilter, setEndDateFilter] = useState("");
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [selectedPayrollId, setSelectedPayrollId] = useState(null);
 
+  const { t } = useLanguage();
+
+  const query = new URLSearchParams();
+
+  // if (statusFilter) query.append("status", statusFilter);
+  if (employeeFilter) query.append("employee_id", employeeFilter);
+  if (startDateFilter) query.append("start_date", startDateFilter);
+  if (endDateFilter) query.append("end_date", endDateFilter);
+
+  const {
+    data: payrolls,
+    loading,
+    refetch,
+  } = useFetch(`/payrolls/?${query.toString()}`);
   const handleDelete = async () => {
     if (deleteConfirm) {
       await deleteData(`/payrolls/${deleteConfirm.id}/`);
@@ -43,15 +65,51 @@ export default function PayrollPage() {
     }
   };
 
-  const filteredPayrolls = Array.isArray(payrolls)
-    ? payrolls.filter((p) => {
-        const matchesStatus =
-          !statusFilter || p.payment_status === statusFilter;
-        const matchesEmployee =
-          !employeeFilter || p.employee === parseInt(employeeFilter);
-        return matchesStatus && matchesEmployee;
-      })
-    : [];
+  const handleDownloadPDF = async () => {
+    try {
+      const response = await instance.get(
+        `/employees/payrolls/export-pdf/?${query}`,
+        {
+          responseType: "blob",
+        },
+      );
+
+      const url = window.URL.createObjectURL(
+        new Blob([response.data], { type: "application/pdf" }),
+      );
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `payrolls-${new Date().toISOString().slice(0, 10)}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // const filteredPayrolls = Array.isArray(payrolls)
+  //   ? payrolls.filter((p) => {
+  //       const matchesStatus =
+  //         !statusFilter || p.payment_status === statusFilter;
+
+  //       const matchesEmployee =
+  //         !employeeFilter || p.employee === parseInt(employeeFilter);
+
+  //       const matchesStartDate =
+  //         !startDateFilter ||
+  //         new Date(p.payroll_period_start) >= new Date(startDateFilter);
+
+  //       const matchesEndDate =
+  //         !endDateFilter ||
+  //         new Date(p.payroll_period_end) <= new Date(endDateFilter);
+
+  //       return (
+  //         matchesStatus && matchesEmployee && matchesStartDate && matchesEndDate
+  //       );
+  //     })
+  //   : [];
 
   const getStatusBadge = (status) => {
     const colors = {
@@ -92,21 +150,34 @@ export default function PayrollPage() {
 
   return (
     <div>
-      <Header title="Payroll" subtitle={`${filteredPayrolls.length} records`}>
-        <button
-          onClick={() => {
-            setSelectedPayroll(null);
-            setShowForm(true);
-          }}
-          className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
-          style={{ backgroundColor: "var(--primary)" }}
-        >
-          + New Payroll
-        </button>
+      <Header
+        title={t("PayrollPage.title")}
+        subtitle={t("PayrollPage.records", { count: payrolls.length })}
+      >
+        <div className="flex gap-2">
+          <button
+            onClick={handleDownloadPDF}
+            className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
+            style={{ backgroundColor: "var(--success)" }}
+          >
+            {t("PayrollPage.downloadPdf")}
+          </button>
+
+          <button
+            onClick={() => {
+              setSelectedPayroll(null);
+              setShowForm(true);
+            }}
+            className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
+            style={{ backgroundColor: "var(--primary)" }}
+          >
+            + {t("PayrollPage.newPayroll")}
+          </button>
+        </div>
       </Header>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-wrap gap-4 mb-6">
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
@@ -117,11 +188,15 @@ export default function PayrollPage() {
             borderColor: "var(--border)",
           }}
         >
-          <option value="">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="processed">Processed</option>
-          <option value="paid">Paid</option>
-          <option value="cancelled">Cancelled</option>
+          <option value="">{t("PayrollPage.filters.allStatus")}</option>
+          <option value="pending">{t("PayrollPage.filters.pending")}</option>
+          <option value="processed">
+            {t("PayrollPage.filters.processed")}
+          </option>
+          <option value="paid">{t("PayrollPage.filters.paid")}</option>
+          <option value="cancelled">
+            {t("PayrollPage.filters.cancelled")}
+          </option>
         </select>
         <select
           value={employeeFilter}
@@ -133,7 +208,7 @@ export default function PayrollPage() {
             borderColor: "var(--border)",
           }}
         >
-          <option value="">All Employees</option>
+          <option value="">{t("PayrollPage.filters.allEmployees")}</option>
           {Array.isArray(employees) &&
             employees.map((emp) => (
               <option key={emp.id} value={emp.id}>
@@ -141,6 +216,45 @@ export default function PayrollPage() {
               </option>
             ))}
         </select>
+        <input
+          type="date"
+          value={startDateFilter}
+          onChange={(e) => setStartDateFilter(e.target.value)}
+          className="px-4 py-2 rounded-lg border text-sm"
+          style={{
+            backgroundColor: "var(--card)",
+            color: "var(--text)",
+            borderColor: "var(--border)",
+          }}
+        />
+
+        <input
+          type="date"
+          value={endDateFilter}
+          onChange={(e) => setEndDateFilter(e.target.value)}
+          className="px-4 py-2 rounded-lg border text-sm"
+          style={{
+            backgroundColor: "var(--card)",
+            color: "var(--text)",
+            borderColor: "var(--border)",
+          }}
+        />
+
+        <button
+          onClick={() => {
+            setStatusFilter("");
+            setEmployeeFilter("");
+            setStartDateFilter("");
+            setEndDateFilter("");
+          }}
+          className="px-4 py-2 rounded-lg text-sm"
+          style={{
+            backgroundColor: "var(--hover)",
+            color: "var(--text)",
+          }}
+        >
+          {t("PayrollPage.filters.clearFilters")}
+        </button>
       </div>
 
       {/* Summary Cards */}
@@ -160,31 +274,39 @@ export default function PayrollPage() {
                 className="text-sm mb-3 font-medium"
                 style={{ color: "var(--text)" }}
               >
-                Currency: {currency}
+                {t("PayrollPage.summary.currency")}: {currency}
               </p>
 
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span style={{ color: "var(--muted)" }}>Total Gross</span>
+                  <span style={{ color: "var(--muted)" }}>
+                    {t("PayrollPage.summary.totalGross")}
+                  </span>
                   <span style={{ color: "var(--primary)" }}>
                     {currency} {data.gross.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex justify-between text-sm">
-                  <span style={{ color: "var(--muted)" }}>Total Net</span>
+                  <span style={{ color: "var(--muted)" }}>
+                    {t("PayrollPage.summary.totalNet")}
+                  </span>
                   <span style={{ color: "var(--success)" }}>
                     {currency} {data.net.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex justify-between text-sm">
-                  <span style={{ color: "var(--muted)" }}>Records</span>
+                  <span style={{ color: "var(--muted)" }}>
+                    {t("PayrollPage.summary.records")}
+                  </span>
                   <span style={{ color: "var(--text)" }}>{data.count}</span>
                 </div>
 
                 <div className="flex justify-between text-sm">
-                  <span style={{ color: "var(--muted)" }}>Paid</span>
+                  <span style={{ color: "var(--muted)" }}>
+                    {t("PayrollPage.summary.paid")}
+                  </span>
                   <span style={{ color: "var(--success)" }}>{data.paid}</span>
                 </div>
               </div>
@@ -193,12 +315,12 @@ export default function PayrollPage() {
         </div>
       )}
       {loading ? (
-        <Loading message="Loading payroll records..." />
-      ) : filteredPayrolls.length === 0 ? (
+        <Loading message={t("PayrollPage.loading")} />
+      ) : payrolls.length === 0 ? (
         <EmptyState
           icon="💰"
-          title="No payroll records"
-          description="Create your first payroll record to get started."
+          title={t("PayrollPage.empty.title")}
+          description={t("PayrollPage.empty.description")}
           action={
             <button
               onClick={() => {
@@ -208,7 +330,7 @@ export default function PayrollPage() {
               className="px-4 py-2 rounded-lg text-sm font-medium text-white"
               style={{ backgroundColor: "var(--primary)" }}
             >
-              Create Payroll
+              {t("PayrollPage.empty.create")}
             </button>
           }
         />
@@ -220,21 +342,26 @@ export default function PayrollPage() {
           <table className="w-full">
             <thead style={{ backgroundColor: "var(--hover)" }}>
               <tr>
-                {["Employee", "Period", "Gross Pay", "Net Pay", "Actions"].map(
-                  (header) => (
-                    <th
-                      key={header}
-                      className="text-left px-4 py-3 text-xs font-semibold uppercase"
-                      style={{ color: "var(--muted)" }}
-                    >
-                      {header}
-                    </th>
-                  ),
-                )}
+                {[
+                  t("PayrollPage.table.employee"),
+                  t("PayrollPage.table.period"),
+                  t("PayrollPage.table.paymentDate"),
+                  t("PayrollPage.table.grossPay"),
+                  t("PayrollPage.table.netPay"),
+                  t("PayrollPage.table.actions"),
+                ].map((header) => (
+                  <th
+                    key={header}
+                    className="text-start px-4 py-3 text-xs font-semibold uppercase"
+                    style={{ color: "var(--muted)" }}
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {filteredPayrolls.map((payroll) => (
+              {payrolls.map((payroll) => (
                 <tr
                   key={payroll.id}
                   className="border-t transition-colors"
@@ -262,9 +389,15 @@ export default function PayrollPage() {
                       {payroll.payroll_period_start}
                     </p>
                     <p className="text-xs" style={{ color: "var(--muted)" }}>
-                      to {payroll.payroll_period_end}
+                      {t("PayrollPage.table.to")} {payroll.payroll_period_end}
                     </p>
                   </td>
+                  <td className="px-4 py-3">
+                    <p className="text-sm" style={{ color: "var(--text)" }}>
+                      {payroll.payment_date}
+                    </p>
+                  </td>
+
                   <td className="px-4 py-3">
                     <span
                       className="font-medium text-sm"
@@ -294,15 +427,29 @@ export default function PayrollPage() {
                         className="text-xs font-medium"
                         style={{ color: "var(--primary)" }}
                       >
-                        Edit
+                        {t("PayrollPage.table.edit")}
                       </button>
-                      <button
-                        onClick={() => setDeleteConfirm(payroll)}
-                        className="text-xs font-medium"
-                        style={{ color: "var(--danger)" }}
-                      >
-                        Delete
-                      </button>
+                      <PermissionWrapper permissions={["payrolls.delete"]}>
+                        <button
+                          onClick={() => setDeleteConfirm(payroll)}
+                          className="text-xs font-medium"
+                          style={{ color: "var(--danger)" }}
+                        >
+                          {t("PayrollPage.table.delete")}
+                        </button>
+                      </PermissionWrapper>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedPayrollId(payroll.id);
+                            setShowPrintModal(true);
+                          }}
+                          className="text-xs font-medium"
+                          style={{ color: "var(--success)" }}
+                        >
+                          Print
+                        </button>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -319,7 +466,11 @@ export default function PayrollPage() {
           setShowForm(false);
           setSelectedPayroll(null);
         }}
-        title={selectedPayroll ? "Edit Payroll" : "Create Payroll"}
+        title={
+          selectedPayroll
+            ? t("PayrollPage.modal.editPayroll")
+            : t("PayrollPage.modal.createPayroll")
+        }
         size="lg"
       >
         <PayrollForm
@@ -338,9 +489,31 @@ export default function PayrollPage() {
         isOpen={!!deleteConfirm}
         onClose={() => setDeleteConfirm(null)}
         onConfirm={handleDelete}
-        title="Delete Payroll"
-        message={`Are you sure you want to delete this payroll record for ${deleteConfirm?.employee_name}?`}
+        title={t("PayrollPage.deleteDialog.title")}
+        message={t("PayrollPage.deleteDialog.message", {
+          employee: deleteConfirm?.employee_name,
+        })}
       />
+      <Modal
+        isOpen={showPrintModal}
+        onClose={() => {
+          setShowPrintModal(false);
+          setSelectedPayrollId(null);
+        }}
+        title="Payroll Details"
+        size="xl"
+      >
+        {selectedPayrollId && (
+          <PayrollPrintModal
+            isOpen={showPrintModal}
+            onClose={() => {
+              setShowPrintModal(false);
+              setSelectedPayrollId(null);
+            }}
+            payrollID={selectedPayrollId}
+          />
+        )}
+      </Modal>
     </div>
   );
 }

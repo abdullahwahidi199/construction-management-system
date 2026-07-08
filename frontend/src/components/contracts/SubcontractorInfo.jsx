@@ -1,6 +1,9 @@
 import { Building2, Phone, Mail, User, MapPin } from "lucide-react";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function SubcontractorInfo({ subcontractor }) {
+  const { t } = useLanguage();
+
   return (
     <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6">
       <div className="flex items-center gap-3 mb-6">
@@ -13,33 +16,40 @@ export default function SubcontractorInfo({ subcontractor }) {
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
         <InfoItem
           icon={<User size={18} />}
-          label="Contact Person"
+          label={t("SubcontractorInfo.labels.contact_person")}
           value={subcontractor.contact_person}
         />
 
         <InfoItem
           icon={<Phone size={18} />}
-          label="Phone"
+          label={t("SubcontractorInfo.labels.phone")}
           value={subcontractor.phone}
         />
 
         <InfoItem
           icon={<Mail size={18} />}
-          label="Email"
+          label={t("SubcontractorInfo.labels.email")}
           value={subcontractor.email}
         />
 
         <InfoItem
           icon={<MapPin size={18} />}
-          label="Address"
+          label={t("SubcontractorInfo.labels.address")}
           value={subcontractor.address}
         />
 
-        <InfoItem label="Specialization" value={subcontractor.specialization} />
+        <InfoItem
+          label={t("SubcontractorInfo.labels.specialization")}
+          value={subcontractor.specialization}
+        />
 
         <InfoItem
-          label="Status"
-          value={subcontractor.is_active ? "Active" : "Inactive"}
+          label={t("SubcontractorInfo.labels.status")}
+          value={
+            subcontractor.is_active
+              ? t("SubcontractorInfo.labels.active")
+              : t("SubcontractorInfo.labels.inactive")
+          }
         />
       </div>
     </div>

@@ -1,8 +1,11 @@
+// src/components/contracts/ContractInvoiceDetails.jsx
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import useFetch from "../../hooks/useFetch";
 import instance from "../../api/axiosInstance";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function ContractInvoiceDetails({ id, onClose }) {
+  const { t } = useLanguage();
   // Force refetch after successful upload
   const [refreshKey, setRefreshKey] = useState(0);
   const {
@@ -63,14 +66,14 @@ export default function ContractInvoiceDetails({ id, onClose }) {
       });
       setUploadMessage({
         type: "success",
-        text: "Document uploaded successfully!",
+        text: t("ContractInvoiceDetails.documentUploaded"),
       });
       setRefreshKey((prev) => prev + 1); // Triggers useFetch refetch
     } catch (err) {
       const msg =
         err?.response?.data?.file?.[0] ||
         err?.response?.data?.detail ||
-        "Upload failed";
+        t("ContractInvoiceDetails.uploadFailed");
       setUploadMessage({ type: "error", text: msg });
     } finally {
       setUploading(false);
@@ -83,7 +86,7 @@ export default function ContractInvoiceDetails({ id, onClose }) {
       <p
         style={{ padding: "2rem", color: "var(--muted)", textAlign: "center" }}
       >
-        Loading invoice details...
+        {t("ContractInvoiceDetails.loadingInvoiceDetails")}
       </p>
     );
   if (error)
@@ -91,7 +94,7 @@ export default function ContractInvoiceDetails({ id, onClose }) {
       <p
         style={{ padding: "2rem", color: "var(--danger)", textAlign: "center" }}
       >
-        Error: {error}
+        {t("ContractInvoiceDetails.error")}: {error}
       </p>
     );
   if (!invoiceDetails) return null;
@@ -145,7 +148,8 @@ export default function ContractInvoiceDetails({ id, onClose }) {
               color: "var(--text)",
             }}
           >
-            Invoice {invoiceDetails.invoice_number}
+            {t("ContractInvoiceDetails.invoice")}{" "}
+            {invoiceDetails.invoice_number}
           </h2>
           <button
             onClick={onClose}
@@ -172,34 +176,46 @@ export default function ContractInvoiceDetails({ id, onClose }) {
             marginBottom: "1.5rem",
           }}
         >
-          <DetailItem label="Contract" value={invoiceDetails.contract_number} />
-          <DetailItem label="Project" value={invoiceDetails.project_name} />
           <DetailItem
-            label="Subcontractor"
+            label={t("ContractInvoiceDetails.contract")}
+            value={invoiceDetails.contract_number}
+          />
+          <DetailItem
+            label={t("ContractInvoiceDetails.project")}
+            value={invoiceDetails.project_name}
+          />
+          <DetailItem
+            label={t("ContractInvoiceDetails.subcontractor")}
             value={invoiceDetails.subcontractor_name}
           />
           <DetailItem
-            label="Amount"
+            label={t("ContractInvoiceDetails.amount")}
             value={`$${Number(invoiceDetails.amount).toFixed(2)}`}
           />
           <DetailItem
-            label="Status"
+            label={t("ContractInvoiceDetails.status")}
             value={invoiceDetails.status?.replace("_", " ")}
           />
           <DetailItem
-            label="Invoice Date"
+            label={t("ContractInvoiceDetails.invoiceDate")}
             value={invoiceDetails.invoice_date}
           />
-          <DetailItem label="Due Date" value={invoiceDetails.due_date || "-"} />
+          <DetailItem
+            label={t("ContractInvoiceDetails.dueDate")}
+            value={invoiceDetails.due_date || "-"}
+          />
         </div>
         <div style={{ marginBottom: "1.5rem" }}>
           <DetailItem
-            label="Description"
+            label={t("ContractInvoiceDetails.description")}
             value={invoiceDetails.description || "-"}
           />
         </div>
         <div style={{ marginBottom: "1.5rem" }}>
-          <DetailItem label="Notes" value={invoiceDetails.notes || "-"} />
+          <DetailItem
+            label={t("ContractInvoiceDetails.notes")}
+            value={invoiceDetails.notes || "-"}
+          />
         </div>
 
         {/* Upload Section */}
@@ -211,7 +227,7 @@ export default function ContractInvoiceDetails({ id, onClose }) {
             marginBottom: "0.75rem",
           }}
         >
-          Documents
+          {t("ContractInvoiceDetails.documents")}
         </h3>
 
         <div
@@ -243,7 +259,7 @@ export default function ContractInvoiceDetails({ id, onClose }) {
             <p
               style={{ margin: 0, color: "var(--primary)", fontWeight: "500" }}
             >
-              Uploading...
+              {t("ContractInvoiceDetails.uploading")}
             </p>
           ) : (
             <>
@@ -254,14 +270,14 @@ export default function ContractInvoiceDetails({ id, onClose }) {
                   fontSize: "0.9rem",
                 }}
               >
-                Drag & drop a file here, or{" "}
+                {t("ContractInvoiceDetails.dragDrop")}{" "}
                 <span
                   style={{
                     color: "var(--primary)",
                     textDecoration: "underline",
                   }}
                 >
-                  browse
+                  {t("ContractInvoiceDetails.browse")}
                 </span>
               </p>
               <p
@@ -271,7 +287,7 @@ export default function ContractInvoiceDetails({ id, onClose }) {
                   color: "var(--muted)",
                 }}
               >
-                Supports PDF, DOCX, XLSX, JPG, PNG
+                {t("ContractInvoiceDetails.supportedFiles")}
               </p>
             </>
           )}
@@ -326,7 +342,9 @@ export default function ContractInvoiceDetails({ id, onClose }) {
                     flex: 1,
                   }}
                 >
-                  📄 {doc.file?.split("/").pop() || `Document ${doc.id}`}
+                  📄{" "}
+                  {doc.file?.split("/").pop() ||
+                    `${t("ContractInvoiceDetails.document")} ${doc.id}`}
                 </span>
                 <a
                   href={doc.file}
@@ -343,7 +361,7 @@ export default function ContractInvoiceDetails({ id, onClose }) {
                     border: "1px solid var(--border)",
                   }}
                 >
-                  View / Download
+                  {t("ContractInvoiceDetails.viewDownload")}
                 </a>
               </div>
             ))
@@ -357,7 +375,7 @@ export default function ContractInvoiceDetails({ id, onClose }) {
                 margin: 0,
               }}
             >
-              No documents uploaded yet.
+              {t("ContractInvoiceDetails.noDocuments")}
             </p>
           )}
         </div>

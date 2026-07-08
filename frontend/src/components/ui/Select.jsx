@@ -9,7 +9,7 @@ export default function Select({
 }) {
   return (
     <label className={`block ${className}`}>
-      {label && <div className="mb-1 text-sm text-[var(--muted)]">{label}</div>}
+      {label && <div className="mb-1 text-sm text-[var(--text)]">{label}</div>}
 
       <select
         value={value ?? ""}

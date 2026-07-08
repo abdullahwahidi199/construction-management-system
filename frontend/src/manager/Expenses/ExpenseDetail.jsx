@@ -11,8 +11,14 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { useLanguage } from "../../hooks/useLanguage";
+
+const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
 export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
+  const { t, lang } = useLanguage();
+  const isRTL = RTL_LANGS.includes(lang);
+
   if (!isOpen || !expense) return null;
 
   const formatDate = (dateString) => {
@@ -46,12 +52,15 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-2xl">
+        <div
+          dir={isRTL ? "rtl" : "ltr"}
+          className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-2xl"
+        >
           {/* Header */}
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur-sm px-6 py-4">
             <div>
               <h2 className="text-xl font-semibold text-[var(--text)]">
-                Expense Details
+                {t("ExpenseDetail.title")}
               </h2>
               <p className="text-sm text-[var(--muted)] mt-0.5">
                 #{expense.serial_number} • {expense.project_name}
@@ -63,7 +72,7 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                 className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary)]/90 transition-colors"
               >
                 <FileText className="h-4 w-4" />
-                Edit
+                {t("ExpenseDetail.edit")}
               </button>
               <button
                 onClick={onClose}
@@ -79,10 +88,10 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
             {/* Status & Type Badge */}
             <div className="flex items-center gap-3">
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-3 py-1.5 text-sm font-medium text-blue-600">
-                {expense.expense_type || "General"}
+                {expense.expense_type || t("ExpenseDetail.general")}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-sm font-medium text-emerald-600">
-                Active
+                {t("ExpenseDetail.active")}
               </span>
             </div>
 
@@ -94,10 +103,10 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[var(--muted)] mb-1">
-                    Description
+                    {t("ExpenseDetail.description")}
                   </p>
                   <p className="text-[var(--text)] leading-relaxed">
-                    {expense.description || "No description provided"}
+                    {expense.description || t("ExpenseDetail.noDescription")}
                   </p>
                 </div>
               </div>
@@ -107,20 +116,22 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="rounded-xl border border-[var(--border)] p-4">
                 <p className="text-sm font-medium text-[var(--muted)] mb-3">
-                  Amount in USD
+                  {t("ExpenseDetail.amountUsd")}
                 </p>
                 <p className="text-2xl font-bold text-[var(--text)]">
                   ${parseFloat(expense.amount_usd || 0).toLocaleString()}
                 </p>
                 <div className="mt-2 flex items-center gap-2 text-sm text-[var(--muted)]">
                   <DollarSign className="h-4 w-4" />
-                  <span>Exchange Rate: {expense.exchange_rate}</span>
+                  <span>
+                    {t("ExpenseDetail.exchangeRate")}: {expense.exchange_rate}
+                  </span>
                 </div>
               </div>
 
               <div className="rounded-xl border border-[var(--border)] p-4">
                 <p className="text-sm font-medium text-[var(--muted)] mb-3">
-                  Amount in AFN
+                  {t("ExpenseDetail.amountAfn")}
                 </p>
                 <p className="text-2xl font-bold text-[var(--text)]">
                   ؋{parseFloat(expense.amount_afn || 0).toLocaleString()}
@@ -132,7 +143,7 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="rounded-xl bg-[var(--primary)]/5 border border-[var(--primary)]/20 p-4">
                 <p className="text-sm font-medium text-[var(--primary)] mb-1">
-                  Total in USD
+                  {t("ExpenseDetail.totalUsd")}
                 </p>
                 <p className="text-xl font-bold text-[var(--primary)]">
                   ${parseFloat(expense.total_usd || 0).toLocaleString()}
@@ -141,7 +152,7 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
 
               <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 p-4">
                 <p className="text-sm font-medium text-emerald-600 mb-1">
-                  Total in AFN
+                  {t("ExpenseDetail.totalAfn")}
                 </p>
                 <p className="text-xl font-bold text-emerald-600">
                   ؋{parseFloat(expense.total_afn || 0).toLocaleString()}
@@ -155,7 +166,9 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                 <div className="flex items-center gap-3 text-sm">
                   <Calendar className="h-4 w-4 text-[var(--muted)]" />
                   <div>
-                    <p className="text-[var(--muted)]">Expense Date</p>
+                    <p className="text-[var(--muted)]">
+                      {t("ExpenseDetail.expenseDate")}
+                    </p>
                     <p className="text-[var(--text)] font-medium">
                       {formatDate(expense.expense_date)}
                     </p>
@@ -165,7 +178,9 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                 <div className="flex items-center gap-3 text-sm">
                   <Calendar className="h-4 w-4 text-[var(--muted)]" />
                   <div>
-                    <p className="text-[var(--muted)]">Created</p>
+                    <p className="text-[var(--muted)]">
+                      {t("ExpenseDetail.created")}
+                    </p>
                     <p className="text-[var(--text)] font-medium">
                       {formatDateTime(expense.created_at)}
                     </p>
@@ -177,9 +192,11 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                 <div className="flex items-center gap-3 text-sm">
                   <User className="h-4 w-4 text-[var(--muted)]" />
                   <div>
-                    <p className="text-[var(--muted)]">Paid To</p>
+                    <p className="text-[var(--muted)]">
+                      {t("ExpenseDetail.paidTo")}
+                    </p>
                     <p className="text-[var(--text)] font-medium">
-                      {expense.paid_to || "N/A"}
+                      {expense.paid_to || t("ExpenseDetail.notAvailable")}
                     </p>
                   </div>
                 </div>
@@ -187,7 +204,9 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                 <div className="flex items-center gap-3 text-sm">
                   <RefreshCw className="h-4 w-4 text-[var(--muted)]" />
                   <div>
-                    <p className="text-[var(--muted)]">Updated</p>
+                    <p className="text-[var(--muted)]">
+                      {t("ExpenseDetail.updated")}
+                    </p>
                     <p className="text-[var(--text)] font-medium">
                       {formatDateTime(expense.updated_at)}
                     </p>
@@ -203,7 +222,7 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                   <FileText className="h-5 w-5 text-yellow-600 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-yellow-600 mb-1">
-                      Remarks
+                      {t("ExpenseDetail.remarks")}
                     </p>
                     <p className="text-sm text-[var(--text)]">
                       {expense.remarks}

@@ -16,19 +16,19 @@ export default function ReportSummary({ summary, extraBlocks }) {
   );
 
   return (
-    <div className="mb-6">
-      <div className="grid gap-3.5 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
+    <div className="space-y-6">
+      <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
         {scalarEntries.map(([key, value]) => (
           <div
             key={key}
-            className="bg-card border border-border rounded-xl p-4 flex flex-col gap-1.5"
+            className="bg-card border border-border rounded-lg p-4"
           >
-            <span className="text-xs font-semibold text-muted uppercase tracking-wide">
+            <p className="text-xs font-medium text-muted mb-2">
               {formatLabel(key)}
-            </span>
-            <span className="text-2xl font-bold text-text">
+            </p>
+            <p className="text-2xl font-semibold text-text">
               {formatValue(value)}
-            </span>
+            </p>
           </div>
         ))}
       </div>

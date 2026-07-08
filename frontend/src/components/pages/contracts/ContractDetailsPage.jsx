@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
+  ArrowRight,
   DollarSign,
   Calendar,
   FileText,
@@ -25,15 +26,7 @@ import VariationFormModal from "../../contracts/VariationFormModal";
 import DocumentTable from "../../contracts/DocumentTable";
 import DocumentUploadModal from "../../contracts/DocumentUploadModal";
 import ContractInvoicesPage from "./ContractInvoicesPage";
-
-const TABS = [
-  { key: "info", label: "Information", icon: FileText },
-  { key: "financial", label: "Financial", icon: DollarSign },
-  { key: "invoices", label: "Invoices", icon: DollarSign },
-  { key: "payments", label: "Payments", icon: TrendingUp },
-  { key: "variations", label: "Variations", icon: GitBranch },
-  { key: "documents", label: "Documents", icon: FileText },
-];
+import { useLanguage } from "../../../hooks/useLanguage";
 
 export default function ContractDetailsPage() {
   const { id } = useParams();
@@ -52,6 +45,42 @@ export default function ContractDetailsPage() {
 
   const [showDocUpload, setShowDocUpload] = useState(false);
   const [deleteDoc, setDeleteDoc] = useState(null);
+  const { t, lang } = useLanguage();
+  const isRTL = lang === "dr" || lang === "ps";
+  const BackIcon = isRTL ? ArrowRight : ArrowLeft;
+
+  const TABS = [
+    {
+      key: "info",
+      label: t("ContractDetailsPage.information"),
+      icon: FileText,
+    },
+    {
+      key: "financial",
+      label: t("ContractDetailsPage.financial"),
+      icon: DollarSign,
+    },
+    {
+      key: "invoices",
+      label: t("ContractDetailsPage.invoices"),
+      icon: DollarSign,
+    },
+    {
+      key: "payments",
+      label: t("ContractDetailsPage.payments"),
+      icon: TrendingUp,
+    },
+    {
+      key: "variations",
+      label: t("ContractDetailsPage.variations"),
+      icon: GitBranch,
+    },
+    {
+      key: "documents",
+      label: t("ContractDetailsPage.documents"),
+      icon: FileText,
+    },
+  ];
 
   // Fetch contract detail
   const {
@@ -63,7 +92,8 @@ export default function ContractDetailsPage() {
   const { postData, loading: posting } = usePost();
   const [actionLoading, setActionLoading] = useState(false);
 
-  const formatDate = (d) => (d ? new Date(d).toLocaleDateString() : "—");
+  const formatDate = (d) =>
+    d ? new Date(d).toLocaleDateString() : t("ContractDetailsPage.noData");
 
   const fmt = new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
@@ -151,6 +181,25 @@ export default function ContractDetailsPage() {
       console.error(err);
     }
   };
+  const handleDownloadContractPDF = async () => {
+    try {
+      const response = await instance.get(`contracts/${id}/export-pdf/`, {
+        responseType: "blob",
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `contract_${contract.contract_number}.pdf`);
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("PDF download failed:", err);
+    }
+  };
 
   // --- Documents ---
   const handleUploadDocument = async (formData) => {
@@ -193,11 +242,11 @@ export default function ContractDetailsPage() {
           onClick={() => navigate("/manager/contracts")}
           className="flex items-center gap-2 text-[var(--muted)] hover:text-[var(--text)] transition-colors"
         >
-          <ArrowLeft size={16} /> Back to Contracts
+          <BackIcon size={16} /> {t("ContractDetailsPage.backToContracts")}
         </button>
         <Card className="p-12 text-center">
           <p className="text-[var(--danger)]">
-            Failed to load contract details.
+            {t("ContractDetailsPage.failedToLoadContractDetails")}
           </p>
         </Card>
       </div>
@@ -211,7 +260,7 @@ export default function ContractDetailsPage() {
         onClick={() => navigate("/manager/contracts")}
         className="flex items-center gap-2 text-[var(--muted)] hover:text-[var(--text)] transition-colors text-sm"
       >
-        <ArrowLeft size={16} /> Back to Contracts
+        <BackIcon size={16} /> {t("ContractDetailsPage.backToContracts")}
       </button>
 
       {/* Header */}
@@ -228,10 +277,15 @@ export default function ContractDetailsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[var(--muted)]">Progress:</span>
+          <span className="text-sm text-[var(--muted)]">
+            {t("ContractDetailsPage.progress")}:
+          </span>
           <div className="w-32">
             <ProgressBar value={contract.completion_percentage} size="sm" />
           </div>
+          <Button variant="secondary" onClick={handleDownloadContractPDF}>
+            {t("ContractDetailsPage.downloadPdf")}
+          </Button>
         </div>
       </div>
 
@@ -262,31 +316,48 @@ export default function ContractDetailsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="p-6 space-y-4">
             <h3 className="text-lg font-semibold text-[var(--text)]">
-              Contract Details
+              {t("ContractDetailsPage.contractDetails")}
             </h3>
             <div className="space-y-3 text-sm">
-              <Row label="Project" value={contract.project_name} />
-              <Row label="Subcontractor" value={contract.subcontractor.name} />
               <Row
-                label="Scope of Work"
-                value={contract.scope_of_work || "—"}
+                label={t("ContractDetailsPage.project")}
+                value={contract.project_name}
               />
-              <Row label="Notes" value={contract.notes || "—"} />
+              <Row
+                label={t("ContractDetailsPage.subcontractor")}
+                value={contract.subcontractor.name}
+              />
+              <Row
+                label={t("ContractDetailsPage.scopeOfWork")}
+                value={
+                  contract.scope_of_work || t("ContractDetailsPage.noData")
+                }
+              />
+              <Row
+                label={t("ContractDetailsPage.notes")}
+                value={contract.notes || t("ContractDetailsPage.noData")}
+              />
             </div>
           </Card>
           <Card className="p-6 space-y-4">
             <h3 className="text-lg font-semibold text-[var(--text)]">
-              Timeline
+              {t("ContractDetailsPage.timeline")}
             </h3>
             <div className="space-y-3 text-sm">
-              <Row label="Start Date" value={formatDate(contract.start_date)} />
-              <Row label="End Date" value={formatDate(contract.end_date)} />
               <Row
-                label="Adjusted End Date"
+                label={t("ContractDetailsPage.startDate")}
+                value={formatDate(contract.start_date)}
+              />
+              <Row
+                label={t("ContractDetailsPage.endDate")}
+                value={formatDate(contract.end_date)}
+              />
+              <Row
+                label={t("ContractDetailsPage.adjustedEndDate")}
                 value={formatDate(contract.adjusted_end_date)}
               />
               <Row
-                label="Completion"
+                label={t("ContractDetailsPage.completion")}
                 value={`${contract.completion_percentage}%`}
               />
             </div>
@@ -304,27 +375,27 @@ export default function ContractDetailsPage() {
           />
           <Card className="p-6">
             <h3 className="text-lg font-semibold text-[var(--text)] mb-4">
-              Financial Breakdown
+              {t("ContractDetailsPage.financialBreakdown")}
             </h3>
             <div className="space-y-3 text-sm">
               <Row
-                label="Original Contract Value"
+                label={t("ContractDetailsPage.originalContractValue")}
                 value={`${contract.currency}${fmt.format(contract.contract_value)}`}
               />
               <Row
-                label="Retention Percentage"
+                label={t("ContractDetailsPage.retentionPercentage")}
                 value={`${contract.retention_percentage}%`}
               />
               <Row
-                label="Retention Amount"
+                label={t("ContractDetailsPage.retentionAmount")}
                 value={`${contract.currency}${fmt.format(contract.retention_amount)}`}
               />
               <Row
-                label="Total Variation Amount"
+                label={t("ContractDetailsPage.totalVariationAmount")}
                 value={`${contract.currency}${fmt.format(contract.total_variation_amount || 0)}`}
               />
               <Row
-                label="Adjusted Contract Value"
+                label={t("ContractDetailsPage.adjustedContractValue")}
                 value={`${contract.currency}${fmt.format(contract.adjusted_contract_value || 0)}`}
                 highlight
               />
@@ -344,7 +415,7 @@ export default function ContractDetailsPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-[var(--text)]">
-              Payments
+              {t("ContractDetailsPage.payments")}
             </h3>
             {contract.status === "active" && (
               <Button
@@ -354,7 +425,7 @@ export default function ContractDetailsPage() {
                   setShowPaymentForm(true);
                 }}
               >
-                Add Payment
+                {t("ContractDetailsPage.addPayment")}
               </Button>
             )}
           </div>
@@ -386,8 +457,8 @@ export default function ContractDetailsPage() {
             onClose={() => setDeletePayment(null)}
             onConfirm={handleDeletePayment}
             loading={actionLoading}
-            title="Delete Payment"
-            message="Are you sure you want to delete this payment record?"
+            title={t("ContractDetailsPage.deletePayment")}
+            message={t("ContractDetailsPage.deletePaymentMessage")}
           />
         </div>
       )}
@@ -397,7 +468,7 @@ export default function ContractDetailsPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-[var(--text)]">
-              Variations / Change Orders
+              {t("ContractDetailsPage.variationsChangeOrders")}
             </h3>
             <Button
               variant="primary"
@@ -406,7 +477,7 @@ export default function ContractDetailsPage() {
                 setShowVariationForm(true);
               }}
             >
-              Add Variation
+              {t("ContractDetailsPage.addVariation")}
             </Button>
           </div>
           <VariationTable
@@ -437,8 +508,8 @@ export default function ContractDetailsPage() {
             onClose={() => setDeleteVariation(null)}
             onConfirm={handleDeleteVariation}
             loading={actionLoading}
-            title="Delete Variation"
-            message="Are you sure you want to delete this variation?"
+            title={t("ContractDetailsPage.deleteVariation")}
+            message={t("ContractDetailsPage.deleteVariationMessage")}
           />
         </div>
       )}
@@ -448,10 +519,10 @@ export default function ContractDetailsPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-[var(--text)]">
-              Documents
+              {t("ContractDetailsPage.documents")}
             </h3>
             <Button variant="primary" onClick={() => setShowDocUpload(true)}>
-              Upload Document
+              {t("ContractDetailsPage.uploadDocument")}
             </Button>
           </div>
           <DocumentTable
@@ -469,8 +540,10 @@ export default function ContractDetailsPage() {
             onClose={() => setDeleteDoc(null)}
             onConfirm={handleDeleteDoc}
             loading={actionLoading}
-            title="Delete Document"
-            message={`Are you sure you want to delete "${deleteDoc?.title}"?`}
+            title={t("ContractDetailsPage.deleteDocument")}
+            message={t("ContractDetailsPage.deleteDocumentMessage", {
+              title: deleteDoc?.title,
+            })}
           />
         </div>
       )}

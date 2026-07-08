@@ -1,6 +1,7 @@
 // components/dashboard/PayrollSummary.jsx
 
 import Card from "../ui/Card";
+import { useLanguage } from "../../hooks/useLanguage";
 
 const formatMoney = (val, currency = "USD") => {
   if (val === null || val === undefined) return `${currency} 0`;
@@ -30,6 +31,8 @@ const PAYMENT_ICONS = {
 export default function PayrollSummary({ data }) {
   if (!data) return null;
 
+  const { t } = useLanguage();
+
   const current = data.current_month || {};
   const previous = data.previous_month || {};
 
@@ -43,10 +46,12 @@ export default function PayrollSummary({ data }) {
 
   return (
     <Card
-      title="Payroll Summary"
+      title={t("payrollSummary.title")}
       right={
         <span className="text-xs text-[var(--muted)]">
-          {current.count || 0} payrolls this month
+          {t("payrollSummary.payrollsThisMonth", {
+            count: current.count || 0,
+          })}
         </span>
       }
     >
@@ -54,19 +59,24 @@ export default function PayrollSummary({ data }) {
         {/* CURRENT vs PREVIOUS */}
         <div className="grid grid-cols-2 gap-4">
           <div className="p-4 rounded-lg bg-[var(--bg)] border border-[var(--border)]">
-            <p className="text-xs text-[var(--muted)] mb-1">This Month (Net)</p>
+            <p className="text-xs text-[var(--muted)] mb-1">
+              {t("payrollSummary.thisMonthNet")}
+            </p>
 
             <div className="text-xl font-bold text-[var(--text)]">
               {renderDual(current.net_usd, current.net_afn)}
             </div>
 
             <div className="text-xs text-[var(--muted)] mt-1">
-              Gross: {renderDual(current.gross_usd, current.gross_afn)}
+              {t("payrollSummary.gross")}:{" "}
+              {renderDual(current.gross_usd, current.gross_afn)}
             </div>
           </div>
 
           <div className="p-4 rounded-lg bg-[var(--bg)] border border-[var(--border)]">
-            <p className="text-xs text-[var(--muted)] mb-1">Last Month (Net)</p>
+            <p className="text-xs text-[var(--muted)] mb-1">
+              {t("payrollSummary.lastMonthNet")}
+            </p>
 
             <div className="text-xl font-bold text-[var(--muted)]">
               {renderDual(previous.net_usd, previous.net_afn)}
@@ -79,7 +89,8 @@ export default function PayrollSummary({ data }) {
                   color: changeNet > 0 ? "var(--danger)" : "var(--success)",
                 }}
               >
-                {changeNet > 0 ? "↑" : "↓"} {Math.abs(changeNet)}% change
+                {changeNet > 0 ? "↑" : "↓"} {Math.abs(changeNet)}%{" "}
+                {t("payrollSummary.change")}
               </p>
             )}
           </div>
@@ -89,25 +100,25 @@ export default function PayrollSummary({ data }) {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             {
-              label: "Deductions",
+              label: t("payrollSummary.tax"),
               usd: current.total_deductions_usd,
               afn: current.total_deductions_afn,
               color: "var(--danger)",
             },
             {
-              label: "Tax",
+              label: t("payrollSummary.tax"),
               usd: current.total_tax_usd,
               afn: current.total_tax_afn,
               color: "var(--warning)",
             },
             {
-              label: "Bonus",
+              label: t("payrollSummary.bonus"),
               usd: current.total_bonus_usd,
               afn: current.total_bonus_afn,
               color: "var(--success)",
             },
             {
-              label: "Overtime",
+              label: t("payrollSummary.overtime"),
               usd: current.total_overtime_usd,
               afn: current.total_overtime_afn,
               color: "var(--primary)",
@@ -129,7 +140,7 @@ export default function PayrollSummary({ data }) {
         {data.payment_method_breakdown?.length > 0 && (
           <div>
             <h4 className="text-sm font-medium text-[var(--muted)] mb-3">
-              Payment Methods
+              {t("payrollSummary.paymentMethods")}
             </h4>
 
             <div className="space-y-2">
@@ -159,7 +170,7 @@ export default function PayrollSummary({ data }) {
         {data.recent_payrolls?.length > 0 && (
           <div className="border-t border-[var(--border)] pt-4">
             <h4 className="text-sm font-medium text-[var(--muted)] mb-3">
-              Recent Payrolls
+              {t("payrollSummary.recentPayrolls")}
             </h4>
 
             <div className="space-y-2">
@@ -182,7 +193,8 @@ export default function PayrollSummary({ data }) {
                       {formatMoney(pr.net_pay, pr.currency)}
                     </div>
                     <div className="text-xs text-[var(--muted)]">
-                      Gross: {formatMoney(pr.gross_pay, pr.currency)}
+                      {t("payrollSummary.gross")}:{" "}
+                      {formatMoney(pr.gross_pay, pr.currency)}
                     </div>
                   </div>
                 </div>

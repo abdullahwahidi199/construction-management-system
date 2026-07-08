@@ -12,7 +12,7 @@ export default function ReportFilters({
   };
 
   const inputClass =
-    "px-3 py-2 border border-border rounded-lg bg-bg text-text text-sm outline-none focus:border-primary transition";
+    "h-9 px-3 border border-border rounded-md bg-bg text-text text-sm outline-none transition-colors focus:border-primary";
 
   return (
     <form
@@ -20,12 +20,12 @@ export default function ReportFilters({
         e.preventDefault();
         onApply();
       }}
-      className="bg-card border border-border rounded-xl p-4 mb-6"
+      className="bg-card border border-border rounded-lg p-4 mb-6"
     >
-      <div className="grid gap-3.5 grid-cols-[repeat(auto-fill,minmax(180px,1fr))]">
+      <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(180px,1fr))]">
         {filters.map((field) => (
           <div className="flex flex-col gap-1.5" key={field.name}>
-            <label className="text-xs font-semibold text-muted">
+            <label className="text-xs font-medium text-muted">
               {field.label}
             </label>
 
@@ -54,17 +54,17 @@ export default function ReportFilters({
         ))}
       </div>
 
-      <div className="flex gap-2.5 mt-4">
+      <div className="flex gap-2 mt-4 pt-4 border-t border-border">
         <button
           type="submit"
-          className="px-4 py-2.5 rounded-lg bg-primary text-white text-sm font-semibold transition active:scale-95"
+          className="h-9 px-4 rounded-md bg-primary text-white text-sm font-medium transition-colors hover:opacity-90"
         >
-          Apply Filters
+          Apply
         </button>
         <button
           type="button"
           onClick={onReset}
-          className="px-4 py-2.5 rounded-lg border border-border text-text text-sm font-semibold transition hover:bg-hover active:scale-95"
+          className="h-9 px-4 rounded-md border border-border text-text text-sm font-medium transition-colors hover:bg-hover"
         >
           Reset
         </button>

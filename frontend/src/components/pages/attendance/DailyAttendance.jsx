@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
 import useAttendance from "../../../hooks/useAttendance";
+import { useLanguage } from "../../../hooks/useLanguage";
 
 function DailyAttendance() {
   const { fetchDailyAttendance, loading, error } = useAttendance();
+
+  const { t, language } = useLanguage();
+
+  // RTL languages (Dari / Pashto)
+  const isRTL = ["fa", "ps", "dari", "pashto"].includes(language);
+
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0],
   );
@@ -50,6 +57,14 @@ function DailyAttendance() {
     };
     const style = styles[status] || styles.present;
     const isDark = document.documentElement.classList.contains("dark");
+
+    const statusLabels = {
+      present: t("DailyAttendance.status.present"),
+      absent: t("DailyAttendance.status.absent"),
+      half_day: t("DailyAttendance.status.halfDay"),
+      leave: t("DailyAttendance.status.leave"),
+    };
+
     return (
       <span
         className="px-3 py-1 rounded-full text-xs font-semibold capitalize"
@@ -58,25 +73,27 @@ function DailyAttendance() {
           color: isDark ? style.darkColor : style.color,
         }}
       >
-        {status}
+        {statusLabels[status] || status}
       </span>
     );
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={isRTL ? "rtl" : "ltr"}>
       <div
         className="rounded-lg border p-6"
         style={{ backgroundColor: "var(--card)", borderColor: "var(--border)" }}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Daily Attendance View</h2>
+          <h2 className="text-xl font-semibold">
+            {t("DailyAttendance.title")}
+          </h2>
           <div>
             <label
               className="block text-sm font-medium mb-2"
               style={{ color: "var(--muted)" }}
             >
-              Select Date
+              {t("DailyAttendance.selectDate")}
             </label>
             <input
               type="date"
@@ -100,7 +117,7 @@ function DailyAttendance() {
 
         {loading ? (
           <div className="text-center py-12" style={{ color: "var(--muted)" }}>
-            Loading...
+            {t("DailyAttendance.loading")}
           </div>
         ) : data ? (
           <div>
@@ -114,7 +131,7 @@ function DailyAttendance() {
                 }}
               >
                 <div className="text-sm" style={{ color: "var(--muted)" }}>
-                  Total Marked
+                  {t("DailyAttendance.totalMarked")}
                 </div>
                 <div className="text-3xl font-bold">{data.total_marked}</div>
               </div>
@@ -126,7 +143,7 @@ function DailyAttendance() {
                 }}
               >
                 <div className="text-sm" style={{ color: "var(--muted)" }}>
-                  Unmarked
+                  {t("DailyAttendance.unmarked")}
                 </div>
                 <div
                   className="text-3xl font-bold"
@@ -143,7 +160,7 @@ function DailyAttendance() {
                 }}
               >
                 <div className="text-sm" style={{ color: "var(--muted)" }}>
-                  Present
+                  {t("DailyAttendance.present")}
                 </div>
                 <div
                   className="text-3xl font-bold"
@@ -160,7 +177,7 @@ function DailyAttendance() {
                 }}
               >
                 <div className="text-sm" style={{ color: "var(--muted)" }}>
-                  Absent
+                  {t("DailyAttendance.absent")}
                 </div>
                 <div
                   className="text-3xl font-bold"
@@ -177,7 +194,7 @@ function DailyAttendance() {
                 }}
               >
                 <div className="text-sm" style={{ color: "var(--muted)" }}>
-                  Leave
+                  {t("DailyAttendance.leave")}
                 </div>
                 <div
                   className="text-3xl font-bold"
@@ -190,49 +207,53 @@ function DailyAttendance() {
 
             {/* Marked Employees */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-4">Marked Employees</h3>
+              <h3 className="text-lg font-semibold mb-4">
+                {t("DailyAttendance.markedEmployees")}
+              </h3>
               <div
                 className="rounded-lg border overflow-hidden"
                 style={{ borderColor: "var(--border)" }}
+                dir={isRTL ? "rtl" : "ltr"}
               >
                 <table className="w-full">
                   <thead>
                     <tr style={{ backgroundColor: "var(--card)" }}>
                       <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase"
+                        className="px-6 py-3 text-start text-xs font-medium uppercase"
                         style={{ color: "var(--muted)" }}
                       >
-                        Employee
+                        {t("DailyAttendance.employee")}
                       </th>
                       <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase"
+                        className="px-6 py-3 text-start text-xs font-medium uppercase"
                         style={{ color: "var(--muted)" }}
                       >
-                        Status
+                        {t("DailyAttendance.status.present") &&
+                          t("DailyAttendance.employee")}
                       </th>
                       <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase"
+                        className="px-6 py-3 text-start text-xs font-medium uppercase"
                         style={{ color: "var(--muted)" }}
                       >
-                        Check In
+                        {t("DailyAttendance.checkIn")}
                       </th>
                       <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase"
+                        className="px-6 py-3 text-start text-xs font-medium uppercase"
                         style={{ color: "var(--muted)" }}
                       >
-                        Check Out
+                        {t("DailyAttendance.checkOut")}
                       </th>
                       <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase"
+                        className="px-6 py-3 text-start text-xs font-medium uppercase"
                         style={{ color: "var(--muted)" }}
                       >
-                        Overtime
+                        {t("DailyAttendance.overtime")}
                       </th>
                       <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase"
+                        className="px-6 py-3 text-start text-xs font-medium uppercase"
                         style={{ color: "var(--muted)" }}
                       >
-                        Note
+                        {t("DailyAttendance.note")}
                       </th>
                     </tr>
                   </thead>
@@ -260,16 +281,16 @@ function DailyAttendance() {
                           {getStatusBadge(record.status)}
                         </td>
                         <td className="px-6 py-4 text-sm">
-                          {record.check_in || "-"}
+                          {record.check_in || t("DailyAttendance.empty")}
                         </td>
                         <td className="px-6 py-4 text-sm">
-                          {record.check_out || "-"}
+                          {record.check_out || t("DailyAttendance.empty")}
                         </td>
                         <td className="px-6 py-4 text-sm">
                           {record.overtime_hours || 0}h
                         </td>
                         <td className="px-6 py-4 text-sm max-w-xs truncate">
-                          {record.note || "-"}
+                          {record.note || t("DailyAttendance.empty")}
                         </td>
                       </tr>
                     ))}
@@ -282,32 +303,35 @@ function DailyAttendance() {
             {data.unmarked_employees.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold mb-4">
-                  Unmarked Employees ({data.unmarked_employees.length})
+                  {t("DailyAttendance.unmarkedCount", {
+                    count: data.unmarked_employees.length,
+                  })}
                 </h3>
                 <div
                   className="rounded-lg border overflow-hidden"
                   style={{ borderColor: "var(--border)" }}
+                  dir={isRTL ? "rtl" : "ltr"}
                 >
                   <table className="w-full">
                     <thead>
                       <tr style={{ backgroundColor: "var(--card)" }}>
                         <th
-                          className="px-6 py-3 text-left text-xs font-medium uppercase"
+                          className="px-6 py-3 text-start text-xs font-medium uppercase"
                           style={{ color: "var(--muted)" }}
                         >
-                          Employee ID
+                          {t("DailyAttendance.employeeId")}
                         </th>
                         <th
-                          className="px-6 py-3 text-left text-xs font-medium uppercase"
+                          className="px-6 py-3 text-start text-xs font-medium uppercase"
                           style={{ color: "var(--muted)" }}
                         >
-                          Name
+                          {t("DailyAttendance.name")}
                         </th>
                         <th
-                          className="px-6 py-3 text-left text-xs font-medium uppercase"
+                          className="px-6 py-3 text-start text-xs font-medium uppercase"
                           style={{ color: "var(--muted)" }}
                         >
-                          Department
+                          {t("DailyAttendance.department")}
                         </th>
                       </tr>
                     </thead>

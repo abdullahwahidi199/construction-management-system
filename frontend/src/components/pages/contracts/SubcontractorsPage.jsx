@@ -11,24 +11,44 @@ import Button from "../../ui/Button";
 import DeleteConfirmModal from "../../ui/DeleteConfirmModal";
 import SubcontractorTable from "../../contracts/SubcontractorTable";
 import SubcontractorFormModal from "../../contracts/SubcontractorFormModal";
-
-const SPECIALIZATION_OPTIONS = [
-  { value: "", label: "All Specializations" },
-  { value: "concrete", label: "Concrete Works" },
-  { value: "steel", label: "Steel Works" },
-  { value: "electrical", label: "Electrical Works" },
-  { value: "plumbing", label: "Plumbing Works" },
-  { value: "finishing", label: "Finishing Works" },
-  { value: "excavation", label: "Excavation Works" },
-  { value: "hvac", label: "HVAC" },
-  { value: "landscaping", label: "Landscaping" },
-  { value: "other", label: "Other" },
-];
+import { useLanguage } from "../../../hooks/useLanguage";
 
 export default function SubcontractorsPage() {
   const navigate = useNavigate();
   const { page, pageSize, nextPage, prevPage, setPage } = usePagination();
   const { postData, loading: posting } = usePost();
+  const { t } = useLanguage();
+
+  const SPECIALIZATION_OPTIONS = [
+    { value: "", label: t("SubcontractorsPage.filters.specialization_all") },
+    {
+      value: "concrete",
+      label: t("SubcontractorsPage.specializations.concrete"),
+    },
+    { value: "steel", label: t("SubcontractorsPage.specializations.steel") },
+    {
+      value: "electrical",
+      label: t("SubcontractorsPage.specializations.electrical"),
+    },
+    {
+      value: "plumbing",
+      label: t("SubcontractorsPage.specializations.plumbing"),
+    },
+    {
+      value: "finishing",
+      label: t("SubcontractorsPage.specializations.finishing"),
+    },
+    {
+      value: "excavation",
+      label: t("SubcontractorsPage.specializations.excavation"),
+    },
+    { value: "hvac", label: t("SubcontractorsPage.specializations.hvac") },
+    {
+      value: "landscaping",
+      label: t("SubcontractorsPage.specializations.landscaping"),
+    },
+    { value: "other", label: t("SubcontractorsPage.specializations.other") },
+  ];
 
   const [search, setSearch] = useState("");
   const [specFilter, setSpecFilter] = useState("");
@@ -107,10 +127,10 @@ export default function SubcontractorsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text)]">
-            Subcontractors
+            {t("SubcontractorsPage.title")}
           </h1>
           <p className="text-sm text-[var(--muted)] mt-1">
-            Manage subcontractor companies and their details
+            {t("SubcontractorsPage.subtitle")}
           </p>
         </div>
         <Button
@@ -121,7 +141,7 @@ export default function SubcontractorsPage() {
           }}
         >
           <Plus size={16} className="mr-1" />
-          New Subcontractor
+          {t("SubcontractorsPage.actions.new")}
         </Button>
       </div>
 
@@ -140,7 +160,7 @@ export default function SubcontractorsPage() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              placeholder="Search by name, email, tax number..."
+              placeholder={t("SubcontractorsPage.filters.search_placeholder")}
               className="w-full pl-9 pr-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
             />
           </div>
@@ -166,9 +186,15 @@ export default function SubcontractorsPage() {
             }}
             className="px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
           >
-            <option value="">All Status</option>
-            <option value="true">Active</option>
-            <option value="false">Inactive</option>
+            <option value="">
+              {t("SubcontractorsPage.filters.status_all")}
+            </option>
+            <option value="true">
+              {t("SubcontractorsPage.filters.active")}
+            </option>
+            <option value="false">
+              {t("SubcontractorsPage.filters.inactive")}
+            </option>
           </select>
           {hasFilters && (
             <button
@@ -181,7 +207,7 @@ export default function SubcontractorsPage() {
               className="flex items-center gap-1 px-3 py-2 text-sm text-[var(--danger)] hover:bg-[var(--danger)]/10 rounded-lg transition-colors"
             >
               <X size={14} />
-              Clear
+              {t("SubcontractorsPage.actions.clear_filters")}
             </button>
           )}
         </div>
@@ -189,7 +215,7 @@ export default function SubcontractorsPage() {
 
       {error && (
         <div className="bg-[var(--danger)]/10 border border-[var(--danger)]/20 rounded-xl p-4 text-sm text-[var(--danger)]">
-          Failed to load subcontractors.
+          {t("SubcontractorsPage.messages.error_load")}
         </div>
       )}
 
@@ -205,18 +231,19 @@ export default function SubcontractorsPage() {
       {totalCount > pageSize && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-[var(--muted)]">
-            Showing {(page - 1) * pageSize + 1}-
-            {Math.min(page * pageSize, totalCount)} of {totalCount}
+            {t("SubcontractorsPage.pagination.showing")}{" "}
+            {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, totalCount)}{" "}
+            {t("SubcontractorsPage.pagination.of")} {totalCount}
           </p>
           <div className="flex items-center gap-2">
             <Button variant="secondary" onClick={prevPage} disabled={!hasPrev}>
-              Previous
+              {t("SubcontractorsPage.pagination.previous")}
             </Button>
             <span className="text-sm text-[var(--muted)] px-2">
               {page} / {totalPages}
             </span>
             <Button variant="secondary" onClick={nextPage} disabled={!hasNext}>
-              Next
+              {t("SubcontractorsPage.pagination.next")}
             </Button>
           </div>
         </div>
@@ -238,8 +265,10 @@ export default function SubcontractorsPage() {
         onClose={() => setDeletingSub(null)}
         onConfirm={handleDelete}
         loading={deleteLoading}
-        title="Delete Subcontractor"
-        message={`Are you sure you want to delete "${deletingSub?.name}"? This cannot be undone.`}
+        title={t("SubcontractorsPage.delete.title")}
+        message={t("SubcontractorsPage.delete.message", {
+          name: deletingSub?.name,
+        })}
       />
     </div>
   );

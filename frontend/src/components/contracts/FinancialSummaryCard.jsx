@@ -8,6 +8,7 @@ import {
   BadgeDollarSign,
   Shield,
 } from "lucide-react";
+import { useLanguage } from "../../hooks/useLanguage";
 
 const formatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -46,20 +47,22 @@ function SummaryItem({
 }
 
 export default function FinancialSummaryCard({ summary, currency }) {
+  const { t } = useLanguage();
+
   if (!summary) return null;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <SummaryItem
         icon={DollarSign}
-        label="Original Contract Value"
+        label={t("FinancialSummaryCard.originalContractValue")}
         value={summary.original_contract_value}
         currency={currency}
         color="var(--primary)"
       />
       <SummaryItem
         icon={TrendingUp}
-        label="Total Variation Amount"
+        label={t("FinancialSummaryCard.totalVariationAmount")}
         value={summary.total_variation_amount}
         currency={currency}
         color={
@@ -70,35 +73,35 @@ export default function FinancialSummaryCard({ summary, currency }) {
       />
       <SummaryItem
         icon={BadgeDollarSign}
-        label="Adjusted Contract Value"
+        label={t("FinancialSummaryCard.adjustedContractValue")}
         value={summary.adjusted_contract_value}
         currency={currency}
         color="var(--primary)"
       />
       <SummaryItem
         icon={Wallet}
-        label="Total Paid"
+        label={t("FinancialSummaryCard.totalPaid")}
         value={summary.total_paid}
         currency={currency}
         color="var(--success)"
       />
       <SummaryItem
         icon={TrendingDown}
-        label="Remaining Amount"
+        label={t("FinancialSummaryCard.remainingAmount")}
         value={summary.remaining_amount}
         color="var(--danger)"
         currency={currency}
       />
       <SummaryItem
         icon={Shield}
-        label="Retention Balance"
+        label={t("FinancialSummaryCard.retentionBalance")}
         value={summary.retention_balance}
         currency={currency}
         color="#f59e0b"
       />
       <SummaryItem
         icon={BadgeDollarSign}
-        label="Total Invoiced"
+        label={t("FinancialSummaryCard.totalInvoiced")}
         value={summary.total_invoiced}
         currency={currency}
         color="var(--primary)"

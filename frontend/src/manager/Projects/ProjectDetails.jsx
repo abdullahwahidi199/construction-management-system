@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
+  ArrowRight,
   Pencil,
   Trash2,
   MapPin,
@@ -24,7 +25,10 @@ import {
 import instance from "../../api/axiosInstance";
 import ProjectEditView from "../../components/reusableComponents/ProjectEditView";
 import DeleteConfirmModal from "../../components/ui/DeleteConfirmModal";
-const getStatusConfig = (status) => {
+import Button from "../../components/ui/Button";
+import PermissionWrapper from "../../auth/PermissionWrapper";
+import { useLanguage } from "../../hooks/useLanguage";
+const getStatusConfig = (status, t) => {
   const s = status?.toLowerCase();
   if (s === "active" || s === "in progress")
     return {
@@ -33,7 +37,7 @@ const getStatusConfig = (status) => {
       dot: "bg-emerald-500",
       border: "border-emerald-500/20",
       icon: TrendingUp,
-      label: "In Progress",
+      label: t("ProjectDetails.status.inProgress"),
     };
   if (s === "completed")
     return {
@@ -42,7 +46,7 @@ const getStatusConfig = (status) => {
       dot: "bg-blue-500",
       border: "border-blue-500/20",
       icon: CheckCircle2,
-      label: "Completed",
+      label: t("ProjectDetails.status.completed"),
     };
   if (s === "planning")
     return {
@@ -51,7 +55,7 @@ const getStatusConfig = (status) => {
       dot: "bg-violet-500",
       border: "border-violet-500/20",
       icon: FileText,
-      label: "Planning",
+      label: t("ProjectDetails.status.planning"),
     };
   if (s === "pending" || s === "on hold" || s === "hold")
     return {
@@ -60,7 +64,7 @@ const getStatusConfig = (status) => {
       dot: "bg-amber-500",
       border: "border-amber-500/20",
       icon: Timer,
-      label: "On Hold",
+      label: t("ProjectDetails.status.onHold"),
     };
   if (s === "cancelled")
     return {
@@ -69,7 +73,7 @@ const getStatusConfig = (status) => {
       dot: "bg-red-500",
       border: "border-red-500/20",
       icon: AlertCircle,
-      label: "Cancelled",
+      label: t("ProjectDetails.status.cancelled"),
     };
   return {
     bg: "bg-[var(--hover)]",
@@ -77,7 +81,7 @@ const getStatusConfig = (status) => {
     dot: "bg-[var(--muted)]",
     border: "border-[var(--border)]",
     icon: Clock,
-    label: status || "Unknown",
+    label: status || t("ProjectDetails.status.unknown"),
   };
 };
 
@@ -101,17 +105,26 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-const formatRelativeDate = (dateString) => {
+const formatRelativeDate = (dateString, t) => {
   if (!dateString) return null;
+
   const date = new Date(dateString);
   const now = new Date();
   const diffMs = date - now;
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDays < 0) return `${Math.abs(diffDays)} days ago`;
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Tomorrow";
-  return `In ${diffDays} days`;
+  if (diffDays < 0)
+    return t("ProjectDetails.relativeDate.daysAgo", {
+      count: Math.abs(diffDays),
+    });
+
+  if (diffDays === 0) return t("ProjectDetails.relativeDate.today");
+
+  if (diffDays === 1) return t("ProjectDetails.relativeDate.tomorrow");
+
+  return t("ProjectDetails.relativeDate.inDays", {
+    count: diffDays,
+  });
 };
 
 const capitalize = (str) => {
@@ -185,6 +198,8 @@ export default function ProjectDetails() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  const { t, lang } = useLanguage();
+  const isRTL = lang === "dr" || lang === "ps";
   /* ── Fetch ─────────────────────────────────────── */
   const fetchProjectDetails = async () => {
     try {
@@ -217,6 +232,25 @@ export default function ProjectDetails() {
     }
   };
 
+  const handleDownloadContractPDF = async () => {
+    try {
+      const response = await instance.get(`projects/${id}/export-pdf/`, {
+        responseType: "blob",
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `project_${project.name}.pdf`);
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("PDF download failed:", err);
+    }
+  };
   const formatAFN = (amount) => {
     if (!amount || parseFloat(amount) === 0) return null;
 
@@ -232,7 +266,9 @@ export default function ProjectDetails() {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-[var(--primary)]" />
-          <p className="text-sm text-[var(--muted)]">Loading project…</p>
+          <p className="text-sm text-[var(--muted)]">
+            {t("ProjectDetails.loading")}
+          </p>
         </div>
       </div>
     );
@@ -247,14 +283,14 @@ export default function ProjectDetails() {
             <AlertCircle className="h-7 w-7 text-[var(--danger)]" />
           </div>
           <p className="text-sm font-medium text-[var(--text)]">
-            Failed to load project
+            {t("ProjectDetails.failedToLoad")}
           </p>
           <p className="max-w-xs text-xs text-[var(--muted)]">{error}</p>
           <button
             onClick={fetchProjectDetails}
             className="mt-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white transition-all hover:opacity-90"
           >
-            Retry
+            {t("ProjectDetails.retry")}
           </button>
         </div>
       </div>
@@ -264,7 +300,7 @@ export default function ProjectDetails() {
   if (!projectDetails) return null;
 
   const project = projectDetails;
-  const status = getStatusConfig(project.status);
+  const status = getStatusConfig(project.status, t);
   const StatusIcon = status.icon;
 
   /* ── Compute progress timeline ─────────────────── */
@@ -287,7 +323,7 @@ export default function ProjectDetails() {
   };
 
   const progress = getTimelineProgress();
-
+  const ArrowIcon = isRTL ? ArrowRight : ArrowLeft;
   return (
     <>
       <div className="space-y-6">
@@ -297,8 +333,8 @@ export default function ProjectDetails() {
             onClick={() => navigate("/manager/projects")}
             className="inline-flex w-fit items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[var(--muted)] transition-all hover:bg-[var(--hover)] hover:text-[var(--text)]"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Projects
+            <ArrowIcon className="h-4 w-4" />
+            {t("ProjectDetails.backToProjects")}
           </button>
 
           <div className="flex items-center gap-2">
@@ -307,15 +343,32 @@ export default function ProjectDetails() {
               className="inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-sm font-medium text-[var(--text)] shadow-sm transition-all hover:bg-[var(--hover)]"
             >
               <Pencil className="h-4 w-4" strokeWidth={1.8} />
-              Edit
+              {t("ProjectDetails.edit")}
             </button>
-            <button
-              onClick={() => setDeleteOpen(true)}
-              className="inline-flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm font-medium text-[var(--danger)] shadow-sm transition-all hover:bg-red-500/20"
+            <PermissionWrapper
+              permissions={["projects.delete"]}
+              fallback={
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled
+                  title="You do not have permission for this action"
+                >
+                  {t("ProjectDetails.delete")}
+                </Button>
+              }
             >
-              <Trash2 className="h-4 w-4" strokeWidth={1.8} />
-              Delete
-            </button>
+              <button
+                onClick={() => setDeleteOpen(true)}
+                className="inline-flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm font-medium text-[var(--danger)] shadow-sm transition-all hover:bg-red-500/20"
+              >
+                <Trash2 className="h-4 w-4" strokeWidth={1.8} />
+                {t("ProjectDetails.delete")}
+              </button>
+            </PermissionWrapper>
+            <Button variant="secondary" onClick={handleDownloadContractPDF}>
+              {t("ProjectDetails.downloadPdf")}
+            </Button>
           </div>
         </div>
 
@@ -371,42 +424,42 @@ export default function ProjectDetails() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           <StatCard
             icon={Layers}
-            label="Total Floors"
+            label={t("ProjectDetails.totalFloors")}
             value={project.total_floors || "—"}
             color="violet"
           />
 
           <StatCard
             icon={DollarSign}
-            label="Estimated Budget"
+            label={t("ProjectDetails.estimatedBudget")}
             value={formatCurrency(project.estimated_budget) || "Not set"}
             color="success"
           />
 
           <StatCard
             icon={DollarSign}
-            label="Expenses (USD)"
+            label={t("ProjectDetails.expensesUsd")}
             value={formatCurrency(project.total_expenses_usd) || "$0"}
             color="success"
           />
 
           <StatCard
             icon={DollarSign}
-            label="Expenses (AFN)"
+            label={t("ProjectDetails.expensesAfn")}
             value={formatAFN(project.total_expenses_afn) || "0"}
             color="warning"
           />
 
           <StatCard
             icon={Calendar}
-            label="Start Date"
+            label={t("ProjectDetails.startDate")}
             value={formatDate(project.start_date) || "Not set"}
             color="primary"
           />
 
           <StatCard
             icon={CalendarCheck}
-            label="Expected Completion"
+            label={t("ProjectDetails.expectedCompletion")}
             value={formatDate(project.expected_completion_date) || "Not set"}
             color="warning"
           />
@@ -415,28 +468,29 @@ export default function ProjectDetails() {
         <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
           <h3 className="mb-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
             <DollarSign className="h-4 w-4" />
-            Contract Financial Summary
+            {t("ProjectDetails.contractFinancialSummary")}
           </h3>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {/* Contract Value */}
             <div className="rounded-xl border border-[var(--border)] p-4">
               <h4 className="mb-3 text-sm font-medium text-[var(--muted)]">
-                Total Contract Value
+                {t("ProjectDetails.totalContractValue")}
               </h4>
 
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span>USD</span>
+                  <span>{t("ProjectDetails.currency.usd")}</span>
                   <span className="font-semibold">
                     ${formatAFN(project.total_contract_value?.USD)}
                   </span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span>AFN</span>
+                  <span>{t("ProjectDetails.currency.afn")}</span>
                   <span className="font-semibold">
-                    {formatAFN(project.total_contract_value?.AFN)} AFN
+                    {formatAFN(project.total_contract_value?.AFN)}
+                    {t("ProjectDetails.currency.afn")}
                   </span>
                 </div>
               </div>
@@ -445,21 +499,22 @@ export default function ProjectDetails() {
             {/* Payments */}
             <div className="rounded-xl border border-[var(--border)] p-4">
               <h4 className="mb-3 text-sm font-medium text-[var(--muted)]">
-                Total Payments
+                {t("ProjectDetails.totalPayments")}
               </h4>
 
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span>USD</span>
+                  <span>{t("ProjectDetails.currency.usd")} </span>
                   <span className="font-semibold">
                     ${formatAFN(project.total_contract_payments?.USD)}
                   </span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span>AFN</span>
+                  <span>{t("ProjectDetails.currency.afn")} </span>
                   <span className="font-semibold">
-                    {formatAFN(project.total_contract_payments?.AFN)} AFN
+                    {formatAFN(project.total_contract_payments?.AFN)}{" "}
+                    {t("ProjectDetails.currency.afn")}
                   </span>
                 </div>
               </div>
@@ -468,21 +523,22 @@ export default function ProjectDetails() {
             {/* Remaining */}
             <div className="rounded-xl border border-[var(--border)] p-4">
               <h4 className="mb-3 text-sm font-medium text-[var(--muted)]">
-                Remaining Balance
+                {t("ProjectDetails.remainingBalance")}
               </h4>
 
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span>USD</span>
+                  <span>{t("ProjectDetails.currency.usd")} </span>
                   <span className="font-semibold text-emerald-600">
                     ${formatAFN(project.remaining_contract_balance?.USD)}
                   </span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span>AFN</span>
+                  <span>{t("ProjectDetails.currency.afn")} </span>
                   <span className="font-semibold text-emerald-600">
-                    {formatAFN(project.remaining_contract_balance?.AFN)} AFN
+                    {formatAFN(project.remaining_contract_balance?.AFN)}{" "}
+                    {t("ProjectDetails.currency.afn")}
                   </span>
                 </div>
               </div>
@@ -495,7 +551,7 @@ export default function ProjectDetails() {
           <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-[var(--text)]">
-                Timeline Progress
+                {t("ProjectDetails.timelineProgress")}
               </h3>
               <span className="text-sm font-medium text-[var(--primary)]">
                 {progress}%
@@ -524,32 +580,32 @@ export default function ProjectDetails() {
           <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
             <h3 className="mb-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
               <FolderKanban className="h-4 w-4" />
-              Project Information
+              {t("ProjectDetails.projectInformation")}
             </h3>
             <div className="space-y-5">
               <DetailItem
                 icon={FolderKanban}
-                label="Project Name"
+                label={t("ProjectDetails.projectName")}
                 value={project.name}
               />
               <DetailItem
                 icon={Building2}
-                label="Property Type"
+                label={t("ProjectDetails.propertyType")}
                 value={capitalize(project.property_type)}
               />
               <DetailItem
                 icon={MapPin}
-                label="Location"
+                label={t("ProjectDetails.location")}
                 value={project.location || "—"}
               />
               <DetailItem
                 icon={Layers}
-                label="Total Floors"
+                label={t("ProjectDetails.totalFloors")}
                 value={project.total_floors}
               />
               <DetailItem
                 icon={DollarSign}
-                label="Estimated Budget"
+                label={t("ProjectDetails.estimatedBudget")}
                 value={formatCurrency(project.estimated_budget) || "Not set"}
               />
             </div>
@@ -561,24 +617,24 @@ export default function ProjectDetails() {
             <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
               <h3 className="mb-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
                 <Calendar className="h-4 w-4" />
-                Important Dates
+                {t("ProjectDetails.importantDates")}
               </h3>
               <div className="space-y-5">
                 <DetailItem
                   icon={Calendar}
-                  label="Start Date"
+                  label={t("ProjectDetails.startDate")}
                   value={formatDate(project.start_date)}
                 />
                 <DetailItem
                   icon={CalendarClock}
-                  label="Expected Completion"
+                  label={t("ProjectDetails.expectedCompletion")}
                   value={
                     formatDate(project.expected_completion_date) || "Not set"
                   }
                 />
                 <DetailItem
                   icon={CalendarCheck}
-                  label="Actual Completion"
+                  label={t("ProjectDetails.actualCompletion")}
                   value={
                     formatDate(project.actual_completion_date) || "Not yet"
                   }
@@ -586,13 +642,13 @@ export default function ProjectDetails() {
                 />
                 <DetailItem
                   icon={Clock}
-                  label="Created"
+                  label={t("ProjectDetails.created")}
                   value={formatDate(project.created_at)}
                   muted
                 />
                 <DetailItem
                   icon={Clock}
-                  label="Last Updated"
+                  label={t("ProjectDetails.lastUpdated")}
                   value={formatDate(project.updated_at)}
                   muted
                 />
@@ -604,7 +660,7 @@ export default function ProjectDetails() {
               <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
                 <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
                   <StickyNote className="h-4 w-4" />
-                  Notes
+                  {t("ProjectDetails.notes")}
                 </h3>
                 <div className="rounded-lg bg-[var(--hover)] p-4">
                   <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--text)]">

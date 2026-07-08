@@ -25,9 +25,16 @@ SECRET_KEY = 'django-insecure-c3mgpze0q&kse)nj8%zisw883f0-x^2!%wql_1k3j7w&de-5pv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "192.168.100.71",
+    "127.0.0.1",
+    "localhost"
+]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
+
+    "http://192.168.100.71:3000",
 ]
 
 
@@ -48,6 +55,7 @@ INSTALLED_APPS = [
     'project',
     'expenses',
     'Employees',
+    'labour',
     "subcontractor",
     "dashboard",
     "reports"

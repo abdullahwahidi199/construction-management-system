@@ -373,6 +373,7 @@ class ContractInvoiceSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "project_name",
+            "contract",
             "subcontractor_name",
             "invoice_number",
             "invoice_date",

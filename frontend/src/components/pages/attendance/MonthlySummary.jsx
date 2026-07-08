@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from "react";
 import useAttendance from "../../../hooks/useAttendance";
 import instance from "../../../api/axiosInstance";
+import { useLanguage } from "../../../hooks/useLanguage";
 
 function MonthlySummary() {
   const { fetchMonthlySummary, loading, error } = useAttendance();
+
+  const { t, language } = useLanguage();
+
+  // RTL languages (Dari / Pashto)
+  const isRTL = ["fa", "ps", "dari", "pashto"].includes(language);
+
   const [employees, setEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [month, setMonth] = useState(new Date().getMonth() + 1);
@@ -81,13 +88,13 @@ function MonthlySummary() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={isRTL ? "rtl" : "ltr"}>
       <div
         className="rounded-lg border p-6"
         style={{ backgroundColor: "var(--card)", borderColor: "var(--border)" }}
       >
         <h2 className="text-xl font-semibold mb-6">
-          Monthly Attendance Summary
+          {t("MonthlySummary.title")}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -96,7 +103,7 @@ function MonthlySummary() {
               className="block text-sm font-medium mb-2"
               style={{ color: "var(--muted)" }}
             >
-              Employee
+              {t("MonthlySummary.selectEmployee")}
             </label>
             <select
               value={selectedEmployee}
@@ -108,7 +115,7 @@ function MonthlySummary() {
                 color: "var(--text)",
               }}
             >
-              <option value="">Select Employee</option>
+              <option value="">{t("MonthlySummary.selectEmployee")}</option>
               {employees.map((emp) => (
                 <option key={emp.id} value={emp.id}>
                   {emp.full_name} ({emp.employee_id})
@@ -122,7 +129,7 @@ function MonthlySummary() {
               className="block text-sm font-medium mb-2"
               style={{ color: "var(--muted)" }}
             >
-              Month
+              {t("MonthlySummary.selectMonth")}
             </label>
             <select
               value={month}
@@ -149,7 +156,7 @@ function MonthlySummary() {
               className="block text-sm font-medium mb-2"
               style={{ color: "var(--muted)" }}
             >
-              Year
+              {t("MonthlySummary.selectYear")}
             </label>
             <select
               value={year}
@@ -178,7 +185,7 @@ function MonthlySummary() {
 
         {loading ? (
           <div className="text-center py-12" style={{ color: "var(--muted)" }}>
-            Loading...
+            {t("MonthlySummary.loading")}
           </div>
         ) : summary ? (
           <div>
@@ -196,16 +203,17 @@ function MonthlySummary() {
                     {summary.employee.name}
                   </h3>
                   <p className="text-sm" style={{ color: "var(--muted)" }}>
-                    ID: {summary.employee.employee_id} •{" "}
+                    {t("MonthlySummary.employeeInfo.id")}:{" "}
+                    {summary.employee.employee_id} •{" "}
                     {new Date(summary.month, 0).toLocaleString("default", {
                       month: "long",
                     })}{" "}
                     {summary.year}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <div className="text-sm" style={{ color: "var(--muted)" }}>
-                    Effective Working Days
+                    {t("MonthlySummary.employeeInfo.effectiveWorkingDays")}
                   </div>
                   <div
                     className="text-3xl font-bold"
@@ -227,7 +235,7 @@ function MonthlySummary() {
                 }}
               >
                 <div className="text-sm" style={{ color: "var(--muted)" }}>
-                  Total Days
+                  {t("MonthlySummary.stats.totalDays")}
                 </div>
                 <div className="text-2xl font-bold">
                   {summary.total_records}
@@ -241,7 +249,7 @@ function MonthlySummary() {
                 }}
               >
                 <div className="text-sm" style={{ color: "var(--muted)" }}>
-                  Present
+                  {t("MonthlySummary.stats.present")}
                 </div>
                 <div
                   className="text-2xl font-bold"
@@ -258,7 +266,7 @@ function MonthlySummary() {
                 }}
               >
                 <div className="text-sm" style={{ color: "var(--muted)" }}>
-                  Absent
+                  {t("MonthlySummary.stats.absent")}
                 </div>
                 <div
                   className="text-2xl font-bold"
@@ -275,7 +283,7 @@ function MonthlySummary() {
                 }}
               >
                 <div className="text-sm" style={{ color: "var(--muted)" }}>
-                  Half Day
+                  {t("MonthlySummary.stats.halfDay")}
                 </div>
                 <div
                   className="text-2xl font-bold"
@@ -292,7 +300,7 @@ function MonthlySummary() {
                 }}
               >
                 <div className="text-sm" style={{ color: "var(--muted)" }}>
-                  Leave
+                  {t("MonthlySummary.stats.leave")}
                 </div>
                 <div
                   className="text-2xl font-bold"
@@ -309,7 +317,7 @@ function MonthlySummary() {
                 }}
               >
                 <div className="text-sm" style={{ color: "var(--muted)" }}>
-                  Overtime
+                  {t("MonthlySummary.stats.overtime")}
                 </div>
                 <div
                   className="text-2xl font-bold"
@@ -329,22 +337,30 @@ function MonthlySummary() {
               }}
             >
               <h3 className="text-lg font-semibold mb-4">
-                Attendance Breakdown
+                {t("MonthlySummary.attendanceBreakdown")}
               </h3>
               <div className="space-y-4">
                 {[
                   {
-                    label: "Present",
+                    label: t("MonthlySummary.stats.present"),
                     count: summary.present,
                     color: "#16a34a",
                   },
-                  { label: "Absent", count: summary.absent, color: "#dc2626" },
                   {
-                    label: "Half Day",
+                    label: t("MonthlySummary.stats.absent"),
+                    count: summary.absent,
+                    color: "#dc2626",
+                  },
+                  {
+                    label: t("MonthlySummary.stats.halfDay"),
                     count: summary.half_day,
                     color: "#d97706",
                   },
-                  { label: "Leave", count: summary.leave, color: "#2563eb" },
+                  {
+                    label: t("MonthlySummary.stats.leave"),
+                    count: summary.leave,
+                    color: "#2563eb",
+                  },
                 ].map((item) => (
                   <div key={item.label}>
                     <div className="flex justify-between text-sm mb-1">
@@ -372,7 +388,7 @@ function MonthlySummary() {
           </div>
         ) : (
           <div className="text-center py-12" style={{ color: "var(--muted)" }}>
-            Select an employee, month, and year to view summary
+            {t("MonthlySummary.emptyState")}
           </div>
         )}
       </div>
