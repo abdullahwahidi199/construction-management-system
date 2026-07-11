@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'labour',
     "subcontractor",
     "dashboard",
-    "reports"
+    "reports",
+    "audit.apps.AuditConfig",
 ]
 
 CACHES = {
@@ -77,6 +78,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'audit.middleware.AuditRequestMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { LayoutDashboard, ShieldCheck, Users, LogOut } from "lucide-react";
+import { LayoutDashboard, ScrollText, ShieldCheck, Users, LogOut } from "lucide-react";
 import { useLanguage } from "../hooks/useLanguage";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import ThemeToggle from "../components/ui/ToggleButton";
@@ -13,6 +13,7 @@ export default function AdminRootLayout() {
     { label: t("admin.nav.dashboard"), to: "/admin/dashboard", icon: LayoutDashboard },
     { label: t("admin.nav.users"), to: "/admin/users", icon: Users },
     { label: t("admin.nav.permissions"), to: "/admin/permissions", icon: ShieldCheck },
+    { label: "Audit Logs", to: "/admin/audit-logs", icon: ScrollText },
   ];
 
   return (

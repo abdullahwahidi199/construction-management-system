@@ -6,6 +6,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.exceptions import ValidationError
+
+from audit.utils import create_audit_log
 
 from .permissions import IsAdminRole
 from .serializers import (
@@ -36,9 +39,26 @@ class LoginView(APIView):
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data, context={"request": request})
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError:
+            create_audit_log(
+                user=None,
+                action="auth.login_failed",
+                status="failed",
+                description=f"Failed login attempt for {request.data.get('username', '')}",
+                request=request,
+                extra_metadata={"username": request.data.get("username", "")},
+            )
+            raise
         user = serializer.validated_data["user"]
         token, _ = Token.objects.get_or_create(user=user)
+        create_audit_log(
+            user=user,
+            action="auth.login",
+            description=f"User {user.get_username()} logged in",
+            request=request,
+        )
         return Response(
             {
                 "token": token.key,
@@ -53,6 +73,12 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        create_audit_log(
+            user=request.user,
+            action="auth.logout",
+            description=f"User {request.user.get_username()} logged out",
+            request=request,
+        )
         Token.objects.filter(user=request.user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -103,6 +129,15 @@ class UserViewSet(viewsets.ModelViewSet):
             
         user.set_password(new_password) # Securely hashes the password
         user.save()
+        create_audit_log(
+            user=request.user,
+            action="auth.password_change",
+            model_name="User",
+            object_id=user.pk,
+            object_repr=user.get_username(),
+            description=f"Password changed for {user.get_username()}",
+            request=request,
+        )
         return Response({"status": "Password updated successfully"})
 
 

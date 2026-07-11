@@ -72,6 +72,7 @@ urlpatterns = [
     path('api/contracts/', include("subcontractor.urls")),
     path('api/dashboard/', include("dashboard.urls")),
     path('api/reports/', include("reports.urls")),
+    path('api/audit/', include("audit.urls")),
     path('api/', include(router.urls)),
 ]
 if settings.DEBUG:

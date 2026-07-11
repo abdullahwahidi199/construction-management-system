@@ -60,8 +60,11 @@ class DashboardService:
 
         # --- Budget aggregation ---
         budget_agg = projects.aggregate(
-            total_estimated_budget=Coalesce(
-                Sum("estimated_budget"), Decimal("0.00")
+            total_estimated_budget_afn=Coalesce(
+                Sum("estimated_budget", filter=Q(budget_currency="AFN")), Decimal("0.00")
+            ),
+            total_estimated_budget_usd=Coalesce(
+                Sum("estimated_budget", filter=Q(budget_currency="USD")), Decimal("0.00")
             ),
             avg_estimated_budget=Coalesce(
                 Avg("estimated_budget"), Decimal("0.00")
@@ -89,7 +92,10 @@ class DashboardService:
                 "commercial": property_type_counts.get("commercial", 0),
                 "mixed": property_type_counts.get("mixed", 0),
             },
-            "total_estimated_budget": budget_agg["total_estimated_budget"],
+            "total_estimated_budget": {
+                "AFN": budget_agg["total_estimated_budget_afn"],
+                "USD": budget_agg["total_estimated_budget_usd"],
+            },
             "avg_estimated_budget": round(budget_agg["avg_estimated_budget"], 2),
             "overdue_projects_count": overdue_projects.count(),
             "overdue_projects": list(
@@ -119,22 +125,25 @@ class DashboardService:
                 float(exp.total_afn) for exp in expenses
             )
             estimated = float(project.estimated_budget)
+            budget_currency = project.budget_currency
+            comparable_spent = total_expense_usd if budget_currency == "USD" else total_expense_afn
 
             results.append({
                 "id": project.id,
                 "name": project.name,
                 "status": project.status,
                 "estimated_budget": estimated,
+                "budget_currency": budget_currency,
                 "total_spent_usd": round(total_expense_usd, 2),
                 "total_spent_afn": round(total_expense_afn, 2),
-                "budget_remaining_usd": round(
-                    estimated - total_expense_usd, 2
-                ),
+                "budget_remaining": round(estimated - comparable_spent, 2),
+                "budget_remaining_usd": round(estimated - total_expense_usd, 2) if budget_currency == "USD" else None,
+                "budget_remaining_afn": round(estimated - total_expense_afn, 2) if budget_currency == "AFN" else None,
                 "budget_utilization_pct": round(
-                    (total_expense_usd / estimated * 100)
+                    (comparable_spent / estimated * 100)
                     if estimated > 0 else 0, 1
                 ),
-                "is_over_budget": total_expense_usd > estimated,
+                "is_over_budget": comparable_spent > estimated,
             })
 
         # Sort by utilization descending (most critical first)
@@ -1114,14 +1123,15 @@ class DashboardService:
 
         # ── Project Budgets ────────────────────────
         total_budget = Project.objects.aggregate(
-            total=Coalesce(
-                Sum("estimated_budget"),
-                Decimal("0.00"),
-            )
-        )["total"]
+            usd=Coalesce(Sum("estimated_budget", filter=Q(budget_currency="USD")), Decimal("0.00")),
+            afn=Coalesce(Sum("estimated_budget", filter=Q(budget_currency="AFN")), Decimal("0.00")),
+        )
 
         return {
-            "total_budget_all_projects": total_budget,
+            "total_budget_all_projects": {
+                "usd": total_budget["usd"],
+                "afn": total_budget["afn"],
+            },
 
             "expenses": {
                 "total_usd": total_expenses_usd,

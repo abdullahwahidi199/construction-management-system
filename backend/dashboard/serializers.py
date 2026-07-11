@@ -11,9 +11,7 @@ class ProjectOverviewSerializer(serializers.Serializer):
     total_projects = serializers.IntegerField()
     status_breakdown = serializers.DictField()
     property_type_breakdown = serializers.DictField()
-    total_estimated_budget = serializers.DecimalField(
-        max_digits=15, decimal_places=2
-    )
+    total_estimated_budget = serializers.DictField()
     avg_estimated_budget = serializers.DecimalField(
         max_digits=15, decimal_places=2
     )
@@ -27,10 +25,7 @@ class GrandTotalOutflowSerializer(serializers.Serializer):
 
 
 class FinancialOverviewSerializer(serializers.Serializer):
-    total_budget_all_projects = serializers.DecimalField(
-        max_digits=15,
-        decimal_places=2
-    )
+    total_budget_all_projects = serializers.DictField()
 
     expenses = serializers.DictField()
     payroll = serializers.DictField()
@@ -183,9 +178,12 @@ class BudgetComparisonSerializer(serializers.Serializer):
     name = serializers.CharField()
     status = serializers.CharField()
     estimated_budget = serializers.FloatField()
+    budget_currency = serializers.CharField()
     total_spent_usd = serializers.FloatField()
     total_spent_afn = serializers.FloatField()
-    budget_remaining_usd = serializers.FloatField()
+    budget_remaining = serializers.FloatField()
+    budget_remaining_usd = serializers.FloatField(allow_null=True)
+    budget_remaining_afn = serializers.FloatField(allow_null=True)
     budget_utilization_pct = serializers.FloatField()
     is_over_budget = serializers.BooleanField()
 

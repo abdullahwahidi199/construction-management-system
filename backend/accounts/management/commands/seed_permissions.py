@@ -126,6 +126,12 @@ PERMISSIONS = [
     # Settings
     ("settings.view", "View Settings", "Settings"),
     ("settings.manage", "Manage Settings", "Settings"),
+
+    # Audit Logs
+    ("audit_logs.view", "View Audit Logs", "Audit Logs"),
+    ("audit_logs.export", "Export Audit Logs", "Audit Logs"),
+    ("audit_logs.delete", "Delete Audit Logs", "Audit Logs"),
+    ("audit_logs.manage_retention", "Manage Audit Retention", "Audit Logs"),
 ]
 from accounts.constants import Role
 

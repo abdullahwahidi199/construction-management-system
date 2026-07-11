@@ -13,6 +13,7 @@ import AdminRootLayout from "./admin/AdminRootLayout";
 import AdminDashboard from "./admin/AdminDashboard";
 import UserManagement from "./admin/UserManagement";
 import PermissionManagement from "./admin/PermissionManagement";
+import AuditLogsPage from "./admin/AuditLogsPage";
 import DataEntryRootLayout from "./dataEntry/DataEntryRootLayout";
 import DataEntryDashboard from "./dataEntry/DataEntryDashboard";
 import ManagerRootLayout from "./manager/ManagerRootLayout";
@@ -45,6 +46,7 @@ const router = createBrowserRouter(
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<UserManagement />} />
           <Route path="permissions" element={<PermissionManagement />} />
+          <Route path="audit-logs" element={<AuditLogsPage />} />
         </Route>
       </Route>
 
