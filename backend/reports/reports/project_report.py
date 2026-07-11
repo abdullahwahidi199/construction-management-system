@@ -47,6 +47,8 @@ class ProjectSummaryReport(BaseReport):
 
         rows = []
         total_budget = Decimal("0")
+        total_budget_usd = Decimal("0")
+        total_budget_afn = Decimal("0")
 
         total_spent_usd = Decimal("0")
         total_spent_afn = Decimal("0")
@@ -56,6 +58,7 @@ class ProjectSummaryReport(BaseReport):
         # ─────────────────────────────────────────────
         for p in qs:
             budget = p.estimated_budget or Decimal("0")
+            budget_currency = p.budget_currency or "AFN"
 
             # ── EXPENSES
             spent_usd_expenses = p.total_expense_usd or Decimal("0")
@@ -79,6 +82,10 @@ class ProjectSummaryReport(BaseReport):
 
             # ── GLOBAL SUMS
             total_budget += budget
+            if budget_currency == "USD":
+                total_budget_usd += budget
+            else:
+                total_budget_afn += budget
             total_spent_usd += project_total_usd
             total_spent_afn += project_total_afn
 
@@ -94,6 +101,7 @@ class ProjectSummaryReport(BaseReport):
                 "actual_completion_date": p.actual_completion_date,
 
                 "estimated_budget": budget,
+                "budget_currency": budget_currency,
 
                 # ── EXPENSE BREAKDOWN
                 "expenses_usd": spent_usd_expenses,
@@ -109,8 +117,11 @@ class ProjectSummaryReport(BaseReport):
 
                 "expense_count": p.expense_count,
 
-                # NOTE: budget is currency-ambiguous → not mixed
-                "budget_remaining": budget,
+                "budget_remaining": (
+                    budget - project_total_usd
+                    if budget_currency == "USD"
+                    else budget - project_total_afn
+                ),
             })
 
         # ─────────────────────────────────────────────
@@ -131,6 +142,8 @@ class ProjectSummaryReport(BaseReport):
             "summary": {
                 "total_projects": len(rows),
                 "total_estimated_budget": total_budget,
+                "total_estimated_budget_usd": total_budget_usd,
+                "total_estimated_budget_afn": total_budget_afn,
 
                 "total_spent_usd": total_spent_usd,
                 "total_spent_afn": total_spent_afn,

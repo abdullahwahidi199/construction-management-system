@@ -37,7 +37,7 @@ class ExpensePagination(PageNumberPagination):
 class ExpenseViewSet(viewsets.ModelViewSet):
     queryset = Expense.objects.select_related("project").annotate(
         total_usd_calc=ExpressionWrapper(
-            F("amount_usd") + (F("amount_afn") / F("exchange_rate")),
+            F("amount_usd"),
             output_field=DecimalField(max_digits=20, decimal_places=2),
         )
     )
@@ -127,33 +127,13 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         base_qs = self.filter_queryset(self.get_queryset())
 
-        # -------- USD TOTAL (converted unified model) --------
+        # -------- RAW TOTALS BY CURRENCY --------
         usd_total = base_qs.aggregate(
-        total=Sum(
-            ExpressionWrapper(
-                F("amount_usd")
-                + Case(
-                    When(
-                        amount_afn__gt=0,
-                        exchange_rate__gt=0,
-                        then=F("amount_afn") / F("exchange_rate"),
-                    ),
-                    default=Value(0),
-                    output_field=DecimalField(max_digits=20, decimal_places=6),
-                ),
-                output_field=DecimalField(max_digits=20, decimal_places=6),
-            )
-        )
-    )["total"] or 0
+            total=Sum("amount_usd")
+        )["total"] or 0
 
-        # -------- AFN TOTAL (converted unified model) --------
         afn_total = base_qs.aggregate(
-            total=Sum(
-                ExpressionWrapper(
-                    F("amount_afn") + (F("amount_usd") * F("exchange_rate")),
-                    output_field=DecimalField(max_digits=20, decimal_places=2),
-                )
-            )
+            total=Sum("amount_afn")
         )["total"] or 0
 
         # -------- PAGINATION --------

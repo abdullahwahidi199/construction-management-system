@@ -96,22 +96,20 @@ class Expense(models.Model):
     # --- CALCULATED PROPERTIES (matches your EXACT Excel formulas!) ---
     @property
     def total_usd(self):
-        """Total cost of this expense converted to USD, exactly as you calculate in Excel"""
-        afn_converted = (self.amount_afn / self.exchange_rate) if self.exchange_rate and self.amount_afn else 0
-        return round(self.amount_usd + afn_converted, 2)
+        """USD amount only. AFN is intentionally not converted into USD."""
+        return round(self.amount_usd, 2)
 
     @property
     def total_afn(self):
-        """Total cost of this expense converted to AFN"""
-        usd_converted = (self.amount_usd * self.exchange_rate) if self.exchange_rate and self.amount_usd else 0
-        return round(self.amount_afn + usd_converted, 2)
+        """AFN amount only. USD is intentionally not converted into AFN."""
+        return round(self.amount_afn, 2)
 
     def clean(self):
         # Add database level validation matching your business rules
         if self.amount_afn <=0 and self.amount_usd <=0:
             raise ValidationError("Expense must have at least one amount (AFN or USD) greater than 0")
-        if self.amount_afn > 0 and self.exchange_rate <=0:
-            raise ValidationError("Exchange rate is required for expenses paid in AFN")
+        if self.amount_afn > 0 and self.amount_usd > 0:
+            raise ValidationError("Expense cannot contain both AFN and USD amounts")
     
     def save(self, *args, **kwargs):
         if not self.serial_number:

@@ -38,8 +38,8 @@ class ExpenseSerializer(serializers.ModelSerializer):
 
         if amount_afn <= 0 and amount_usd <=0:
             raise serializers.ValidationError("Expense must have at least one amount (AFN or USD) greater than 0")
-        if amount_afn > 0 and exchange_rate <=0:
-            raise serializers.ValidationError("Exchange rate is required when recording AFN expenses")
+        if amount_afn > 0 and amount_usd > 0:
+            raise serializers.ValidationError("Expense cannot contain both AFN and USD amounts")
         return data
     
 

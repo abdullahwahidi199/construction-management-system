@@ -12,6 +12,17 @@ const formatCurrency = (val) => {
   });
 };
 
+const getBudgetTotals = (value) => {
+  if (!value || typeof value !== "object") {
+    return { usd: value || 0, afn: 0 };
+  }
+
+  return {
+    usd: value.usd ?? value.USD ?? 0,
+    afn: value.afn ?? value.AFN ?? 0,
+  };
+};
+
 function FinancialRow({ label, value, prefix = "", color, bold = false }) {
   return (
     <div className="flex items-center justify-between py-2.5 border-b border-[var(--border)] last:border-0">
@@ -29,18 +40,27 @@ function FinancialRow({ label, value, prefix = "", color, bold = false }) {
 }
 
 export default function FinancialOverview({ data }) {
-  if (!data) return null;
   const { t } = useLanguage();
+  if (!data) return null;
+
+  const budgets = getBudgetTotals(data.total_budget_all_projects);
+
   return (
     <Card title={t("financialOverview.title")}>
       <div className="space-y-0">
         <FinancialRow
-          label={t("financialOverview.totalBudget")}
-          value={data.total_budget_all_projects}
+          label={`${t("financialOverview.totalBudget")} USD`}
+          value={budgets.usd}
+          prefix="$"
+          bold
+        />
+        <FinancialRow
+          label={`${t("financialOverview.totalBudget")} AFN`}
+          value={budgets.afn}
+          prefix="AFN "
           bold
         />
 
-        {/* Expenses */}
         <div className="mt-4 mb-1">
           <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
             {t("financialOverview.expenses")}
@@ -56,10 +76,9 @@ export default function FinancialOverview({ data }) {
         <FinancialRow
           label={t("financialOverview.expensesAfn")}
           value={data.expenses?.total_afn}
-          prefix="؋"
+          prefix="AFN "
         />
 
-        {/* Payroll */}
         <div className="mt-4 mb-1">
           <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
             {t("financialOverview.payroll")}
@@ -75,7 +94,7 @@ export default function FinancialOverview({ data }) {
         <FinancialRow
           label={t("financialOverview.netPayrollAfn")}
           value={data.payroll?.net_afn}
-          prefix="؋"
+          prefix="AFN "
         />
 
         <FinancialRow
@@ -88,7 +107,7 @@ export default function FinancialOverview({ data }) {
         <FinancialRow
           label="Employee Payroll AFN"
           value={data.payroll?.employee_net_afn}
-          prefix="Ø‹"
+          prefix="AFN "
           color="var(--muted)"
         />
 
@@ -102,7 +121,7 @@ export default function FinancialOverview({ data }) {
         <FinancialRow
           label="Daily Worker Payroll AFN"
           value={data.payroll?.daily_worker_net_afn}
-          prefix="Ø‹"
+          prefix="AFN "
           color="var(--muted)"
         />
 
@@ -116,11 +135,10 @@ export default function FinancialOverview({ data }) {
         <FinancialRow
           label={t("financialOverview.grossPayrollAfn")}
           value={data.payroll?.gross_afn}
-          prefix="؋"
+          prefix="AFN "
           color="var(--muted)"
         />
 
-        {/* Contracts */}
         <div className="mt-4 mb-1">
           <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
             {t("financialOverview.contracts")}
@@ -136,7 +154,7 @@ export default function FinancialOverview({ data }) {
         <FinancialRow
           label={t("financialOverview.contractValueAfn")}
           value={data.contracts?.total_contract_value_afn}
-          prefix="؋"
+          prefix="AFN "
         />
 
         <FinancialRow
@@ -148,7 +166,7 @@ export default function FinancialOverview({ data }) {
         <FinancialRow
           label={t("financialOverview.paymentsMadeAfn")}
           value={data.contracts?.total_payments_made_afn}
-          prefix="؋"
+          prefix="AFN "
         />
 
         <FinancialRow
@@ -161,11 +179,10 @@ export default function FinancialOverview({ data }) {
         <FinancialRow
           label={t("financialOverview.remainingAfn")}
           value={data.contracts?.total_remaining_afn}
-          prefix="؋"
+          prefix="AFN "
           color="var(--warning)"
         />
 
-        {/* Grand Totals */}
         <div className="mt-4 pt-3 border-t-2 border-[var(--border)]">
           <FinancialRow
             label={t("financialOverview.grandTotalOutflowUsd")}
@@ -178,7 +195,7 @@ export default function FinancialOverview({ data }) {
           <FinancialRow
             label={t("financialOverview.grandTotalOutflowAfn")}
             value={data.grand_total_outflow?.afn}
-            prefix="؋"
+            prefix="AFN "
             bold
             color="var(--primary)"
           />

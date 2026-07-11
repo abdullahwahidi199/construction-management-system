@@ -68,6 +68,7 @@ class ProjectReportView(BaseReportView):
         ("location", "Location"),
         ("status", "Status"),
         ("estimated_budget", "Budget"),
+        ("budget_currency", "Currency"),
         ("total_expense_usd", "Spent (USD)"),
         ("budget_remaining", "Remaining"),
     ]

@@ -38,6 +38,7 @@ export const REPORTS = {
       { key: "location", label: "Location" },
       { key: "status", label: "Status", type: "badge" },
       { key: "estimated_budget", label: "Budget", type: "currency" },
+      { key: "budget_currency", label: "Cur" },
       { key: "total_expense_usd", label: "Spent (USD)", type: "currency" },
       { key: "budget_remaining", label: "Remaining", type: "currency" },
     ],

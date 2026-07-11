@@ -223,8 +223,6 @@ class PayrollViewSet(viewsets.ModelViewSet):
                 # Calculate tax based on percentage
                 basic_and_overtime = employee.salary
                 tax_deducted = (basic_and_overtime * data['tax_percentage']) / 100
-                social_security = (basic_and_overtime * 5) / 100  # Example: 5% SS
-                
                 payroll = Payroll(
                     employee=employee,
                     payroll_period_start=data['payroll_period_start'],
@@ -234,7 +232,6 @@ class PayrollViewSet(viewsets.ModelViewSet):
                     allowances=data['allowances'],
                     deductions=data['deductions'],
                     tax_deducted=tax_deducted,
-                    social_security=social_security,
                     payment_method=data['payment_method'],
                     notes=data.get('notes', ''),
                     created_by=request.user,
@@ -258,19 +255,12 @@ class PayrollViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'])
     def update_payment_status(self, request, pk=None):
-        """Update payment status for a specific payroll"""
+        """Update payment metadata for a specific payroll."""
         payroll = self.get_object()
-        
-        new_status = request.data.get('payment_status')
+
         payment_date = request.data.get('payment_date')
         payment_method = request.data.get('payment_method')
-        
-        if new_status and new_status in dict(Payroll.PAYMENT_STATUS_CHOICES):
-            payroll.payment_status = new_status
-            
-            if new_status == 'paid' and not payment_date:
-                payroll.payment_date = datetime.now().date()
-        
+
         if payment_date:
             payroll.payment_date = payment_date
         
@@ -310,15 +300,14 @@ class PayrollViewSet(viewsets.ModelViewSet):
             total_records=Count('id')
         )
         
-        # Add status breakdown
-        status_breakdown = queryset.values('payment_status').annotate(
+        method_breakdown = queryset.values('payment_method', 'currency').annotate(
             count=Count('id'),
             total_net=Sum('net_pay')
         )
         
         return Response({
             'summary': summary,
-            'status_breakdown': status_breakdown,
+            'payment_method_breakdown': method_breakdown,
             'period': period or 'all_time'
         })
 

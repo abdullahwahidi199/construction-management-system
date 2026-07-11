@@ -3,6 +3,11 @@ from django.db import models
 
 
 class Project(models.Model):
+    CURRENCY_CHOICES = [
+        ("AFN", "Afghani (AFN)"),
+        ("USD", "US Dollar (USD)"),
+    ]
+
     STATUS_CHOICES = [
         ("planning", "Planning"),
         ("ongoing", "Ongoing"),
@@ -43,6 +48,11 @@ class Project(models.Model):
         max_digits=15,
         decimal_places=2,
         default=0,
+    )
+    budget_currency = models.CharField(
+        max_length=3,
+        choices=CURRENCY_CHOICES,
+        default="AFN",
     )
 
     status = models.CharField(

@@ -119,8 +119,9 @@ class FinancialOverviewReport(BaseReport):
             proj_qs = proj_qs.filter(id=project_id)
 
         budget_total = proj_qs.aggregate(
-            total=money_sum("estimated_budget"),
-        )["total"]
+            total_afn=money_sum("estimated_budget", Q(budget_currency="AFN")),
+            total_usd=money_sum("estimated_budget", Q(budget_currency="USD")),
+        )
 
         # =====================================================
         # RESPONSE

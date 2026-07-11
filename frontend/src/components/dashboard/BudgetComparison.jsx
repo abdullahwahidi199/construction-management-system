@@ -13,12 +13,13 @@ import {
   Legend,
 } from "recharts";
 
-const formatCurrency = (val) => {
-  if (!val) return "$0";
+const formatCurrency = (val, currency = "USD") => {
+  if (!val) return `${currency === "USD" ? "$" : "AFN "}0`;
   const num = parseFloat(val);
-  if (num >= 1000000) return `$${(num / 1000000).toFixed(1)}M`;
-  if (num >= 1000) return `$${(num / 1000).toFixed(0)}K`;
-  return `$${num.toFixed(0)}`;
+  const prefix = currency === "USD" ? "$" : "AFN ";
+  if (num >= 1000000) return `${prefix}${(num / 1000000).toFixed(1)}M`;
+  if (num >= 1000) return `${prefix}${(num / 1000).toFixed(0)}K`;
+  return `${prefix}${num.toFixed(0)}`;
 };
 
 export default function BudgetComparison({ data }) {
@@ -28,7 +29,7 @@ export default function BudgetComparison({ data }) {
       <Card title={t("budgetComparison.emptyTitle")}>
         <div className="h-[300px] flex items-center justify-center text-[var(--muted)]">
           <div className="text-center">
-            <p className="text-4xl mb-2">📊</p>
+            <p className="text-4xl mb-2">Chart</p>
             <p>{t("budgetComparison.noData")}</p>
           </div>
         </div>
@@ -36,14 +37,18 @@ export default function BudgetComparison({ data }) {
     );
   }
 
-  const chartData = data.slice(0, 8).map((p) => ({
-    name: p.name.length > 15 ? p.name.substring(0, 15) + "…" : p.name,
-    fullName: p.name,
-    budget: parseFloat(p.estimated_budget),
-    spent: parseFloat(p.total_spent_usd),
-    isOver: p.is_over_budget,
-    utilization: p.budget_utilization_pct,
-  }));
+  const chartData = data.slice(0, 8).map((p) => {
+    const currency = p.budget_currency || "USD";
+    return {
+      name: p.name.length > 15 ? `${p.name.substring(0, 15)}...` : p.name,
+      fullName: p.name,
+      budget: parseFloat(p.estimated_budget),
+      currency,
+      spent: parseFloat(currency === "AFN" ? p.total_spent_afn : p.total_spent_usd),
+      isOver: p.is_over_budget,
+      utilization: p.budget_utilization_pct,
+    };
+  });
 
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload?.length) return null;
@@ -56,7 +61,7 @@ export default function BudgetComparison({ data }) {
         <p className="text-xs text-[var(--muted)]">
           {t("budgetComparison.budget")}:
           <span className="font-medium text-[var(--text)]">
-            {formatCurrency(d.budget)}
+            {formatCurrency(d.budget, d.currency)}
           </span>
         </p>
         <p className="text-xs text-[var(--muted)]">
@@ -65,7 +70,7 @@ export default function BudgetComparison({ data }) {
             className="font-medium"
             style={{ color: d.isOver ? "var(--danger)" : "var(--success)" }}
           >
-            {formatCurrency(d.spent)}
+            {formatCurrency(d.spent, d.currency)}
           </span>
         </p>
         <p className="text-xs text-[var(--muted)]">
@@ -109,7 +114,7 @@ export default function BudgetComparison({ data }) {
             tickLine={false}
           />
           <YAxis
-            tickFormatter={formatCurrency}
+            tickFormatter={(value) => formatCurrency(value, chartData[0]?.currency)}
             tick={{ fill: "var(--muted)", fontSize: 11 }}
             axisLine={{ stroke: "var(--border)" }}
             tickLine={false}
@@ -150,7 +155,6 @@ export default function BudgetComparison({ data }) {
         </BarChart>
       </ResponsiveContainer>
 
-      {/* Over-budget projects list */}
       {data.filter((p) => p.is_over_budget).length > 0 && (
         <div className="mt-4 pt-4 border-t border-[var(--border)]">
           <p className="text-xs font-semibold text-[var(--danger)] mb-2">
