@@ -33,6 +33,7 @@ from subcontractor.views import (
 from labour.views import (
     DailyWorkerViewSet,
     WorkerAttendanceViewSet,
+    WorkerAdvanceViewSet,
     WorkerPayrollViewSet
 )
 router = DefaultRouter()
@@ -43,6 +44,7 @@ router.register(r'attendance', AttendanceViewSet)
 router.register(r'daily-workers', DailyWorkerViewSet, basename='daily-worker')
 router.register(r'worker-attendance', WorkerAttendanceViewSet, basename='worker-attendance')
 router.register(r'worker-payroll', WorkerPayrollViewSet, basename='worker-payroll')
+router.register(r'worker-advances', WorkerAdvanceViewSet, basename='worker-advance')
 
 router.register(r'subcontractors',      SubcontractorViewSet)
 router.register(r'contracts',           ContractViewSet)

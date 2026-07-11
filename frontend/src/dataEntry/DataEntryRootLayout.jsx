@@ -11,6 +11,7 @@ import {
   Wallet,
   BarChart3,
   ClipboardList,
+  HardHat,
 } from "lucide-react";
 
 import { useAuth } from "../auth/AuthContext";
@@ -102,6 +103,25 @@ export default function DataEntryRootLayout() {
         "employees.create",
         "employees.update",
         "employees.delete",
+      ]),
+    },
+
+    {
+      label: t("dailyWorkers.title", "Daily Workers"),
+      to: "/data-entry/daily-workers",
+      icon: HardHat,
+      visible: hasAnyPermission(permissions, [
+        "daily_workers.view",
+        "daily_workers.create",
+        "daily_workers.update",
+        "daily_workers.delete",
+        "daily_worker_attendance.view",
+        "daily_worker_attendance.create",
+        "daily_worker_attendance.update",
+        "daily_worker_payroll.view",
+        "daily_worker_payroll.create",
+        "daily_worker_payroll.update",
+        "worker_advances.view",
       ]),
     },
 

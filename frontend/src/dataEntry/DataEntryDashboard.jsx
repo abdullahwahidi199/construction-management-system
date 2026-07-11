@@ -9,6 +9,7 @@ import {
   Wallet,
   ClipboardList,
   BarChart3,
+  HardHat,
 } from "lucide-react";
 
 import { useLanguage } from "../hooks/useLanguage";
@@ -95,6 +96,26 @@ export default function DataEntryDashboard() {
         "payrolls.create",
         "payrolls.update",
         "payrolls.delete",
+      ]),
+    },
+
+    {
+      title: "Daily Workers",
+      body: "Manage daily workers, attendance, and worker payrolls",
+      to: "/data-entry/daily-workers",
+      icon: HardHat,
+      visible: hasAnyPermission(permissions, [
+        "daily_workers.view",
+        "daily_workers.create",
+        "daily_workers.update",
+        "daily_workers.delete",
+        "daily_worker_attendance.view",
+        "daily_worker_attendance.create",
+        "daily_worker_attendance.update",
+        "daily_worker_payroll.view",
+        "daily_worker_payroll.create",
+        "daily_worker_payroll.update",
+        "worker_advances.view",
       ]),
     },
 

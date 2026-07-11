@@ -1,49 +1,77 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { useLanguage } from "../../hooks/useLanguage";
-
+import { useAuth } from "../../auth/AuthContext";
+import { hasAnyPermission } from "../../../utils/permissions";
 function WorkerBulkAttendance() {
-  const { fetchDailyStatus, bulkMarkAttendance, loading, error } =
+  const { fetchDailyStatus, fetchProjects, bulkMarkAttendance, loading } =
     useDailyWorkers();
+
   const { t, language } = useLanguage();
+  const { permissions } = useAuth();
+  const canSaveAttendance = hasAnyPermission(permissions, [
+    "daily_worker_attendance.create",
+    "daily_worker_attendance.update",
+  ]);
   const isRTL = ["fa", "ps", "dari", "pashto"].includes(language);
   const textAlignment = isRTL ? "text-right" : "text-left";
 
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [projectSite, setProjectSite] = useState("");
+  const [projects, setProjects] = useState([]);
   const [workersData, setWorkersData] = useState([]);
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
     loadStatus();
-  }, [date]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date, projectSite]);
+
+  useEffect(() => {
+    loadProjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const loadProjects = async () => {
+    try {
+      const data = await fetchProjects();
+      setProjects(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const loadStatus = async () => {
     try {
-      const data = await fetchDailyStatus(date);
+      const data = await fetchDailyStatus(
+        date,
+        projectSite ? { project: projectSite } : {},
+      );
+
       setStats(data);
 
       // Combine unmarked and marked into one editable list
       const combined = [
-        ...data.unmarked_workers.map((w) => ({
+        ...(data?.unmarked_workers || []).map((w) => ({
           workerId: w.id,
           name: w.full_name,
-          trade: w.trade,
+          trade: w.trade || w.skill_type || "",
           status: "present", // default to present for quick marking
           overtime_hours: "",
           notes: "",
           isMarked: false,
         })),
-        ...data.marked_records.map((r) => ({
+        ...(data?.marked_records || []).map((r) => ({
           workerId: r.worker,
           name: r.worker_name,
-          trade: r.trade,
+          trade: r.trade || r.skill_type || "",
           status: r.status,
           overtime_hours: r.overtime_hours || "",
           notes: r.notes || "",
           isMarked: true,
         })),
       ];
+
       setWorkersData(combined);
     } catch (err) {
       console.error(err);
@@ -59,7 +87,7 @@ function WorkerBulkAttendance() {
   const handleSaveAll = async () => {
     const payload = {
       date,
-      project_site: projectSite,
+      project: projectSite || null,
       records: workersData.map((w) => ({
         worker: w.workerId,
         status: w.status,
@@ -70,7 +98,7 @@ function WorkerBulkAttendance() {
 
     try {
       await bulkMarkAttendance(payload);
-      alert("Attendance Saved!");
+      alert(t("WorkerBulkAttendance.attendanceSaved"));
       loadStatus();
     } catch (err) {
       console.error(err);
@@ -86,7 +114,7 @@ function WorkerBulkAttendance() {
         <div className="flex gap-4 items-center">
           <div>
             <label className="text-xs" style={{ color: "var(--muted)" }}>
-              Date
+              {t("WorkerBulkAttendance.date")}
             </label>
             <input
               type="date"
@@ -100,32 +128,43 @@ function WorkerBulkAttendance() {
               }}
             />
           </div>
+
           <div>
             <label className="text-xs" style={{ color: "var(--muted)" }}>
-              Project / Site
+              {t("WorkerBulkAttendance.projectSite")}
             </label>
-            <input
-              type="text"
+            <select
               value={projectSite}
               onChange={(e) => setProjectSite(e.target.value)}
-              placeholder="e.g. Block A"
               className="block rounded border px-3 py-1.5 text-sm"
               style={{
                 borderColor: "var(--border)",
                 backgroundColor: "var(--bg)",
                 color: "var(--text)",
               }}
-            />
+            >
+              <option value="">{t("WorkerBulkAttendance.allProjects")}</option>
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
-        <button
-          onClick={handleSaveAll}
-          disabled={loading}
-          className="rounded px-6 py-2 text-sm font-medium text-white transition disabled:opacity-50"
-          style={{ backgroundColor: "var(--primary)" }}
-        >
-          {loading ? "Saving..." : "Save All Attendance"}
-        </button>
+
+        {canSaveAttendance && (
+          <button
+            onClick={handleSaveAll}
+            disabled={loading}
+            className="rounded px-6 py-2 text-sm font-medium text-white transition disabled:opacity-50"
+            style={{ backgroundColor: "var(--primary)" }}
+          >
+            {loading
+              ? t("WorkerBulkAttendance.saving")
+              : t("WorkerBulkAttendance.saveAllAttendance")}
+          </button>
+        )}
       </div>
 
       <div
@@ -139,22 +178,23 @@ function WorkerBulkAttendance() {
           >
             <tr>
               <th className={`px-4 py-3 font-medium ${textAlignment}`}>
-                Worker
+                {t("WorkerBulkAttendance.worker")}
               </th>
               <th className={`px-4 py-3 font-medium ${textAlignment}`}>
-                Trade
+                {t("WorkerBulkAttendance.trade")}
               </th>
               <th className={`px-4 py-3 font-medium ${textAlignment}`}>
-                Status
+                {t("WorkerBulkAttendance.status")}
               </th>
               <th className={`px-4 py-3 font-medium ${textAlignment}`}>
-                Overtime (Hrs)
+                {t("WorkerBulkAttendance.overtimeHours")}
               </th>
               <th className={`px-4 py-3 font-medium ${textAlignment}`}>
-                Notes
+                {t("WorkerBulkAttendance.notes")}
               </th>
             </tr>
           </thead>
+
           <tbody className="divide-y" style={{ borderColor: "var(--border)" }}>
             {workersData.map((w) => (
               <tr
@@ -168,20 +208,23 @@ function WorkerBulkAttendance() {
                 <td className={`px-4 py-3 font-medium ${textAlignment}`}>
                   {w.name}
                 </td>
+
                 <td
                   className={`px-4 py-3 ${textAlignment}`}
                   style={{ color: "var(--muted)" }}
                 >
                   <span className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-xs capitalize">
-                    {w.trade.replace("_", " ")}
+                    {(w.trade || "").replace("_", " ")}
                   </span>
                 </td>
+
                 <td className={`px-4 py-3 ${textAlignment}`}>
                   <select
                     value={w.status}
                     onChange={(e) =>
                       handleUpdate(w.workerId, "status", e.target.value)
                     }
+                    disabled={!canSaveAttendance}
                     className="rounded border px-2 py-1"
                     style={{
                       borderColor: "var(--border)",
@@ -189,16 +232,23 @@ function WorkerBulkAttendance() {
                       color: "var(--text)",
                     }}
                   >
-                    <option value="present">Present (Full Day)</option>
-                    <option value="half_day">Half Day</option>
-                    <option value="absent">Absent</option>
+                    <option value="present">
+                      {t("WorkerBulkAttendance.present")}
+                    </option>
+                    <option value="half_day">
+                      {t("WorkerBulkAttendance.halfDay")}
+                    </option>
+                    <option value="absent">
+                      {t("WorkerBulkAttendance.absent")}
+                    </option>
                   </select>
                 </td>
+
                 <td className={`px-4 py-3 ${textAlignment}`}>
                   <input
                     type="number"
                     step="0.5"
-                    disabled={w.status === "absent"}
+                    disabled={!canSaveAttendance || w.status === "absent"}
                     value={w.overtime_hours}
                     onChange={(e) =>
                       handleUpdate(w.workerId, "overtime_hours", e.target.value)
@@ -211,6 +261,7 @@ function WorkerBulkAttendance() {
                     }}
                   />
                 </td>
+
                 <td className={`px-4 py-3 ${textAlignment}`}>
                   <input
                     type="text"
@@ -218,8 +269,9 @@ function WorkerBulkAttendance() {
                     onChange={(e) =>
                       handleUpdate(w.workerId, "notes", e.target.value)
                     }
+                    disabled={!canSaveAttendance}
                     className="w-full rounded border px-2 py-1"
-                    placeholder="Optional note..."
+                    placeholder={t("WorkerBulkAttendance.optionalNote")}
                     style={{
                       borderColor: "var(--border)",
                       backgroundColor: "var(--bg)",

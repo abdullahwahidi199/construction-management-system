@@ -17,6 +17,7 @@ from django.utils import timezone
 from project.models import Project
 from expenses.models import Expense
 from Employees.models import Employee, Payroll, Attendance
+from labour.models import WorkerPayroll
 from subcontractor.models import (
     Subcontractor, Contract, ContractPayment,
     ContractVariation, ContractStatusChoices
@@ -1056,6 +1057,24 @@ class DashboardService:
                 Decimal("0.00"),
             ),
         )
+        worker_payroll = WorkerPayroll.objects.aggregate(
+            gross_usd=Coalesce(
+                Sum("gross_amount", filter=Q(currency="USD")),
+                Decimal("0.00"),
+            ),
+            gross_afn=Coalesce(
+                Sum("gross_amount", filter=Q(currency="AFN")),
+                Decimal("0.00"),
+            ),
+            net_usd=Coalesce(
+                Sum("net_amount", filter=Q(currency="USD")),
+                Decimal("0.00"),
+            ),
+            net_afn=Coalesce(
+                Sum("net_amount", filter=Q(currency="AFN")),
+                Decimal("0.00"),
+            ),
+        )
 
         # ── Contract Payments ──────────────────────
         contract_payments = ContractPayment.objects.aggregate(
@@ -1110,10 +1129,14 @@ class DashboardService:
             },
 
             "payroll": {
-                "gross_usd": payroll["gross_usd"],
-                "gross_afn": payroll["gross_afn"],
-                "net_usd": payroll["net_usd"],
-                "net_afn": payroll["net_afn"],
+                "gross_usd": payroll["gross_usd"] + worker_payroll["gross_usd"],
+                "gross_afn": payroll["gross_afn"] + worker_payroll["gross_afn"],
+                "net_usd": payroll["net_usd"] + worker_payroll["net_usd"],
+                "net_afn": payroll["net_afn"] + worker_payroll["net_afn"],
+                "employee_net_usd": payroll["net_usd"],
+                "employee_net_afn": payroll["net_afn"],
+                "daily_worker_net_usd": worker_payroll["net_usd"],
+                "daily_worker_net_afn": worker_payroll["net_afn"],
             },
 
             "contracts": {
@@ -1138,11 +1161,13 @@ class DashboardService:
                 "usd": (
                     total_expenses_usd
                     + payroll["net_usd"]
+                    + worker_payroll["net_usd"]
                     + contract_payments["total_usd"]
                 ),
                 "afn": (
                     total_expenses_afn
                     + payroll["net_afn"]
+                    + worker_payroll["net_afn"]
                     + contract_payments["total_afn"]
                 ),
             },
@@ -1151,6 +1176,142 @@ class DashboardService:
     # ════════════════════════════════════════════
     # 8. FULL DASHBOARD (combines everything)
     # ════════════════════════════════════════════
+
+    @staticmethod
+    def get_payroll_summary():
+        today = date.today()
+        first_of_month = today.replace(day=1)
+        prev_month_start = (first_of_month - timedelta(days=1)).replace(day=1)
+
+        def employee_totals(queryset):
+            return queryset.aggregate(
+                gross_usd=Coalesce(Sum("gross_pay", filter=Q(currency="USD")), Decimal("0.00")),
+                gross_afn=Coalesce(Sum("gross_pay", filter=Q(currency="AFN")), Decimal("0.00")),
+                net_usd=Coalesce(Sum("net_pay", filter=Q(currency="USD")), Decimal("0.00")),
+                net_afn=Coalesce(Sum("net_pay", filter=Q(currency="AFN")), Decimal("0.00")),
+                deductions_usd=Coalesce(Sum("deductions", filter=Q(currency="USD")), Decimal("0.00")),
+                deductions_afn=Coalesce(Sum("deductions", filter=Q(currency="AFN")), Decimal("0.00")),
+                tax_usd=Coalesce(Sum("tax_deducted", filter=Q(currency="USD")), Decimal("0.00")),
+                tax_afn=Coalesce(Sum("tax_deducted", filter=Q(currency="AFN")), Decimal("0.00")),
+                bonus_usd=Coalesce(Sum("bonus", filter=Q(currency="USD")), Decimal("0.00")),
+                bonus_afn=Coalesce(Sum("bonus", filter=Q(currency="AFN")), Decimal("0.00")),
+                overtime_usd=Coalesce(Sum("overtime_amount", filter=Q(currency="USD")), Decimal("0.00")),
+                overtime_afn=Coalesce(Sum("overtime_amount", filter=Q(currency="AFN")), Decimal("0.00")),
+                count=Count("id"),
+            )
+
+        overtime_amount = ExpressionWrapper(
+            F("overtime_hours") * F("overtime_rate_applied"),
+            output_field=DecimalField(max_digits=15, decimal_places=2),
+        )
+
+        def worker_totals(queryset):
+            return queryset.aggregate(
+                gross_usd=Coalesce(Sum("gross_amount", filter=Q(currency="USD")), Decimal("0.00")),
+                gross_afn=Coalesce(Sum("gross_amount", filter=Q(currency="AFN")), Decimal("0.00")),
+                net_usd=Coalesce(Sum("net_amount", filter=Q(currency="USD")), Decimal("0.00")),
+                net_afn=Coalesce(Sum("net_amount", filter=Q(currency="AFN")), Decimal("0.00")),
+                deductions_usd=Coalesce(Sum("deductions", filter=Q(currency="USD")), Decimal("0.00")),
+                deductions_afn=Coalesce(Sum("deductions", filter=Q(currency="AFN")), Decimal("0.00")),
+                advances_usd=Coalesce(Sum("advances", filter=Q(currency="USD")), Decimal("0.00")),
+                advances_afn=Coalesce(Sum("advances", filter=Q(currency="AFN")), Decimal("0.00")),
+                overtime_usd=Coalesce(Sum(overtime_amount, filter=Q(currency="USD")), Decimal("0.00")),
+                overtime_afn=Coalesce(Sum(overtime_amount, filter=Q(currency="AFN")), Decimal("0.00")),
+                count=Count("id"),
+            )
+
+        employee_current = employee_totals(Payroll.objects.filter(payroll_period_start__gte=first_of_month))
+        employee_previous = employee_totals(Payroll.objects.filter(payroll_period_start__gte=prev_month_start, payroll_period_start__lt=first_of_month))
+        worker_current = worker_totals(WorkerPayroll.objects.filter(period_start__gte=first_of_month))
+        worker_previous = worker_totals(WorkerPayroll.objects.filter(period_start__gte=prev_month_start, period_start__lt=first_of_month))
+
+        current_month = {
+            "gross_usd": employee_current["gross_usd"] + worker_current["gross_usd"],
+            "gross_afn": employee_current["gross_afn"] + worker_current["gross_afn"],
+            "net_usd": employee_current["net_usd"] + worker_current["net_usd"],
+            "net_afn": employee_current["net_afn"] + worker_current["net_afn"],
+            "total_deductions_usd": employee_current["deductions_usd"] + worker_current["deductions_usd"] + worker_current["advances_usd"],
+            "total_deductions_afn": employee_current["deductions_afn"] + worker_current["deductions_afn"] + worker_current["advances_afn"],
+            "total_tax_usd": employee_current["tax_usd"],
+            "total_tax_afn": employee_current["tax_afn"],
+            "total_bonus_usd": employee_current["bonus_usd"],
+            "total_bonus_afn": employee_current["bonus_afn"],
+            "total_overtime_usd": employee_current["overtime_usd"] + worker_current["overtime_usd"],
+            "total_overtime_afn": employee_current["overtime_afn"] + worker_current["overtime_afn"],
+            "employee_net_usd": employee_current["net_usd"],
+            "employee_net_afn": employee_current["net_afn"],
+            "daily_worker_net_usd": worker_current["net_usd"],
+            "daily_worker_net_afn": worker_current["net_afn"],
+            "count": employee_current["count"] + worker_current["count"],
+        }
+        previous_month = {
+            "gross_usd": employee_previous["gross_usd"] + worker_previous["gross_usd"],
+            "gross_afn": employee_previous["gross_afn"] + worker_previous["gross_afn"],
+            "net_usd": employee_previous["net_usd"] + worker_previous["net_usd"],
+            "net_afn": employee_previous["net_afn"] + worker_previous["net_afn"],
+            "count": employee_previous["count"] + worker_previous["count"],
+        }
+
+        methods = defaultdict(lambda: {"payment_method": "", "count": 0, "total_usd": Decimal("0.00"), "total_afn": Decimal("0.00")})
+        method_rows = list(
+            Payroll.objects.values("payment_method").annotate(
+                count=Count("id"),
+                total_usd=Coalesce(Sum("net_pay", filter=Q(currency="USD")), Decimal("0.00")),
+                total_afn=Coalesce(Sum("net_pay", filter=Q(currency="AFN")), Decimal("0.00")),
+            )
+        ) + list(
+            WorkerPayroll.objects.values("payment_method").annotate(
+                count=Count("id"),
+                total_usd=Coalesce(Sum("net_amount", filter=Q(currency="USD")), Decimal("0.00")),
+                total_afn=Coalesce(Sum("net_amount", filter=Q(currency="AFN")), Decimal("0.00")),
+            )
+        )
+        for row in method_rows:
+            method = row["payment_method"]
+            methods[method]["payment_method"] = method
+            methods[method]["count"] += row["count"]
+            methods[method]["total_usd"] += row["total_usd"]
+            methods[method]["total_afn"] += row["total_afn"]
+
+        recent_payrolls = []
+        for payroll in Payroll.objects.select_related("employee").order_by("-created_at")[:5]:
+            recent_payrolls.append({
+                "id": payroll.id,
+                "employee__first_name": payroll.employee.first_name,
+                "employee__last_name": payroll.employee.last_name,
+                "employee__employee_id": payroll.employee.employee_id,
+                "payroll_period_start": payroll.payroll_period_start,
+                "payroll_period_end": payroll.payroll_period_end,
+                "gross_pay": payroll.gross_pay,
+                "net_pay": payroll.net_pay,
+                "currency": payroll.currency,
+                "payment_date": payroll.payment_date,
+                "created_at": payroll.created_at,
+            })
+        for payroll in WorkerPayroll.objects.select_related("worker").order_by("-created_at")[:5]:
+            recent_payrolls.append({
+                "id": payroll.id,
+                "employee__first_name": payroll.worker.full_name,
+                "employee__last_name": "",
+                "employee__employee_id": payroll.worker.worker_id,
+                "payroll_period_start": payroll.period_start,
+                "payroll_period_end": payroll.period_end,
+                "gross_pay": payroll.gross_amount,
+                "net_pay": payroll.net_amount,
+                "currency": payroll.currency,
+                "payment_date": payroll.payment_date,
+                "created_at": payroll.created_at,
+            })
+        recent_payrolls = sorted(recent_payrolls, key=lambda item: item["created_at"], reverse=True)[:5]
+        for payroll in recent_payrolls:
+            payroll.pop("created_at", None)
+
+        return {
+            "current_month": current_month,
+            "previous_month": previous_month,
+            "payment_method_breakdown": sorted(methods.values(), key=lambda item: item["count"], reverse=True),
+            "recent_payrolls": recent_payrolls,
+        }
 
     @staticmethod
     def get_full_dashboard():

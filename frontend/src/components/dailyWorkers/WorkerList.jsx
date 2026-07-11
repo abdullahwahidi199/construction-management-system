@@ -1,54 +1,122 @@
 import React, { useState, useEffect } from "react";
+import { Edit2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { useLanguage } from "../../hooks/useLanguage";
+import { useAuth } from "../../auth/AuthContext";
 import AddWorkerModal from "./AddWorkerModal";
+import useFetch from "../../hooks/useFetch";
+import { hasAnyPermission } from "../../../utils/permissions";
 
 function WorkersList() {
-  const { fetchWorkers, loading } = useDailyWorkers();
+  const { fetchWorkers, fetchWorkerDetail, deleteWorker, loading } =
+    useDailyWorkers();
+  const { data: projects = [] } = useFetch("projects/");
+
   const { t, language } = useLanguage();
+  const { permissions } = useAuth();
+  const canCreate = hasAnyPermission(permissions, ["daily_workers.create"]);
+  const canUpdate = hasAnyPermission(permissions, ["daily_workers.update"]);
+  const canDelete = hasAnyPermission(permissions, ["daily_workers.delete"]);
+  const canManage = canUpdate || canDelete;
   const isRTL = ["fa", "ps", "dari", "pashto"].includes(language);
   const textAlignment = isRTL ? "text-right" : "text-left";
 
   const [workers, setWorkers] = useState([]);
+  const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedWorker, setSelectedWorker] = useState(null);
 
   useEffect(() => {
     loadWorkers();
-  }, []);
+  }, [search]);
 
   const loadWorkers = async () => {
     try {
-      const data = await fetchWorkers();
+      const data = await fetchWorkers({ search });
       setWorkers(data);
     } catch (err) {
       console.error(err);
     }
   };
 
+  const handleAdd = () => {
+    setSelectedWorker(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = async (workerId) => {
+    try {
+      const data = await fetchWorkerDetail(workerId);
+      setSelectedWorker(data.worker);
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error(err);
+      alert(t("workersList.couldNotLoadWorkerDetails"));
+    }
+  };
+
+  const handleDelete = async (worker) => {
+    if (
+      !window.confirm(
+        t("workersList.deleteWorkerConfirmation", { name: worker.full_name }),
+      )
+    )
+      return;
+    try {
+      await deleteWorker(worker.id);
+      await loadWorkers();
+    } catch (err) {
+      console.error(err);
+      alert(t("workersList.couldNotDeleteWorker"));
+    }
+  };
+
   return (
     <div className="space-y-4" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Construction Workers</h2>
-        {/* Placeholder for "Add Worker" Modal Trigger */}
-        <AddWorkerModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSuccess={loadWorkers}
-        />
-
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Construction Workers</h2>
-
-          {/* 4. Fix the fucking button ;) */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <h2 className="text-xl font-bold">{t("constructionWorkers")}</h2>
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t("workersList.searchWorkersPlaceholder")}
+            className="rounded border px-3 py-2 text-sm outline-none"
+            style={{
+              borderColor: "var(--border)",
+              backgroundColor: "var(--bg)",
+              color: "var(--text)",
+            }}
+          />
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="rounded px-4 py-2 text-sm text-white"
-            style={{ backgroundColor: "var(--primary)" }}
+            onClick={loadWorkers}
+            className="rounded border p-2"
+            style={{ borderColor: "var(--border)" }}
+            title={t("refresh")}
+            aria-label={t("refresh")}
           >
-            + Add Worker
+            <RefreshCw className="h-4 w-4" />
           </button>
+          {canCreate && (
+            <button
+              onClick={handleAdd}
+              className="inline-flex items-center gap-2 rounded px-4 py-2 text-sm text-white"
+              style={{ backgroundColor: "var(--primary)" }}
+            >
+              <Plus className="h-4 w-4" />
+              {t("workersList.addWorker")}
+            </button>
+          )}
         </div>
       </div>
+
+      <AddWorkerModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={loadWorkers}
+        worker={selectedWorker}
+        projects={projects}
+      />
 
       <div
         className="rounded-lg border"
@@ -61,24 +129,39 @@ function WorkersList() {
           >
             <tr>
               <th className={`px-4 py-3 font-medium ${textAlignment}`}>
-                ID & Name
+                {t("workersList.idAndName")}
               </th>
               <th className={`px-4 py-3 font-medium ${textAlignment}`}>
-                Trade
+                {t("workersList.trade")}
               </th>
               <th className={`px-4 py-3 font-medium ${textAlignment}`}>
-                Daily Rate
+                {t("workersList.dailyRate")}
               </th>
               <th className={`px-4 py-3 font-medium ${textAlignment}`}>
-                Status
+                {t("workersList.status")}
               </th>
+              {canManage && (
+                <th className={`px-4 py-3 font-medium ${textAlignment}`}>
+                  {t("workersList.actions")}
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y" style={{ borderColor: "var(--border)" }}>
             {loading ? (
               <tr>
-                <td colSpan="4" className="text-center py-6">
-                  Loading...
+                <td colSpan={canManage ? 5 : 4} className="text-center py-6">
+                  {t("workersList.loading")}
+                </td>
+              </tr>
+            ) : workers.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={canManage ? 5 : 4}
+                  className="text-center py-6"
+                  style={{ color: "var(--muted)" }}
+                >
+                  {t("workersList.noWorkersFound")}
                 </td>
               </tr>
             ) : (
@@ -91,24 +174,65 @@ function WorkersList() {
                     </div>
                   </td>
                   <td className={`px-4 py-3 capitalize ${textAlignment}`}>
-                    {w.trade.replace("_", " ")}
+                    {(w.trade || w.skill_type || "").replace("_", " ")}
+                    {w.assigned_project_name && (
+                      <div
+                        className="text-xs normal-case"
+                        style={{ color: "var(--muted)" }}
+                      >
+                        {w.assigned_project_name}
+                      </div>
+                    )}
                   </td>
                   <td className={`px-4 py-3 ${textAlignment}`}>
                     <div className="font-medium">
                       {w.daily_rate} {w.currency}
                     </div>
                     <div className="text-xs" style={{ color: "var(--muted)" }}>
-                      OT: {w.overtime_hourly_rate} {w.currency}/h
+                      {t("workersList.overtimeRate", {
+                        rate: w.overtime_hourly_rate,
+                        currency: w.currency,
+                      })}
                     </div>
                   </td>
                   <td className={`px-4 py-3 ${textAlignment}`}>
-                    {w.is_active ? (
-                      <span className="h-2 w-2 rounded-full bg-green-500 inline-block mr-2"></span>
+                    {w.status === "active" ? (
+                      <span className="h-2 w-2 rounded-full bg-green-500 inline-block me-2"></span>
                     ) : (
-                      <span className="h-2 w-2 rounded-full bg-red-500 inline-block mr-2"></span>
+                      <span className="h-2 w-2 rounded-full bg-red-500 inline-block me-2"></span>
                     )}
-                    {w.is_active ? "Active" : "Inactive"}
+                    {w.status === "active" ? t("active") : t("inactive")}
                   </td>
+                  {canManage && (
+                    <td className={`px-4 py-3 ${textAlignment}`}>
+                      <div className="flex items-center gap-2">
+                        {canUpdate && (
+                          <button
+                            onClick={() => handleEdit(w.id)}
+                            className="rounded border p-2"
+                            style={{ borderColor: "var(--border)" }}
+                            title={t("editWorker")}
+                            aria-label={t("editWorkerAria", { name: w.full_name })}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                        )}
+                        {canDelete && (
+                          <button
+                            onClick={() => handleDelete(w)}
+                            className="rounded border p-2 text-red-600"
+                            style={{ borderColor: "var(--border)" }}
+                            title={t("deleteWorker")}
+                            aria-label={t("deleteWorkerAria", {
+                              name: w.full_name,
+                            })}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))
             )}

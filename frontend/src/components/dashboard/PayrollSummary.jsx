@@ -71,6 +71,16 @@ export default function PayrollSummary({ data }) {
               {t("payrollSummary.gross")}:{" "}
               {renderDual(current.gross_usd, current.gross_afn)}
             </div>
+            <div className="mt-2 space-y-1 text-xs text-[var(--muted)]">
+              <div className="flex justify-between gap-3">
+                <span>Employees</span>
+                <div className="text-right">{renderDual(current.employee_net_usd, current.employee_net_afn)}</div>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>Daily workers</span>
+                <div className="text-right">{renderDual(current.daily_worker_net_usd, current.daily_worker_net_afn)}</div>
+              </div>
+            </div>
           </div>
 
           <div className="p-4 rounded-lg bg-[var(--bg)] border border-[var(--border)]">

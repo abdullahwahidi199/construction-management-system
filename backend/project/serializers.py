@@ -6,6 +6,7 @@ from subcontractor.models import Contract
 from subcontractor.serializers import ContractListSerializer
 from django.db.models import Sum
 from decimal import Decimal
+from labour.models import WorkerPayroll
 
 
 
@@ -20,6 +21,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     total_contract_value = serializers.SerializerMethodField()
     total_contract_payments = serializers.SerializerMethodField()
     remaining_contract_balance = serializers.SerializerMethodField()
+    worker_payroll_summary = serializers.SerializerMethodField()
     class Meta:
         model = Project
         fields = "__all__"
@@ -73,6 +75,41 @@ class ProjectSerializer(serializers.ModelSerializer):
             "AFN": contract_values["AFN"] - payments["AFN"],
             "USD": contract_values["USD"] - payments["USD"],
         }
+
+    def get_worker_payroll_summary(self, obj):
+        summary = {
+            "AFN": {
+                "gross": Decimal("0.00"),
+                "net": Decimal("0.00"),
+                "advances": Decimal("0.00"),
+                "deductions": Decimal("0.00"),
+                "count": 0,
+            },
+            "USD": {
+                "gross": Decimal("0.00"),
+                "net": Decimal("0.00"),
+                "advances": Decimal("0.00"),
+                "deductions": Decimal("0.00"),
+                "count": 0,
+            },
+        }
+
+        payrolls = WorkerPayroll.objects.filter(project=obj)
+        for currency in summary.keys():
+            totals = payrolls.filter(currency=currency).aggregate(
+                gross=Sum("gross_amount"),
+                net=Sum("net_amount"),
+                advances=Sum("advances"),
+                deductions=Sum("deductions"),
+            )
+            summary[currency] = {
+                "gross": totals["gross"] or Decimal("0.00"),
+                "net": totals["net"] or Decimal("0.00"),
+                "advances": totals["advances"] or Decimal("0.00"),
+                "deductions": totals["deductions"] or Decimal("0.00"),
+                "count": payrolls.filter(currency=currency).count(),
+            }
+        return summary
     
 class ProjectListSerializer(serializers.ModelSerializer):
     class Meta:

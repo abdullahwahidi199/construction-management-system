@@ -1,57 +1,107 @@
-from rest_framework import viewsets, status
+from datetime import date
+from decimal import Decimal
+
+from django.db import transaction
+from django.db.models import Count, Q, Sum
+from django.db.models.functions import Coalesce, TruncMonth
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db import transaction
-from django.db.models import Q, Sum, Count
-from datetime import date
 
-# Import your existing permissions
-from accounts.permissions import RBACPermission 
-from accounts.services import has_permission
+from accounts.permissions import RBACPermission
+from project.models import Project
 
-from .models import DailyWorker, WorkerAttendance, WorkerPayroll
+from .models import DailyWorker, WorkerAdvance, WorkerAttendance, WorkerPayroll
 from .serializers import (
-    DailyWorkerSerializer, WorkerAttendanceSerializer, 
-    BulkWorkerAttendanceSerializer, WorkerPayrollSerializer,
-    GenerateWorkerPayrollSerializer
+    BulkWorkerAttendanceSerializer,
+    DailyWorkerListSerializer,
+    DailyWorkerSerializer,
+    GenerateWorkerPayrollSerializer,
+    WorkerAdvanceSerializer,
+    WorkerAttendanceSerializer,
+    WorkerPayrollSerializer,
 )
 
+
 class DailyWorkerViewSet(viewsets.ModelViewSet):
-    queryset = DailyWorker.objects.all()
-    serializer_class = DailyWorkerSerializer
+    queryset = DailyWorker.objects.select_related("assigned_project").prefetch_related("attendances", "payrolls", "advances")
     permission_classes = [RBACPermission]
     rbac_resource = "daily_workers"
 
+    def get_serializer_class(self):
+        return DailyWorkerListSerializer if self.action == "list" else DailyWorkerSerializer
+
     def get_queryset(self):
         qs = super().get_queryset()
-        search = self.request.query_params.get('search')
-        trade = self.request.query_params.get('trade')
-        is_active = self.request.query_params.get('is_active')
+        search = self.request.query_params.get("search")
+        skill_type = self.request.query_params.get("skill_type") or self.request.query_params.get("trade")
+        status_filter = self.request.query_params.get("status")
+        project = self.request.query_params.get("project")
+        ordering = self.request.query_params.get("ordering")
 
         if search:
-            qs = qs.filter(Q(first_name__icontains=search) | Q(last_name__icontains=search) | Q(worker_id__icontains=search))
-        if trade:
-            qs = qs.filter(trade=trade)
-        if is_active is not None:
-            qs = qs.filter(is_active=(is_active.lower() == 'true'))
+            qs = qs.filter(
+                Q(full_name__icontains=search)
+                | Q(father_name__icontains=search)
+                | Q(worker_id__icontains=search)
+                | Q(phone__icontains=search)
+                | Q(national_id__icontains=search)
+            )
+        if skill_type:
+            qs = qs.filter(skill_type=skill_type)
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        if project:
+            qs = qs.filter(assigned_project_id=project)
+        if ordering:
+            qs = qs.order_by(ordering)
         return qs
+
+    @action(detail=True, methods=["get"])
+    def detail_summary(self, request, pk=None):
+        worker = self.get_object()
+        return Response({
+            "worker": DailyWorkerSerializer(worker).data,
+            "attendance_history": WorkerAttendanceSerializer(worker.attendances.select_related("project")[:50], many=True).data,
+            "payroll_history": WorkerPayrollSerializer(worker.payrolls.select_related("project")[:50], many=True).data,
+            "advances": WorkerAdvanceSerializer(worker.advances.all()[:50], many=True).data,
+            "projects": list(Project.objects.filter(
+                Q(id=worker.assigned_project_id) | Q(worker_attendances__worker=worker) | Q(worker_payrolls__worker=worker)
+            ).distinct().values("id", "name", "status", "location")),
+            "documents": [],
+        })
 
 
 class WorkerAttendanceViewSet(viewsets.ModelViewSet):
-    queryset = WorkerAttendance.objects.select_related('worker')
+    queryset = WorkerAttendance.objects.select_related("worker", "project")
     serializer_class = WorkerAttendanceSerializer
     permission_classes = [RBACPermission]
     rbac_resource = "daily_worker_attendance"
 
     def get_queryset(self):
         qs = super().get_queryset()
-        worker = self.request.query_params.get('worker')
-        date_param = self.request.query_params.get('date')
-        site = self.request.query_params.get('project_site')
+        worker = self.request.query_params.get("worker")
+        project = self.request.query_params.get("project")
+        date_param = self.request.query_params.get("date")
+        start_date = self.request.query_params.get("start_date")
+        end_date = self.request.query_params.get("end_date")
+        status_param = self.request.query_params.get("status")
+        search = self.request.query_params.get("search")
 
-        if worker: qs = qs.filter(worker_id=worker)
-        if date_param: qs = qs.filter(date=date_param)
-        if site: qs = qs.filter(project_site__icontains=site)
+        if worker:
+            qs = qs.filter(worker_id=worker)
+        if project:
+            qs = qs.filter(project_id=project)
+        if date_param:
+            qs = qs.filter(date=date_param)
+        if start_date:
+            qs = qs.filter(date__gte=start_date)
+        if end_date:
+            qs = qs.filter(date__lte=end_date)
+        if status_param:
+            qs = qs.filter(status=status_param)
+        if search:
+            qs = qs.filter(Q(worker__full_name__icontains=search) | Q(worker__worker_id__icontains=search))
         return qs
 
     def perform_create(self, serializer):
@@ -60,146 +110,261 @@ class WorkerAttendanceViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"])
     @transaction.atomic
     def bulk_mark(self, request):
-        """Mark attendance for multiple construction workers at once (e.g. by the Foreman)"""
         serializer = BulkWorkerAttendanceSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-
         target_date = data["date"]
-        project_site = data.get("project_site", "")
-        
-        created_count = 0
-        updated_count = 0
+        project_id = data.get("project")
+        created, updated, errors = [], [], []
 
         for record in data["records"]:
-            worker_id = record["worker"]
             try:
-                worker = DailyWorker.objects.get(id=worker_id, is_active=True)
+                worker = DailyWorker.objects.get(id=record["worker"], status="active")
             except DailyWorker.DoesNotExist:
+                errors.append({"worker": record.get("worker"), "error": "Worker not found or inactive."})
                 continue
 
             defaults = {
+                "project_id": project_id or worker.assigned_project_id,
                 "status": record["status"],
-                "overtime_hours": record.get("overtime_hours", 0),
-                "notes": record.get("notes", ""),
-                "project_site": project_site
+                "overtime_hours": record.get("overtime_hours") or 0,
+                "notes": (record.get("notes") or "").strip(),
             }
+            if defaults["status"] == "absent":
+                defaults["overtime_hours"] = 0
 
-            obj, created = WorkerAttendance.objects.update_or_create(
+            obj, was_created = WorkerAttendance.objects.update_or_create(
                 worker=worker,
                 date=target_date,
-                defaults=defaults
+                defaults=defaults,
             )
-            
-            if created:
+            if was_created:
                 obj.created_by = request.user
-                obj.save()
-                created_count += 1
+                obj.save(update_fields=["created_by"])
+                created.append(WorkerAttendanceSerializer(obj).data)
             else:
-                updated_count += 1
-
-        return Response({
-            "message": f"Successfully marked attendance.",
-            "created": created_count,
-            "updated": updated_count
-        })
-
-    @action(detail=False, methods=['get'])
-    def daily_status(self, request):
-        """Shows who is present/absent on the site today"""
-        target_date = request.query_params.get('date', str(date.today()))
-        
-        attendances = WorkerAttendance.objects.filter(date=target_date)
-        marked_ids = attendances.values_list('worker_id', flat=True)
-        unmarked = DailyWorker.objects.filter(is_active=True).exclude(id__in=marked_ids)
+                updated.append(WorkerAttendanceSerializer(obj).data)
 
         return Response({
             "date": target_date,
-            "present_count": attendances.filter(status='present').count(),
-            "half_day_count": attendances.filter(status='half_day').count(),
-            "absent_count": attendances.filter(status='absent').count(),
+            "created_count": len(created),
+            "updated_count": len(updated),
+            "error_count": len(errors),
+            "created": created,
+            "updated": updated,
+            "errors": errors,
+        })
+
+    @action(detail=False, methods=["get"])
+    def daily_status(self, request):
+        target_date = request.query_params.get("date", str(date.today()))
+        project = request.query_params.get("project")
+        records = self.get_queryset().filter(date=target_date)
+        active_workers = DailyWorker.objects.filter(status="active")
+        if project:
+            active_workers = active_workers.filter(assigned_project_id=project)
+            records = records.filter(project_id=project)
+        marked_ids = records.values_list("worker_id", flat=True)
+        unmarked = active_workers.exclude(id__in=marked_ids)
+        counts = dict(records.values_list("status").annotate(count=Count("id")).values_list("status", "count"))
+        return Response({
+            "date": target_date,
+            "status_counts": {
+                "present": counts.get("present", 0),
+                "absent": counts.get("absent", 0),
+                "half_day": counts.get("half_day", 0),
+                "overtime": counts.get("overtime", 0),
+            },
+            "present_count": counts.get("present", 0) + counts.get("overtime", 0),
+            "absent_count": counts.get("absent", 0),
+            "half_day_count": counts.get("half_day", 0),
             "unmarked_count": unmarked.count(),
-            "marked_records": WorkerAttendanceSerializer(attendances, many=True).data,
-            "unmarked_workers": DailyWorkerSerializer(unmarked, many=True).data
+            "marked_records": WorkerAttendanceSerializer(records, many=True).data,
+            "unmarked_workers": DailyWorkerListSerializer(unmarked, many=True).data,
+        })
+
+    @action(detail=False, methods=["get"])
+    def summary(self, request):
+        qs = self.get_queryset()
+        return Response({
+            "total_records": qs.count(),
+            "present": qs.filter(status="present").count(),
+            "absent": qs.filter(status="absent").count(),
+            "half_day": qs.filter(status="half_day").count(),
+            "overtime": qs.filter(status="overtime").count(),
+            "overtime_hours": qs.aggregate(total=Coalesce(Sum("overtime_hours"), Decimal("0.00")))["total"],
         })
 
 
+class WorkerAdvanceViewSet(viewsets.ModelViewSet):
+    queryset = WorkerAdvance.objects.select_related("worker")
+    serializer_class = WorkerAdvanceSerializer
+    permission_classes = [RBACPermission]
+    rbac_resource = "worker_advances"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        worker = self.request.query_params.get("worker")
+        status_filter = self.request.query_params.get("status")
+        if worker:
+            qs = qs.filter(worker_id=worker)
+        if status_filter == "open":
+            qs = qs.filter(remaining_balance__gt=0)
+        elif status_filter == "paid":
+            qs = qs.filter(remaining_balance__lte=0)
+        return qs
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+
 class WorkerPayrollViewSet(viewsets.ModelViewSet):
-    queryset = WorkerPayroll.objects.select_related('worker')
+    queryset = WorkerPayroll.objects.select_related("worker", "project")
     serializer_class = WorkerPayrollSerializer
     permission_classes = [RBACPermission]
     rbac_resource = "daily_worker_payroll"
 
     def get_queryset(self):
         qs = super().get_queryset()
-        worker = self.request.query_params.get('worker')
-        is_paid = self.request.query_params.get('is_paid')
-
-        if worker: qs = qs.filter(worker_id=worker)
-        if is_paid is not None: qs = qs.filter(is_paid=(is_paid.lower() == 'true'))
+        worker = self.request.query_params.get("worker")
+        project = self.request.query_params.get("project")
+        status_filter = self.request.query_params.get("status")
+        start_date = self.request.query_params.get("start_date")
+        end_date = self.request.query_params.get("end_date")
+        if worker:
+            qs = qs.filter(worker_id=worker)
+        if project:
+            qs = qs.filter(project_id=project)
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        if start_date:
+            qs = qs.filter(period_start__gte=start_date)
+        if end_date:
+            qs = qs.filter(period_end__lte=end_date)
         return qs
 
-    @action(detail=False, methods=['post'])
+    def perform_create(self, serializer):
+        payroll = serializer.save(created_by=self.request.user)
+        payroll.calculate_from_attendance()
+        payroll.save()
+
+    def perform_update(self, serializer):
+        payroll = serializer.save()
+        payroll.calculate_from_attendance()
+        payroll.save()
+
+    @action(detail=False, methods=["post"])
     @transaction.atomic
     def generate(self, request):
-        """
-        MAGIC ENDPOINT: Automatically creates payrolls based strictly on attendance records!
-        Provide start date, end date, and optional list of worker IDs.
-        """
         serializer = GenerateWorkerPayrollSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
-        start_date = serializer.validated_data['period_start']
-        end_date = serializer.validated_data['period_end']
-        worker_ids = serializer.validated_data.get('worker_ids', [])
-        payment_method = serializer.validated_data['payment_method']
+        data = serializer.validated_data
+        start_date = data["period_start"]
+        end_date = data["period_end"]
+        project_id = data.get("project")
+        worker_ids = data.get("worker_ids") or ([data["worker"]] if data.get("worker") else [])
 
-        workers = DailyWorker.objects.filter(is_active=True)
+        workers = DailyWorker.objects.filter(status="active")
         if worker_ids:
             workers = workers.filter(id__in=worker_ids)
+        if project_id:
+            workers = workers.filter(Q(assigned_project_id=project_id) | Q(attendances__project_id=project_id)).distinct()
 
-        generated_payrolls = []
-        errors = []
-
+        generated, errors = [], []
         for worker in workers:
-            # Prevent duplicate generation
-            if WorkerPayroll.objects.filter(worker=worker, period_start=start_date, period_end=end_date).exists():
-                errors.append(f"Payroll already exists for {worker.full_name} in this period.")
+            attendance = WorkerAttendance.objects.filter(worker=worker, date__gte=start_date, date__lte=end_date)
+            if project_id:
+                attendance = attendance.filter(project_id=project_id)
+            if not attendance.exists():
                 continue
-
-            # Check if they actually worked in this period
-            has_attendance = WorkerAttendance.objects.filter(
-                worker=worker, date__gte=start_date, date__lte=end_date
-            ).exists()
-
-            if not has_attendance:
-                continue # Skip workers who didn't show up at all this week/month
-
+            if WorkerPayroll.objects.filter(worker=worker, project_id=project_id, period_start=start_date, period_end=end_date).exists():
+                errors.append({"worker": worker.full_name, "error": "Payroll already exists for this period."})
+                continue
             payroll = WorkerPayroll(
                 worker=worker,
+                project_id=project_id,
                 period_start=start_date,
                 period_end=end_date,
                 daily_rate_applied=worker.daily_rate,
                 overtime_rate_applied=worker.overtime_hourly_rate,
                 currency=worker.currency,
-                payment_method=payment_method,
-                created_by=request.user
+                payment_method=data["payment_method"],
+                deductions=data["deductions"],
+                notes=data.get("notes", ""),
+                created_by=request.user,
             )
-            
             payroll.calculate_from_attendance()
             payroll.save()
-            generated_payrolls.append(WorkerPayrollSerializer(payroll).data)
+            generated.append(WorkerPayrollSerializer(payroll).data)
 
-        return Response({
-            "message": f"Generated {len(generated_payrolls)} payroll records.",
-            "generated": generated_payrolls,
-            "errors": errors
-        })
+        return Response({"message": f"Generated {len(generated)} payroll records.", "generated": generated, "errors": errors}, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=['patch'])
+    @action(detail=True, methods=["patch"])
+    def approve(self, request, pk=None):
+        payroll = self.get_object()
+        payroll.status = "approved"
+        payroll.save(update_fields=["status", "updated_at"])
+        return Response(self.get_serializer(payroll).data)
+
+    @action(detail=True, methods=["patch"])
+    @transaction.atomic
     def mark_paid(self, request, pk=None):
         payroll = self.get_object()
-        payroll.is_paid = True
-        payroll.payment_date = request.data.get('payment_date', date.today())
-        payroll.save()
+        payroll.status = "paid"
+        payroll.payment_date = request.data.get("payment_date") or date.today()
+        payroll.payment_method = request.data.get("payment_method") or payroll.payment_method
+        payroll.apply_advance_deductions()
+        payroll.save(update_fields=["status", "payment_date", "payment_method", "updated_at"])
         return Response(self.get_serializer(payroll).data)
+
+    @action(detail=False, methods=["get"])
+    def summary(self, request):
+        qs = self.get_queryset()
+        return Response({
+            "records": qs.count(),
+            "gross_amount": qs.aggregate(total=Coalesce(Sum("gross_amount"), Decimal("0.00")))["total"],
+            "advances": qs.aggregate(total=Coalesce(Sum("advances"), Decimal("0.00")))["total"],
+            "deductions": qs.aggregate(total=Coalesce(Sum("deductions"), Decimal("0.00")))["total"],
+            "net_amount": qs.aggregate(total=Coalesce(Sum("net_amount"), Decimal("0.00")))["total"],
+            "pending": qs.exclude(status="paid").count(),
+            "paid": qs.filter(status="paid").count(),
+        })
+
+    @action(detail=False, methods=["get"])
+    def reports(self, request):
+        payrolls = self.get_queryset()
+        attendance = WorkerAttendance.objects.select_related("worker", "project")
+        project = request.query_params.get("project")
+        worker = request.query_params.get("worker")
+        if project:
+            attendance = attendance.filter(project_id=project)
+        if worker:
+            attendance = attendance.filter(worker_id=worker)
+
+        monthly_labor_cost = list(
+            payrolls.annotate(month=TruncMonth("period_start"))
+            .values("month", "currency")
+            .annotate(total=Coalesce(Sum("net_amount"), Decimal("0.00")), count=Count("id"))
+            .order_by("month")
+        )
+        for row in monthly_labor_cost:
+            row["month"] = row["month"].strftime("%Y-%m") if row["month"] else None
+
+        return Response({
+            "worker_attendance_summary": list(attendance.values("worker_id", "worker__full_name").annotate(records=Count("id"), overtime_hours=Coalesce(Sum("overtime_hours"), Decimal("0.00")))),
+            "worker_payroll_summary": list(payrolls.values("worker_id", "worker__full_name", "currency").annotate(gross=Coalesce(Sum("gross_amount"), Decimal("0.00")), net=Coalesce(Sum("net_amount"), Decimal("0.00")), advances=Coalesce(Sum("advances"), Decimal("0.00")))),
+            "monthly_labor_cost": monthly_labor_cost,
+            "project_labor_cost": list(payrolls.values("project_id", "project__name", "currency").annotate(total=Coalesce(Sum("net_amount"), Decimal("0.00")), records=Count("id"))),
+            "worker_payment_history": WorkerPayrollSerializer(payrolls.filter(status="paid")[:100], many=True).data,
+            "attendance_statistics": {
+                "present": attendance.filter(status="present").count(),
+                "absent": attendance.filter(status="absent").count(),
+                "half_day": attendance.filter(status="half_day").count(),
+                "overtime": attendance.filter(status="overtime").count(),
+            },
+            "payroll_statistics": {
+                "draft": payrolls.filter(status="draft").count(),
+                "approved": payrolls.filter(status="approved").count(),
+                "paid": payrolls.filter(status="paid").count(),
+            },
+        })

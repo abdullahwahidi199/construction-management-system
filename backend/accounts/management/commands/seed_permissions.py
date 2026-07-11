@@ -57,6 +57,30 @@ PERMISSIONS = [
     ("attendance.update", "Update Attendance", "Attendance"),
     ("attendance.delete", "Delete Attendance", "Attendance"),
 
+    # Daily Workers
+    ("daily_workers.view", "View Daily Workers", "Daily Workers"),
+    ("daily_workers.create", "Create Daily Workers", "Daily Workers"),
+    ("daily_workers.update", "Update Daily Workers", "Daily Workers"),
+    ("daily_workers.delete", "Delete Daily Workers", "Daily Workers"),
+
+    # Worker Attendance
+    ("daily_worker_attendance.view", "View Worker Attendance", "Worker Attendance"),
+    ("daily_worker_attendance.create", "Create Worker Attendance", "Worker Attendance"),
+    ("daily_worker_attendance.update", "Update Worker Attendance", "Worker Attendance"),
+    ("daily_worker_attendance.delete", "Delete Worker Attendance", "Worker Attendance"),
+
+    # Worker Payroll
+    ("daily_worker_payroll.view", "View Worker Payroll", "Worker Payroll"),
+    ("daily_worker_payroll.create", "Create Worker Payroll", "Worker Payroll"),
+    ("daily_worker_payroll.update", "Update Worker Payroll", "Worker Payroll"),
+    ("daily_worker_payroll.delete", "Delete Worker Payroll", "Worker Payroll"),
+
+    # Worker Advances
+    ("worker_advances.view", "View Worker Advances", "Worker Advances"),
+    ("worker_advances.create", "Create Worker Advances", "Worker Advances"),
+    ("worker_advances.update", "Update Worker Advances", "Worker Advances"),
+    ("worker_advances.delete", "Delete Worker Advances", "Worker Advances"),
+
     # Subcontractors
     ("subcontractors.view", "View Subcontractors", "Subcontractors"),
     ("subcontractors.create", "Create Subcontractors", "Subcontractors"),
@@ -120,6 +144,19 @@ ROLE_PERMISSIONS = {
         "employees.view",
         "employees.create",
         "employees.update",
+
+        "daily_workers.view",
+        "daily_workers.create",
+        "daily_workers.update",
+        "daily_worker_attendance.view",
+        "daily_worker_attendance.create",
+        "daily_worker_attendance.update",
+        "daily_worker_payroll.view",
+        "daily_worker_payroll.create",
+        "daily_worker_payroll.update",
+        "worker_advances.view",
+        "worker_advances.create",
+        "worker_advances.update",
     ],
 
     Role.DATA_ENTRY: [
@@ -130,6 +167,12 @@ ROLE_PERMISSIONS = {
 
         "attendance.view",
         "attendance.create",
+
+        "daily_workers.view",
+        "daily_worker_attendance.view",
+        "daily_worker_attendance.create",
+        "worker_advances.view",
+        "worker_advances.create",
     ]
 }
 
@@ -144,12 +187,9 @@ class Command(BaseCommand):
 
         for code, name, module in PERMISSIONS:
 
-            Permission.objects.get_or_create(
+            Permission.objects.update_or_create(
                 code=code,
-                defaults={
-                    "name": name,
-                    "module": module,
-                },
+                defaults={"name": name, "module": module},
             )
 
         for role, permissions in ROLE_PERMISSIONS.items():

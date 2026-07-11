@@ -6,6 +6,7 @@ import {
   Handshake,
   Receipt,
   Users,
+  HardHat,
   CalendarCheck,
   Menu,
   X,
@@ -16,11 +17,13 @@ import ThemeToggle from "../components/ui/ToggleButton";
 import { useLanguage } from "../hooks/useLanguage";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import { useAuth } from "../auth/AuthContext";
+import { hasAnyPermission } from "../../utils/permissions";
 
 export default function ManagerNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { t } = useLanguage();
   const { logout, user } = useAuth();
+  const permissions = user?.permissions || [];
 
   const options = [
     {
@@ -32,43 +35,104 @@ export default function ManagerNavbar() {
       name: t("managerNavbar.projects"),
       path: "/manager/projects",
       icon: FolderKanban,
+      visible: hasAnyPermission(permissions, [
+        "projects.view",
+        "projects.create",
+        "projects.update",
+        "projects.delete",
+      ]),
     },
     {
       name: t("managerNavbar.subContractors"),
       path: "/manager/subcontractors",
       icon: Handshake,
+      visible: hasAnyPermission(permissions, [
+        "subcontractors.view",
+        "subcontractors.create",
+        "subcontractors.update",
+        "subcontractors.delete",
+      ]),
     },
     {
       name: t("managerNavbar.contracts"),
       path: "/manager/contracts",
       icon: Handshake,
+      visible: hasAnyPermission(permissions, [
+        "contracts.view",
+        "contracts.create",
+        "contracts.update",
+        "contracts.delete",
+      ]),
     },
     {
       name: t("managerNavbar.expenses"),
       path: "/manager/expenses",
       icon: Receipt,
+      visible: hasAnyPermission(permissions, [
+        "expenses.view",
+        "expenses.create",
+        "expenses.update",
+        "expenses.delete",
+      ]),
     },
     {
       name: t("managerNavbar.employees"),
       path: "/manager/employees",
       icon: Users,
+      visible: hasAnyPermission(permissions, [
+        "employees.view",
+        "employees.create",
+        "employees.update",
+        "employees.delete",
+      ]),
+    },
+    {
+      name: t("dailyWorkers.title", "Daily Workers"),
+      path: "/manager/daily-workers",
+      icon: HardHat,
+      visible: hasAnyPermission(permissions, [
+        "daily_workers.view",
+        "daily_workers.create",
+        "daily_workers.update",
+        "daily_workers.delete",
+        "daily_worker_attendance.view",
+        "daily_worker_attendance.create",
+        "daily_worker_attendance.update",
+        "daily_worker_payroll.view",
+        "daily_worker_payroll.create",
+        "daily_worker_payroll.update",
+        "worker_advances.view",
+      ]),
     },
     {
       name: t("managerNavbar.payrolls"),
       path: "/manager/payrolls",
       icon: Users,
+      visible: hasAnyPermission(permissions, [
+        "payrolls.view",
+        "payrolls.create",
+        "payrolls.update",
+        "payrolls.delete",
+      ]),
     },
     {
       name: t("managerNavbar.attendance"),
       path: "/manager/attendance",
       icon: CalendarCheck,
+      visible: hasAnyPermission(permissions, [
+        "attendance.view",
+        "attendance.create",
+        "attendance.update",
+        "attendance.delete",
+      ]),
     },
     {
       name: t("managerNavbar.reports"),
       path: "/manager/reports",
       icon: BarChart3,
+      visible: hasAnyPermission(permissions, ["reports.view", "reports.export"]),
     },
-  ];
+  ].filter((option) => option.visible !== false);
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-(--border) bg-(--bg)/80 backdrop-blur-md">

@@ -79,6 +79,34 @@ export default function FinancialOverview({ data }) {
         />
 
         <FinancialRow
+          label="Employee Payroll USD"
+          value={data.payroll?.employee_net_usd}
+          prefix="$"
+          color="var(--muted)"
+        />
+
+        <FinancialRow
+          label="Employee Payroll AFN"
+          value={data.payroll?.employee_net_afn}
+          prefix="Ø‹"
+          color="var(--muted)"
+        />
+
+        <FinancialRow
+          label="Daily Worker Payroll USD"
+          value={data.payroll?.daily_worker_net_usd}
+          prefix="$"
+          color="var(--muted)"
+        />
+
+        <FinancialRow
+          label="Daily Worker Payroll AFN"
+          value={data.payroll?.daily_worker_net_afn}
+          prefix="Ø‹"
+          color="var(--muted)"
+        />
+
+        <FinancialRow
           label={t("financialOverview.grossPayrollUsd")}
           value={data.payroll?.gross_usd}
           prefix="$"

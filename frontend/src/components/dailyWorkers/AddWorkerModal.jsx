@@ -1,19 +1,57 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
+import { useLanguage } from "../../hooks/useLanguage";
 
-function AddWorkerModal({ isOpen, onClose, onSuccess }) {
-  const { createWorker, loading } = useDailyWorkers();
+const blankForm = {
+  full_name: "",
+  father_name: "",
+  phone: "",
+  national_id: "",
+  address: "",
+  emergency_contact: "",
+  daily_rate: "",
+  overtime_hourly_rate: "0",
+  currency: "AFN",
+  skill_type: "helper",
+  specialization: "",
+  status: "active",
+  joining_date: new Date().toISOString().slice(0, 10),
+  assigned_project: "",
+  notes: "",
+};
 
-  const [formData, setFormData] = useState({
-    first_name: "",
-    last_name: "",
-    phone: "",
-    national_id: "",
-    trade: "laborer",
-    daily_rate: "",
-    overtime_hourly_rate: "0",
-    currency: "AFN",
-  });
+const skillOptions = [
+  ["mason", "mason"],
+  ["carpenter", "carpenter"],
+  ["electrician", "electrician"],
+  ["painter", "painter"],
+  ["plumber", "plumber"],
+  ["steel_fixer", "steel_fixer"],
+  ["driver", "driver"],
+  ["excavator_operator", "excavator_operator"],
+  ["helper", "helper"],
+  ["other", "other"],
+];
+
+function AddWorkerModal({ isOpen, onClose, onSuccess, worker, projects = [] }) {
+  const { createWorker, updateWorker, loading } = useDailyWorkers();
+  const [formData, setFormData] = useState(blankForm);
+  const [error, setError] = useState("");
+  const { t } = useLanguage();
+
+  useEffect(() => {
+    if (worker) {
+      setFormData({
+        ...blankForm,
+        ...worker,
+        assigned_project: worker.assigned_project || "",
+      });
+    } else {
+      setFormData(blankForm);
+    }
+    setError("");
+  }, [worker, isOpen]);
 
   if (!isOpen) return null;
 
@@ -23,256 +61,280 @@ function AddWorkerModal({ isOpen, onClose, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    const payload = {
+      ...formData,
+      assigned_project: formData.assigned_project || null,
+    };
     try {
-      await createWorker(formData);
-      onSuccess(); // Refresh the list
-      onClose(); // Close the modal
-      setFormData({
-        // Reset form
-        first_name: "",
-        last_name: "",
-        phone: "",
-        national_id: "",
-        trade: "laborer",
-        daily_rate: "",
-        overtime_hourly_rate: "0",
-        currency: "AFN",
-      });
+      if (worker?.id) {
+        await updateWorker(worker.id, payload);
+      } else {
+        await createWorker(payload);
+      }
+      onSuccess();
+      onClose();
     } catch (err) {
+      setError(t("AddWorkerModal.errorMessage"));
       console.error(err);
-      alert("Failed to create worker. Check console for details.");
     }
   };
 
+  const inputClass =
+    "w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-(--primary)/30";
+  const inputStyle = {
+    borderColor: "var(--border)",
+    backgroundColor: "var(--bg)",
+    color: "var(--text)",
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div
-        className="w-full max-w-lg rounded-lg shadow-lg"
-        style={{ backgroundColor: "var(--card)", color: "var(--text)" }}
+        className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-lg border shadow-lg"
+        style={{
+          backgroundColor: "var(--card)",
+          borderColor: "var(--border)",
+          color: "var(--text)",
+        }}
       >
         <div
-          className="flex justify-between items-center border-b p-4"
+          className="flex items-center justify-between border-b p-4"
           style={{ borderColor: "var(--border)" }}
         >
-          <h2 className="text-lg font-bold">Add New Worker</h2>
+          <h2 className="text-lg font-semibold">
+            {worker
+              ? t("AddWorkerModal.editWorker")
+              : t("AddWorkerModal.addWorker")}
+          </h2>
           <button
             onClick={onClose}
-            className="text-xl leading-none hover:opacity-70"
+            className="rounded-lg p-2 hover:bg-(--hover)"
+            aria-label={t("AddWorkerModal.close")}
           >
-            &times;
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label
-                className="block text-sm mb-1"
-                style={{ color: "var(--muted)" }}
-              >
-                First Name *
-              </label>
+        <form onSubmit={handleSubmit} className="space-y-5 p-4">
+          {error && (
+            <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-600">
+              {error}
+            </p>
+          )}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <Field label={t("AddWorkerModal.fullName")}>
               <input
                 required
-                type="text"
-                name="first_name"
-                value={formData.first_name}
+                name="full_name"
+                value={formData.full_name}
                 onChange={handleChange}
-                className="w-full rounded border px-3 py-2 text-sm"
-                style={{
-                  borderColor: "var(--border)",
-                  backgroundColor: "var(--bg)",
-                  color: "var(--text)",
-                }}
+                className={inputClass}
+                style={inputStyle}
               />
-            </div>
-            <div>
-              <label
-                className="block text-sm mb-1"
-                style={{ color: "var(--muted)" }}
-              >
-                Last Name *
-              </label>
+            </Field>
+            <Field label={t("AddWorkerModal.fatherName")}>
+              <input
+                name="father_name"
+                value={formData.father_name}
+                onChange={handleChange}
+                className={inputClass}
+                style={inputStyle}
+              />
+            </Field>
+            <Field label={t("AddWorkerModal.phone")}>
               <input
                 required
-                type="text"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                className="w-full rounded border px-3 py-2 text-sm"
-                style={{
-                  borderColor: "var(--border)",
-                  backgroundColor: "var(--bg)",
-                  color: "var(--text)",
-                }}
-              />
-            </div>
-            <div>
-              <label
-                className="block text-sm mb-1"
-                style={{ color: "var(--muted)" }}
-              >
-                Phone
-              </label>
-              <input
-                type="text"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full rounded border px-3 py-2 text-sm"
-                style={{
-                  borderColor: "var(--border)",
-                  backgroundColor: "var(--bg)",
-                  color: "var(--text)",
-                }}
+                className={inputClass}
+                style={inputStyle}
               />
-            </div>
-            <div>
-              <label
-                className="block text-sm mb-1"
-                style={{ color: "var(--muted)" }}
-              >
-                National ID / Tazkira
-              </label>
+            </Field>
+            <Field label={t("AddWorkerModal.nationalId")}>
               <input
-                type="text"
                 name="national_id"
-                value={formData.national_id}
+                value={formData.national_id || ""}
                 onChange={handleChange}
-                className="w-full rounded border px-3 py-2 text-sm"
-                style={{
-                  borderColor: "var(--border)",
-                  backgroundColor: "var(--bg)",
-                  color: "var(--text)",
-                }}
+                className={inputClass}
+                style={inputStyle}
               />
-            </div>
-
-            <div className="col-span-2">
-              <label
-                className="block text-sm mb-1"
-                style={{ color: "var(--muted)" }}
-              >
-                Trade / Skill *
-              </label>
-              <select
-                name="trade"
-                value={formData.trade}
+            </Field>
+            <Field label={t("AddWorkerModal.emergencyContact")}>
+              <input
+                name="emergency_contact"
+                value={formData.emergency_contact}
                 onChange={handleChange}
-                className="w-full rounded border px-3 py-2 text-sm"
-                style={{
-                  borderColor: "var(--border)",
-                  backgroundColor: "var(--bg)",
-                  color: "var(--text)",
-                }}
+                className={inputClass}
+                style={inputStyle}
+              />
+            </Field>
+            <Field label={t("AddWorkerModal.joiningDate")}>
+              <input
+                required
+                type="date"
+                name="joining_date"
+                value={formData.joining_date}
+                onChange={handleChange}
+                className={inputClass}
+                style={inputStyle}
+              />
+            </Field>
+            <Field label={t("AddWorkerModal.skillType")}>
+              <select
+                name="skill_type"
+                value={formData.skill_type}
+                onChange={handleChange}
+                className={inputClass}
+                style={inputStyle}
               >
-                <option value="laborer">General Laborer</option>
-                <option value="mason">Mason</option>
-                <option value="carpenter">Carpenter</option>
-                <option value="electrician">Electrician</option>
-                <option value="plumber">Plumber</option>
-                <option value="painter">Painter</option>
-                <option value="welder">Welder</option>
-                <option value="steel_fixer">Steel Fixer</option>
-                <option value="other">Other</option>
+                {skillOptions.map(([value, key]) => (
+                  <option key={value} value={value}>
+                    {t(`AddWorkerModal.skills.${key}`)}
+                  </option>
+                ))}
               </select>
-            </div>
-
-            <div>
-              <label
-                className="block text-sm mb-1"
-                style={{ color: "var(--muted)" }}
+            </Field>
+            <Field label={t("AddWorkerModal.specialization")}>
+              <input
+                name="specialization"
+                value={formData.specialization}
+                onChange={handleChange}
+                className={inputClass}
+                style={inputStyle}
+              />
+            </Field>
+            <Field label={t("AddWorkerModal.status")}>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className={inputClass}
+                style={inputStyle}
               >
-                Daily Rate *
-              </label>
+                <option value="active">{t("AddWorkerModal.active")}</option>
+                <option value="inactive">{t("AddWorkerModal.inactive")}</option>
+              </select>
+            </Field>
+            <Field label={t("AddWorkerModal.dailyRate")}>
               <input
                 required
                 type="number"
+                min="0"
                 step="0.01"
                 name="daily_rate"
                 value={formData.daily_rate}
                 onChange={handleChange}
-                className="w-full rounded border px-3 py-2 text-sm"
-                placeholder="e.g. 500"
-                style={{
-                  borderColor: "var(--border)",
-                  backgroundColor: "var(--bg)",
-                  color: "var(--text)",
-                }}
+                className={inputClass}
+                style={inputStyle}
               />
-            </div>
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label
-                  className="block text-sm mb-1"
-                  style={{ color: "var(--muted)" }}
-                >
-                  Overtime Rate/hr
-                </label>
+            </Field>
+            <Field label={t("AddWorkerModal.overtimeRate")}>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                name="overtime_hourly_rate"
+                value={formData.overtime_hourly_rate}
+                onChange={handleChange}
+                className={inputClass}
+                style={inputStyle}
+              />
+            </Field>
+            <Field label={t("AddWorkerModal.currency")}>
+              <select
+                name="currency"
+                value={formData.currency}
+                onChange={handleChange}
+                className={inputClass}
+                style={inputStyle}
+              >
+                <option value="AFN">AFN</option>
+                <option value="USD">USD</option>
+              </select>
+            </Field>
+            <Field label={t("AddWorkerModal.assignedProject")}>
+              <select
+                name="assigned_project"
+                value={formData.assigned_project || ""}
+                onChange={handleChange}
+                className={inputClass}
+                style={inputStyle}
+              >
+                <option value="">{t("AddWorkerModal.unassigned")}</option>
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <div className="md:col-span-2">
+              <Field label={t("AddWorkerModal.address")}>
                 <input
-                  required
-                  type="number"
-                  step="0.01"
-                  name="overtime_hourly_rate"
-                  value={formData.overtime_hourly_rate}
+                  name="address"
+                  value={formData.address}
                   onChange={handleChange}
-                  className="w-full rounded border px-3 py-2 text-sm"
-                  style={{
-                    borderColor: "var(--border)",
-                    backgroundColor: "var(--bg)",
-                    color: "var(--text)",
-                  }}
+                  className={inputClass}
+                  style={inputStyle}
                 />
-              </div>
-              <div className="w-1/3">
-                <label
-                  className="block text-sm mb-1"
-                  style={{ color: "var(--muted)" }}
-                >
-                  Currency
-                </label>
-                <select
-                  name="currency"
-                  value={formData.currency}
+              </Field>
+            </div>
+            <div className="md:col-span-3">
+              <Field label={t("AddWorkerModal.notes")}>
+                <textarea
+                  name="notes"
+                  value={formData.notes}
                   onChange={handleChange}
-                  className="w-full rounded border px-3 py-2 text-sm"
-                  style={{
-                    borderColor: "var(--border)",
-                    backgroundColor: "var(--bg)",
-                    color: "var(--text)",
-                  }}
-                >
-                  <option value="AFN">AFN</option>
-                  <option value="USD">USD</option>
-                </select>
-              </div>
+                  rows={3}
+                  className={inputClass}
+                  style={inputStyle}
+                />
+              </Field>
             </div>
           </div>
 
           <div
-            className="mt-6 flex justify-end gap-3 pt-4 border-t"
+            className="flex justify-end gap-3 border-t pt-4"
             style={{ borderColor: "var(--border)" }}
           >
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded text-sm border"
+              className="rounded-lg border px-4 py-2 text-sm"
               style={{ borderColor: "var(--border)" }}
             >
-              Cancel
+              {t("AddWorkerModal.cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 rounded text-sm text-white transition disabled:opacity-50"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
               style={{ backgroundColor: "var(--primary)" }}
             >
-              {loading ? "Saving..." : "Save Worker"}
+              {loading
+                ? t("AddWorkerModal.saving")
+                : t("AddWorkerModal.saveWorker")}
             </button>
           </div>
         </form>
       </div>
     </div>
+  );
+}
+
+function Field({ label, children }) {
+  return (
+    <label className="block">
+      <span
+        className="mb-1 block text-xs font-medium"
+        style={{ color: "var(--muted)" }}
+      >
+        {label}
+      </span>
+      {children}
+    </label>
   );
 }
 

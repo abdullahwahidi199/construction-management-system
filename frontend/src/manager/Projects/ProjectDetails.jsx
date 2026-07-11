@@ -259,6 +259,11 @@ export default function ProjectDetails() {
       maximumFractionDigits: 0,
     }).format(amount);
   };
+  const formatAmount = (amount) =>
+    new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(Number(amount || 0));
 
   /* ── Loading state ─────────────────────────────── */
   if (loading) {
@@ -547,6 +552,60 @@ export default function ProjectDetails() {
         </div>
 
         {/* ── Timeline Progress ────────────────────── */}
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
+          <h3 className="mb-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
+            <DollarSign className="h-4 w-4" />
+            Daily Worker Payroll
+          </h3>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {["USD", "AFN"].map((currency) => {
+              const row = project.worker_payroll_summary?.[currency] || {};
+              return (
+                <div
+                  key={currency}
+                  className="rounded-xl border border-[var(--border)] p-4"
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <h4 className="text-sm font-medium text-[var(--muted)]">
+                      {currency}
+                    </h4>
+                    <span className="rounded-full bg-[var(--hover)] px-2 py-1 text-xs text-[var(--muted)]">
+                      {row.count || 0} records
+                    </span>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Gross</span>
+                      <span className="font-semibold">
+                        {currency} {formatAmount(row.gross)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Advances</span>
+                      <span className="font-semibold">
+                        {currency} {formatAmount(row.advances)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Deductions</span>
+                      <span className="font-semibold">
+                        {currency} {formatAmount(row.deductions)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-t border-[var(--border)] pt-2">
+                      <span>Net payroll</span>
+                      <span className="font-semibold text-emerald-600">
+                        {currency} {formatAmount(row.net)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {progress !== null && (
           <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
             <div className="mb-3 flex items-center justify-between">
