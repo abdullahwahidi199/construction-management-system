@@ -19,6 +19,7 @@ from django.urls import path,include
 from rest_framework.routers import DefaultRouter
 from django.conf import settings
 from django.conf.urls.static import static
+from .schema_views import redoc_ui, schema_view, swagger_ui
 
 from Employees.views import EmployeeViewSet,PayrollViewSet,AttendanceViewSet
 from subcontractor.views import (
@@ -73,6 +74,9 @@ urlpatterns = [
     path('api/dashboard/', include("dashboard.urls")),
     path('api/reports/', include("reports.urls")),
     path('api/audit/', include("audit.urls")),
+    path('api/schema/', schema_view, name="openapi-schema"),
+    path('api/docs/swagger/', swagger_ui, name="swagger-ui"),
+    path('api/docs/redoc/', redoc_ui, name="redoc-ui"),
     path('api/', include(router.urls)),
 ]
 if settings.DEBUG:

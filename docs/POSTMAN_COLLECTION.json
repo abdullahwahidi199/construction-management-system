@@ -1,0 +1,4780 @@
+{
+  "info": {
+    "name": "Construction Management System API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "Authorization",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "Token {{token}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Attendance",
+      "item": [
+        {
+          "name": "GET /api/attendance/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "attendance"
+              ]
+            },
+            "description": "Attendance management.\n\nlist:    GET /attendance/              \u2014 all records (with filters)\ncreate:  POST /attendance/             \u2014 single record\nread:    GET /attendance/{id}/         \u2014 one record\nupdate:  PUT /attendance/{id}/         \u2014 full update\npatch:   PATCH /attendance/{id}/       \u2014 partial update\ndelete:  DELETE /attendance/{id}/      \u2014 remove record\n\nCustom actions:\n    POST /attendance/bulk_mark/       \u2014 mark attendance for many employees at once\n    GET  /attendance/daily/?date=     \u2014 get all attendance for a specific date\n    GET  /attendance/summary/?employee=&month=&year= \u2014 monthly summary"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/attendance/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "attendance"
+              ]
+            },
+            "description": "Attendance management.\n\nlist:    GET /attendance/              \u2014 all records (with filters)\ncreate:  POST /attendance/             \u2014 single record\nread:    GET /attendance/{id}/         \u2014 one record\nupdate:  PUT /attendance/{id}/         \u2014 full update\npatch:   PATCH /attendance/{id}/       \u2014 partial update\ndelete:  DELETE /attendance/{id}/      \u2014 remove record\n\nCustom actions:\n    POST /attendance/bulk_mark/       \u2014 mark attendance for many employees at once\n    GET  /attendance/daily/?date=     \u2014 get all attendance for a specific date\n    GET  /attendance/summary/?employee=&month=&year= \u2014 monthly summary",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/attendance/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "attendance",
+                "{id}"
+              ]
+            },
+            "description": "Attendance management.\n\nlist:    GET /attendance/              \u2014 all records (with filters)\ncreate:  POST /attendance/             \u2014 single record\nread:    GET /attendance/{id}/         \u2014 one record\nupdate:  PUT /attendance/{id}/         \u2014 full update\npatch:   PATCH /attendance/{id}/       \u2014 partial update\ndelete:  DELETE /attendance/{id}/      \u2014 remove record\n\nCustom actions:\n    POST /attendance/bulk_mark/       \u2014 mark attendance for many employees at once\n    GET  /attendance/daily/?date=     \u2014 get all attendance for a specific date\n    GET  /attendance/summary/?employee=&month=&year= \u2014 monthly summary"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/attendance/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "attendance",
+                "{id}"
+              ]
+            },
+            "description": "Attendance management.\n\nlist:    GET /attendance/              \u2014 all records (with filters)\ncreate:  POST /attendance/             \u2014 single record\nread:    GET /attendance/{id}/         \u2014 one record\nupdate:  PUT /attendance/{id}/         \u2014 full update\npatch:   PATCH /attendance/{id}/       \u2014 partial update\ndelete:  DELETE /attendance/{id}/      \u2014 remove record\n\nCustom actions:\n    POST /attendance/bulk_mark/       \u2014 mark attendance for many employees at once\n    GET  /attendance/daily/?date=     \u2014 get all attendance for a specific date\n    GET  /attendance/summary/?employee=&month=&year= \u2014 monthly summary"
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/attendance/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "attendance",
+                "{id}"
+              ]
+            },
+            "description": "Attendance management.\n\nlist:    GET /attendance/              \u2014 all records (with filters)\ncreate:  POST /attendance/             \u2014 single record\nread:    GET /attendance/{id}/         \u2014 one record\nupdate:  PUT /attendance/{id}/         \u2014 full update\npatch:   PATCH /attendance/{id}/       \u2014 partial update\ndelete:  DELETE /attendance/{id}/      \u2014 remove record\n\nCustom actions:\n    POST /attendance/bulk_mark/       \u2014 mark attendance for many employees at once\n    GET  /attendance/daily/?date=     \u2014 get all attendance for a specific date\n    GET  /attendance/summary/?employee=&month=&year= \u2014 monthly summary",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/attendance/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "attendance",
+                "{id}"
+              ]
+            },
+            "description": "Attendance management.\n\nlist:    GET /attendance/              \u2014 all records (with filters)\ncreate:  POST /attendance/             \u2014 single record\nread:    GET /attendance/{id}/         \u2014 one record\nupdate:  PUT /attendance/{id}/         \u2014 full update\npatch:   PATCH /attendance/{id}/       \u2014 partial update\ndelete:  DELETE /attendance/{id}/      \u2014 remove record\n\nCustom actions:\n    POST /attendance/bulk_mark/       \u2014 mark attendance for many employees at once\n    GET  /attendance/daily/?date=     \u2014 get all attendance for a specific date\n    GET  /attendance/summary/?employee=&month=&year= \u2014 monthly summary",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/attendance/bulk_mark/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/bulk_mark/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "attendance",
+                "bulk_mark"
+              ]
+            },
+            "description": "Attendance management.\n\nlist:    GET /attendance/              \u2014 all records (with filters)\ncreate:  POST /attendance/             \u2014 single record\nread:    GET /attendance/{id}/         \u2014 one record\nupdate:  PUT /attendance/{id}/         \u2014 full update\npatch:   PATCH /attendance/{id}/       \u2014 partial update\ndelete:  DELETE /attendance/{id}/      \u2014 remove record\n\nCustom actions:\n    POST /attendance/bulk_mark/       \u2014 mark attendance for many employees at once\n    GET  /attendance/daily/?date=     \u2014 get all attendance for a specific date\n    GET  /attendance/summary/?employee=&month=&year= \u2014 monthly summary",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/attendance/daily/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/daily/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "attendance",
+                "daily"
+              ]
+            },
+            "description": "Get attendance for a specific date.\nAlso shows which active employees have NO record (unmarked).\n\nGET /attendance/daily/?date=2025-01-15"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/attendance/summary/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/summary/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "attendance",
+                "summary"
+              ]
+            },
+            "description": "Monthly attendance summary for one employee.\n\nGET /attendance/summary/?employee=1&month=1&year=2025"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/employees/attendance/export-pdf/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/attendance/export-pdf/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employees",
+                "attendance",
+                "export-pdf"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/worker-attendance/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-attendance/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-attendance"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/worker-attendance/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-attendance/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-attendance"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/worker-attendance/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-attendance/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-attendance",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/worker-attendance/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-attendance/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-attendance",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/worker-attendance/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-attendance/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-attendance",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/worker-attendance/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-attendance/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-attendance",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/worker-attendance/bulk_mark/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-attendance/bulk_mark/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-attendance",
+                "bulk_mark"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/worker-attendance/daily_status/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-attendance/daily_status/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-attendance",
+                "daily_status"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/worker-attendance/summary/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-attendance/summary/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-attendance",
+                "summary"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Audit / Settings",
+      "item": [
+        {
+          "name": "GET /api/audit/logs/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit/logs/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit",
+                "logs"
+              ]
+            },
+            "description": "List a queryset."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/audit/logs/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit/logs/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit",
+                "logs",
+                "{id}"
+              ]
+            },
+            "description": "List a queryset."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/audit/logs/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit/logs/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit",
+                "logs",
+                "{id}"
+              ]
+            },
+            "description": "List a queryset."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/audit/logs/export/csv/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit/logs/export/csv/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit",
+                "logs",
+                "export",
+                "csv"
+              ]
+            },
+            "description": "List a queryset."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/audit/logs/export/excel/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit/logs/export/excel/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit",
+                "logs",
+                "export",
+                "excel"
+              ]
+            },
+            "description": "List a queryset."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/audit/logs/options/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit/logs/options/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit",
+                "logs",
+                "options"
+              ]
+            },
+            "description": "Handler method for HTTP 'OPTIONS' request."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/audit/logs/retention/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit/logs/retention/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit",
+                "logs",
+                "retention"
+              ]
+            },
+            "description": "List a queryset."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/audit/logs/retention/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit/logs/retention/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit",
+                "logs",
+                "retention"
+              ]
+            },
+            "description": "List a queryset.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/audit/logs/summary/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit/logs/summary/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit",
+                "logs",
+                "summary"
+              ]
+            },
+            "description": "List a queryset."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "POST /api/auth/login/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/auth/logout/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/auth/me/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/auth/meta/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/meta/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "meta"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Contractors",
+      "item": [
+        {
+          "name": "GET /api/subcontractors/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subcontractors/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subcontractors"
+              ]
+            },
+            "description": "CRUD + soft-delete + nested contract list + financial summary."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/subcontractors/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/subcontractors/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subcontractors"
+              ]
+            },
+            "description": "CRUD + soft-delete + nested contract list + financial summary.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/subcontractors/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subcontractors/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subcontractors",
+                "{id}"
+              ]
+            },
+            "description": "CRUD + soft-delete + nested contract list + financial summary."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/subcontractors/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subcontractors/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subcontractors",
+                "{id}"
+              ]
+            },
+            "description": "CRUD + soft-delete + nested contract list + financial summary."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/subcontractors/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/subcontractors/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subcontractors",
+                "{id}"
+              ]
+            },
+            "description": "CRUD + soft-delete + nested contract list + financial summary.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/subcontractors/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/subcontractors/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subcontractors",
+                "{id}"
+              ]
+            },
+            "description": "CRUD + soft-delete + nested contract list + financial summary.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/subcontractors/{id}/contracts/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subcontractors/{id}/contracts/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subcontractors",
+                "{id}",
+                "contracts"
+              ]
+            },
+            "description": "List all contracts for this subcontractor."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/subcontractors/{id}/financial_summary/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subcontractors/{id}/financial_summary/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subcontractors",
+                "{id}",
+                "financial_summary"
+              ]
+            },
+            "description": "CRUD + soft-delete + nested contract list + financial summary."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Contracts",
+      "item": [
+        {
+          "name": "GET /api/contract-documents/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-documents/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-documents"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/contract-documents/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-documents/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-documents"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/contract-documents/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-documents/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-documents",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contract-documents/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-documents/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-documents",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/contract-documents/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-documents/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-documents",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/contract-documents/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-documents/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-documents",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contract-payments/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-payments/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-payments"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/contract-payments/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-payments/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-payments"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/contract-payments/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-payments/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-payments",
+                "{id}"
+              ]
+            },
+            "description": "Payments are permanent audit records \u2014 disallow deletion."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contract-payments/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-payments/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-payments",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/contract-payments/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-payments/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-payments",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/contract-payments/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-payments/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-payments",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contract-variations/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-variations/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-variations"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/contract-variations/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-variations/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-variations"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/contract-variations/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-variations/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-variations",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contract-variations/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-variations/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-variations",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/contract-variations/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-variations/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-variations",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/contract-variations/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-variations/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-variations",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/contract-variations/{id}/approve/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contract-variations/{id}/approve/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contract-variations",
+                "{id}",
+                "approve"
+              ]
+            },
+            "description": "Approve a variation with financial-impact validation.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contracts/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/contracts/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/contracts/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{id}"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contracts/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{id}"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/contracts/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{id}"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/contracts/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{id}"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contracts/{id}/documents/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/{id}/documents/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{id}",
+                "documents"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/contracts/{id}/documents/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/{id}/documents/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{id}",
+                "documents"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contracts/{id}/financial_summary/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/{id}/financial_summary/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{id}",
+                "financial_summary"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contracts/{id}/payments/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/{id}/payments/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{id}",
+                "payments"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/contracts/{id}/payments/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/{id}/payments/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{id}",
+                "payments"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contracts/{id}/variations/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/{id}/variations/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{id}",
+                "variations"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/contracts/{id}/variations/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/{id}/variations/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{id}",
+                "variations"
+              ]
+            },
+            "description": "CRUD + nested payments / variations / documents + financial summary.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contracts/export-pdf/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/export-pdf/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "export-pdf"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contracts/{id}/export-pdf/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/{{id}}/export-pdf/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{{id}}",
+                "export-pdf"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/invoice-documents/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoice-documents/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invoice-documents"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/invoice-documents/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoice-documents/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invoice-documents"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/invoice-documents/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoice-documents/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invoice-documents",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/invoice-documents/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoice-documents/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invoice-documents",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/invoice-documents/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoice-documents/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invoice-documents",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/invoice-documents/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoice-documents/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invoice-documents",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/invoices/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoices/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invoices"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/invoices/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoices/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invoices"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/invoices/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoices/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invoices",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/invoices/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoices/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invoices",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/invoices/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoices/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invoices",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/invoices/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoices/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invoices",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "GET /api/dashboard/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard"
+              ]
+            },
+            "description": "GET /api/dashboard/\nReturns the complete dashboard payload with all sections.\nThis is the primary endpoint for the dashboard page."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/dashboard/activity/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/activity/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "activity"
+              ]
+            },
+            "description": "GET /api/dashboard/activity/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/dashboard/alerts/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/alerts/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "alerts"
+              ]
+            },
+            "description": "GET /api/dashboard/alerts/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/dashboard/attendance/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/attendance/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "attendance"
+              ]
+            },
+            "description": "GET /api/dashboard/attendance/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/dashboard/budget-comparison/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/budget-comparison/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "budget-comparison"
+              ]
+            },
+            "description": "GET /api/dashboard/budget-comparison/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/dashboard/contracts/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/contracts/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "contracts"
+              ]
+            },
+            "description": "GET /api/dashboard/contracts/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/dashboard/expenses/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/expenses/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "expenses"
+              ]
+            },
+            "description": "GET /api/dashboard/expenses/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/dashboard/expenses/this-month/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/expenses/this-month/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "expenses",
+                "this-month"
+              ]
+            },
+            "description": "GET /api/dashboard/expenses/this-month/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/dashboard/financial/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/financial/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "financial"
+              ]
+            },
+            "description": "GET /api/dashboard/financial/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/dashboard/payroll/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/payroll/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "payroll"
+              ]
+            },
+            "description": "GET /api/dashboard/payroll/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/dashboard/projects/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/projects/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "projects"
+              ]
+            },
+            "description": "GET /api/dashboard/projects/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/dashboard/subcontractors/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/subcontractors/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "subcontractors"
+              ]
+            },
+            "description": "GET /api/dashboard/subcontractors/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/dashboard/workforce/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/workforce/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "workforce"
+              ]
+            },
+            "description": "GET /api/dashboard/workforce/"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "GET /api/employees/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employees"
+              ]
+            },
+            "description": "ViewSet for managing Employee CRUD operations.\n\nlist: Get all employees with optional filtering\nretrieve: Get a specific employee by ID\ncreate: Create a new employee\nupdate: Fully update an employee\npartial_update: Partially update an employee\ndestroy: Delete an employee"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/employees/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employees"
+              ]
+            },
+            "description": "ViewSet for managing Employee CRUD operations.\n\nlist: Get all employees with optional filtering\nretrieve: Get a specific employee by ID\ncreate: Create a new employee\nupdate: Fully update an employee\npartial_update: Partially update an employee\ndestroy: Delete an employee",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/employees/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employees",
+                "{id}"
+              ]
+            },
+            "description": "ViewSet for managing Employee CRUD operations.\n\nlist: Get all employees with optional filtering\nretrieve: Get a specific employee by ID\ncreate: Create a new employee\nupdate: Fully update an employee\npartial_update: Partially update an employee\ndestroy: Delete an employee"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/employees/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employees",
+                "{id}"
+              ]
+            },
+            "description": "ViewSet for managing Employee CRUD operations.\n\nlist: Get all employees with optional filtering\nretrieve: Get a specific employee by ID\ncreate: Create a new employee\nupdate: Fully update an employee\npartial_update: Partially update an employee\ndestroy: Delete an employee"
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/employees/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employees",
+                "{id}"
+              ]
+            },
+            "description": "ViewSet for managing Employee CRUD operations.\n\nlist: Get all employees with optional filtering\nretrieve: Get a specific employee by ID\ncreate: Create a new employee\nupdate: Fully update an employee\npartial_update: Partially update an employee\ndestroy: Delete an employee",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/employees/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employees",
+                "{id}"
+              ]
+            },
+            "description": "ViewSet for managing Employee CRUD operations.\n\nlist: Get all employees with optional filtering\nretrieve: Get a specific employee by ID\ncreate: Create a new employee\nupdate: Fully update an employee\npartial_update: Partially update an employee\ndestroy: Delete an employee",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/employees/{id}/payroll_history/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{id}/payroll_history/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employees",
+                "{id}",
+                "payroll_history"
+              ]
+            },
+            "description": "Get payroll history for a specific employee"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/employees/{id}/payroll_summary/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/{id}/payroll_summary/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employees",
+                "{id}",
+                "payroll_summary"
+              ]
+            },
+            "description": "Get payroll summary for a specific employee"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/employees/by_department/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/by_department/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employees",
+                "by_department"
+              ]
+            },
+            "description": "Get employees grouped by department"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Expenses",
+      "item": [
+        {
+          "name": "GET /api/expenses/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/expenses/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/expenses/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/expenses/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/expenses/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/expenses/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/expenses/export-pdf/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/export-pdf/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "expenses",
+                "export-pdf"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Inventory / Labour",
+      "item": [
+        {
+          "name": "GET /api/daily-workers/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/daily-workers/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "daily-workers"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/daily-workers/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/daily-workers/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "daily-workers"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/daily-workers/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/daily-workers/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "daily-workers",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/daily-workers/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/daily-workers/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "daily-workers",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/daily-workers/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/daily-workers/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "daily-workers",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/daily-workers/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/daily-workers/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "daily-workers",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/daily-workers/{id}/detail_summary/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/daily-workers/{id}/detail_summary/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "daily-workers",
+                "{id}",
+                "detail_summary"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payroll",
+      "item": [
+        {
+          "name": "GET /api/employees/payrolls/export-pdf/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/payrolls/export-pdf/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employees",
+                "payrolls",
+                "export-pdf"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/payrolls/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payrolls/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payrolls"
+              ]
+            },
+            "description": "ViewSet for managing Payroll CRUD operations.\n\nProvides standard CRUD operations plus additional actions for\nbulk creation, payment status updates, and reporting."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/payrolls/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/payrolls/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payrolls"
+              ]
+            },
+            "description": "ViewSet for managing Payroll CRUD operations.\n\nProvides standard CRUD operations plus additional actions for\nbulk creation, payment status updates, and reporting.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/payrolls/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payrolls/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payrolls",
+                "{id}"
+              ]
+            },
+            "description": "ViewSet for managing Payroll CRUD operations.\n\nProvides standard CRUD operations plus additional actions for\nbulk creation, payment status updates, and reporting."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/payrolls/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payrolls/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payrolls",
+                "{id}"
+              ]
+            },
+            "description": "ViewSet for managing Payroll CRUD operations.\n\nProvides standard CRUD operations plus additional actions for\nbulk creation, payment status updates, and reporting."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/payrolls/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/payrolls/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payrolls",
+                "{id}"
+              ]
+            },
+            "description": "ViewSet for managing Payroll CRUD operations.\n\nProvides standard CRUD operations plus additional actions for\nbulk creation, payment status updates, and reporting.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/payrolls/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/payrolls/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payrolls",
+                "{id}"
+              ]
+            },
+            "description": "ViewSet for managing Payroll CRUD operations.\n\nProvides standard CRUD operations plus additional actions for\nbulk creation, payment status updates, and reporting.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/payrolls/{id}/update_payment_status/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/payrolls/{id}/update_payment_status/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payrolls",
+                "{id}",
+                "update_payment_status"
+              ]
+            },
+            "description": "Update payment status for a specific payroll",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/payrolls/bulk_create_payroll/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/payrolls/bulk_create_payroll/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payrolls",
+                "bulk_create_payroll"
+              ]
+            },
+            "description": "Create payroll records for multiple employees at once",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/payrolls/monthly_report/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payrolls/monthly_report/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payrolls",
+                "monthly_report"
+              ]
+            },
+            "description": "Generate monthly payroll report"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/payrolls/summary/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payrolls/summary/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payrolls",
+                "summary"
+              ]
+            },
+            "description": "Get overall payroll summary"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/worker-advances/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-advances/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-advances"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/worker-advances/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-advances/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-advances"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/worker-advances/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-advances/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-advances",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/worker-advances/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-advances/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-advances",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/worker-advances/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-advances/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-advances",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/worker-advances/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-advances/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-advances",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/worker-payroll/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-payroll/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-payroll"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/worker-payroll/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-payroll/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-payroll"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/worker-payroll/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-payroll/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-payroll",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/worker-payroll/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-payroll/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-payroll",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/worker-payroll/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-payroll/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-payroll",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/worker-payroll/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-payroll/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-payroll",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/worker-payroll/{id}/approve/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-payroll/{id}/approve/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-payroll",
+                "{id}",
+                "approve"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/worker-payroll/{id}/mark_paid/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-payroll/{id}/mark_paid/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-payroll",
+                "{id}",
+                "mark_paid"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/worker-payroll/generate/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-payroll/generate/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-payroll",
+                "generate"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/worker-payroll/reports/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-payroll/reports/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-payroll",
+                "reports"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/worker-payroll/summary/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/worker-payroll/summary/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "worker-payroll",
+                "summary"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "GET /api/projects/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/projects/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/projects/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{id}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{id}}"
+              ]
+            },
+            "description": "Concrete view for retrieving, updating or deleting a model instance."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/projects/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{id}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{id}}"
+              ]
+            },
+            "description": "Concrete view for retrieving, updating or deleting a model instance."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/projects/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{id}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{id}}"
+              ]
+            },
+            "description": "Concrete view for retrieving, updating or deleting a model instance.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/projects/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{id}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{id}}"
+              ]
+            },
+            "description": "Concrete view for retrieving, updating or deleting a model instance.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/projects/{id}/export-pdf/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{id}}/export-pdf/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{id}}",
+                "export-pdf"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "GET /api/reports/attendance/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/attendance/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "attendance"
+              ]
+            },
+            "description": "Generic report view.\nSubclasses set: report_class, serializer_class, pdf_columns, filename."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/reports/contracts/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/contracts/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "contracts"
+              ]
+            },
+            "description": "Generic report view.\nSubclasses set: report_class, serializer_class, pdf_columns, filename."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/reports/employees/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/employees/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "employees"
+              ]
+            },
+            "description": "Generic report view.\nSubclasses set: report_class, serializer_class, pdf_columns, filename."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/reports/expenses/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/expenses/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "expenses"
+              ]
+            },
+            "description": "Generic report view.\nSubclasses set: report_class, serializer_class, pdf_columns, filename."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/reports/financial/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/financial/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "financial"
+              ]
+            },
+            "description": "Generic report view.\nSubclasses set: report_class, serializer_class, pdf_columns, filename."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/reports/payroll/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/payroll/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "payroll"
+              ]
+            },
+            "description": "Generic report view.\nSubclasses set: report_class, serializer_class, pdf_columns, filename."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/reports/projects/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/projects/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "projects"
+              ]
+            },
+            "description": "Generic report view.\nSubclasses set: report_class, serializer_class, pdf_columns, filename."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "GET /api/schema/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/schema/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "schema"
+              ]
+            },
+            "description": "Intentionally simple parent class for all views. Only implements\ndispatch-by-method and simple sanity checking."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET /api/auth/permissions/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/permissions/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "permissions"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/auth/permissions/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/permissions/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "permissions"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/auth/permissions/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/permissions/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "permissions",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/auth/permissions/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/permissions/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "permissions",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/auth/permissions/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/permissions/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "permissions",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/auth/permissions/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/permissions/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "permissions",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/auth/project-assignments/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/project-assignments/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "project-assignments"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/auth/project-assignments/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/project-assignments/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "project-assignments"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/auth/project-assignments/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/project-assignments/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "project-assignments",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/auth/project-assignments/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/project-assignments/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "project-assignments",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/auth/project-assignments/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/project-assignments/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "project-assignments",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/auth/project-assignments/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/project-assignments/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "project-assignments",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/auth/role-permissions/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/role-permissions/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "role-permissions"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/auth/role-permissions/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/role-permissions/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "role-permissions"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/auth/role-permissions/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/role-permissions/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "role-permissions",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/auth/role-permissions/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/role-permissions/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "role-permissions",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/auth/role-permissions/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/role-permissions/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "role-permissions",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/auth/role-permissions/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/role-permissions/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "role-permissions",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/auth/user-permissions/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/user-permissions/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "user-permissions"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/auth/user-permissions/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/user-permissions/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "user-permissions"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/auth/user-permissions/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/user-permissions/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "user-permissions",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/auth/user-permissions/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/user-permissions/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "user-permissions",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/auth/user-permissions/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/user-permissions/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "user-permissions",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/auth/user-permissions/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/user-permissions/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "user-permissions",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/auth/users/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/users/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "users"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/auth/users/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/users/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "users"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/auth/users/{id}/",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/users/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "users",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/auth/users/{id}/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/users/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "users",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/auth/users/{id}/",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/users/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "users",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/auth/users/{id}/",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/users/{id}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "users",
+                "{id}"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/auth/users/{id}/set_password/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/users/{id}/set_password/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "users",
+                "{id}",
+                "set_password"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/auth/users/{id}/set_role/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/users/{id}/set_role/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "users",
+                "{id}",
+                "set_role"
+              ]
+            },
+            "description": "A viewset that provides default `create()`, `retrieve()`, `update()`,\n`partial_update()`, `destroy()` and `list()` actions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
