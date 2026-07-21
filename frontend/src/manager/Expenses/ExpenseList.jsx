@@ -109,8 +109,8 @@ export default function ExpenseList({
       let bValue = b[sortField];
 
       if (sortField === "expense_date") {
-        aValue = new Date(aValue).getTime();
-        bValue = new Date(bValue).getTime();
+        aValue = String(aValue || "");
+        bValue = String(bValue || "");
       } else if (sortField === "amount") {
         aValue = getTotalAmount(a);
         bValue = getTotalAmount(b);
@@ -152,12 +152,7 @@ export default function ExpenseList({
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    return dateString || "-";
   };
 
   const handleViewDetails = (expense) => {
@@ -312,7 +307,10 @@ export default function ExpenseList({
                       <div className="flex items-center gap-2 text-[var(--muted)]">
                         <Calendar className="h-3.5 w-3.5" />
                         <span className="text-sm">
-                          {formatDate(expense.expense_date)}
+                          {formatDate(
+                            expense.formatted_expense_date ||
+                              expense.expense_date,
+                          )}
                         </span>
                       </div>
                     </td>

@@ -87,7 +87,7 @@ export default function EmployeeCard({ employee, onEdit, onView, onDelete }) {
             {t("EmployeeCard.hired")}
           </span>
           <span style={{ color: "var(--text)" }}>
-            {new Date(employee.hire_date).toLocaleDateString()}
+            {employee.formatted_hire_date || employee.hire_date || "-"}
           </span>
         </div>
       </div>

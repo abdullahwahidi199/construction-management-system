@@ -109,3 +109,35 @@ class ProjectAssignment(models.Model):
 
     def __str__(self):
         return f"{self.user.get_username()} -> {self.project}"
+
+
+class ApplicationSettings(models.Model):
+    app_settings = models.JSONField(default=dict, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="updated_application_settings",
+    )
+
+    class Meta:
+        verbose_name = _("Application settings")
+        verbose_name_plural = _("Application settings")
+
+    @classmethod
+    def get_solo(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+    @property
+    def calendar_settings(self):
+        from common.calendar_utils import normalize_calendar_settings
+
+        return normalize_calendar_settings(self.app_settings.get("calendar_settings"))
+
+    def set_calendar_settings(self, value):
+        from common.calendar_utils import normalize_calendar_settings
+
+        self.app_settings["calendar_settings"] = normalize_calendar_settings(value)

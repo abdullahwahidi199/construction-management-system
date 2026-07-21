@@ -92,8 +92,7 @@ export default function ContractDetailsPage() {
   const { postData, loading: posting } = usePost();
   const [actionLoading, setActionLoading] = useState(false);
 
-  const formatDate = (d) =>
-    d ? new Date(d).toLocaleDateString() : t("ContractDetailsPage.noData");
+  const formatDate = (d) => d || t("ContractDetailsPage.noData");
 
   const fmt = new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,

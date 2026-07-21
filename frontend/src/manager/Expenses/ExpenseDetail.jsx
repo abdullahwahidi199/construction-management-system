@@ -22,24 +22,11 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
   if (!isOpen || !expense) return null;
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    return dateString || "-";
   };
 
   const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    return dateString || "-";
   };
 
   return (
@@ -170,7 +157,10 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                       {t("ExpenseDetail.expenseDate")}
                     </p>
                     <p className="text-[var(--text)] font-medium">
-                      {formatDate(expense.expense_date)}
+                      {formatDate(
+                        expense.formatted_expense_date ||
+                          expense.expense_date,
+                      )}
                     </p>
                   </div>
                 </div>
@@ -182,7 +172,9 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                       {t("ExpenseDetail.created")}
                     </p>
                     <p className="text-[var(--text)] font-medium">
-                      {formatDateTime(expense.created_at)}
+                      {formatDateTime(
+                        expense.formatted_created_at || expense.created_at,
+                      )}
                     </p>
                   </div>
                 </div>
@@ -208,7 +200,9 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                       {t("ExpenseDetail.updated")}
                     </p>
                     <p className="text-[var(--text)] font-medium">
-                      {formatDateTime(expense.updated_at)}
+                      {formatDateTime(
+                        expense.formatted_updated_at || expense.updated_at,
+                      )}
                     </p>
                   </div>
                 </div>

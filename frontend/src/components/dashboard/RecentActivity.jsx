@@ -37,7 +37,7 @@ function formatTimeAgo(isoString, t) {
   if (diffMins < 60) return t("RecentActivity.minutesAgo", { count: diffMins });
   if (diffHours < 24) return t("RecentActivity.hoursAgo", { count: diffHours });
   if (diffDays < 7) return t("RecentActivity.daysAgo", { count: diffDays });
-  return then.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return String(isoString || "").slice(0, 10);
 }
 
 export default function RecentActivity({ activities }) {

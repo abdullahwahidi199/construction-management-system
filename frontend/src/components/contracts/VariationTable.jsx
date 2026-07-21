@@ -79,7 +79,7 @@ export default function VariationTable({
                   {v.variation_number}
                 </td>
                 <td className="px-4 py-3 text-[var(--text)] text-start">
-                  {v.date}
+                  {v.formatted_date || v.date || "-"}
                 </td>
                 <td className="px-4 py-3 text-[var(--text)] max-w-[250px] truncate text-start">
                   {v.description}

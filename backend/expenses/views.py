@@ -19,6 +19,7 @@ from .serializers import ExpenseSerializer
 from accounts.permissions import RBACPermission
 from accounts.constants import Role
 from accounts.services import get_user_role, has_permission
+from common.calendar_utils import get_module_calendar, parse_calendar_date
 
 
 # =========================
@@ -47,7 +48,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     rbac_resource = "expenses"
 
     filter_backends = [
-        DjangoFilterBackend,
         filters.SearchFilter,
         filters.OrderingFilter
     ]
@@ -81,6 +81,13 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     # =========================
     def get_queryset(self):
         queryset = super().get_queryset()
+        calendar_type = get_module_calendar("expenses", request=self.request)
+        project = self.request.query_params.get("project")
+        expense_type = self.request.query_params.get("expense_type")
+        expense_exact = self.request.query_params.get("expense_date")
+        expense_gte = self.request.query_params.get("expense_date__gte")
+        expense_lte = self.request.query_params.get("expense_date__lte")
+        serial_number = self.request.query_params.get("serial_number")
 
         if get_user_role(self.request.user) == Role.DATA_ENTRY:
             assigned_project_ids = self.request.user.project_assignments.values_list(
@@ -88,6 +95,18 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 flat=True,
             )
             queryset = queryset.filter(project_id__in=assigned_project_ids)
+        if project:
+            queryset = queryset.filter(project=project)
+        if expense_type:
+            queryset = queryset.filter(expense_type=expense_type)
+        if serial_number:
+            queryset = queryset.filter(serial_number=serial_number)
+        if expense_exact:
+            queryset = queryset.filter(expense_date=parse_calendar_date(expense_exact, calendar_type))
+        if expense_gte:
+            queryset = queryset.filter(expense_date__gte=parse_calendar_date(expense_gte, calendar_type))
+        if expense_lte:
+            queryset = queryset.filter(expense_date__lte=parse_calendar_date(expense_lte, calendar_type))
 
         return queryset
 
@@ -261,11 +280,13 @@ class ExpensePDFExportView(APIView):
             )
 
         if date_from:
+            date_from = parse_calendar_date(date_from, get_module_calendar("expenses", request=self.request))
             qs = qs.filter(
                 expense_date__gte=date_from
             )
 
         if date_to:
+            date_to = parse_calendar_date(date_to, get_module_calendar("expenses", request=self.request))
             qs = qs.filter(
                 expense_date__lte=date_to
             )

@@ -86,7 +86,7 @@ export default function PaymentTable({
                 className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--hover)] transition-colors"
               >
                 <td className="px-4 py-3 text-[var(--text)] text-start">
-                  {payment.payment_date}
+                  {payment.formatted_payment_date || payment.payment_date || "-"}
                 </td>
                 <td className="px-4 py-3 text-start">
                   <span
@@ -139,7 +139,7 @@ export default function PaymentTable({
           <div key={payment.id} className="p-4 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm text-[var(--muted)]">
-                {payment.payment_date}
+                {payment.formatted_payment_date || payment.payment_date || "-"}
               </span>
               <span
                 className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${

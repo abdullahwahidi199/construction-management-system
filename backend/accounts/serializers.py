@@ -2,8 +2,10 @@ from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from common.calendar_utils import DEFAULT_CALENDAR_SETTINGS, normalize_calendar_settings
 from .constants import Role
 from .models import (
+    ApplicationSettings,
     ProjectAssignment,
     UserPermissionOverride,
     UserProfile,
@@ -193,3 +195,22 @@ class RolePermissionCreateSerializer(serializers.ModelSerializer):
             "role",
             "permission",
         )
+
+
+class CalendarSettingsSerializer(serializers.Serializer):
+    default_calendar = serializers.ChoiceField(
+        choices=["shamsi", "gregorian"],
+        default="shamsi",
+    )
+    modules = serializers.DictField(
+        child=serializers.ChoiceField(choices=["inherit", "shamsi", "gregorian"]),
+        required=False,
+    )
+
+    def to_representation(self, instance):
+        if isinstance(instance, ApplicationSettings):
+            return instance.calendar_settings
+        return normalize_calendar_settings(instance or DEFAULT_CALENDAR_SETTINGS)
+
+    def validate(self, attrs):
+        return normalize_calendar_settings(attrs)

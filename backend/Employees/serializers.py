@@ -1,8 +1,10 @@
 from rest_framework import serializers
+from common.serializers import CalendarModelSerializer
 from .models import Employee, Payroll
 
 
-class EmployeeSerializer(serializers.ModelSerializer):
+class EmployeeSerializer(CalendarModelSerializer):
+    calendar_module = "employees"
     full_name = serializers.ReadOnlyField()
     total_payrolls = serializers.SerializerMethodField()
     latest_payroll = serializers.SerializerMethodField()
@@ -45,7 +47,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
         return value
 
 
-class EmployeeListSerializer(serializers.ModelSerializer):
+class EmployeeListSerializer(CalendarModelSerializer):
+    calendar_module = "employees"
     """Simplified serializer for list views"""
     full_name = serializers.ReadOnlyField()
 
@@ -59,7 +62,8 @@ class EmployeeListSerializer(serializers.ModelSerializer):
         read_only_fields = ["employee_id"]
 
 
-class PayrollSerializer(serializers.ModelSerializer):
+class PayrollSerializer(CalendarModelSerializer):
+    calendar_module = "payroll"
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_id = serializers.CharField(source='employee.employee_id', read_only=True)
     
@@ -94,7 +98,8 @@ class PayrollSerializer(serializers.ModelSerializer):
         return instance
 
 
-class PayrollListSerializer(serializers.ModelSerializer):
+class PayrollListSerializer(CalendarModelSerializer):
+    calendar_module = "payroll"
     """Simplified serializer for list views"""
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_id = serializers.CharField(source='employee.employee_id', read_only=True)
@@ -130,6 +135,17 @@ class PayrollBulkCreateSerializer(serializers.Serializer):
     payment_method = serializers.CharField(max_length=20, default="bank_transfer")
     notes = serializers.CharField(required=False, allow_blank=True)
 
+    def to_internal_value(self, data):
+        from common.calendar_utils import get_module_calendar, parse_calendar_date
+
+        if isinstance(data, dict):
+            data = data.copy()
+            calendar_type = get_module_calendar("payroll", request=self.context.get("request"))
+            for field in ["payroll_period_start", "payroll_period_end"]:
+                if data.get(field):
+                    data[field] = parse_calendar_date(data[field], calendar_type)
+        return super().to_internal_value(data)
+
 
 # Add to your existing serializers.py
 
@@ -137,7 +153,8 @@ from .models import Attendance
 from datetime import date
 
 
-class AttendanceSerializer(serializers.ModelSerializer):
+class AttendanceSerializer(CalendarModelSerializer):
+    calendar_module = "attendance"
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_identifier = serializers.CharField(source='employee.employee_id', read_only=True)
 
@@ -175,7 +192,8 @@ class AttendanceSerializer(serializers.ModelSerializer):
         return value
 
 
-class AttendanceListSerializer(serializers.ModelSerializer):
+class AttendanceListSerializer(CalendarModelSerializer):
+    calendar_module = "attendance"
     """Lighter serializer for list views"""
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_identifier = serializers.CharField(source='employee.employee_id', read_only=True)
@@ -198,6 +216,14 @@ class BulkAttendanceSerializer(serializers.Serializer):
         child=serializers.DictField(),
         help_text="List of {employee: id, status: 'present/absent/half_day/leave', check_in: '08:00', check_out: '17:00', overtime_hours: 0, note: ''}"
     )
+
+    def to_internal_value(self, data):
+        from common.calendar_utils import get_module_calendar, parse_calendar_date
+
+        if isinstance(data, dict) and data.get("date"):
+            data = data.copy()
+            data["date"] = parse_calendar_date(data["date"], get_module_calendar("attendance", request=self.context.get("request")))
+        return super().to_internal_value(data)
 
     def validate_date(self, value):
         if value > date.today():

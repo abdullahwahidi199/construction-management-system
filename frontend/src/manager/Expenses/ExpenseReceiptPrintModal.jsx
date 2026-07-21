@@ -20,12 +20,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
 
   const formatDate = (dateString) => {
     if (!dateString) return "—";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    return dateString;
   };
 
   const handlePrint = () => {
@@ -255,7 +250,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
             <div class="meta">
               <div class="receipt-title">Receipt No.</div>
               <div class="serial">#${expense.serial_number || "—"}</div>
-              <div class="date">${formatDate(expense.expense_date)}</div>
+              <div class="date">${formatDate(expense.formatted_expense_date || expense.expense_date)}</div>
             </div>
           </div>
 
@@ -415,7 +410,9 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
                     #{expense.serial_number || "—"}
                   </p>
                   <p className="text-xs text-[var(--muted)] mt-0.5">
-                    {formatDate(expense.expense_date)}
+                    {formatDate(
+                      expense.formatted_expense_date || expense.expense_date,
+                    )}
                   </p>
                 </div>
               </div>

@@ -10,6 +10,7 @@ from datetime import datetime
 
 from accounts.permissions import RBACPermission
 from accounts.services import has_permission
+from common.calendar_utils import calendar_month_bounds, calendar_year_bounds, get_module_calendar, parse_calendar_date, to_shamsi
 from .models import Employee, Payroll
 from .serializers import (
     EmployeeSerializer,
@@ -79,7 +80,8 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         # Optional year filtering
         year = request.query_params.get('year', None)
         if year:
-            payrolls = payrolls.filter(payroll_period_start__year=year)
+            start, end = calendar_year_bounds(year, get_module_calendar("payroll", request=request))
+            payrolls = payrolls.filter(payroll_period_start__gte=start, payroll_period_start__lte=end)
         
         page = self.paginate_queryset(payrolls)
         if page is not None:
@@ -95,7 +97,8 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         employee = self.get_object()
         year = request.query_params.get('year', datetime.now().year)
         
-        payrolls = employee.payrolls.filter(payroll_period_start__year=year)
+        start, end = calendar_year_bounds(year, get_module_calendar("payroll", request=request))
+        payrolls = employee.payrolls.filter(payroll_period_start__gte=start, payroll_period_start__lte=end)
         summary = payrolls.aggregate(
             total_gross=Sum('gross_pay'),
             total_net=Sum('net_pay'),
@@ -172,6 +175,7 @@ class PayrollViewSet(viewsets.ModelViewSet):
         payment_method = self.request.query_params.get('payment_method', None)
         start_date = self.request.query_params.get('start_date', None)
         end_date = self.request.query_params.get('end_date', None)
+        calendar_type = get_module_calendar("payroll", request=self.request)
         
         if employee_id:
             queryset = queryset.filter(employee_id=employee_id)
@@ -183,9 +187,11 @@ class PayrollViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(payment_method=payment_method)
         
         if start_date:
+            start_date = parse_calendar_date(start_date, calendar_type)
             queryset = queryset.filter(payment_date__gte=start_date)
 
         if end_date:
+            end_date = parse_calendar_date(end_date, calendar_type)
             queryset = queryset.filter(payment_date__lte=end_date)
         
         return queryset.select_related('employee')
@@ -197,7 +203,7 @@ class PayrollViewSet(viewsets.ModelViewSet):
     @transaction.atomic
     def bulk_create_payroll(self, request):
         """Create payroll records for multiple employees at once"""
-        serializer = PayrollBulkCreateSerializer(data=request.data)
+        serializer = PayrollBulkCreateSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         
         data = serializer.validated_data
@@ -289,16 +295,22 @@ class PayrollViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         
         if period:
+            calendar_type = get_module_calendar("payroll", request=request)
+            today = datetime.now().date()
             if period == 'monthly':
-                # Current month
+                if calendar_type == "shamsi":
+                    current_year, current_month, _ = to_shamsi(today)
+                else:
+                    current_year, current_month = today.year, today.month
+                start, end = calendar_month_bounds(current_year, current_month, calendar_type)
                 queryset = queryset.filter(
-                    payroll_period_start__month=datetime.now().month,
-                    payroll_period_start__year=datetime.now().year
+                    payroll_period_start__gte=start,
+                    payroll_period_start__lte=end,
                 )
             elif period == 'yearly':
-                queryset = queryset.filter(
-                    payroll_period_start__year=datetime.now().year
-                )
+                current_year = to_shamsi(today)[0] if calendar_type == "shamsi" else today.year
+                start, end = calendar_year_bounds(current_year, calendar_type)
+                queryset = queryset.filter(payroll_period_start__gte=start, payroll_period_start__lte=end)
         
         summary = queryset.aggregate(
             total_gross=Sum('gross_pay'),
@@ -327,10 +339,11 @@ class PayrollViewSet(viewsets.ModelViewSet):
         """Generate monthly payroll report"""
         year = int(request.query_params.get('year', datetime.now().year))
         month = int(request.query_params.get('month', datetime.now().month))
+        start, end = calendar_month_bounds(year, month, get_module_calendar("payroll", request=request))
         
         payrolls = self.get_queryset().filter(
-            payroll_period_start__year=year,
-            payroll_period_start__month=month
+            payroll_period_start__gte=start,
+            payroll_period_start__lte=end,
         )
         
         report = {
@@ -415,6 +428,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         month = self.request.query_params.get('month', None)
         year = self.request.query_params.get('year', None)
         search = self.request.query_params.get('search', None)
+        calendar_type = get_module_calendar("attendance", request=self.request)
 
         if employee_id:
             queryset = queryset.filter(employee_id=employee_id)
@@ -423,12 +437,15 @@ class AttendanceViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(status=status)
 
         if date_param:
+            date_param = parse_calendar_date(date_param, calendar_type)
             queryset = queryset.filter(date=date_param)
 
         if month and year:
-            queryset = queryset.filter(date__month=month, date__year=year)
+            start, end = calendar_month_bounds(year, month, calendar_type)
+            queryset = queryset.filter(date__gte=start, date__lte=end)
         elif year:
-            queryset = queryset.filter(date__year=year)
+            start, end = calendar_year_bounds(year, calendar_type)
+            queryset = queryset.filter(date__gte=start, date__lte=end)
 
         if search:
             queryset = queryset.filter(
@@ -454,7 +471,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"])
     @transaction.atomic
     def bulk_mark(self, request):
-        serializer = BulkAttendanceSerializer(data=request.data)
+        serializer = BulkAttendanceSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
@@ -530,6 +547,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         GET /attendance/daily/?date=2025-01-15
         """
         target_date = request.query_params.get('date', str(date.today()))
+        target_date = parse_calendar_date(target_date, get_module_calendar("attendance", request=request))
 
         records = Attendance.objects.filter(
             date=target_date
@@ -553,7 +571,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         serializer = AttendanceListSerializer(records, many=True)
 
         return Response({
-            'date': target_date,
+            'date': target_date.isoformat(),
             'total_marked': records.count(),
             'total_unmarked': unmarked_employees.count(),
             'status_counts': status_counts,
@@ -572,6 +590,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         employee_id = request.query_params.get('employee', None)
         month = request.query_params.get('month', date.today().month)
         year = request.query_params.get('year', date.today().year)
+        start, end = calendar_month_bounds(year, month, get_module_calendar("attendance", request=request))
 
         if not employee_id:
             return Response(
@@ -589,8 +608,8 @@ class AttendanceViewSet(viewsets.ModelViewSet):
 
         records = Attendance.objects.filter(
             employee=employee,
-            date__month=month,
-            date__year=year
+            date__gte=start,
+            date__lte=end,
         )
 
         total_present = records.filter(status='present').count()

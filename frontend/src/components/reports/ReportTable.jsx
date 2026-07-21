@@ -1,7 +1,14 @@
-const formatCell = (value, type) => {
-  if (value === null || value === undefined || value === "") return "—";
+import { useCalendar } from "../../hooks/useCalendar";
 
-  switch (type) {
+const EMPTY = "-";
+
+const formatCell = (row, column, formatDate) => {
+  const value = row[`formatted_${column.key}`] || row[column.key];
+  if (value === null || value === undefined || value === "") return EMPTY;
+
+  switch (column.type) {
+    case "date":
+      return row[`formatted_${column.key}`] || formatDate(value) || EMPTY;
     case "currency":
       return Number(value).toLocaleString(undefined, {
         minimumFractionDigits: 2,
@@ -30,6 +37,8 @@ const badgeClass = (value) => {
 };
 
 export default function ReportTable({ columns, rows }) {
+  const { formatDate } = useCalendar("reports");
+
   if (!columns || columns.length === 0) return null;
 
   if (!rows || rows.length === 0) {
@@ -73,10 +82,10 @@ export default function ReportTable({ columns, rows }) {
                           row[col.key],
                         )}`}
                       >
-                        {row[col.key] ?? "—"}
+                        {row[col.key] ?? EMPTY}
                       </span>
                     ) : (
-                      formatCell(row[col.key], col.type)
+                      formatCell(row, col, formatDate)
                     )}
                   </td>
                 ))}

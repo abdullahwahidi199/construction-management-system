@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from common.calendar_utils import get_module_calendar, parse_calendar_date
 
 
 class BaseReportFilterSerializer(serializers.Serializer):
@@ -7,6 +8,17 @@ class BaseReportFilterSerializer(serializers.Serializer):
     export = serializers.ChoiceField(
         choices=["json", "pdf"], required=False, default="json"
     )
+
+    calendar_module = "reports"
+
+    def to_internal_value(self, data):
+        if isinstance(data, dict):
+            data = data.copy()
+            calendar_type = get_module_calendar(self.calendar_module, request=self.context.get("request"))
+            for field in ["start_date", "end_date"]:
+                if data.get(field):
+                    data[field] = parse_calendar_date(data[field], calendar_type)
+        return super().to_internal_value(data)
 
     def validate(self, data):
         start = data.get("start_date")

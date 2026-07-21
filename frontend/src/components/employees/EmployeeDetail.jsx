@@ -164,7 +164,10 @@ export default function EmployeeDetail({ employeeId, onClose }) {
                 },
                 {
                   label: t("EmployeeDetail.hireDate"),
-                  value: new Date(employee.hire_date).toLocaleDateString(),
+                  value:
+                    employee.formatted_hire_date ||
+                    employee.hire_date ||
+                    t("EmployeeDetail.emptyValue"),
                 },
                 {
                   label: t("EmployeeDetail.salary"),

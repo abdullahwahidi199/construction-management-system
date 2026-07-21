@@ -1,3 +1,5 @@
+import CalendarDatePicker from "../common/CalendarDatePicker";
+
 export default function ReportFilters({
   filters,
   values,
@@ -41,6 +43,12 @@ export default function ReportFilters({
                   </option>
                 ))}
               </select>
+            ) : field.type === "date" ? (
+              <CalendarDatePicker
+                value={values[field.name] ?? ""}
+                onChange={(value) => handleField(field.name, value)}
+                module="reports"
+              />
             ) : (
               <input
                 type={field.type}

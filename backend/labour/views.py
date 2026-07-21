@@ -9,6 +9,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts.permissions import RBACPermission
+from common.calendar_utils import get_module_calendar, parse_calendar_date
 from project.models import Project
 
 from .models import DailyWorker, WorkerAdvance, WorkerAttendance, WorkerPayroll
@@ -85,6 +86,7 @@ class WorkerAttendanceViewSet(viewsets.ModelViewSet):
         date_param = self.request.query_params.get("date")
         start_date = self.request.query_params.get("start_date")
         end_date = self.request.query_params.get("end_date")
+        calendar_type = get_module_calendar("daily_worker_attendance", request=self.request)
         status_param = self.request.query_params.get("status")
         search = self.request.query_params.get("search")
 
@@ -93,10 +95,13 @@ class WorkerAttendanceViewSet(viewsets.ModelViewSet):
         if project:
             qs = qs.filter(project_id=project)
         if date_param:
+            date_param = parse_calendar_date(date_param, calendar_type)
             qs = qs.filter(date=date_param)
         if start_date:
+            start_date = parse_calendar_date(start_date, calendar_type)
             qs = qs.filter(date__gte=start_date)
         if end_date:
+            end_date = parse_calendar_date(end_date, calendar_type)
             qs = qs.filter(date__lte=end_date)
         if status_param:
             qs = qs.filter(status=status_param)
@@ -110,7 +115,7 @@ class WorkerAttendanceViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"])
     @transaction.atomic
     def bulk_mark(self, request):
-        serializer = BulkWorkerAttendanceSerializer(data=request.data)
+        serializer = BulkWorkerAttendanceSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         target_date = data["date"]
@@ -158,6 +163,7 @@ class WorkerAttendanceViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def daily_status(self, request):
         target_date = request.query_params.get("date", str(date.today()))
+        target_date = parse_calendar_date(target_date, get_module_calendar("daily_worker_attendance", request=request))
         project = request.query_params.get("project")
         records = self.get_queryset().filter(date=target_date)
         active_workers = DailyWorker.objects.filter(status="active")
@@ -168,7 +174,7 @@ class WorkerAttendanceViewSet(viewsets.ModelViewSet):
         unmarked = active_workers.exclude(id__in=marked_ids)
         counts = dict(records.values_list("status").annotate(count=Count("id")).values_list("status", "count"))
         return Response({
-            "date": target_date,
+            "date": target_date.isoformat(),
             "status_counts": {
                 "present": counts.get("present", 0),
                 "absent": counts.get("absent", 0),
@@ -231,6 +237,7 @@ class WorkerPayrollViewSet(viewsets.ModelViewSet):
         status_filter = self.request.query_params.get("status")
         start_date = self.request.query_params.get("start_date")
         end_date = self.request.query_params.get("end_date")
+        calendar_type = get_module_calendar("daily_worker_payroll", request=self.request)
         if worker:
             qs = qs.filter(worker_id=worker)
         if project:
@@ -238,8 +245,10 @@ class WorkerPayrollViewSet(viewsets.ModelViewSet):
         if status_filter:
             qs = qs.filter(status=status_filter)
         if start_date:
+            start_date = parse_calendar_date(start_date, calendar_type)
             qs = qs.filter(period_start__gte=start_date)
         if end_date:
+            end_date = parse_calendar_date(end_date, calendar_type)
             qs = qs.filter(period_end__lte=end_date)
         return qs
 
@@ -256,7 +265,7 @@ class WorkerPayrollViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"])
     @transaction.atomic
     def generate(self, request):
-        serializer = GenerateWorkerPayrollSerializer(data=request.data)
+        serializer = GenerateWorkerPayrollSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         start_date = data["period_start"]

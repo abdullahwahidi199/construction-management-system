@@ -88,11 +88,7 @@ const getStatusConfig = (status, t) => {
 /* ── Helpers ────────────────────────────────────── */
 const formatDate = (dateString) => {
   if (!dateString) return null;
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return dateString;
 };
 
 const formatCurrency = (amount) => {
@@ -107,6 +103,9 @@ const formatCurrency = (amount) => {
 
 const formatRelativeDate = (dateString, t) => {
   if (!dateString) return null;
+  if (/^\d{4}-/.test(dateString) && Number(dateString.slice(0, 4)) < 1700) {
+    return null;
+  }
 
   const date = new Date(dateString);
   const now = new Date();
@@ -126,6 +125,9 @@ const formatRelativeDate = (dateString, t) => {
     count: diffDays,
   });
 };
+
+const isGregorianDateString = (dateString) =>
+  /^\d{4}-/.test(dateString || "") && Number(dateString.slice(0, 4)) >= 1700;
 
 const capitalize = (str) => {
   if (!str) return "—";
@@ -311,6 +313,13 @@ export default function ProjectDetails() {
   /* ── Compute progress timeline ─────────────────── */
   const getTimelineProgress = () => {
     if (!project.start_date) return 0;
+    if (
+      !isGregorianDateString(project.start_date) ||
+      (project.expected_completion_date &&
+        !isGregorianDateString(project.expected_completion_date))
+    ) {
+      return null;
+    }
     const start = new Date(project.start_date);
     const end = project.expected_completion_date
       ? new Date(project.expected_completion_date)

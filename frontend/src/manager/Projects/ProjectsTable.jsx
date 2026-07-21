@@ -19,11 +19,7 @@ import { useLanguage } from "../../hooks/useLanguage";
 
 const formatDate = (dateString) => {
   if (!dateString) return "—";
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  return dateString;
 };
 
 const getStatusConfig = (status) => {
@@ -262,7 +258,9 @@ export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
 
                     {/* Date */}
                     <td className="whitespace-nowrap px-4 py-3 tabular-nums text-[var(--muted)]">
-                      {formatDate(project.start_date)}
+                      {formatDate(
+                        project.formatted_start_date || project.start_date,
+                      )}
                     </td>
 
                     {/* Status */}

@@ -1,8 +1,10 @@
 from rest_framework import serializers
+from common.serializers import CalendarModelSerializer
 from .models import Expense
 from project.models import Project
 
-class ExpenseSerializer(serializers.ModelSerializer):
+class ExpenseSerializer(CalendarModelSerializer):
+    calendar_module = "expenses"
     # Add read-only calculated fields to API responses
     total_usd = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
     total_afn = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
@@ -43,7 +45,8 @@ class ExpenseSerializer(serializers.ModelSerializer):
         return data
     
 
-class ProjectExpenseSerializer(serializers.ModelSerializer):
+class ProjectExpenseSerializer(CalendarModelSerializer):
+    calendar_module = "expenses"
     class Meta:
         model = Expense
         fields = [

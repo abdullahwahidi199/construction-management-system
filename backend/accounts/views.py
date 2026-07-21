@@ -12,6 +12,7 @@ from audit.utils import create_audit_log
 
 from .permissions import IsAdminRole
 from .serializers import (
+    CalendarSettingsSerializer,
     LoginSerializer,
     ProjectAssignmentSerializer,
     PermissionSerializer,
@@ -23,8 +24,9 @@ RolePermissionSerializer,
     permissions_payload,
     role_payload,
 )
-from .services import get_effective_permissions, get_user_role
+from .services import get_effective_permissions, get_user_role, has_permission
 from .models import (
+    ApplicationSettings,
     ProjectAssignment,
     UserPermissionOverride,
     Permission,
@@ -203,6 +205,29 @@ class PermissionViewSet(ModelViewSet):
     serializer_class = PermissionSerializer
     permission_classes = [IsAdminRole]
 from rest_framework.viewsets import ModelViewSet
+
+
+class CalendarSettingsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not (
+            has_permission(request.user, "settings.view")
+            or has_permission(request.user, "settings.manage")
+        ):
+            raise PermissionDenied()
+        return Response(CalendarSettingsSerializer(ApplicationSettings.get_solo()).data)
+
+    def put(self, request):
+        if not has_permission(request.user, "settings.manage"):
+            raise PermissionDenied()
+        settings_obj = ApplicationSettings.get_solo()
+        serializer = CalendarSettingsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        settings_obj.set_calendar_settings(serializer.validated_data)
+        settings_obj.updated_by = request.user
+        settings_obj.save(update_fields=["app_settings", "updated_by", "updated_at"])
+        return Response(CalendarSettingsSerializer(settings_obj).data)
 
 class RolePermissionViewSet(ModelViewSet):
     queryset = RolePermission.objects.select_related(
