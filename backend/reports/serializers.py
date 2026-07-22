@@ -41,12 +41,20 @@ class ExpenseReportFilterSerializer(BaseReportFilterSerializer):
 
 
 class PayrollReportFilterSerializer(BaseReportFilterSerializer):
+    source_type = serializers.ChoiceField(
+        choices=["employee", "daily_worker"],
+        required=False,
+    )
     employee_id = serializers.IntegerField(required=False)
     currency = serializers.CharField(required=False)
     payment_method = serializers.CharField(required=False)
 
 
 class AttendanceReportFilterSerializer(BaseReportFilterSerializer):
+    source_type = serializers.ChoiceField(
+        choices=["employee", "daily_worker"],
+        required=False,
+    )
     employee_id = serializers.IntegerField(required=False)
     status = serializers.CharField(required=False)
 

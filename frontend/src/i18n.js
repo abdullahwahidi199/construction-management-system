@@ -1,11 +1,12 @@
 import en from "./locales/en.json";
 import dr from "./locales/dr.json";
 import ps from "./locales/ps.json";
+import reportTranslations from "./locales/reports";
 
 const resources = {
-  en,
-  dr,
-  ps,
+  en: { ...en, reports: reportTranslations.en },
+  dr: { ...dr, reports: reportTranslations.dr },
+  ps: { ...ps, reports: reportTranslations.ps },
 };
 
 const LANGUAGE_KEY = "cms.language";

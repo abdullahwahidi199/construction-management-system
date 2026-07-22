@@ -68,8 +68,15 @@ class ProjectReportView(BaseReportView):
         ("location", "Location"),
         ("status", "Status"),
         ("estimated_budget", "Budget"),
-        ("total_expense_usd", "Spent (USD)"),
-        ("budget_remaining", "Remaining"),
+        ("budget_currency", "Budget Cur"),
+        ("expenses_usd", "Expenses USD Eq."),
+        ("expenses_afn", "Expenses AFN Eq."),
+        ("contracts_usd", "Contract Paid USD"),
+        ("contracts_afn", "Contract Paid AFN"),
+        ("worker_payroll_usd", "Worker Payroll USD"),
+        ("worker_payroll_afn", "Worker Payroll AFN"),
+        ("total_spent_usd", "Total USD"),
+        ("total_spent_afn", "Total AFN"),
     ]
 
 
@@ -94,14 +101,20 @@ class PayrollReportView(BaseReportView):
     serializer_class = PayrollReportFilterSerializer
     filename = "payroll_report.pdf"
     pdf_columns = [
+        ("source_type", "Source"),
         ("employee", "Employee"),
+        ("employee_id", "ID"),
+        ("project", "Project"),
         ("department", "Dept"),
         ("period_start", "From"),
         ("period_end", "To"),
         ("currency", "Cur"),
         ("gross_pay", "Gross"),
+        ("advances", "Advances"),
         ("deductions", "Deduct"),
+        ("tax_deducted", "Tax"),
         ("net_pay", "Net"),
+        ("status", "Status"),
     ]
 
 
@@ -110,7 +123,10 @@ class AttendanceReportView(BaseReportView):
     serializer_class = AttendanceReportFilterSerializer
     filename = "attendance_report.pdf"
     pdf_columns = [
+        ("source_type", "Source"),
         ("employee", "Employee"),
+        ("employee_id", "ID"),
+        ("project", "Project"),
         ("date", "Date"),
         ("status", "Status"),
         ("check_in", "In"),

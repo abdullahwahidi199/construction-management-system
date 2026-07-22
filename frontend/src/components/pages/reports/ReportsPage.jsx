@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
+
 import { REPORTS } from "../../../config/reportConfig";
 import useReport from "../../../hooks/useReport";
-
-import ReportSidebar from "../../reports/ReportSidebar";
-import ReportFilters from "../../reports/ReportFilters";
-import ReportToolbar from "../../reports/ReportToolbar";
-import ReportSummary from "../../reports/ReportSummary";
+import { useLanguage } from "../../../hooks/useLanguage";
 import ReportBreakdowns from "../../reports/ReportBreakdowns";
+import ReportFilters from "../../reports/ReportFilters";
+import ReportSidebar from "../../reports/ReportSidebar";
+import ReportSummary from "../../reports/ReportSummary";
 import ReportTable from "../../reports/ReportTable";
+import ReportToolbar from "../../reports/ReportToolbar";
+import ReportVisuals from "../../reports/ReportVisuals";
+import { getReportRows, translateOrFallback } from "../../reports/reportUtils";
 
 export default function ReportsPage() {
   const [activeKey, setActiveKey] = useState("projects");
   const [filterValues, setFilterValues] = useState({});
+  const { t } = useLanguage();
 
   const report = REPORTS[activeKey];
   const { data, loading, exporting, error, fetchReport, exportPdf } = useReport(
@@ -19,10 +23,14 @@ export default function ReportsPage() {
   );
 
   useEffect(() => {
-    setFilterValues({});
     fetchReport({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeKey]);
+
+  const handleSelectReport = (key) => {
+    setActiveKey(key);
+    setFilterValues({});
+  };
 
   const handleApply = () => fetchReport(filterValues);
   const handleReset = () => {
@@ -32,17 +40,19 @@ export default function ReportsPage() {
   const handleExport = () =>
     exportPdf(filterValues, `${report.key}_report.pdf`);
 
-  return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-bg text-text">
-      <ReportSidebar activeKey={activeKey} onSelect={setActiveKey} />
+  const rows = getReportRows(data);
 
-      <main className="flex-1 px-6 py-8 max-w-[1400px] w-full mx-auto">
+  return (
+    <div className="min-h-screen bg-bg text-text">
+      <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:py-10">
         <ReportToolbar
           report={report}
           onExportPdf={handleExport}
           exporting={exporting}
           generatedAt={data?.generated_at}
         />
+
+        <ReportSidebar activeKey={activeKey} onSelect={handleSelectReport} />
 
         <ReportFilters
           filters={report.filters}
@@ -53,24 +63,29 @@ export default function ReportsPage() {
         />
 
         {loading && (
-          <div className="p-12 text-center text-sm text-muted bg-card border border-border rounded-lg">
-            Loading report…
+          <div className="rounded-lg bg-card p-12 text-center text-sm text-muted shadow-sm shadow-black/5">
+            {translateOrFallback(t, "reports.states.loading", "Loading report...")}
           </div>
         )}
 
         {error && (
-          <div className="p-12 text-center text-sm text-danger bg-card border border-border rounded-lg">
-            Failed to load report. Please try again.
+          <div className="rounded-lg bg-card p-12 text-center text-sm text-danger shadow-sm shadow-black/5">
+            {translateOrFallback(
+              t,
+              "reports.states.error",
+              "Failed to load report. Please try again.",
+            )}
           </div>
         )}
 
         {!loading && !error && data && (
-          <div className="space-y-8">
-            <ReportSummary
-              summary={data.summary}
-              extraBlocks={<ReportBreakdowns summary={data.summary} />}
-            />
-            <ReportTable columns={report.columns} rows={data.rows} />
+          <div className="space-y-6">
+            <ReportSummary summary={data.summary} />
+            <ReportVisuals reportKey={activeKey} data={data} rows={rows} />
+            <ReportBreakdowns data={data} />
+            {report.columns.length > 0 && (
+              <ReportTable columns={report.columns} rows={rows} />
+            )}
           </div>
         )}
       </main>

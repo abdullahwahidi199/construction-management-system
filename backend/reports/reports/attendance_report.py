@@ -1,15 +1,51 @@
-from django.db.models import Count, Sum, Value, DecimalField, Q
-from django.db.models.functions import Coalesce
+from collections import defaultdict
 from decimal import Decimal
 
-from Employees.models import Attendance  # adjust import
+from Employees.models import Attendance
+from labour.models import WorkerAttendance
 from .base import BaseReport
+
+
+ZERO = Decimal("0.00")
+
+
+def decimal_value(value):
+    if value is None or value == "":
+        return ZERO
+    return Decimal(str(value))
+
+
+def empty_status_summary(status, source_type=None):
+    data = {
+        "status": status,
+        "count": 0,
+        "total_overtime": ZERO,
+    }
+    if source_type:
+        data["source_type"] = source_type
+    return data
+
+
+def empty_source_summary(source_type):
+    return {
+        "source_type": source_type,
+        "count": 0,
+        "present": 0,
+        "absent": 0,
+        "half_day": 0,
+        "leave": 0,
+        "overtime": 0,
+        "total_overtime": ZERO,
+    }
 
 
 class AttendanceReport(BaseReport):
     report_name = "Attendance Report"
 
-    def _base_queryset(self):
+    def _employee_queryset(self):
+        if self.filters.get("source_type") == "daily_worker":
+            return Attendance.objects.none()
+
         qs = Attendance.objects.select_related("employee")
 
         employee_id = self.filters.get("employee_id")
@@ -27,56 +63,157 @@ class AttendanceReport(BaseReport):
 
         return qs
 
+    def _worker_queryset(self):
+        if self.filters.get("source_type") == "employee":
+            return WorkerAttendance.objects.none()
+
+        qs = WorkerAttendance.objects.select_related("worker", "project")
+
+        employee_id = self.filters.get("employee_id")
+        status = self.filters.get("status")
+        start, end = self.get_date_range()
+
+        if employee_id:
+            qs = qs.filter(worker_id=employee_id)
+        if status:
+            qs = qs.filter(status=status)
+        if start:
+            qs = qs.filter(date__gte=start)
+        if end:
+            qs = qs.filter(date__lte=end)
+
+        return qs
+
+    def _employee_row(self, attendance):
+        return {
+            "id": f"employee-{attendance.id}",
+            "source_type": "Employee",
+            "employee": attendance.employee.full_name,
+            "employee_id": attendance.employee.employee_id,
+            "project": "",
+            "date": attendance.date,
+            "status": attendance.get_status_display(),
+            "status_key": attendance.status,
+            "check_in": attendance.check_in,
+            "check_out": attendance.check_out,
+            "overtime_hours": attendance.overtime_hours,
+            "note": attendance.note,
+        }
+
+    def _worker_row(self, attendance):
+        return {
+            "id": f"daily-worker-{attendance.id}",
+            "source_type": "Daily Worker",
+            "employee": attendance.worker.full_name,
+            "employee_id": attendance.worker.worker_id,
+            "project": attendance.project.name if attendance.project else "",
+            "date": attendance.date,
+            "status": attendance.get_status_display(),
+            "status_key": attendance.status,
+            "check_in": None,
+            "check_out": None,
+            "overtime_hours": attendance.overtime_hours,
+            "note": attendance.notes,
+        }
+
+    def _add_status_summary(self, by_status, by_source_status, row):
+        status = row["status_key"]
+        source_type = row["source_type"]
+        overtime = decimal_value(row["overtime_hours"])
+
+        if status not in by_status:
+            by_status[status] = empty_status_summary(status)
+        by_status[status]["count"] += 1
+        by_status[status]["total_overtime"] += overtime
+
+        source_key = (source_type, status)
+        if source_key not in by_source_status:
+            by_source_status[source_key] = empty_status_summary(status, source_type)
+        by_source_status[source_key]["count"] += 1
+        by_source_status[source_key]["total_overtime"] += overtime
+
+    def _add_source_summary(self, by_source, row):
+        source_type = row["source_type"]
+        status = row["status_key"]
+
+        if source_type not in by_source:
+            by_source[source_type] = empty_source_summary(source_type)
+
+        summary = by_source[source_type]
+        summary["count"] += 1
+        summary["total_overtime"] += decimal_value(row["overtime_hours"])
+
+        if status in summary:
+            summary[status] += 1
+
+    def _person_summary(self, rows):
+        people = {}
+        for row in rows:
+            key = (row["source_type"], row["employee_id"])
+            if key not in people:
+                people[key] = {
+                    "source_type": row["source_type"],
+                    "employee_id": row["employee_id"],
+                    "name": row["employee"],
+                    "project": row["project"],
+                    "present": 0,
+                    "absent": 0,
+                    "half_day": 0,
+                    "leave": 0,
+                    "overtime": 0,
+                    "total_overtime": ZERO,
+                }
+
+            person = people[key]
+            status = row["status_key"]
+            if status in person:
+                person[status] += 1
+            person["total_overtime"] += decimal_value(row["overtime_hours"])
+
+            if row["project"] and not person["project"]:
+                person["project"] = row["project"]
+
+        return sorted(
+            people.values(),
+            key=lambda item: (
+                item["source_type"],
+                item["name"],
+            ),
+        )
+
     def generate(self):
-        qs = self._base_queryset()
-
-        rows = []
-        for a in qs:
-            rows.append({
-                "id": a.id,
-                "employee": a.employee.full_name,
-                "employee_id": a.employee.employee_id,
-                "date": a.date,
-                "status": a.get_status_display(),
-                "check_in": a.check_in,
-                "check_out": a.check_out,
-                "overtime_hours": a.overtime_hours,
-                "note": a.note,
-            })
-
-        # Status breakdown
-        status_breakdown = list(
-            qs.values("status").annotate(count=Count("id")).order_by("status")
+        employee_rows = [self._employee_row(a) for a in self._employee_queryset()]
+        worker_rows = [self._worker_row(a) for a in self._worker_queryset()]
+        rows = sorted(
+            [*employee_rows, *worker_rows],
+            key=lambda row: (row["date"], row["source_type"], row["employee"]),
+            reverse=True,
         )
 
-        # Per-employee summary
-        per_employee = list(
-            qs.values(
-                "employee__id", "employee__first_name", "employee__last_name"
-            ).annotate(
-                present=Count("id", filter=Q(status="present")),
-                absent=Count("id", filter=Q(status="absent")),
-                half_day=Count("id", filter=Q(status="half_day")),
-                leave=Count("id", filter=Q(status="leave")),
-                total_overtime=Coalesce(
-                    Sum("overtime_hours"), Value(Decimal("0")),
-                    output_field=DecimalField(max_digits=8, decimal_places=2),
-                ),
-            ).order_by("employee__first_name")
-        )
+        by_status = {}
+        by_source_status = {}
+        by_source = {}
 
-        total_overtime = qs.aggregate(
-            total=Coalesce(Sum("overtime_hours"), Value(Decimal("0")),
-                           output_field=DecimalField(max_digits=10, decimal_places=2))
-        )["total"]
+        for row in rows:
+            self._add_status_summary(by_status, by_source_status, row)
+            self._add_source_summary(by_source, row)
+
+        total_overtime = sum(
+            (decimal_value(row["overtime_hours"]) for row in rows),
+            ZERO,
+        )
 
         return {
             **self.get_metadata(),
             "summary": {
                 "total_records": len(rows),
+                "employee_attendance_records": len(employee_rows),
+                "daily_worker_attendance_records": len(worker_rows),
                 "total_overtime_hours": total_overtime,
-                "status_breakdown": status_breakdown,
+                "status_breakdown": list(by_status.values()),
+                "by_source": list(by_source.values()),
             },
-            "per_employee": per_employee,
+            "status_by_source": list(by_source_status.values()),
+            "per_employee": self._person_summary(rows),
             "rows": rows,
         }
