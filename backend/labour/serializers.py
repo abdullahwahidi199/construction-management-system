@@ -3,11 +3,13 @@ from decimal import Decimal
 
 from django.db.models import Sum
 from rest_framework import serializers
+from common.serializers import CalendarModelSerializer
 
 from .models import DailyWorker, WorkerAdvance, WorkerAttendance, WorkerPayroll
 
 
-class DailyWorkerSerializer(serializers.ModelSerializer):
+class DailyWorkerSerializer(CalendarModelSerializer):
+    calendar_module = "daily_workers"
     assigned_project_name = serializers.CharField(source="assigned_project.name", read_only=True)
     total_days_worked = serializers.SerializerMethodField()
     total_earnings = serializers.SerializerMethodField()
@@ -35,7 +37,8 @@ class DailyWorkerSerializer(serializers.ModelSerializer):
         return data
 
 
-class DailyWorkerListSerializer(serializers.ModelSerializer):
+class DailyWorkerListSerializer(CalendarModelSerializer):
+    calendar_module = "daily_workers"
     assigned_project_name = serializers.CharField(source="assigned_project.name", read_only=True)
     trade = serializers.CharField(source="skill_type", read_only=True)
     is_active = serializers.BooleanField(read_only=True)
@@ -61,7 +64,8 @@ class DailyWorkerListSerializer(serializers.ModelSerializer):
         ]
 
 
-class WorkerAttendanceSerializer(serializers.ModelSerializer):
+class WorkerAttendanceSerializer(CalendarModelSerializer):
+    calendar_module = "daily_worker_attendance"
     worker_name = serializers.CharField(source="worker.full_name", read_only=True)
     worker_code = serializers.CharField(source="worker.worker_id", read_only=True)
     skill_type = serializers.CharField(source="worker.skill_type", read_only=True)
@@ -93,6 +97,14 @@ class BulkWorkerAttendanceSerializer(serializers.Serializer):
     project = serializers.IntegerField(required=False, allow_null=True)
     records = serializers.ListField(child=serializers.DictField())
 
+    def to_internal_value(self, data):
+        from common.calendar_utils import get_module_calendar, parse_calendar_date
+
+        if isinstance(data, dict) and data.get("date"):
+            data = data.copy()
+            data["date"] = parse_calendar_date(data["date"], get_module_calendar("daily_worker_attendance", request=self.context.get("request")))
+        return super().to_internal_value(data)
+
     def validate_date(self, value):
         if value > date.today():
             raise serializers.ValidationError("Cannot mark attendance for future dates.")
@@ -110,7 +122,8 @@ class BulkWorkerAttendanceSerializer(serializers.Serializer):
         return value
 
 
-class WorkerAdvanceSerializer(serializers.ModelSerializer):
+class WorkerAdvanceSerializer(CalendarModelSerializer):
+    calendar_module = "worker_advances"
     worker_name = serializers.CharField(source="worker.full_name", read_only=True)
     worker_code = serializers.CharField(source="worker.worker_id", read_only=True)
     status = serializers.SerializerMethodField()
@@ -131,7 +144,8 @@ class WorkerAdvanceSerializer(serializers.ModelSerializer):
         return data
 
 
-class WorkerPayrollSerializer(serializers.ModelSerializer):
+class WorkerPayrollSerializer(CalendarModelSerializer):
+    calendar_module = "daily_worker_payroll"
     worker_name = serializers.CharField(source="worker.full_name", read_only=True)
     worker_id_code = serializers.CharField(source="worker.worker_id", read_only=True)
     project_name = serializers.CharField(source="project.name", read_only=True)
@@ -184,6 +198,17 @@ class GenerateWorkerPayrollSerializer(serializers.Serializer):
     payment_method = serializers.ChoiceField(choices=WorkerPayroll.PAYMENT_METHOD_CHOICES, default="cash")
     deductions = serializers.DecimalField(max_digits=12, decimal_places=2, default=0)
     notes = serializers.CharField(required=False, allow_blank=True)
+
+    def to_internal_value(self, data):
+        from common.calendar_utils import get_module_calendar, parse_calendar_date
+
+        if isinstance(data, dict):
+            data = data.copy()
+            calendar_type = get_module_calendar("daily_worker_payroll", request=self.context.get("request"))
+            for field in ["period_start", "period_end"]:
+                if data.get(field):
+                    data[field] = parse_calendar_date(data[field], calendar_type)
+        return super().to_internal_value(data)
 
     def validate(self, data):
         if data["period_start"] > data["period_end"]:

@@ -3,6 +3,7 @@ import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { useLanguage } from "../../hooks/useLanguage";
 import { useAuth } from "../../auth/AuthContext";
 import { hasAnyPermission } from "../../../utils/permissions";
+import toast from "react-hot-toast";
 function WorkerBulkAttendance() {
   const { fetchDailyStatus, fetchProjects, bulkMarkAttendance, loading } =
     useDailyWorkers();
@@ -37,7 +38,7 @@ function WorkerBulkAttendance() {
       const data = await fetchProjects();
       setProjects(data);
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -74,7 +75,7 @@ function WorkerBulkAttendance() {
 
       setWorkersData(combined);
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -98,10 +99,10 @@ function WorkerBulkAttendance() {
 
     try {
       await bulkMarkAttendance(payload);
-      alert(t("WorkerBulkAttendance.attendanceSaved"));
+      toast.success(t("WorkerBulkAttendance.attendanceSaved"));
       loadStatus();
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -196,7 +197,19 @@ function WorkerBulkAttendance() {
           </thead>
 
           <tbody className="divide-y" style={{ borderColor: "var(--border)" }}>
-            {workersData.map((w) => (
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="px-4 py-6 text-center" style={{ color: "var(--muted)" }}>
+                  Loading attendance...
+                </td>
+              </tr>
+            ) : workersData.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-4 py-6 text-center" style={{ color: "var(--muted)" }}>
+                  No workers available for this date.
+                </td>
+              </tr>
+            ) : workersData.map((w) => (
               <tr
                 key={w.workerId}
                 style={{

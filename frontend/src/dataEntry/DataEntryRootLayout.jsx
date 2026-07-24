@@ -17,6 +17,7 @@ import {
 import { useAuth } from "../auth/AuthContext";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import ThemeToggle from "../components/ui/ToggleButton";
+import NotificationBell from "../components/notifications/NotificationBell";
 import { useLanguage } from "../hooks/useLanguage";
 import { hasAnyPermission } from "../../utils/permissions";
 
@@ -183,6 +184,7 @@ export default function DataEntryRootLayout() {
 
             <LanguageSwitcher />
             <ThemeToggle />
+            <NotificationBell />
 
             <button
               onClick={logout}

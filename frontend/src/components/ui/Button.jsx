@@ -9,6 +9,9 @@ export default function Button({
   fullWidth = false,
   disabled = false,
   className = "",
+  leftIcon = null,
+  rightIcon = null,
+  ...props
 }) {
   const baseClasses =
     "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 select-none";
@@ -31,6 +34,8 @@ export default function Button({
       "bg-transparent text-[var(--text)] border border-[var(--border)] hover:bg-[var(--hover)] focus:ring-[var(--border)]",
     ghost:
       "bg-transparent text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--hover)] focus:ring-[var(--hover)]",
+    secondary:
+      "bg-[var(--card)] text-[var(--text)] border border-[var(--border)] hover:bg-[var(--hover)] focus:ring-[var(--border)]",
     soft: "bg-[var(--hover)] text-[var(--text)] border border-transparent hover:bg-[color:rgba(37,99,235,0.1)]", // Subtle tint
   };
 
@@ -39,6 +44,7 @@ export default function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
+      {...props}
       className={`
         ${baseClasses} 
         ${sizes[size]} 
@@ -47,7 +53,9 @@ export default function Button({
         ${className}
       `}
     >
+      {leftIcon}
       {children}
+      {rightIcon}
     </button>
   );
 }

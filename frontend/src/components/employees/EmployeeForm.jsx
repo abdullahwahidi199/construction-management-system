@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import usePost from "../../hooks/usePost";
 import instance from "../../api/axiosInstance";
 import Loading from "../common/Loading";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import Button from "../ui/Button";
 import { useLanguage } from "../../hooks/useLanguage";
+import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -26,44 +28,54 @@ const initialFormData = {
   notes: "",
 };
 
-export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
+export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel }) {
   const { t, lang } = useLanguage();
   const isRTL = RTL_LANGS.includes(lang);
+  const effectiveEmployeeId = employeeId || employee?.id;
 
   const [formData, setFormData] = useState(initialFormData);
   const { postData, loading, error } = usePost();
-  const [employee, setEmployee] = useState("");
+  const [currentEmployee, setCurrentEmployee] = useState(employee || null);
   const [fetchloading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [localError, setLocalError] = useState("");
 
   const fetchEmployeeDetails = async () => {
     setLoading(true);
+    setLocalError("");
     try {
-      const response = await instance.get(`/employees/${employeeId}/`);
-      setEmployee(response.data);
+      const response = await instance.get(`/employees/${effectiveEmployeeId}/`);
+      setCurrentEmployee(response.data);
     } catch (error) {
-      console.log(error);
+      setLocalError(
+        getFriendlyErrorMessage(error, "The requested item could not be found."),
+      );
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (employeeId) {
+    if (employee?.id) {
+      setCurrentEmployee(employee);
+      return;
+    }
+    if (effectiveEmployeeId) {
       fetchEmployeeDetails();
     }
-  }, [employeeId]);
+  }, [employee?.id, effectiveEmployeeId]);
 
   useEffect(() => {
-    if (employee && employee.id) {
+    if (currentEmployee && currentEmployee.id) {
       setFormData({
         ...initialFormData,
-        ...employee,
-        salary: employee.salary ?? "",
-        hourly_rate: employee.hourly_rate ?? "",
-        hire_date: employee.hire_date ? employee.hire_date.split("T")[0] : "",
+        ...currentEmployee,
+        salary: currentEmployee.salary ?? "",
+        hourly_rate: currentEmployee.hourly_rate ?? "",
+        hire_date: currentEmployee.hire_date ? currentEmployee.hire_date.split("T")[0] : "",
       });
     }
-  }, [employee]);
+  }, [currentEmployee]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -75,6 +87,7 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLocalError("");
 
     const payload = {
       ...formData,
@@ -85,14 +98,19 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
     };
 
     try {
-      if (employee?.id) {
-        await instance.put(`/employees/${employee.id}/`, payload);
+      setSaving(true);
+      if (currentEmployee?.id) {
+        await instance.put(`/employees/${currentEmployee.id}/`, payload);
+        toast.success("Employee updated.");
       } else {
         await postData("/employees/", payload);
+        toast.success("Employee created.");
       }
       onSuccess?.();
     } catch (err) {
-      console.error("Error saving employee:", err);
+      setLocalError(getFriendlyErrorMessage(err, "Unable to save changes."));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -110,12 +128,12 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
       onSubmit={handleSubmit}
       className="space-y-5"
     >
-      {error && (
+      {(localError || error) && (
         <div
           className="p-3 rounded-lg text-sm"
           style={{ backgroundColor: "var(--danger)", color: "#fff" }}
         >
-          {typeof error === "object" ? JSON.stringify(error) : error}
+          {localError || error}
         </div>
       )}
 
@@ -452,7 +470,7 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
           {t("EmployeeForm.cancel")}
         </button>
         <PermissionWrapper
-          permissions={[employeeId ? "employees.update" : "employees.create"]}
+          permissions={[effectiveEmployeeId ? "employees.update" : "employees.create"]}
           fallback={
             <Button
               type="submit"
@@ -468,13 +486,13 @@ export default function EmployeeForm({ employeeId, onSuccess, onCancel }) {
         >
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || saving}
             className="px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-colors disabled:opacity-50"
             style={{ backgroundColor: "var(--primary)" }}
           >
-            {loading
+            {loading || saving
               ? t("EmployeeForm.saving")
-              : employee
+              : currentEmployee
                 ? t("EmployeeForm.updateEmployee")
                 : t("EmployeeForm.addEmployee")}
           </button>

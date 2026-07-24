@@ -2,6 +2,8 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+    CalendarSettingsView,
+    CustomRoleViewSet,
     LoginView,
     LogoutView,
     MeView,
@@ -16,6 +18,7 @@ from .views import (
 
 router = DefaultRouter()
 router.register("users", UserViewSet, basename="users")
+router.register("roles", CustomRoleViewSet, basename="roles")
 router.register(
     "permissions",
     PermissionViewSet
@@ -30,5 +33,6 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("me/", MeView.as_view(), name="me"),
     path("meta/", roles_and_permissions, name="roles-permissions"),
+    path("settings/calendar/", CalendarSettingsView.as_view(), name="calendar-settings"),
     path("", include(router.urls)),
 ]

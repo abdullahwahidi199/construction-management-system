@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import useFetch from "../hooks/useFetch";
 import useDelete from "../hooks/useDelete";
 import Header from "../components/Layout/Header";
@@ -34,9 +35,14 @@ export default function EmployeesMain() {
 
   const handleDelete = async () => {
     if (deleteConfirm) {
-      await deleteData(`/employees/${deleteConfirm.id}/`);
-      setDeleteConfirm(null);
-      refetch();
+      try {
+        await deleteData(`/employees/${deleteConfirm.id}/`);
+        setDeleteConfirm(null);
+        await refetch();
+        toast.success("Employee deleted.");
+      } catch {
+        // Central API handling displays the user-facing error toast.
+      }
     }
   };
 

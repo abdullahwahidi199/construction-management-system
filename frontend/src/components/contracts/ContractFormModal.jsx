@@ -142,15 +142,9 @@ export default function ContractFormModal({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("SUBMIT CLICKED");
-    console.log(form);
-
     if (!validate()) {
-      console.log("VALIDATION FAILED");
       return;
     }
-
-    console.log("VALIDATION PASSED");
 
     const payload = {
       ...form,
@@ -158,8 +152,6 @@ export default function ContractFormModal({
       retention_percentage: Number(form.retention_percentage),
       completion_percentage: Number(form.completion_percentage),
     };
-
-    console.log("PAYLOAD", payload);
 
     await onSubmit(payload);
   };

@@ -14,6 +14,7 @@ import RecentActivity from "../dashboard/RecentActivity";
 import PayrollSummary from "../dashboard/PayrollSummary";
 import DashboardSkeleton from "../dashboard/DashboardSkeleton";
 import { useLanguage } from "../../hooks/useLanguage";
+import useRealtimeEvents from "../../hooks/useRealtimeEvents";
 
 export default function Dashboard() {
   const { data, loading, error, refetch } = useFetch("dashboard/");
@@ -24,6 +25,13 @@ export default function Dashboard() {
     refetch();
     setLastRefresh(new Date());
   };
+
+  useRealtimeEvents((message) => {
+    if (message.event?.startsWith("expense.")) {
+      refetch();
+      setLastRefresh(new Date());
+    }
+  });
 
   if (loading) return <DashboardSkeleton />;
 

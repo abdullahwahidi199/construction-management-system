@@ -28,6 +28,8 @@ import DeleteConfirmModal from "../../components/ui/DeleteConfirmModal";
 import Button from "../../components/ui/Button";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
+import useRealtimeEvents from "../../hooks/useRealtimeEvents";
+import toast from "react-hot-toast";
 const getStatusConfig = (status, t) => {
   const s = status?.toLowerCase();
   if (s === "active" || s === "in progress")
@@ -88,11 +90,7 @@ const getStatusConfig = (status, t) => {
 /* ── Helpers ────────────────────────────────────── */
 const formatDate = (dateString) => {
   if (!dateString) return null;
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return dateString;
 };
 
 const formatCurrency = (amount) => {
@@ -107,6 +105,9 @@ const formatCurrency = (amount) => {
 
 const formatRelativeDate = (dateString, t) => {
   if (!dateString) return null;
+  if (/^\d{4}-/.test(dateString) && Number(dateString.slice(0, 4)) < 1700) {
+    return null;
+  }
 
   const date = new Date(dateString);
   const now = new Date();
@@ -126,6 +127,9 @@ const formatRelativeDate = (dateString, t) => {
     count: diffDays,
   });
 };
+
+const isGregorianDateString = (dateString) =>
+  /^\d{4}-/.test(dateString || "") && Number(dateString.slice(0, 4)) >= 1700;
 
 const capitalize = (str) => {
   if (!str) return "—";
@@ -208,7 +212,7 @@ export default function ProjectDetails() {
       const response = await instance.get(`/projects/${id}/`);
       setProjectDetails(response.data);
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+      setError(err.userMessage || "The requested item could not be found.");
     } finally {
       setLoading(false);
     }
@@ -218,15 +222,25 @@ export default function ProjectDetails() {
     fetchProjectDetails();
   }, [id]);
 
+  useRealtimeEvents((message) => {
+    if (
+      message.event?.startsWith("expense.") &&
+      String(message.payload?.project_id) === String(id)
+    ) {
+        fetchProjectDetails();
+    }
+  });
+
   /* ── Delete handler ────────────────────────────── */
   const handleDelete = async () => {
     try {
       setDeleting(true);
       await instance.delete(`/projects/${id}/`);
       setDeleteOpen(false);
+      toast.success("Project deleted.");
       navigate("/manager/projects");
     } catch (err) {
-      console.error(err.message);
+      // Central axios handling shows the user-facing error.
     } finally {
       setDeleting(false);
     }
@@ -247,8 +261,10 @@ export default function ProjectDetails() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Project PDF downloaded.");
     } catch (err) {
-      console.error("PDF download failed:", err);
+      // Central axios handling shows the user-facing error.
     }
   };
   const formatAFN = (amount) => {
@@ -311,6 +327,13 @@ export default function ProjectDetails() {
   /* ── Compute progress timeline ─────────────────── */
   const getTimelineProgress = () => {
     if (!project.start_date) return 0;
+    if (
+      !isGregorianDateString(project.start_date) ||
+      (project.expected_completion_date &&
+        !isGregorianDateString(project.expected_completion_date))
+    ) {
+      return null;
+    }
     const start = new Date(project.start_date);
     const end = project.expected_completion_date
       ? new Date(project.expected_completion_date)
@@ -626,7 +649,7 @@ export default function ProjectDetails() {
               <span>{formatDate(project.start_date)}</span>
               {project.expected_completion_date && (
                 <span>
-                  {formatRelativeDate(project.expected_completion_date)}
+                  {formatRelativeDate(project.expected_completion_date, t)}
                 </span>
               )}
             </div>

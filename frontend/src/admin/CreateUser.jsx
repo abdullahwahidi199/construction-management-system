@@ -1,5 +1,7 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import instance from "../api/axiosInstance";
+import { getFriendlyErrorMessage } from "../utils/apiErrors";
 
 const roles = [
   "super_admin",
@@ -40,6 +42,7 @@ export default function CreateUser() {
       await instance.post("/accounts/users/", formData);
 
       setMessage("User created successfully.");
+      toast.success("User created.");
 
       setFormData({
         username: "",
@@ -50,13 +53,7 @@ export default function CreateUser() {
         role: "data_entry",
       });
     } catch (error) {
-      console.error(error);
-
-      if (error.response?.data) {
-        setMessage(JSON.stringify(error.response.data));
-      } else {
-        setMessage("Failed to create user.");
-      }
+      setMessage(getFriendlyErrorMessage(error, "Unable to create user."));
     } finally {
       setLoading(false);
     }

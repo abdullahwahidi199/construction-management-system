@@ -3,6 +3,7 @@ import { X, Save, DollarSign, User, FileText, Calendar } from "lucide-react";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import Button from "../../components/ui/Button";
 import { useLanguage } from "../../hooks/useLanguage";
+import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -105,9 +106,11 @@ export default function ExpenseCreateModal({
 
       onClose();
     } catch (error) {
-      console.error(error);
       setErrors({
-        submit: t("ExpenseCreateModal.createFailed"),
+        submit: getFriendlyErrorMessage(
+          error,
+          t("ExpenseCreateModal.createFailed"),
+        ),
       });
     } finally {
       setIsSubmitting(false);

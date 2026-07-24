@@ -14,6 +14,7 @@ import DeleteConfirmModal from "../../ui/DeleteConfirmModal";
 import ContractTable from "../../contracts/ContractTable";
 import ContractFormModal from "../../contracts/ContractFormModal";
 import { useLanguage } from "../../../hooks/useLanguage";
+import toast from "react-hot-toast";
 
 export default function ContractsPage() {
   const navigate = useNavigate();
@@ -82,17 +83,13 @@ export default function ContractsPage() {
 
   const handleCreate = async (payload) => {
     try {
-      console.log("PAYLOAD:", payload);
-
-      const response = await postData("contracts/", payload);
-
-      console.log("SUCCESS:", response);
+      await postData("contracts/", payload);
 
       setShowForm(false);
       refetch();
+      toast.success("Contract created.");
     } catch (err) {
-      console.error("FULL ERROR:", err);
-      console.error("RESPONSE:", err?.response?.data);
+      // Central axios handling shows the user-facing error.
     }
   };
   const handleEdit = (contract) => {
@@ -106,8 +103,9 @@ export default function ContractsPage() {
       setEditingContract(null);
       setShowForm(false);
       refetch();
+      toast.success("Contract updated.");
     } catch (err) {
-      console.error("Update failed:", err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -118,8 +116,9 @@ export default function ContractsPage() {
       await instance.delete(`contracts/${deletingContract.id}/`);
       setDeletingContract(null);
       refetch();
+      toast.success("Contract deleted.");
     } catch (err) {
-      console.error("Delete failed:", err);
+      // Central axios handling shows the user-facing error.
     } finally {
       setDeleteLoading(false);
     }
@@ -143,8 +142,10 @@ export default function ContractsPage() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Contracts exported.");
     } catch (error) {
-      console.error(error);
+      // Central axios handling shows the user-facing error.
     }
   };
 

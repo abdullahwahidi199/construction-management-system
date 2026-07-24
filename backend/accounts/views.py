@@ -6,9 +6,14 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from .permissions import IsAdminRole
+from audit.utils import create_audit_log
+
+from .permissions import AccountPermission
 from .serializers import (
+    CalendarSettingsSerializer,
+    CustomRoleSerializer,
     LoginSerializer,
     ProjectAssignmentSerializer,
     PermissionSerializer,
@@ -20,8 +25,10 @@ RolePermissionSerializer,
     permissions_payload,
     role_payload,
 )
-from .services import get_effective_permissions, get_user_role
+from .services import get_effective_permissions, get_user_role, has_permission
 from .models import (
+    ApplicationSettings,
+    CustomRole,
     ProjectAssignment,
     UserPermissionOverride,
     Permission,
@@ -36,9 +43,26 @@ class LoginView(APIView):
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data, context={"request": request})
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError:
+            create_audit_log(
+                user=None,
+                action="auth.login_failed",
+                status="failed",
+                description=f"Failed login attempt for {request.data.get('username', '')}",
+                request=request,
+                extra_metadata={"username": request.data.get("username", "")},
+            )
+            raise
         user = serializer.validated_data["user"]
         token, _ = Token.objects.get_or_create(user=user)
+        create_audit_log(
+            user=user,
+            action="auth.login",
+            description=f"User {user.get_username()} logged in",
+            request=request,
+        )
         return Response(
             {
                 "token": token.key,
@@ -53,6 +77,12 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        create_audit_log(
+            user=request.user,
+            action="auth.logout",
+            description=f"User {request.user.get_username()} logged out",
+            request=request,
+        )
         Token.objects.filter(user=request.user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -74,7 +104,19 @@ User = get_user_model()
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.select_related("profile").order_by("username")
-    permission_classes = [IsAdminRole]
+    permission_classes = [AccountPermission]
+    rbac_resource = "users"
+    permission_requirements = {
+        "list": ("users.view",),
+        "retrieve": ("users.view",),
+        "create": ("users.create",),
+        "update": ("users.update",),
+        "partial_update": ("users.update",),
+        "destroy": ("users.delete",),
+        "set_role": ("users.update", "roles.manage"),
+        "set_password": ("users.update",),
+        "*": ("users.view",),
+    }
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -103,6 +145,15 @@ class UserViewSet(viewsets.ModelViewSet):
             
         user.set_password(new_password) # Securely hashes the password
         user.save()
+        create_audit_log(
+            user=request.user,
+            action="auth.password_change",
+            model_name="User",
+            object_id=user.pk,
+            object_repr=user.get_username(),
+            description=f"Password changed for {user.get_username()}",
+            request=request,
+        )
         return Response({"status": "Password updated successfully"})
 
 
@@ -128,7 +179,16 @@ class UserPermissionOverrideViewSet(viewsets.ModelViewSet):
     "permission",
 )
     serializer_class = UserPermissionOverrideSerializer
-    permission_classes = [IsAdminRole]
+    permission_classes = [AccountPermission]
+    permission_requirements = {
+        "list": ("permissions.manage",),
+        "retrieve": ("permissions.manage",),
+        "create": ("permissions.manage",),
+        "update": ("permissions.manage",),
+        "partial_update": ("permissions.manage",),
+        "destroy": ("permissions.manage",),
+        "*": ("permissions.manage",),
+    }
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -144,7 +204,16 @@ class UserPermissionOverrideViewSet(viewsets.ModelViewSet):
 class ProjectAssignmentViewSet(viewsets.ModelViewSet):
     queryset = ProjectAssignment.objects.select_related("user", "project", "assigned_by")
     serializer_class = ProjectAssignmentSerializer
-    permission_classes = [IsAdminRole]
+    permission_classes = [AccountPermission]
+    permission_requirements = {
+        "list": ("users.view", "users.manage"),
+        "retrieve": ("users.view", "users.manage"),
+        "create": ("users.update", "users.manage"),
+        "update": ("users.update", "users.manage"),
+        "partial_update": ("users.update", "users.manage"),
+        "destroy": ("users.update", "users.manage"),
+        "*": ("users.manage",),
+    }
 
     def perform_create(self, serializer):
         serializer.save(assigned_by=self.request.user)
@@ -153,6 +222,19 @@ class ProjectAssignmentViewSet(viewsets.ModelViewSet):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def roles_and_permissions(request):
+    if not (
+        has_permission(request.user, "roles.view")
+        or has_permission(request.user, "roles.create")
+        or has_permission(request.user, "roles.update")
+        or has_permission(request.user, "roles.delete")
+        or has_permission(request.user, "roles.manage")
+        or has_permission(request.user, "permissions.view")
+        or has_permission(request.user, "permissions.manage")
+        or has_permission(request.user, "users.view")
+        or has_permission(request.user, "users.create")
+        or has_permission(request.user, "users.update")
+    ):
+        raise PermissionDenied()
     return Response(
         {
             "roles": role_payload(),
@@ -166,15 +248,56 @@ class PermissionViewSet(ModelViewSet):
         "name",
     )
     serializer_class = PermissionSerializer
-    permission_classes = [IsAdminRole]
+    permission_classes = [AccountPermission]
+    permission_requirements = {
+        "list": ("permissions.view", "permissions.manage", "roles.view", "roles.create", "roles.update", "roles.delete"),
+        "retrieve": ("permissions.view", "permissions.manage", "roles.view", "roles.create", "roles.update", "roles.delete"),
+        "create": ("permissions.manage",),
+        "update": ("permissions.manage",),
+        "partial_update": ("permissions.manage",),
+        "destroy": ("permissions.manage",),
+        "*": ("permissions.manage",),
+    }
 from rest_framework.viewsets import ModelViewSet
+
+
+class CalendarSettingsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not (
+            has_permission(request.user, "settings.view")
+            or has_permission(request.user, "settings.manage")
+        ):
+            raise PermissionDenied()
+        return Response(CalendarSettingsSerializer(ApplicationSettings.get_solo()).data)
+
+    def put(self, request):
+        if not has_permission(request.user, "settings.manage"):
+            raise PermissionDenied()
+        settings_obj = ApplicationSettings.get_solo()
+        serializer = CalendarSettingsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        settings_obj.set_calendar_settings(serializer.validated_data)
+        settings_obj.updated_by = request.user
+        settings_obj.save(update_fields=["app_settings", "updated_by", "updated_at"])
+        return Response(CalendarSettingsSerializer(settings_obj).data)
 
 class RolePermissionViewSet(ModelViewSet):
     queryset = RolePermission.objects.select_related(
         "permission"
     )
 
-    permission_classes = [IsAdminRole]
+    permission_classes = [AccountPermission]
+    permission_requirements = {
+        "list": ("permissions.view", "permissions.manage", "roles.view", "roles.create", "roles.update", "roles.delete"),
+        "retrieve": ("permissions.view", "permissions.manage", "roles.view", "roles.create", "roles.update", "roles.delete"),
+        "create": ("permissions.manage",),
+        "update": ("permissions.manage",),
+        "partial_update": ("permissions.manage",),
+        "destroy": ("permissions.manage",),
+        "*": ("permissions.manage",),
+    }
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:
@@ -200,3 +323,18 @@ class RolePermissionViewSet(ModelViewSet):
             RolePermissionSerializer(role_permission).data,
             status=status.HTTP_201_CREATED,
         )
+
+
+class CustomRoleViewSet(ModelViewSet):
+    queryset = CustomRole.objects.all()
+    serializer_class = CustomRoleSerializer
+    permission_classes = [AccountPermission]
+    rbac_resource = "roles"
+
+    def perform_destroy(self, instance):
+        if instance.is_system:
+            raise ValidationError({"detail": "System roles cannot be deleted."})
+        if User.objects.filter(profile__role=instance.value).exists():
+            raise ValidationError({"detail": "This role is assigned to users."})
+        RolePermission.objects.filter(role=instance.value).delete()
+        instance.delete()

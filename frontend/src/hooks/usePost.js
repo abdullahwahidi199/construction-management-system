@@ -1,5 +1,6 @@
 import { useState } from "react";
 import instance from "../api/axiosInstance";
+import { getFriendlyErrorMessage } from "../utils/apiErrors";
 
 export default function usePost() {
   const [loading, setLoading] = useState(false);
@@ -13,9 +14,7 @@ export default function usePost() {
       const res = await instance.post(url, payload);
       return res.data;
     } catch (err) {
-      const message = err?.response?.data || err?.message || "Request failed";
-
-      setError(message);
+      setError(getFriendlyErrorMessage(err, "Unable to save changes."));
       throw err;
     } finally {
       setLoading(false);

@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Building2, LogIn } from "lucide-react";
 import { useAuth } from "./AuthContext";
-import { roleHome } from "./roles";
+import { homeForUser } from "./roles";
 import { useLanguage } from "../hooks/useLanguage";
 import LanguageSwitcher from "../components/LanguageSwitcher";
+import { SESSION_NOTICE_KEY } from "../api/axiosInstance";
+import { getFriendlyErrorMessage } from "../utils/apiErrors";
 
 export default function LoginPage() {
-  const { login, isAuthenticated, role } = useAuth();
+  const { login, isAuthenticated, role, permissions = [] } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,25 +17,38 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const notice = localStorage.getItem(SESSION_NOTICE_KEY);
+    if (notice) {
+      setError(notice);
+      localStorage.removeItem(SESSION_NOTICE_KEY);
+    }
+  }, []);
+
   if (isAuthenticated) {
-    return <Navigate to={roleHome[role] || "/"} replace />;
+    return <Navigate to={homeForUser(role, permissions)} replace />;
   }
 
   const submit = async (event) => {
     event.preventDefault();
+    if (loading) return;
+    if (!form.username.trim() || !form.password) {
+      setError("Please enter your username and password.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
       const data = await login(form);
-      navigate(location.state?.from?.pathname || roleHome[data.role] || "/", {
-        replace: true,
-      });
-    } catch (err) {
-      setError(
-        err?.response?.data?.non_field_errors?.[0] ||
-          err?.response?.data?.detail ||
-          t("auth.login.error"),
+      navigate(
+        location.state?.from?.pathname ||
+          homeForUser(data.role, data.permissions || data.user?.permissions || []),
+        {
+          replace: true,
+        },
       );
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, t("auth.login.error")));
     } finally {
       setLoading(false);
     }
@@ -63,6 +78,7 @@ export default function LoginPage() {
               value={form.username}
               onChange={(event) => setForm((prev) => ({ ...prev, username: event.target.value }))}
               autoComplete="username"
+              aria-invalid={Boolean(error && !form.username.trim())}
               required
             />
           </label>
@@ -74,6 +90,7 @@ export default function LoginPage() {
               value={form.password}
               onChange={(event) => setForm((prev) => ({ ...prev, password: event.target.value }))}
               autoComplete="current-password"
+              aria-invalid={Boolean(error && !form.password)}
               required
             />
           </label>

@@ -3,11 +3,36 @@ from django.conf import settings
 from project.models import Project  # Assuming projects app with Project model
 from django.db import transaction
 from django.db.models import Max
+from django.utils import timezone
 
 
 from django.core.exceptions import ValidationError
 
+
+class ExpenseQuerySet(models.QuerySet):
+    def approved(self):
+        return self.filter(approval_status=Expense.ApprovalStatus.APPROVED)
+
+    def pending(self):
+        return self.filter(approval_status=Expense.ApprovalStatus.PENDING)
+
+    def rejected(self):
+        return self.filter(approval_status=Expense.ApprovalStatus.REJECTED)
+
+    def for_financials(self):
+        return self.approved()
+
+
+class ApprovedExpenseManager(models.Manager):
+    def get_queryset(self):
+        return ExpenseQuerySet(self.model, using=self._db).approved()
+
 class Expense(models.Model):
+    class ApprovalStatus(models.TextChoices):
+        PENDING = "pending", "Pending"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+
     # Expense categories for future use, all historical imports default to general
     EXPENSE_TYPE_CHOICES = [
         ("general", "General Expense"),  # All your current Excel sheet entries
@@ -79,9 +104,35 @@ class Expense(models.Model):
         on_delete=models.SET_NULL,
         related_name="created_expenses",
     )
+    approval_status = models.CharField(
+        max_length=20,
+        choices=ApprovalStatus.choices,
+        default=ApprovalStatus.APPROVED,
+        db_index=True,
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="approved_expenses",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approval_notes = models.TextField(blank=True, default="")
+    rejected_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="rejected_expenses",
+    )
+    rejected_at = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ExpenseQuerySet.as_manager()
+    approved_objects = ApprovedExpenseManager()
 
     class Meta:
         ordering = ["project", "expense_date", "serial_number"]
@@ -92,6 +143,34 @@ class Expense(models.Model):
 
     def __str__(self):
         return f"{self.project.name} - Expense #{self.serial_number} ({self.expense_date})"
+
+    @property
+    def is_approved(self):
+        return self.approval_status == self.ApprovalStatus.APPROVED
+
+    @property
+    def is_pending(self):
+        return self.approval_status == self.ApprovalStatus.PENDING
+
+    @property
+    def is_rejected(self):
+        return self.approval_status == self.ApprovalStatus.REJECTED
+
+    def mark_approved(self, user, notes=""):
+        self.approval_status = self.ApprovalStatus.APPROVED
+        self.approved_by = user
+        self.approved_at = timezone.now()
+        self.approval_notes = notes or ""
+        self.rejected_by = None
+        self.rejected_at = None
+
+    def mark_rejected(self, user, notes=""):
+        self.approval_status = self.ApprovalStatus.REJECTED
+        self.rejected_by = user
+        self.rejected_at = timezone.now()
+        self.approval_notes = notes or ""
+        self.approved_by = None
+        self.approved_at = None
 
     # --- CALCULATED PROPERTIES (matches your EXACT Excel formulas!) ---
     @property

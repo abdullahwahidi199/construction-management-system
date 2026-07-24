@@ -1,5 +1,6 @@
 # serializers.py
 from rest_framework import serializers
+from common.serializers import CalendarModelSerializer
 from .models import Project
 from expenses.serializers import ProjectExpenseSerializer
 from subcontractor.models import Contract
@@ -11,7 +12,8 @@ from labour.models import WorkerPayroll
 
 
 
-class ProjectSerializer(serializers.ModelSerializer):
+class ProjectSerializer(CalendarModelSerializer):
+    calendar_module = "projects"
     # expenses = ProjectExpenseSerializer(many=True, read_only=True)
     total_expenses_usd = serializers.SerializerMethodField()
     total_expenses_afn = serializers.SerializerMethodField()
@@ -28,12 +30,12 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def get_total_expenses_usd(self, obj):
         return round(
-            sum(float(exp.total_usd) for exp in obj.expenses.all()),
+            sum(float(exp.total_usd) for exp in obj.expenses.approved()),
             2
         )
     def get_total_expenses_afn(self, obj):
         return round(
-            sum(float(exp.total_afn) for exp in obj.expenses.all()),
+            sum(float(exp.total_afn) for exp in obj.expenses.approved()),
             2
         )
     # def get_contracts(self, obj):
@@ -111,7 +113,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             }
         return summary
     
-class ProjectListSerializer(serializers.ModelSerializer):
+class ProjectListSerializer(CalendarModelSerializer):
+    calendar_module = "projects"
     class Meta:
         model=Project
         fields=["id","name","status","start_date","location","property_type"]   

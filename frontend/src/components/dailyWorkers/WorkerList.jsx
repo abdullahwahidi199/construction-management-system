@@ -6,6 +6,8 @@ import { useAuth } from "../../auth/AuthContext";
 import AddWorkerModal from "./AddWorkerModal";
 import useFetch from "../../hooks/useFetch";
 import { hasAnyPermission } from "../../../utils/permissions";
+import ConfirmDialog from "../common/ConfirmDialog";
+import toast from "react-hot-toast";
 
 function WorkersList() {
   const { fetchWorkers, fetchWorkerDetail, deleteWorker, loading } =
@@ -25,6 +27,7 @@ function WorkersList() {
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedWorker, setSelectedWorker] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   useEffect(() => {
     loadWorkers();
@@ -35,7 +38,7 @@ function WorkersList() {
       const data = await fetchWorkers({ search });
       setWorkers(data);
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -50,24 +53,23 @@ function WorkersList() {
       setSelectedWorker(data.worker);
       setIsModalOpen(true);
     } catch (err) {
-      console.error(err);
-      alert(t("workersList.couldNotLoadWorkerDetails"));
+      toast.error(t("workersList.couldNotLoadWorkerDetails"));
     }
   };
 
   const handleDelete = async (worker) => {
-    if (
-      !window.confirm(
-        t("workersList.deleteWorkerConfirmation", { name: worker.full_name }),
-      )
-    )
-      return;
+    setDeleteTarget(worker);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await deleteWorker(worker.id);
+      await deleteWorker(deleteTarget.id);
+      toast.success("Worker deleted.");
+      setDeleteTarget(null);
       await loadWorkers();
     } catch (err) {
-      console.error(err);
-      alert(t("workersList.couldNotDeleteWorker"));
+      toast.error(t("workersList.couldNotDeleteWorker"));
     }
   };
 
@@ -116,6 +118,17 @@ function WorkersList() {
         onSuccess={loadWorkers}
         worker={selectedWorker}
         projects={projects}
+      />
+      <ConfirmDialog
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        title={t("workersList.deleteWorker")}
+        message={t("workersList.deleteConfirmation", {
+          name: deleteTarget?.full_name || "",
+        })}
+        loading={loading}
+        confirmLabel="Delete"
       />
 
       <div

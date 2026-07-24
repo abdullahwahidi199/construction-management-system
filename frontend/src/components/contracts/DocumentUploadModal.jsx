@@ -8,12 +8,22 @@ import Select from "../ui/Select";
 import { useLanguage } from "../../hooks/useLanguage";
 
 const ACCEPTED_EXTENSIONS = ".pdf,.jpg,.jpeg,.png,.tiff,.doc,.docx,.xls,.xlsx";
+const ACCEPTED_EXTENSION_SET = new Set(
+  ACCEPTED_EXTENSIONS.split(",").map((ext) => ext.trim().toLowerCase()),
+);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 function formatFileSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+}
+
+function isAcceptedFile(file) {
+  const lowerName = file.name.toLowerCase();
+  return [...ACCEPTED_EXTENSION_SET].some((extension) =>
+    lowerName.endsWith(extension),
+  );
 }
 
 export default function DocumentUploadModal({
@@ -69,20 +79,37 @@ export default function DocumentUploadModal({
     }
   };
 
+  const selectFile = (nextFile) => {
+    if (!nextFile) return;
+    if (!isAcceptedFile(nextFile)) {
+      setFile(null);
+      setErrors((prev) => ({
+        ...prev,
+        file: "Unsupported file type. Please upload PDF, image, Word, or Excel files.",
+      }));
+      return;
+    }
+    if (nextFile.size > MAX_FILE_SIZE) {
+      setFile(null);
+      setErrors((prev) => ({ ...prev, file: t("DocumentUploadModal.fileTooLarge") }));
+      return;
+    }
+    setFile(nextFile);
+    if (errors.file) setErrors((prev) => ({ ...prev, file: undefined }));
+  };
+
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
-      if (errors.file) setErrors((prev) => ({ ...prev, file: undefined }));
+      selectFile(e.dataTransfer.files[0]);
     }
   };
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-      if (errors.file) setErrors((prev) => ({ ...prev, file: undefined }));
+      selectFile(e.target.files[0]);
     }
   };
 
@@ -95,6 +122,8 @@ export default function DocumentUploadModal({
     const e = {};
     if (!title.trim()) e.title = t("DocumentUploadModal.titleRequired");
     if (!file) e.file = t("DocumentUploadModal.fileRequired");
+    if (file && !isAcceptedFile(file))
+      e.file = "Unsupported file type. Please upload PDF, image, Word, or Excel files.";
     if (file && file.size > MAX_FILE_SIZE)
       e.file = t("DocumentUploadModal.fileTooLarge");
     setErrors(e);

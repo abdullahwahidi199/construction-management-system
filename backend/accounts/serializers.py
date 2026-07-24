@@ -2,8 +2,11 @@ from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from common.calendar_utils import DEFAULT_CALENDAR_SETTINGS, normalize_calendar_settings
 from .constants import Role
 from .models import (
+    ApplicationSettings,
+    CustomRole,
     ProjectAssignment,
     UserPermissionOverride,
     UserProfile,
@@ -60,8 +63,7 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
     def validate_role(self, value):
-        valid_roles = {role for role, _ in Role.CHOICES}
-        if value not in valid_roles:
+        if not CustomRole.objects.filter(value=value).exists():
             raise serializers.ValidationError(_("Invalid role."))
         return value
 
@@ -136,8 +138,56 @@ class RoleSerializer(serializers.Serializer):
     label = serializers.CharField()
 
 
+class CustomRoleSerializer(serializers.ModelSerializer):
+    permissions_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CustomRole
+        fields = (
+            "id",
+            "value",
+            "label",
+            "description",
+            "is_system",
+            "permissions_count",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("id", "is_system", "permissions_count", "created_at", "updated_at")
+        extra_kwargs = {"value": {"required": False}}
+
+    def get_permissions_count(self, obj):
+        return RolePermission.objects.filter(role=obj.value).count()
+
+    def validate_value(self, value):
+        normalized = (value or "").strip().lower().replace("-", "_")
+        if not normalized:
+            raise serializers.ValidationError(_("Role key is required."))
+        if normalized in {"*", "superuser"}:
+            raise serializers.ValidationError(_("This role key is reserved."))
+        if len(normalized) > 32:
+            raise serializers.ValidationError(_("Role key must be 32 characters or fewer."))
+        if not normalized[0].isalpha():
+            raise serializers.ValidationError(_("Role key must start with a letter."))
+        if not all(char.isalnum() or char == "_" for char in normalized):
+            raise serializers.ValidationError(_("Use only letters, numbers, and underscores."))
+        return normalized
+
+    def validate(self, attrs):
+        if not self.instance and not attrs.get("value"):
+            label = attrs.get("label", "")
+            attrs["value"] = "_".join(label.strip().lower().split())
+            attrs["value"] = self.validate_value(attrs["value"])
+        if self.instance and "value" in attrs and attrs["value"] != self.instance.value:
+            raise serializers.ValidationError({"value": _("Role key cannot be changed.")})
+        return attrs
+
+
 def role_payload():
-    return [{"value": value, "label": str(label)} for value, label in Role.CHOICES]
+    roles = CustomRole.objects.all()
+    if roles.exists():
+        return CustomRoleSerializer(roles, many=True).data
+    return [{"value": value, "label": str(label), "is_system": True} for value, label in Role.CHOICES]
 
 
 # def permissions_payload():
@@ -193,3 +243,27 @@ class RolePermissionCreateSerializer(serializers.ModelSerializer):
             "role",
             "permission",
         )
+
+    def validate_role(self, value):
+        if not CustomRole.objects.filter(value=value).exists():
+            raise serializers.ValidationError(_("Invalid role."))
+        return value
+
+
+class CalendarSettingsSerializer(serializers.Serializer):
+    default_calendar = serializers.ChoiceField(
+        choices=["shamsi", "gregorian"],
+        default="shamsi",
+    )
+    modules = serializers.DictField(
+        child=serializers.ChoiceField(choices=["inherit", "shamsi", "gregorian"]),
+        required=False,
+    )
+
+    def to_representation(self, instance):
+        if isinstance(instance, ApplicationSettings):
+            return instance.calendar_settings
+        return normalize_calendar_settings(instance or DEFAULT_CALENDAR_SETTINGS)
+
+    def validate(self, attrs):
+        return normalize_calendar_settings(attrs)

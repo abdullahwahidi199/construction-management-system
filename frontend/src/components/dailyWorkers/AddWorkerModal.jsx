@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { useLanguage } from "../../hooks/useLanguage";
+import { getFriendlyErrorMessage } from "../../utils/apiErrors";
+import toast from "react-hot-toast";
 
 const blankForm = {
   full_name: "",
@@ -69,14 +71,15 @@ function AddWorkerModal({ isOpen, onClose, onSuccess, worker, projects = [] }) {
     try {
       if (worker?.id) {
         await updateWorker(worker.id, payload);
+        toast.success("Worker updated.");
       } else {
         await createWorker(payload);
+        toast.success("Worker created.");
       }
       onSuccess();
       onClose();
     } catch (err) {
-      setError(t("AddWorkerModal.errorMessage"));
-      console.error(err);
+      setError(getFriendlyErrorMessage(err, t("AddWorkerModal.errorMessage")));
     }
   };
 

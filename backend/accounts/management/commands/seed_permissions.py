@@ -38,6 +38,7 @@ PERMISSIONS = [
     ("expenses.create", "Create Expenses", "Expenses"),
     ("expenses.update", "Update Expenses", "Expenses"),
     ("expenses.delete", "Delete Expenses", "Expenses"),
+    ("expenses.approve", "Approve Expenses", "Expenses"),
 
     # Employees
     ("employees.view", "View Employees", "Employees"),
@@ -126,6 +127,12 @@ PERMISSIONS = [
     # Settings
     ("settings.view", "View Settings", "Settings"),
     ("settings.manage", "Manage Settings", "Settings"),
+
+    # Audit Logs
+    ("audit_logs.view", "View Audit Logs", "Audit Logs"),
+    ("audit_logs.export", "Export Audit Logs", "Audit Logs"),
+    ("audit_logs.delete", "Delete Audit Logs", "Audit Logs"),
+    ("audit_logs.manage_retention", "Manage Audit Retention", "Audit Logs"),
 ]
 from accounts.constants import Role
 
@@ -140,6 +147,7 @@ ROLE_PERMISSIONS = {
         "expenses.view",
         "expenses.create",
         "expenses.update",
+        "expenses.approve",
 
         "employees.view",
         "employees.create",
@@ -177,6 +185,7 @@ ROLE_PERMISSIONS = {
 }
 
 from accounts.models import (
+    CustomRole,
     Permission,
     RolePermission,
 )
@@ -184,6 +193,11 @@ from accounts.models import (
 class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
+        for value, label in Role.CHOICES:
+            CustomRole.objects.update_or_create(
+                value=value,
+                defaults={"label": str(label), "is_system": True},
+            )
 
         for code, name, module in PERMISSIONS:
 

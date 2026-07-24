@@ -3,6 +3,7 @@ import useFetch from "../../hooks/useFetch";
 import Loading from "../common/Loading";
 import instance from "../../api/axiosInstance";
 import { useLanguage } from "../../hooks/useLanguage";
+import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -11,16 +12,23 @@ export default function EmployeeDetail({ employeeId, onClose }) {
   const isRTL = RTL_LANGS.includes(lang);
 
   const [activeTab, setActiveTab] = useState("info");
-  const [employee, setEmployee] = useState("");
+  const [employee, setEmployee] = useState({});
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { data: payrollHistory } = useFetch(
+    `/employees/${employeeId}/payroll_history/`,
+  );
 
   const fetchEmployeeDetails = async () => {
     setLoading(true);
+    setError("");
     try {
       const response = await instance.get(`/employees/${employeeId}/`);
-      setEmployee(response.data);
+      setEmployee(response.data || {});
     } catch (error) {
-      console.log(error);
+      setError(
+        getFriendlyErrorMessage(error, "The requested item could not be found."),
+      );
     } finally {
       setLoading(false);
     }
@@ -31,11 +39,16 @@ export default function EmployeeDetail({ employeeId, onClose }) {
   }, []);
 
   if (loading) {
-    <Loading />;
+    return <Loading />;
   }
-  const { data: payrollHistory } = useFetch(
-    `/employees/${employeeId}/payroll_history/`,
-  );
+
+  if (error) {
+    return (
+      <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-600">
+        {error}
+      </div>
+    );
+  }
 
   const tabs = [
     { key: "info", label: t("EmployeeDetail.tabs.info") },
@@ -54,12 +67,12 @@ export default function EmployeeDetail({ employeeId, onClose }) {
           className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold shrink-0"
           style={{ backgroundColor: "var(--primary)", color: "#fff" }}
         >
-          {employee.first_name}
-          {employee.last_name}
+          {(employee.first_name?.charAt(0) || "E").toUpperCase()}
+          {(employee.last_name?.charAt(0) || "").toUpperCase()}
         </div>
         <div>
           <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>
-            {employee.full_name}
+            {employee.full_name || t("EmployeeDetail.emptyValue")}
           </h2>
           <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
             {employee.position} • {employee.employee_id}
@@ -164,11 +177,14 @@ export default function EmployeeDetail({ employeeId, onClose }) {
                 },
                 {
                   label: t("EmployeeDetail.hireDate"),
-                  value: new Date(employee.hire_date).toLocaleDateString(),
+                  value:
+                    employee.formatted_hire_date ||
+                    employee.hire_date ||
+                    t("EmployeeDetail.emptyValue"),
                 },
                 {
                   label: t("EmployeeDetail.salary"),
-                  value: `${t("EmployeeDetail.currency")}${parseFloat(employee.salary).toLocaleString()}`,
+                  value: `${t("EmployeeDetail.currency")}${Number(employee.salary || 0).toLocaleString()}`,
                 },
                 {
                   label: t("EmployeeDetail.hourlyRate"),
@@ -231,7 +247,7 @@ export default function EmployeeDetail({ employeeId, onClose }) {
                     <div className={isRTL ? "text-left" : "text-right"}>
                       <p className="font-bold" style={{ color: "var(--text)" }}>
                         {t("EmployeeDetail.currency")}
-                        {parseFloat(payroll.net_pay).toLocaleString()}
+                        {Number(payroll.net_pay || 0).toLocaleString()}
                       </p>
                       <p className="text-xs" style={{ color: "var(--muted)" }}>
                         {t("EmployeeDetail.netPay")}

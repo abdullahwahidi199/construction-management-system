@@ -4,6 +4,8 @@ import useFetch from "../../../hooks/useFetch";
 import InvoiceFormModal from "./InvoiceFormModal";
 import ContractInvoiceDetails from "../../contracts/ContractInvoiceDetails";
 import { useLanguage } from "../../../hooks/useLanguage";
+import CalendarDatePicker from "../../common/CalendarDatePicker";
+import { useCalendar } from "../../../hooks/useCalendar";
 
 const STATUS_COLORS = {
   pending: "var(--warning)",
@@ -26,6 +28,7 @@ const inputStyle = {
 
 export default function ContractInvoicesPage({ contractID, contractCurrency }) {
   const { t } = useLanguage();
+  const { formatDate } = useCalendar("invoices");
 
   const STATUS_FILTERS = [
     { value: "", label: t("ContractInvoicesPage.allStatuses") },
@@ -41,6 +44,11 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
     loading,
     error,
   } = useFetch(`invoices/?contract=${contractID}`);
+  const invoiceList = Array.isArray(invoices)
+    ? invoices
+    : Array.isArray(invoices?.results)
+      ? invoices.results
+      : [];
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -80,13 +88,12 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
 
   // --- Advanced Filtering Logic ---
   const filteredInvoices = useMemo(() => {
-    if (!invoices) return [];
+    if (!invoiceList.length) return [];
 
-    // Pre-parse date range once per render
-    const start = dateRange.start ? new Date(dateRange.start) : null;
-    const end = dateRange.end ? new Date(dateRange.end) : null;
+    const start = dateRange.start ? formatDate(dateRange.start) : "";
+    const end = dateRange.end ? formatDate(dateRange.end) : "";
 
-    return invoices.filter((inv) => {
+    return invoiceList.filter((inv) => {
       // 1. Status Filter
       const matchesStatus = !statusFilter || inv.status === statusFilter;
 
@@ -94,14 +101,10 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
       const q = searchQuery.toLowerCase().trim();
       if (!q) {
         // If no text query, check status + date
-        const invDate = new Date(inv.invoice_date);
+        const invDate = inv.formatted_invoice_date || inv.invoice_date || "";
         let matchesDate = true;
         if (start && invDate < start) matchesDate = false;
-        if (end) {
-          const endTime = new Date(end);
-          endTime.setHours(23, 59, 59, 999); // Include entire end day
-          if (invDate > endTime) matchesDate = false;
-        }
+        if (end && invDate > end) matchesDate = false;
         return matchesStatus && matchesDate;
       }
 
@@ -111,18 +114,14 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
         inv.project_name?.toLowerCase().includes(q) ||
         inv.subcontractor_name?.toLowerCase().includes(q);
 
-      const invDate = new Date(inv.invoice_date);
+      const invDate = inv.formatted_invoice_date || inv.invoice_date || "";
       let matchesDate = true;
       if (start && invDate < start) matchesDate = false;
-      if (end) {
-        const endTime = new Date(end);
-        endTime.setHours(23, 59, 59, 999);
-        if (invDate > endTime) matchesDate = false;
-      }
+      if (end && invDate > end) matchesDate = false;
 
       return matchesStatus && matchesSearch && matchesDate;
     });
-  }, [invoices, searchQuery, statusFilter, dateRange]);
+  }, [invoiceList, searchQuery, statusFilter, dateRange, formatDate]);
 
   const hasActiveFilters =
     searchQuery || statusFilter || dateRange.start || dateRange.end;
@@ -143,8 +142,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
       <div
         style={{ padding: "2rem", textAlign: "center", color: "var(--danger)" }}
       >
-        {t("ContractInvoicesPage.error")}:{" "}
-        {typeof error === "object" ? JSON.stringify(error) : error}
+        {t("ContractInvoicesPage.error")}: {error}
       </div>
     );
 
@@ -223,26 +221,28 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
         </select>
 
         {/* Start Date */}
-        <input
-          type="date"
-          value={dateRange.start}
-          onChange={(e) =>
-            setDateRange((prev) => ({ ...prev, start: e.target.value }))
-          }
-          placeholder={t("ContractInvoicesPage.startDate")}
-          style={{ ...inputStyle, width: "150px", colorScheme: "dark" }} // colorScheme ensures dark mode date picker works
-        />
+        <div style={{ width: "150px" }}>
+          <CalendarDatePicker
+            value={dateRange.start}
+            onChange={(value) =>
+              setDateRange((prev) => ({ ...prev, start: value }))
+            }
+            placeholder={t("ContractInvoicesPage.startDate")}
+            module="invoices"
+          />
+        </div>
 
         {/* End Date */}
-        <input
-          type="date"
-          value={dateRange.end}
-          onChange={(e) =>
-            setDateRange((prev) => ({ ...prev, end: e.target.value }))
-          }
-          placeholder={t("ContractInvoicesPage.endDate")}
-          style={{ ...inputStyle, width: "150px", colorScheme: "dark" }}
-        />
+        <div style={{ width: "150px" }}>
+          <CalendarDatePicker
+            value={dateRange.end}
+            onChange={(value) =>
+              setDateRange((prev) => ({ ...prev, end: value }))
+            }
+            placeholder={t("ContractInvoicesPage.endDate")}
+            module="invoices"
+          />
+        </div>
 
         {/* Clear Button */}
         {hasActiveFilters && (
@@ -279,7 +279,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
         <span style={{ color: "var(--text)", fontWeight: "bold" }}>
           {filteredInvoices.length}
         </span>{" "}
-        {t("ContractInvoicesPage.of")} {invoices?.length || 0}{" "}
+        {t("ContractInvoicesPage.of")} {invoiceList.length}{" "}
         {t("ContractInvoicesPage.invoices")}
       </div>
 
@@ -367,12 +367,10 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
                     {inv.subcontractor_name || "-"}
                   </td>
                   <td style={{ padding: "1rem" }}>
-                    {new Date(inv.invoice_date).toLocaleDateString()}
+                    {inv.formatted_invoice_date || inv.invoice_date || "-"}
                   </td>
                   <td style={{ padding: "1rem" }}>
-                    {inv.due_date
-                      ? new Date(inv.due_date).toLocaleDateString()
-                      : "-"}
+                    {inv.formatted_due_date || inv.due_date || "-"}
                   </td>
                   <td
                     style={{

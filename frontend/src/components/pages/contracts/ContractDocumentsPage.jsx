@@ -9,6 +9,7 @@ import Button from "../../ui/Button";
 import DeleteConfirmModal from "../../ui/DeleteConfirmModal";
 import DocumentTable from "../../contracts/DocumentTable";
 import DocumentUploadModal from "../../contracts/DocumentUploadModal";
+import toast from "react-hot-toast";
 
 export default function ContractDocumentsPage() {
   const navigate = useNavigate();
@@ -31,8 +32,9 @@ export default function ContractDocumentsPage() {
       });
       setShowUpload(false);
       refetch();
+      toast.success("Document uploaded.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -43,8 +45,9 @@ export default function ContractDocumentsPage() {
       await instance.delete(`contract-documents/${deletingDoc.id}/`);
       setDeletingDoc(null);
       refetch();
+      toast.success("Document deleted.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     } finally {
       setDeleteLoading(false);
     }

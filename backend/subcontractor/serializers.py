@@ -3,6 +3,7 @@ from datetime import date
 
 from rest_framework import serializers
 from django.db.models import Sum
+from common.serializers import CalendarModelSerializer
 
 from .models import (
     Subcontractor,
@@ -67,7 +68,8 @@ class SubcontractorFinancialSummarySerializer(serializers.Serializer):
 # Subcontractor Serializers
 # ──────────────────────────────────────────────
 
-class SubcontractorListSerializer(serializers.ModelSerializer):
+class SubcontractorListSerializer(CalendarModelSerializer):
+    calendar_module = "subcontractors"
     """Lightweight serializer for list views."""
     contract_count = serializers.SerializerMethodField()
     specialization_display = serializers.CharField(
@@ -89,7 +91,8 @@ class SubcontractorListSerializer(serializers.ModelSerializer):
         return obj.contracts.count()
 
 
-class SubcontractorDetailSerializer(serializers.ModelSerializer):
+class SubcontractorDetailSerializer(CalendarModelSerializer):
+    calendar_module = "subcontractors"
     """Full detail with nested contracts and financial summary."""
     contracts         = serializers.SerializerMethodField()
     financial_summary = serializers.SerializerMethodField()
@@ -120,7 +123,8 @@ class SubcontractorDetailSerializer(serializers.ModelSerializer):
 # Contract Serializers
 # ──────────────────────────────────────────────
 
-class ContractListSerializer(serializers.ModelSerializer):
+class ContractListSerializer(CalendarModelSerializer):
+    calendar_module = "contracts"
     """Lightweight serializer for list / nested views."""
     subcontractor_name = serializers.CharField(source='subcontractor.name', read_only=True)
     project_name       = serializers.CharField(source='project.name', read_only=True)
@@ -138,7 +142,8 @@ class ContractListSerializer(serializers.ModelSerializer):
         ]
 
 
-class ContractDetailSerializer(serializers.ModelSerializer):
+class ContractDetailSerializer(CalendarModelSerializer):
+    calendar_module = "contracts"
     """Full detail with nested related objects and financials."""
     subcontractor     = SubcontractorListSerializer(read_only=True)
     project_name      = serializers.CharField(source='project.name', read_only=True)
@@ -174,7 +179,8 @@ class ContractDetailSerializer(serializers.ModelSerializer):
         return ContractService.get_financial_summary(obj)
 
 
-class ContractWriteSerializer(serializers.ModelSerializer):
+class ContractWriteSerializer(CalendarModelSerializer):
+    calendar_module = "contracts"
     """
     Serializer for creating/updating contracts.
     Separates write concerns from the read-heavy detail serializer.
@@ -206,7 +212,8 @@ class ContractWriteSerializer(serializers.ModelSerializer):
 # Contract Document Serializers
 # ──────────────────────────────────────────────
 
-class ContractDocumentSerializer(serializers.ModelSerializer):
+class ContractDocumentSerializer(CalendarModelSerializer):
+    calendar_module = "documents"
     document_type_display = serializers.CharField(
         source='get_document_type_display', read_only=True,
     )
@@ -225,7 +232,8 @@ class ContractDocumentSerializer(serializers.ModelSerializer):
         return value
 
 
-class ContractDocumentCreateSerializer(serializers.ModelSerializer):
+class ContractDocumentCreateSerializer(CalendarModelSerializer):
+    calendar_module = "documents"
     """
     Used when creating through the nested endpoint
     /contracts/{id}/documents/ — the contract comes from the URL.
@@ -252,7 +260,8 @@ class ContractDocumentCreateSerializer(serializers.ModelSerializer):
 # Contract Payment Serializers
 # ──────────────────────────────────────────────
 
-class ContractPaymentSerializer(serializers.ModelSerializer):
+class ContractPaymentSerializer(CalendarModelSerializer):
+    calendar_module = "payments"
     payment_type_display = serializers.CharField(
         source='get_payment_type_display', read_only=True,
     )
@@ -290,7 +299,8 @@ class ContractPaymentSerializer(serializers.ModelSerializer):
         return data
 
 
-class ContractPaymentCreateSerializer(serializers.ModelSerializer):
+class ContractPaymentCreateSerializer(CalendarModelSerializer):
+    calendar_module = "payments"
     """
     Used when creating through the nested endpoint
     /contracts/{id}/payments/ — the contract comes from the URL.
@@ -318,7 +328,8 @@ class ContractPaymentCreateSerializer(serializers.ModelSerializer):
 # Contract Variation Serializers
 # ──────────────────────────────────────────────
 
-class ContractVariationSerializer(serializers.ModelSerializer):
+class ContractVariationSerializer(CalendarModelSerializer):
+    calendar_module = "contract_variations"
     class Meta:
         model  = ContractVariation
         fields = [
@@ -328,7 +339,8 @@ class ContractVariationSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at']
 
 
-class ContractVariationCreateSerializer(serializers.ModelSerializer):
+class ContractVariationCreateSerializer(CalendarModelSerializer):
+    calendar_module = "contract_variations"
     """
     Used when creating through the nested endpoint
     /contracts/{id}/variations/ — the contract comes from the URL.
@@ -341,7 +353,8 @@ class ContractVariationCreateSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['created_at']
 
-class ContractInvoiceDocumentSerializer(serializers.ModelSerializer):
+class ContractInvoiceDocumentSerializer(CalendarModelSerializer):
+    calendar_module = "documents"
     class Meta:
         model = ContractInvoiceDocument
         fields = [
@@ -354,7 +367,8 @@ class ContractInvoiceDocumentSerializer(serializers.ModelSerializer):
             "uploaded_at",
         ]
 
-class ContractInvoiceSerializer(serializers.ModelSerializer):
+class ContractInvoiceSerializer(CalendarModelSerializer):
+    calendar_module = "invoices"
     
 
     project_name = serializers.CharField(
@@ -393,7 +407,8 @@ class ContractInvoiceSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-class ContractInvoiceDetailsSerializer(serializers.ModelSerializer):
+class ContractInvoiceDetailsSerializer(CalendarModelSerializer):
+    calendar_module = "invoices"
     contract_number = serializers.CharField(
         source="contract.contract_number",
         read_only=True,
@@ -443,7 +458,8 @@ class ContractInvoiceDetailsSerializer(serializers.ModelSerializer):
 
 
 
-class ContractInvoiceDocumentCreateSerializer(serializers.ModelSerializer):
+class ContractInvoiceDocumentCreateSerializer(CalendarModelSerializer):
+    calendar_module = "documents"
     class Meta:
         model = ContractInvoiceDocument
         fields = [

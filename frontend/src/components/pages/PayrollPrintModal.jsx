@@ -23,22 +23,12 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
 
   const formatDate = (dateString) => {
     if (!dateString) return "__ / __ / ____";
-    const date = new Date(dateString);
-    const d = date.getDate();
-    const m = date.getMonth() + 1;
-    const y = date.getFullYear();
-    return `${d} / ${m} / ${y}`;
+    return dateString;
   };
 
   const formatFullDate = (dateString) => {
     if (!dateString) return "—";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    return dateString;
   };
 
   const formatNumber = (num) => {
@@ -65,22 +55,7 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
 
   const getPeriodLabel = (start, end) => {
     if (!start) return "";
-    const s = new Date(start);
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    return `${months[s.getMonth()]} ${s.getFullYear()}`;
+    return end ? `${start} - ${end}` : start;
   };
 
   const currencyLabel = payroll?.currency || "AFN";
@@ -583,23 +558,10 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
                     </span>
                     <span className="text-base font-bold text-gray-900">
                       {(() => {
-                        if (!payroll.payroll_period_start) return "";
-                        const s = new Date(payroll.payroll_period_start);
-                        const months = [
-                          "January",
-                          "February",
-                          "March",
-                          "April",
-                          "May",
-                          "June",
-                          "July",
-                          "August",
-                          "September",
-                          "October",
-                          "November",
-                          "December",
-                        ];
-                        return `${months[s.getMonth()]} ${s.getFullYear()}`;
+                        return getPeriodLabel(
+                          payroll.payroll_period_start,
+                          payroll.payroll_period_end,
+                        );
                       })()}
                     </span>
                   </div>
@@ -694,23 +656,10 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
                           {payroll.project_name || "LALANDER 5"} Employee's
                           Payroll Voucher{" "}
                           {(() => {
-                            if (!payroll.payroll_period_start) return "";
-                            const s = new Date(payroll.payroll_period_start);
-                            const months = [
-                              "January",
-                              "February",
-                              "March",
-                              "April",
-                              "May",
-                              "June",
-                              "July",
-                              "August",
-                              "September",
-                              "October",
-                              "November",
-                              "December",
-                            ];
-                            return `${months[s.getMonth()]} ${s.getFullYear()}`;
+                            return getPeriodLabel(
+                              payroll.payroll_period_start,
+                              payroll.payroll_period_end,
+                            );
                           })()}
                         </td>
                         <td className="border-[1.5px] border-gray-900 px-3 py-1"></td>
@@ -919,23 +868,10 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
                             {payroll.project_name || "LALANDER 5"} Employee's
                             Payroll Voucher{" "}
                             {(() => {
-                              if (!payroll.payroll_period_start) return "";
-                              const s = new Date(payroll.payroll_period_start);
-                              const months = [
-                                "January",
-                                "February",
-                                "March",
-                                "April",
-                                "May",
-                                "June",
-                                "July",
-                                "August",
-                                "September",
-                                "October",
-                                "November",
-                                "December",
-                              ];
-                              return `${months[s.getMonth()]} ${s.getFullYear()}`;
+                              return getPeriodLabel(
+                                payroll.payroll_period_start,
+                                payroll.payroll_period_end,
+                              );
                             })()}
                           </span>
                         </td>

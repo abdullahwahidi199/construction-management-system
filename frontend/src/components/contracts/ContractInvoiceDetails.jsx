@@ -3,6 +3,15 @@ import React, { useState, useCallback, useRef, useEffect } from "react";
 import useFetch from "../../hooks/useFetch";
 import instance from "../../api/axiosInstance";
 import { useLanguage } from "../../hooks/useLanguage";
+import { getFriendlyErrorMessage } from "../../utils/apiErrors";
+
+const ACCEPTED_EXTENSIONS = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png"];
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+
+function isAcceptedFile(file) {
+  const lowerName = file.name.toLowerCase();
+  return ACCEPTED_EXTENSIONS.some((extension) => lowerName.endsWith(extension));
+}
 
 export default function ContractInvoiceDetails({ id, onClose }) {
   const { t } = useLanguage();
@@ -53,6 +62,21 @@ export default function ContractInvoiceDetails({ id, onClose }) {
   };
 
   const handleUpload = async (file) => {
+    if (!isAcceptedFile(file)) {
+      setUploadMessage({
+        type: "error",
+        text: "Unsupported file type. Please upload PDF, image, Word, or Excel files.",
+      });
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setUploadMessage({
+        type: "error",
+        text: "File is too large. Maximum size is 50 MB.",
+      });
+      return;
+    }
+
     setUploading(true);
     setUploadMessage({ type: "", text: "" });
 
@@ -70,11 +94,10 @@ export default function ContractInvoiceDetails({ id, onClose }) {
       });
       setRefreshKey((prev) => prev + 1); // Triggers useFetch refetch
     } catch (err) {
-      const msg =
-        err?.response?.data?.file?.[0] ||
-        err?.response?.data?.detail ||
-        t("ContractInvoiceDetails.uploadFailed");
-      setUploadMessage({ type: "error", text: msg });
+      setUploadMessage({
+        type: "error",
+        text: getFriendlyErrorMessage(err, t("ContractInvoiceDetails.uploadFailed")),
+      });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";

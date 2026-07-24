@@ -5,13 +5,17 @@ import { useLanguage } from "../../hooks/useLanguage";
 
 export default function DeleteConfirmModal({
   open,
+  isOpen,
   onClose,
   onConfirm,
   itemName = "this item",
+  title,
+  message,
   loading = false,
 }) {
   const { t } = useLanguage();
-  if (!open) return null;
+  const visible = open ?? isOpen;
+  if (!visible) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -24,12 +28,16 @@ export default function DeleteConfirmModal({
       {/* Modal Panel */}
       <div className="relative w-full max-w-sm bg-(--card) rounded-xl shadow-2xl p-6 border border-(--border) transform transition-all duration-300 scale-100 animate-in fade-in zoom-in-95">
         <h2 className="text-xl font-bold text-(--text) mb-2">
-          {t("DeleteConfirmModal.title")}
+          {title || t("DeleteConfirmModal.title")}
         </h2>
 
         <p className="text-sm text-(--muted) mb-6 leading-relaxed">
-          {t("DeleteConfirmModal.messageStart")}
-          <span className="font-semibold text-(--text)">{itemName}</span>.
+          {message || (
+            <>
+              {t("DeleteConfirmModal.messageStart")}
+              <span className="font-semibold text-(--text)">{itemName}</span>.
+            </>
+          )}
         </p>
 
         <div className="flex justify-end gap-3 mt-4">
@@ -41,7 +49,7 @@ export default function DeleteConfirmModal({
             variant="danger"
             onClick={onConfirm}
             disabled={loading}
-            className="min-w-80px"
+            className="min-w-20"
           >
             {loading ? (
               <>

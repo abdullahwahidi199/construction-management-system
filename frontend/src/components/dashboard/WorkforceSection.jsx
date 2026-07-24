@@ -165,19 +165,7 @@ export default function WorkforceSection({ workforce, attendance }) {
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(val) => {
-                    const d = new Date(val);
-                    const localeMap = {
-                      en: "en-US",
-                      dr: "fa-AF",
-                      ps: "ps-AF",
-                    };
-
-                    return d.toLocaleDateString(
-                      localeMap[language] || "en-US",
-                      {
-                        weekday: "short",
-                      },
-                    );
+                    return String(val || "").slice(0, 10);
                   }}
                 />
                 <YAxis hide />

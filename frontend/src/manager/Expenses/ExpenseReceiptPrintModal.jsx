@@ -18,17 +18,19 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
 
   if (!isOpen || !expense) return null;
 
+  const canPrint = expense.approval_status === "approved";
+
   const formatDate = (dateString) => {
     if (!dateString) return "—";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    return dateString;
   };
 
+  const preparedBy = expense.created_by_name || "-";
+  const approvedBy = expense.approved_by_name || "-";
+  const approvalDate = formatDate(expense.approved_at);
+
   const handlePrint = () => {
+    if (!canPrint) return;
     const printContent = printRef.current;
     if (!printContent) return;
 
@@ -255,7 +257,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
             <div class="meta">
               <div class="receipt-title">Receipt No.</div>
               <div class="serial">#${expense.serial_number || "—"}</div>
-              <div class="date">${formatDate(expense.expense_date)}</div>
+              <div class="date">${formatDate(expense.formatted_expense_date || expense.expense_date)}</div>
             </div>
           </div>
 
@@ -272,6 +274,21 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
             <div class="cell">
               <div class="label">Paid To</div>
               <div class="value">${expense.paid_to || "—"}</div>
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <div class="cell">
+              <div class="label">Prepared By</div>
+              <div class="value">${preparedBy}</div>
+            </div>
+            <div class="cell">
+              <div class="label">Approved By</div>
+              <div class="value">${approvedBy}</div>
+            </div>
+            <div class="cell">
+              <div class="label">Approval Date</div>
+              <div class="value">${approvalDate}</div>
             </div>
           </div>
 
@@ -324,7 +341,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
             <div class="signature-block">
               <div class="signature-line"></div>
               <div class="role">Prepared By</div>
-              <div class="hint">Name & Signature</div>
+              <div class="hint">${preparedBy}</div>
             </div>
             <div class="signature-block">
               <div class="signature-line"></div>
@@ -334,7 +351,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
             <div class="signature-block">
               <div class="signature-line"></div>
               <div class="role">Approved By</div>
-              <div class="hint">Name & Signature</div>
+              <div class="hint">${approvedBy}</div>
             </div>
             <div class="signature-block">
               <div class="signature-line"></div>
@@ -380,6 +397,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
             <div className="flex items-center gap-2">
               <button
                 onClick={handlePrint}
+                disabled={!canPrint}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity"
               >
                 <Printer className="h-4 w-4" />
@@ -396,6 +414,11 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
 
           {/* Scrollable Receipt Preview */}
           <div className="overflow-y-auto flex-1 bg-[var(--bg)]">
+            {!canPrint && (
+              <div className="border-b border-amber-500/20 bg-amber-500/10 px-6 py-3 text-sm text-amber-700 dark:text-amber-300">
+                Expense must be approved before printing.
+              </div>
+            )}
             <div ref={printRef} className="p-8 md:p-10 max-w-3xl mx-auto">
               {/* Document Header */}
               <div className="flex items-start justify-between pb-5 border-b-[3px] border-[var(--text)] mb-7">
@@ -415,7 +438,9 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
                     #{expense.serial_number || "—"}
                   </p>
                   <p className="text-xs text-[var(--muted)] mt-0.5">
-                    {formatDate(expense.expense_date)}
+                    {formatDate(
+                      expense.formatted_expense_date || expense.expense_date,
+                    )}
                   </p>
                 </div>
               </div>
@@ -444,6 +469,33 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
                   </p>
                   <p className="text-sm font-semibold text-[var(--text)]">
                     {expense.paid_to || "—"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] rounded-lg overflow-hidden mb-7">
+                <div className="bg-[var(--card)] px-4 py-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)] mb-1">
+                    Prepared By
+                  </p>
+                  <p className="text-sm font-semibold text-[var(--text)]">
+                    {preparedBy}
+                  </p>
+                </div>
+                <div className="bg-[var(--card)] px-4 py-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)] mb-1">
+                    Approved By
+                  </p>
+                  <p className="text-sm font-semibold text-[var(--text)]">
+                    {approvedBy}
+                  </p>
+                </div>
+                <div className="bg-[var(--card)] px-4 py-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)] mb-1">
+                    Approval Date
+                  </p>
+                  <p className="text-sm font-semibold text-[var(--text)]">
+                    {approvalDate}
                   </p>
                 </div>
               </div>
@@ -516,18 +568,18 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
               {/* Signatures */}
               <div className="mt-14 grid grid-cols-4 gap-6">
                 {[
-                  "Prepared By",
-                  "Checked By",
-                  "Approved By",
-                  "Received By",
-                ].map((role) => (
-                  <div key={role} className="text-center">
+                  { role: "Prepared By", name: preparedBy },
+                  { role: "Checked By", name: "Name & Signature" },
+                  { role: "Approved By", name: approvedBy },
+                  { role: "Received By", name: "Name & Signature" },
+                ].map((item) => (
+                  <div key={item.role} className="text-center">
                     <div className="h-12 border-b-2 border-[var(--muted)] mb-2" />
                     <p className="text-xs font-bold uppercase tracking-wide text-[var(--text)]">
-                      {role}
+                      {item.role}
                     </p>
                     <p className="text-[10px] text-[var(--muted)] mt-0.5">
-                      Name & Signature
+                      {item.name}
                     </p>
                   </div>
                 ))}

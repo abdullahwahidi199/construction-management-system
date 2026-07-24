@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import toast from "react-hot-toast";
 import useAttendance from "../../../hooks/useAttendance";
 import instance from "../../../api/axiosInstance";
 import PermissionWrapper from "../../../auth/PermissionWrapper";
 import Button from "../../ui/Button";
 import { useLanguage } from "../../../hooks/useLanguage";
+import { getFriendlyErrorMessage } from "../../../utils/apiErrors";
 
 // Compact status indicator dot
 const StatusDot = ({ status }) => {
@@ -80,8 +82,7 @@ function BulkAttendance() {
       });
       setEmployees(data);
     } catch (err) {
-      console.error("Failed to load employees:", err);
-      setError(t("BulkAttendance.failedLoadEmployees"));
+      setError(getFriendlyErrorMessage(err, t("BulkAttendance.failedLoadEmployees")));
     }
   }, [setError, t]);
 
@@ -115,8 +116,7 @@ function BulkAttendance() {
       }, {});
       setAttendanceData(mapped);
     } catch (err) {
-      console.error("Failed to load existing attendance:", err);
-      setError(t("BulkAttendance.failedLoadAttendance"));
+      setError(getFriendlyErrorMessage(err, t("BulkAttendance.failedLoadAttendance")));
     } finally {
       setIsLoadingExisting(false);
     }
@@ -185,9 +185,10 @@ function BulkAttendance() {
         records: normalized,
       });
       setResult(response);
+      toast.success("Attendance saved.");
       await loadExistingAttendance();
     } catch (err) {
-      console.error("Failed to submit attendance:", err);
+      setError(getFriendlyErrorMessage(err, "Unable to save attendance."));
     }
   };
 

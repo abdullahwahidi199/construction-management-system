@@ -55,6 +55,7 @@ from xml.sax.saxutils import escape
 
 from django.conf import settings
 from django.http import HttpResponse
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
@@ -76,6 +77,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 from project.models import Project
+from expenses.models import Expense
 
 
 # Optional but strongly recommended for correct Dari/Pashto/Arabic shaping.
@@ -118,7 +120,11 @@ class ProjectPDFExportView(APIView):
     def get_project(self, pk):
         return get_object_or_404(
             Project.objects.prefetch_related(
-                "expenses",
+                Prefetch(
+                    "expenses",
+                    queryset=Expense.objects.approved(),
+                    to_attr="approved_expenses",
+                ),
                 "subcontractor_contracts__subcontractor",
                 "subcontractor_contracts__variations",
                 "subcontractor_contracts__payments",
@@ -510,7 +516,7 @@ class ProjectPDFExportView(APIView):
         # EXPENSE SUMMARY
         # --------------------------------------------------
 
-        expenses = list(project.expenses.all())
+        expenses = list(getattr(project, "approved_expenses", []))
 
         expense_total_usd = sum(
             (self._decimal(expense.total_usd) for expense in expenses),

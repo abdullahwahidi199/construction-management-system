@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useAttendance from "../../../hooks/useAttendance";
 import { useLanguage } from "../../../hooks/useLanguage";
+import { getFriendlyErrorMessage } from "../../../utils/apiErrors";
 
 function DailyAttendance() {
   const { fetchDailyAttendance, loading, error } = useAttendance();
@@ -14,6 +15,7 @@ function DailyAttendance() {
     new Date().toISOString().split("T")[0],
   );
   const [data, setData] = useState(null);
+  const [localError, setLocalError] = useState("");
 
   useEffect(() => {
     loadDailyAttendance();
@@ -21,10 +23,11 @@ function DailyAttendance() {
 
   const loadDailyAttendance = async () => {
     try {
+      setLocalError("");
       const result = await fetchDailyAttendance(selectedDate);
       setData(result);
     } catch (err) {
-      console.error(err);
+      setLocalError(getFriendlyErrorMessage(err, "Unable to load daily attendance."));
     }
   };
 
@@ -109,9 +112,9 @@ function DailyAttendance() {
           </div>
         </div>
 
-        {error && (
+        {(localError || error) && (
           <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
-            {error}
+            {localError || error}
           </div>
         )}
 
@@ -133,7 +136,7 @@ function DailyAttendance() {
                 <div className="text-sm" style={{ color: "var(--muted)" }}>
                   {t("DailyAttendance.totalMarked")}
                 </div>
-                <div className="text-3xl font-bold">{data.total_marked}</div>
+                <div className="text-3xl font-bold">{data.total_marked || 0}</div>
               </div>
               <div
                 className="p-4 rounded-lg border"
@@ -149,7 +152,7 @@ function DailyAttendance() {
                   className="text-3xl font-bold"
                   style={{ color: "var(--danger)" }}
                 >
-                  {data.total_unmarked}
+                  {data.total_unmarked || 0}
                 </div>
               </div>
               <div
@@ -166,7 +169,7 @@ function DailyAttendance() {
                   className="text-3xl font-bold"
                   style={{ color: "var(--success)" }}
                 >
-                  {data.status_counts.present}
+                  {data.status_counts?.present || 0}
                 </div>
               </div>
               <div
@@ -183,7 +186,7 @@ function DailyAttendance() {
                   className="text-3xl font-bold"
                   style={{ color: "var(--danger)" }}
                 >
-                  {data.status_counts.absent}
+                  {data.status_counts?.absent || 0}
                 </div>
               </div>
               <div
@@ -200,7 +203,7 @@ function DailyAttendance() {
                   className="text-3xl font-bold"
                   style={{ color: "var(--primary)" }}
                 >
-                  {data.status_counts.leave}
+                  {data.status_counts?.leave || 0}
                 </div>
               </div>
             </div>
@@ -261,7 +264,7 @@ function DailyAttendance() {
                     className="divide-y"
                     style={{ divideColor: "var(--border)" }}
                   >
-                    {data.records.map((record) => (
+                    {(data.records || []).map((record) => (
                       <tr
                         key={record.id}
                         style={{ backgroundColor: "var(--bg)" }}
@@ -300,11 +303,11 @@ function DailyAttendance() {
             </div>
 
             {/* Unmarked Employees */}
-            {data.unmarked_employees.length > 0 && (
+            {(data.unmarked_employees || []).length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold mb-4">
                   {t("DailyAttendance.unmarkedCount", {
-                    count: data.unmarked_employees.length,
+                    count: (data.unmarked_employees || []).length,
                   })}
                 </h3>
                 <div
@@ -339,7 +342,7 @@ function DailyAttendance() {
                       className="divide-y"
                       style={{ divideColor: "var(--border)" }}
                     >
-                      {data.unmarked_employees.map((emp) => (
+                      {(data.unmarked_employees || []).map((emp) => (
                         <tr
                           key={emp.id}
                           style={{ backgroundColor: "var(--bg)" }}

@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
 import instance from "../api/axiosInstance";
+import { getFriendlyErrorMessage } from "../utils/apiErrors";
+
 export function useDailyWorkers() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -11,7 +13,7 @@ export function useDailyWorkers() {
       const res = await instance.get("/daily-workers/", { params });
       return res.data.results || res.data;
     } catch (err) {
-      setError("Failed to fetch workers");
+      setError(getFriendlyErrorMessage(err, "Unable to load workers."));
       throw err;
     } finally {
       setLoading(false);
@@ -19,13 +21,23 @@ export function useDailyWorkers() {
   }, []);
 
   const fetchProjects = useCallback(async () => {
-    const res = await instance.get("/projects/");
-    return res.data.results || res.data;
+    try {
+      const res = await instance.get("/projects/");
+      return res.data.results || res.data;
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to load projects."));
+      throw err;
+    }
   }, []);
 
   const fetchWorkerDetail = async (id) => {
-    const res = await instance.get(`/daily-workers/${id}/detail_summary/`);
-    return res.data;
+    try {
+      const res = await instance.get(`/daily-workers/${id}/detail_summary/`);
+      return res.data;
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to load worker details."));
+      throw err;
+    }
   };
 
   const updateWorker = async (id, workerData) => {
@@ -33,6 +45,9 @@ export function useDailyWorkers() {
     try {
       const res = await instance.patch(`/daily-workers/${id}/`, workerData);
       return res.data;
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to save worker."));
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -42,6 +57,9 @@ export function useDailyWorkers() {
     setLoading(true);
     try {
       await instance.delete(`/daily-workers/${id}/`);
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to delete worker."));
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -56,7 +74,7 @@ export function useDailyWorkers() {
       });
       return res.data;
     } catch (err) {
-      setError("Failed to fetch daily status");
+      setError(getFriendlyErrorMessage(err, "Unable to load daily status."));
       throw err;
     } finally {
       setLoading(false);
@@ -69,7 +87,7 @@ export function useDailyWorkers() {
       const res = await instance.post("/worker-attendance/bulk_mark/", data);
       return res.data;
     } catch (err) {
-      setError("Failed to save attendance");
+      setError(getFriendlyErrorMessage(err, "Unable to save attendance."));
       throw err;
     } finally {
       setLoading(false);
@@ -82,7 +100,7 @@ export function useDailyWorkers() {
       const res = await instance.post("/daily-workers/", workerData);
       return res.data;
     } catch (err) {
-      setError(err.response?.data || "Failed to create worker");
+      setError(getFriendlyErrorMessage(err, "Unable to create worker."));
       throw err;
     } finally {
       setLoading(false);
@@ -94,19 +112,32 @@ export function useDailyWorkers() {
     try {
       const res = await instance.get("/worker-attendance/", { params });
       return res.data.results || res.data;
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to load attendance."));
+      throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
   const updateAttendance = async (id, data) => {
-    const res = await instance.patch(`/worker-attendance/${id}/`, data);
-    return res.data;
+    try {
+      const res = await instance.patch(`/worker-attendance/${id}/`, data);
+      return res.data;
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to save attendance."));
+      throw err;
+    }
   };
 
   const fetchAttendanceSummary = async (params = {}) => {
-    const res = await instance.get("/worker-attendance/summary/", { params });
-    return res.data;
+    try {
+      const res = await instance.get("/worker-attendance/summary/", { params });
+      return res.data;
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to load attendance summary."));
+      throw err;
+    }
   };
 
   // Don't forget to export it at the bottom:
@@ -118,7 +149,7 @@ export function useDailyWorkers() {
       const res = await instance.get("/worker-payroll/", { params });
       return res.data.results || res.data;
     } catch (err) {
-      setError("Failed to fetch payrolls");
+      setError(getFriendlyErrorMessage(err, "Unable to load payrolls."));
       throw err;
     } finally {
       setLoading(false);
@@ -131,7 +162,7 @@ export function useDailyWorkers() {
       const res = await instance.post("/worker-payroll/generate/", data);
       return res.data;
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to generate payroll");
+      setError(getFriendlyErrorMessage(err, "Unable to generate payroll."));
       throw err;
     } finally {
       setLoading(false);
@@ -144,7 +175,7 @@ export function useDailyWorkers() {
       const res = await instance.post("/worker-payroll/", data);
       return res.data;
     } catch (err) {
-      setError(err.response?.data || "Failed to create payroll");
+      setError(getFriendlyErrorMessage(err, "Unable to create payroll."));
       throw err;
     } finally {
       setLoading(false);
@@ -157,7 +188,7 @@ export function useDailyWorkers() {
       const res = await instance.patch(`/worker-payroll/${id}/`, data);
       return res.data;
     } catch (err) {
-      setError(err.response?.data || "Failed to update payroll");
+      setError(getFriendlyErrorMessage(err, "Unable to save payroll."));
       throw err;
     } finally {
       setLoading(false);
@@ -168,6 +199,9 @@ export function useDailyWorkers() {
     setLoading(true);
     try {
       await instance.delete(`/worker-payroll/${id}/`);
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to delete payroll."));
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -181,7 +215,7 @@ export function useDailyWorkers() {
       });
       return res.data;
     } catch (err) {
-      setError("Failed to mark as paid");
+      setError(getFriendlyErrorMessage(err, "Unable to mark payroll as paid."));
       throw err;
     } finally {
       setLoading(false);
@@ -189,13 +223,23 @@ export function useDailyWorkers() {
   };
 
   const approvePayroll = async (id) => {
-    const res = await instance.patch(`/worker-payroll/${id}/approve/`);
-    return res.data;
+    try {
+      const res = await instance.patch(`/worker-payroll/${id}/approve/`);
+      return res.data;
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to approve payroll."));
+      throw err;
+    }
   };
 
   const fetchPayrollReports = async (params = {}) => {
-    const res = await instance.get("/worker-payroll/reports/", { params });
-    return res.data;
+    try {
+      const res = await instance.get("/worker-payroll/reports/", { params });
+      return res.data;
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to load payroll reports."));
+      throw err;
+    }
   };
 
   const fetchAdvances = useCallback(async (params = {}) => {
@@ -203,23 +247,41 @@ export function useDailyWorkers() {
     try {
       const res = await instance.get("/worker-advances/", { params });
       return res.data.results || res.data;
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to load advances."));
+      throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
   const createAdvance = async (data) => {
-    const res = await instance.post("/worker-advances/", data);
-    return res.data;
+    try {
+      const res = await instance.post("/worker-advances/", data);
+      return res.data;
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to create advance."));
+      throw err;
+    }
   };
 
   const updateAdvance = async (id, data) => {
-    const res = await instance.patch(`/worker-advances/${id}/`, data);
-    return res.data;
+    try {
+      const res = await instance.patch(`/worker-advances/${id}/`, data);
+      return res.data;
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to save advance."));
+      throw err;
+    }
   };
 
   const deleteAdvance = async (id) => {
-    await instance.delete(`/worker-advances/${id}/`);
+    try {
+      await instance.delete(`/worker-advances/${id}/`);
+    } catch (err) {
+      setError(getFriendlyErrorMessage(err, "Unable to delete advance."));
+      throw err;
+    }
   };
 
   return {

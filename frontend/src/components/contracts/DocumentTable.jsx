@@ -106,9 +106,7 @@ export default function DocumentTable({ documents = [], onDelete, loading }) {
                   </div>
                 </td>
                 <td className="px-4 py-3 text-[var(--muted)] text-sm text-start">
-                  {doc.uploaded_at
-                    ? new Date(doc.uploaded_at).toLocaleDateString()
-                    : "—"}
+                  {doc.formatted_uploaded_at || doc.uploaded_at || "-"}
                 </td>
                 <td className="px-4 py-3 text-end">
                   <div className="flex items-center justify-end gap-1">
@@ -154,9 +152,7 @@ export default function DocumentTable({ documents = [], onDelete, loading }) {
             </div>
             <p className="text-xs text-[var(--muted)]">
               {getFileExtension(doc.file_url || doc.file)} &middot;{" "}
-              {doc.uploaded_at
-                ? new Date(doc.uploaded_at).toLocaleDateString()
-                : ""}
+              {doc.formatted_uploaded_at || doc.uploaded_at || ""}
             </p>
             <div className="flex items-center justify-end gap-2">
               {doc.file && (

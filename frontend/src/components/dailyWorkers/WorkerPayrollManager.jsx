@@ -4,6 +4,9 @@ import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { useLanguage } from "../../hooks/useLanguage";
 import { useAuth } from "../../auth/AuthContext";
 import { hasAnyPermission } from "../../../utils/permissions";
+import ConfirmDialog from "../common/ConfirmDialog";
+import { getFriendlyErrorMessage } from "../../utils/apiErrors";
+import toast from "react-hot-toast";
 
 function WorkerPayrollManager() {
   const {
@@ -38,6 +41,8 @@ function WorkerPayrollManager() {
   const [periodEnd, setPeriodEnd] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [generationProject, setGenerationProject] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [markPaidTarget, setMarkPaidTarget] = useState(null);
 
   useEffect(() => {
     loadPayrolls();
@@ -49,7 +54,7 @@ function WorkerPayrollManager() {
       const data = await fetchPayrolls();
       setPayrolls(data);
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -62,15 +67,17 @@ function WorkerPayrollManager() {
       setWorkers(workerData);
       setProjects(projectData);
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
   const handleFormSubmit = async (payload) => {
     if (selectedPayroll?.id) {
       await updatePayroll(selectedPayroll.id, payload);
+      toast.success("Payroll updated.");
     } else {
       await createPayroll(payload);
+      toast.success("Payroll created.");
     }
     setIsFormOpen(false);
     setSelectedPayroll(null);
@@ -83,32 +90,35 @@ function WorkerPayrollManager() {
   };
 
   const handleDelete = async (payroll) => {
-    if (
-      !window.confirm(
-        t("WorkerPayrollManager.deleteConfirmation", {
-          name: payroll.worker_name,
-        }),
-      )
-    )
-      return;
+    setDeleteTarget(payroll);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await deletePayroll(payroll.id);
+      await deletePayroll(deleteTarget.id);
+      toast.success("Payroll deleted.");
+      setDeleteTarget(null);
       await loadPayrolls();
     } catch (err) {
-      console.error(err);
-      alert(t("WorkerPayrollManager.couldNotDeletePayroll"));
+      toast.error(t("WorkerPayrollManager.couldNotDeletePayroll"));
     }
   };
 
   const handleApprove = async (id) => {
-    await approvePayroll(id);
-    await loadPayrolls();
+    try {
+      await approvePayroll(id);
+      toast.success("Payroll approved.");
+      await loadPayrolls();
+    } catch {
+      // Central axios handling shows the user-facing error.
+    }
   };
 
   const handleGenerate = async (e) => {
     e.preventDefault();
     if (!periodStart || !periodEnd)
-      return alert(t("WorkerPayrollManager.selectDateRange"));
+      return toast.error(t("WorkerPayrollManager.selectDateRange"));
 
     try {
       const res = await generatePayrolls({
@@ -117,17 +127,26 @@ function WorkerPayrollManager() {
         payment_method: paymentMethod,
         project: generationProject || null,
       });
-      alert(res.message);
+      toast.success(res.message || "Payroll generated.");
       loadPayrolls();
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
   const handleMarkPaid = async (id) => {
-    if (window.confirm(t("WorkerPayrollManager.confirmPayment"))) {
-      await markPayrollPaid(id, new Date().toISOString().split("T")[0]);
+    setMarkPaidTarget(payrolls.find((payroll) => payroll.id === id) || { id });
+  };
+
+  const confirmMarkPaid = async () => {
+    if (!markPaidTarget) return;
+    try {
+      await markPayrollPaid(markPaidTarget.id, new Date().toISOString().split("T")[0]);
+      toast.success("Payroll marked as paid.");
+      setMarkPaidTarget(null);
       loadPayrolls();
+    } catch {
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -144,6 +163,27 @@ function WorkerPayrollManager() {
         workers={workers}
         projects={projects}
         loading={loading}
+      />
+      <ConfirmDialog
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        title={t("WorkerPayrollManager.deletePayroll")}
+        message={t("WorkerPayrollManager.deleteConfirmation", {
+          name: deleteTarget?.worker_name || "",
+        })}
+        loading={loading}
+        confirmLabel="Delete"
+      />
+      <ConfirmDialog
+        isOpen={Boolean(markPaidTarget)}
+        onClose={() => setMarkPaidTarget(null)}
+        onConfirm={confirmMarkPaid}
+        title="Mark payroll paid"
+        message={t("WorkerPayrollManager.confirmPayment")}
+        loading={loading}
+        confirmLabel="Mark paid"
+        destructive={false}
       />
 
       <div
@@ -530,8 +570,7 @@ function PayrollFormModal({
     try {
       await onSubmit(payload);
     } catch (err) {
-      console.error(err);
-      setError(t("WorkerPayrollManager.modal.errorMessage"));
+      setError(getFriendlyErrorMessage(err, t("WorkerPayrollManager.modal.errorMessage")));
     }
   };
 

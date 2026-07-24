@@ -10,6 +10,7 @@ import {
   FileQuestion,
   Printer,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import ExpenseDetail from "./ExpenseDetail";
 import ExpenseEdit from "./ExpenseEdit";
 import ExpenseReceiptPrintModal from "./ExpenseReceiptPrintModal";
@@ -52,6 +53,12 @@ const categoryConfig = {
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
+const approvalStyles = {
+  pending: "bg-amber-500/10 text-amber-700 dark:text-amber-300",
+  approved: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+  rejected: "bg-red-500/10 text-red-700 dark:text-red-300",
+};
+
 export default function ExpenseList({
   expenses = [],
   onDelete,
@@ -69,6 +76,7 @@ export default function ExpenseList({
   const [showDetail, setShowDetail] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [printExpense, setPrintExpense] = useState(null);
+  const [printBlockMessage, setPrintBlockMessage] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const { t, lang } = useLanguage();
@@ -109,8 +117,8 @@ export default function ExpenseList({
       let bValue = b[sortField];
 
       if (sortField === "expense_date") {
-        aValue = new Date(aValue).getTime();
-        bValue = new Date(bValue).getTime();
+        aValue = String(aValue || "");
+        bValue = String(bValue || "");
       } else if (sortField === "amount") {
         aValue = getTotalAmount(a);
         bValue = getTotalAmount(b);
@@ -152,12 +160,7 @@ export default function ExpenseList({
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    return dateString || "-";
   };
 
   const handleViewDetails = (expense) => {
@@ -177,7 +180,7 @@ export default function ExpenseList({
       setShowEdit(false);
       setSelectedExpense(null);
     } catch (error) {
-      console.error("Failed to update expense:", error);
+      toast.error(error?.userMessage || "Unable to save changes.");
       throw error;
     }
   };
@@ -190,10 +193,19 @@ export default function ExpenseList({
       await onDelete?.(deleteTarget.id);
       setDeleteTarget(null);
     } catch (err) {
-      console.error("Delete failed:", err);
+      toast.error(err?.userMessage || "Unable to delete this item.");
     } finally {
       setDeleteLoading(false);
     }
+  };
+
+  const handlePrint = (expense) => {
+    if (expense.approval_status !== "approved") {
+      setPrintBlockMessage("Expense must be approved before printing.");
+      return;
+    }
+    setPrintBlockMessage("");
+    setPrintExpense(expense);
   };
   if (filteredExpenses.length === 0 && expenses.length > 0) {
     return (
@@ -230,6 +242,11 @@ export default function ExpenseList({
         dir={isRTL ? "rtl" : "ltr"}
         className="rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm overflow-hidden"
       >
+        {printBlockMessage && (
+          <div className="border-b border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
+            {printBlockMessage}
+          </div>
+        )}
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -242,6 +259,9 @@ export default function ExpenseList({
                 </th>
                 <th className="px-4 py-3 text-start text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
                   {t("ExpenseList.type")}
+                </th>
+                <th className="px-4 py-3 text-start text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
+                  Status
                 </th>
                 <th
                   className="px-4 py-3 text-start text-xs font-semibold text-[var(--muted)] uppercase tracking-wider cursor-pointer hover:text-[var(--text)]"
@@ -298,6 +318,11 @@ export default function ExpenseList({
                               t("ExpenseList.noVendor")}{" "}
                             • {expense.expense_type || t("ExpenseList.general")}
                           </p>
+                          {expense.created_by_name && (
+                            <p className="text-xs text-[var(--muted)] mt-0.5">
+                              Created by {expense.created_by_name}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -309,10 +334,34 @@ export default function ExpenseList({
                       </span>
                     </td>
                     <td className="px-4 py-3.5">
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
+                          approvalStyles[expense.approval_status] ||
+                          approvalStyles.approved
+                        }`}
+                      >
+                        {expense.approval_status || "approved"}
+                      </span>
+                      {expense.approval_status === "approved" && (
+                        <p className="mt-1 text-xs text-[var(--muted)]">
+                          {expense.approved_by_name || "-"} ·{" "}
+                          {(expense.approved_at || "").slice(0, 10) || "-"}
+                        </p>
+                      )}
+                      {expense.approval_status === "rejected" && (
+                        <p className="mt-1 max-w-44 truncate text-xs text-[var(--muted)]">
+                          {expense.approval_notes || "Rejected"}
+                        </p>
+                      )}
+                    </td>
+                    <td className="px-4 py-3.5">
                       <div className="flex items-center gap-2 text-[var(--muted)]">
                         <Calendar className="h-3.5 w-3.5" />
                         <span className="text-sm">
-                          {formatDate(expense.expense_date)}
+                          {formatDate(
+                            expense.formatted_expense_date ||
+                              expense.expense_date,
+                          )}
                         </span>
                       </div>
                     </td>
@@ -385,10 +434,19 @@ export default function ExpenseList({
                                 </button>
                                 <button
                                   onClick={() => {
-                                    setPrintExpense(expense);
+                                    handlePrint(expense);
                                     setOpenDropdownId(null);
                                   }}
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-start hover:bg-[var(--hover)]"
+                                  className={`flex w-full items-center gap-2 px-3 py-2 text-sm text-start ${
+                                    expense.approval_status === "approved"
+                                      ? "hover:bg-[var(--hover)]"
+                                      : "cursor-not-allowed text-[var(--muted)]"
+                                  }`}
+                                  title={
+                                    expense.approval_status === "approved"
+                                      ? t("ExpenseList.printReceipt")
+                                      : "Expense must be approved before printing."
+                                  }
                                 >
                                   <Printer className="h-4 w-4 shrink-0" />{" "}
                                   {t("ExpenseList.printReceipt")}
