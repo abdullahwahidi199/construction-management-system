@@ -1,8 +1,12 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import { attachFriendlyError, getFriendlyErrorMessage } from "../utils/apiErrors";
+import {
+  attachFriendlyError,
+  getFriendlyErrorMessage,
+} from "../utils/apiErrors";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api/";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api/";
 const SESSION_EXPIRED_EVENT = "cms:session-expired";
 const SESSION_NOTICE_KEY = "cms.auth.notice";
 let lastToast = { message: "", at: 0 };
