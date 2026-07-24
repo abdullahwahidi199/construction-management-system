@@ -213,43 +213,13 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         base_qs = self.filter_queryset(self.get_queryset())
         financial_qs = base_qs.filter(approval_status=Expense.ApprovalStatus.APPROVED)
 
-<<<<<<< HEAD
         # -------- RAW TOTALS BY CURRENCY --------
-        usd_total = base_qs.aggregate(
+        usd_total = financial_qs.aggregate(
             total=Sum("amount_usd")
         )["total"] or 0
 
-        afn_total = base_qs.aggregate(
-            total=Sum("amount_afn")
-=======
-        # -------- USD TOTAL (converted unified model) --------
-        usd_total = financial_qs.aggregate(
-        total=Sum(
-            ExpressionWrapper(
-                F("amount_usd")
-                + Case(
-                    When(
-                        amount_afn__gt=0,
-                        exchange_rate__gt=0,
-                        then=F("amount_afn") / F("exchange_rate"),
-                    ),
-                    default=Value(0),
-                    output_field=DecimalField(max_digits=20, decimal_places=6),
-                ),
-                output_field=DecimalField(max_digits=20, decimal_places=6),
-            )
-        )
-    )["total"] or 0
-
-        # -------- AFN TOTAL (converted unified model) --------
         afn_total = financial_qs.aggregate(
-            total=Sum(
-                ExpressionWrapper(
-                    F("amount_afn") + (F("amount_usd") * F("exchange_rate")),
-                    output_field=DecimalField(max_digits=20, decimal_places=2),
-                )
-            )
->>>>>>> recovery
+            total=Sum("amount_afn")
         )["total"] or 0
 
         # -------- PAGINATION --------

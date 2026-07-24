@@ -343,12 +343,6 @@ class FinancialOverviewReport(BaseReport):
             contract_paid = contract_totals["paid"][currency]
             operating_cost = expenses_value + employee_net + worker_net + contract_paid
 
-<<<<<<< HEAD
-        budget_total = proj_qs.aggregate(
-            total_afn=money_sum("estimated_budget", Q(budget_currency="AFN")),
-            total_usd=money_sum("estimated_budget", Q(budget_currency="USD")),
-        )
-=======
             cost_mix_by_currency.append({
                 "currency": currency,
                 "budget": budget_totals[currency],
@@ -419,16 +413,9 @@ class FinancialOverviewReport(BaseReport):
                 if item["currency"] == "AFN"
             ),
         }
->>>>>>> recovery
 
         return {
             **self.get_metadata(),
-<<<<<<< HEAD
-            "expenses": exp_totals,
-            "payroll": payroll_totals,
-            "contracts": list(contract_summary),
-            "total_estimated_budget": budget_total,
-=======
             "summary": summary,
             "expenses": {
                 **expense_totals,
@@ -455,5 +442,4 @@ class FinancialOverviewReport(BaseReport):
                 contracts,
             ),
             "rows": self._project_rows(projects, expenses, worker_payrolls, contracts),
->>>>>>> recovery
         }

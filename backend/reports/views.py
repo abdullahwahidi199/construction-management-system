@@ -69,21 +69,15 @@ class ProjectReportView(BaseReportView):
         ("location", "Location"),
         ("status", "Status"),
         ("estimated_budget", "Budget"),
-<<<<<<< HEAD
-        ("budget_currency", "Currency"),
-        ("total_expense_usd", "Spent (USD)"),
-        ("budget_remaining", "Remaining"),
-=======
         ("budget_currency", "Budget Cur"),
-        ("expenses_usd", "Expenses USD Eq."),
-        ("expenses_afn", "Expenses AFN Eq."),
+        ("expenses_usd", "Expenses USD"),
+        ("expenses_afn", "Expenses AFN"),
         ("contracts_usd", "Contract Paid USD"),
         ("contracts_afn", "Contract Paid AFN"),
         ("worker_payroll_usd", "Worker Payroll USD"),
         ("worker_payroll_afn", "Worker Payroll AFN"),
         ("total_spent_usd", "Total USD"),
         ("total_spent_afn", "Total AFN"),
->>>>>>> recovery
     ]
 
 

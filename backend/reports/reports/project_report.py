@@ -1,8 +1,6 @@
-from collections import defaultdict
 from decimal import Decimal
 
-from django.db.models import Count
-from django.db.models import Prefetch
+from django.db.models import Count, Prefetch
 
 from expenses.models import Expense
 from project.models import Project
@@ -124,13 +122,7 @@ class ProjectSummaryReport(BaseReport):
 
     def generate(self):
         qs = self._base_queryset()
-
         rows = []
-<<<<<<< HEAD
-        total_budget = Decimal("0")
-        total_budget_usd = Decimal("0")
-        total_budget_afn = Decimal("0")
-=======
         summary = {
             "total_projects": 0,
             "total_estimated_budget_usd": ZERO,
@@ -144,24 +136,13 @@ class ProjectSummaryReport(BaseReport):
             "total_spent_usd": ZERO,
             "total_spent_afn": ZERO,
         }
->>>>>>> recovery
 
         for project in qs:
             budget = money(project.estimated_budget)
             budget_currency = (project.budget_currency or "AFN").upper()
-
-<<<<<<< HEAD
-        # ─────────────────────────────────────────────
-        # Loop projects
-        # ─────────────────────────────────────────────
-        for p in qs:
-            budget = p.estimated_budget or Decimal("0")
-            budget_currency = p.budget_currency or "AFN"
-=======
             expenses = self._expense_totals(getattr(project, "approved_expenses", []))
             contracts = self._contract_totals(project.subcontractor_contracts.all())
             worker_payroll = self._worker_payroll_totals(project.worker_payrolls.all())
->>>>>>> recovery
 
             total_spent_usd = (
                 expenses["equivalent_usd"]
@@ -185,28 +166,6 @@ class ProjectSummaryReport(BaseReport):
             elif budget_currency == "AFN":
                 summary["total_estimated_budget_afn"] += budget
 
-<<<<<<< HEAD
-            for contract in p.subcontractor_contracts.all():
-                contract_payments = contract.total_paid or Decimal("0")
-
-                if contract.currency == "USD":
-                    contract_usd += contract_payments
-                else:
-                    contract_afn += contract_payments
-
-            # ── TOTALS (no conversion)
-            project_total_usd = spent_usd_expenses + contract_usd
-            project_total_afn = spent_afn_expenses + contract_afn
-
-            # ── GLOBAL SUMS
-            total_budget += budget
-            if budget_currency == "USD":
-                total_budget_usd += budget
-            else:
-                total_budget_afn += budget
-            total_spent_usd += project_total_usd
-            total_spent_afn += project_total_afn
-=======
             summary["total_projects"] += 1
             summary["total_expenses_usd"] += expenses["equivalent_usd"]
             summary["total_expenses_afn"] += expenses["equivalent_afn"]
@@ -216,7 +175,6 @@ class ProjectSummaryReport(BaseReport):
             summary["total_worker_payroll_afn"] += worker_payroll["net"]["AFN"]
             summary["total_spent_usd"] += total_spent_usd
             summary["total_spent_afn"] += total_spent_afn
->>>>>>> recovery
 
             rows.append({
                 "id": project.id,
@@ -230,19 +188,14 @@ class ProjectSummaryReport(BaseReport):
                 "actual_completion_date": project.actual_completion_date,
                 "estimated_budget": budget,
                 "budget_currency": budget_currency,
-<<<<<<< HEAD
-=======
                 "budget_remaining_usd": remaining_usd,
                 "budget_remaining_afn": remaining_afn,
                 "budget_remaining": remaining_usd if budget_currency == "USD" else remaining_afn,
->>>>>>> recovery
-
                 "expense_count": expenses["count"],
                 "raw_expenses_usd": expenses["raw_usd"],
                 "raw_expenses_afn": expenses["raw_afn"],
                 "expenses_usd": expenses["equivalent_usd"],
                 "expenses_afn": expenses["equivalent_afn"],
-
                 "contract_count": contracts["count"],
                 "contracts_value_usd": contracts["value"]["USD"],
                 "contracts_value_afn": contracts["value"]["AFN"],
@@ -250,42 +203,6 @@ class ProjectSummaryReport(BaseReport):
                 "contracts_afn": contracts["paid"]["AFN"],
                 "contracts_remaining_usd": contracts["remaining"]["USD"],
                 "contracts_remaining_afn": contracts["remaining"]["AFN"],
-
-<<<<<<< HEAD
-                # ── TOTAL SPENT (SEPARATED CURRENCIES)
-                "total_spent_usd": project_total_usd,
-                "total_spent_afn": project_total_afn,
-
-                "expense_count": p.expense_count,
-
-                "budget_remaining": (
-                    budget - project_total_usd
-                    if budget_currency == "USD"
-                    else budget - project_total_afn
-                ),
-            })
-
-        # ─────────────────────────────────────────────
-        # Status breakdown
-        # ─────────────────────────────────────────────
-        status_breakdown = list(
-            qs.values("status")
-              .annotate(count=Count("id"))
-              .order_by("status")
-        )
-
-        # ─────────────────────────────────────────────
-        # Final response
-        # ─────────────────────────────────────────────
-        return {
-            **self.get_metadata(),
-
-            "summary": {
-                "total_projects": len(rows),
-                "total_estimated_budget": total_budget,
-                "total_estimated_budget_usd": total_budget_usd,
-                "total_estimated_budget_afn": total_budget_afn,
-=======
                 "worker_payroll_count": worker_payroll["count"],
                 "worker_payroll_gross_usd": worker_payroll["gross"]["USD"],
                 "worker_payroll_gross_afn": worker_payroll["gross"]["AFN"],
@@ -295,8 +212,6 @@ class ProjectSummaryReport(BaseReport):
                 "worker_payroll_deductions_afn": worker_payroll["deductions"]["AFN"],
                 "worker_payroll_usd": worker_payroll["net"]["USD"],
                 "worker_payroll_afn": worker_payroll["net"]["AFN"],
->>>>>>> recovery
-
                 "total_spent_usd": total_spent_usd,
                 "total_spent_afn": total_spent_afn,
             })

@@ -38,14 +38,9 @@ export const REPORTS = {
       { key: "status", label: "Status", type: "badge" },
       { key: "total_floors", label: "Floors", type: "number" },
       { key: "estimated_budget", label: "Budget", type: "currency" },
-<<<<<<< HEAD
-      { key: "budget_currency", label: "Cur" },
-      { key: "total_expense_usd", label: "Spent (USD)", type: "currency" },
-      { key: "budget_remaining", label: "Remaining", type: "currency" },
-=======
       { key: "budget_currency", label: "Budget Cur" },
-      { key: "expenses_usd", label: "Expenses USD Eq.", type: "currency" },
-      { key: "expenses_afn", label: "Expenses AFN Eq.", type: "currency" },
+      { key: "expenses_usd", label: "Expenses USD", type: "currency" },
+      { key: "expenses_afn", label: "Expenses AFN", type: "currency" },
       { key: "contracts_usd", label: "Contract Paid USD", type: "currency" },
       { key: "contracts_afn", label: "Contract Paid AFN", type: "currency" },
       { key: "worker_payroll_usd", label: "Worker Payroll USD", type: "currency" },
@@ -53,7 +48,6 @@ export const REPORTS = {
       { key: "total_spent_usd", label: "Total USD", type: "currency" },
       { key: "total_spent_afn", label: "Total AFN", type: "currency" },
       { key: "expense_count", label: "Expenses", type: "number" },
->>>>>>> recovery
     ],
   },
 
@@ -338,8 +332,8 @@ export const REPORTS = {
       { key: "project", label: "Project" },
       { key: "budget", label: "Budget", type: "currency" },
       { key: "budget_currency", label: "Budget Cur" },
-      { key: "expenses_usd", label: "Expenses USD Eq.", type: "currency" },
-      { key: "expenses_afn", label: "Expenses AFN Eq.", type: "currency" },
+      { key: "expenses_usd", label: "Expenses USD", type: "currency" },
+      { key: "expenses_afn", label: "Expenses AFN", type: "currency" },
       { key: "worker_payroll_usd", label: "Worker Payroll USD", type: "currency" },
       { key: "worker_payroll_afn", label: "Worker Payroll AFN", type: "currency" },
       { key: "contract_value_usd", label: "Contract Value USD", type: "currency" },

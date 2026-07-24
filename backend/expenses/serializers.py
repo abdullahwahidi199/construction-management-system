@@ -94,6 +94,7 @@ class ExpenseSerializer(CalendarModelSerializer):
 
 class ProjectExpenseSerializer(CalendarModelSerializer):
     calendar_module = "expenses"
+
     class Meta:
         model = Expense
         fields = [
@@ -102,8 +103,6 @@ class ProjectExpenseSerializer(CalendarModelSerializer):
             "total_usd",
             "total_afn"
         ]
-<<<<<<< HEAD
-=======
 
 
 class ExpenseApprovalActionSerializer(serializers.Serializer):
@@ -121,4 +120,3 @@ class ExpenseApprovalSettingsSerializer(serializers.Serializer):
         if isinstance(instance, dict):
             return {"enabled": bool(instance.get("enabled", False))}
         return {"enabled": is_expense_approval_enabled()}
->>>>>>> recovery

@@ -132,15 +132,11 @@ class DashboardService:
             )
             estimated = float(project.estimated_budget)
             budget_currency = project.budget_currency
-<<<<<<< HEAD
             comparable_spent = (
                 total_expense_usd
                 if budget_currency == "USD"
                 else total_expense_afn
             )
-=======
-            comparable_spent = total_expense_usd if budget_currency == "USD" else total_expense_afn
->>>>>>> recovery
 
             results.append({
                 "id": project.id,
@@ -151,7 +147,6 @@ class DashboardService:
                 "total_spent_usd": round(total_expense_usd, 2),
                 "total_spent_afn": round(total_expense_afn, 2),
                 "budget_remaining": round(estimated - comparable_spent, 2),
-<<<<<<< HEAD
                 "budget_remaining_usd": (
                     round(estimated - total_expense_usd, 2)
                     if budget_currency == "USD" else None
@@ -160,10 +155,6 @@ class DashboardService:
                     round(estimated - total_expense_afn, 2)
                     if budget_currency == "AFN" else None
                 ),
-=======
-                "budget_remaining_usd": round(estimated - total_expense_usd, 2) if budget_currency == "USD" else None,
-                "budget_remaining_afn": round(estimated - total_expense_afn, 2) if budget_currency == "AFN" else None,
->>>>>>> recovery
                 "budget_utilization_pct": round(
                     (comparable_spent / estimated * 100)
                     if estimated > 0 else 0, 1
