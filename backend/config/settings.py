@@ -38,7 +38,7 @@ def env_list(name, default=None):
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_bool("DJANGO_DEBUG", True)
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY WARNING: keep the secret key used in production secret!!!
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "django-insecure-c3mgpze0q&kse)nj8%zisw883f0-x^2!%wql_1k3j7w&de-5pv",
