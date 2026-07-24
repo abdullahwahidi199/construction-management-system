@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import instance, { setAuthToken } from "../api/axiosInstance";
+import instance, {
+  SESSION_EXPIRED_EVENT,
+  setAuthToken,
+} from "../api/axiosInstance";
 
 const AuthContext = createContext(null);
 const TOKEN_KEY = "cms.auth.token";
@@ -12,6 +15,25 @@ export function AuthProvider({ children }) {
     return stored ? JSON.parse(stored) : null;
   });
   const [initializing, setInitializing] = useState(Boolean(token));
+
+  const clearSession = () => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    setAuthToken(null);
+    setToken(null);
+    setUser(null);
+  };
+
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      clearSession();
+    };
+
+    window.addEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
+    return () => {
+      window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
+    };
+  }, []);
 
   useEffect(() => {
     setAuthToken(token);
@@ -27,11 +49,7 @@ export function AuthProvider({ children }) {
         localStorage.setItem(USER_KEY, JSON.stringify(res.data));
       })
       .catch(() => {
-        setToken(null);
-        setUser(null);
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
-        setAuthToken(null);
+        clearSession();
       })
       .finally(() => setInitializing(false));
   }, [token]);
@@ -50,11 +68,7 @@ export function AuthProvider({ children }) {
     try {
       await instance.post("auth/logout/");
     } finally {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(USER_KEY);
-      setAuthToken(null);
-      setToken(null);
-      setUser(null);
+      clearSession();
     }
   };
 

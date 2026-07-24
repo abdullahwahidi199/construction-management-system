@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { REPORTS } from "../../../config/reportConfig";
 import useReport from "../../../hooks/useReport";
 import { useLanguage } from "../../../hooks/useLanguage";
+import useRealtimeEvents from "../../../hooks/useRealtimeEvents";
 import ReportBreakdowns from "../../reports/ReportBreakdowns";
 import ReportFilters from "../../reports/ReportFilters";
 import ReportSidebar from "../../reports/ReportSidebar";
@@ -26,6 +27,12 @@ export default function ReportsPage() {
     fetchReport({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeKey]);
+
+  useRealtimeEvents((message) => {
+    if (message.event?.startsWith("expense.")) {
+      fetchReport(filterValues);
+    }
+  });
 
   const handleSelectReport = (key) => {
     setActiveKey(key);

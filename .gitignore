@@ -1,19 +1,24 @@
 # Python
 __pycache__/
-*.pyc
-env/
+*.py[cod]
+*.sqlite3
+.env
 venv/
+.env.*
 
 # Django
-db.sqlite3
 media/
+staticfiles/
 
-# Environment variables
-.env
-
-# React
+# Node
 node_modules/
-build/
+dist/
 
-# OS
+# VSCode
+.vscode/
+
+# macOS
 .DS_Store
+
+# Logs
+*.log

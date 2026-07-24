@@ -3,9 +3,11 @@ import useAttendance from "../../../hooks/useAttendance";
 import { Download } from "lucide-react";
 import instance from "../../../api/axiosInstance";
 import { useLanguage } from "../../../hooks/useLanguage";
+import ConfirmDialog from "../../common/ConfirmDialog";
+import toast from "react-hot-toast";
 
 function AttendanceList() {
-  const { loading, error, setError, fetchAttendance, deleteAttendance } =
+  const { loading, error, setError, fetchAttendance, updateAttendance, deleteAttendance } =
     useAttendance();
 
   const [attendance, setAttendance] = useState([]);
@@ -20,6 +22,7 @@ function AttendanceList() {
   const [showFilters, setShowFilters] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const { t, language, lang, isRTL: isRtlHook } = useLanguage();
   const currentLang = (language || lang || "").toLowerCase();
@@ -37,7 +40,7 @@ function AttendanceList() {
       const data = await fetchAttendance(filters);
       setAttendance(data.results || data);
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
   const handleDownloadAttendancePDF = async () => {
@@ -72,19 +75,25 @@ function AttendanceList() {
       link.remove();
 
       window.URL.revokeObjectURL(url);
+      toast.success("Attendance report exported.");
     } catch (error) {
-      console.error(t("AttendanceList.pdfDownloadFailed"), error);
+      toast.error(t("AttendanceList.pdfDownloadFailed"));
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm(t("AttendanceList.deleteConfirmation"))) {
-      try {
-        await deleteAttendance(id);
-        loadAttendance();
-      } catch (err) {
-        console.error(err);
-      }
+    setDeleteTarget(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteAttendance(deleteTarget);
+      toast.success("Attendance record deleted.");
+      setDeleteTarget(null);
+      loadAttendance();
+    } catch (err) {
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -101,11 +110,12 @@ function AttendanceList() {
 
   const handleSaveEdit = async (id) => {
     try {
-      await fetchAttendance.updateAttendance(id, editForm);
+      await updateAttendance(id, editForm);
       setEditingId(null);
+      toast.success("Attendance updated.");
       loadAttendance();
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -166,6 +176,15 @@ function AttendanceList() {
 
   return (
     <div className="space-y-6">
+      <ConfirmDialog
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        title="Delete attendance record"
+        message={t("AttendanceList.deleteConfirmation")}
+        loading={loading}
+        confirmLabel="Delete"
+      />
       <button
         onClick={handleDownloadAttendancePDF}
         className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] px-4 py-2"

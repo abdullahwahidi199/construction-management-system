@@ -52,7 +52,7 @@ class FinancialOverviewReport(BaseReport):
     report_name = "Financial Overview Report"
 
     def _expense_queryset(self):
-        qs = Expense.objects.select_related("project")
+        qs = Expense.objects.approved().select_related("project")
         project_id = self.filters.get("project_id")
         start, end = self.get_date_range()
 

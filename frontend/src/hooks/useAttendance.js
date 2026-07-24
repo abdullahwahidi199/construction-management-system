@@ -1,5 +1,6 @@
 import { useState } from "react";
 import instance from "../api/axiosInstance";
+import { getFriendlyErrorMessage } from "../utils/apiErrors";
 
 export default function useAttendance() {
   const [loading, setLoading] = useState(false);
@@ -14,9 +15,7 @@ export default function useAttendance() {
       const res = await instance.get(url);
       return res.data;
     } catch (err) {
-      const message =
-        err?.response?.data || err?.message || "Failed to fetch attendance";
-      setError(message);
+      setError(getFriendlyErrorMessage(err, "Unable to load attendance."));
       throw err;
     } finally {
       setLoading(false);
@@ -30,9 +29,7 @@ export default function useAttendance() {
       const res = await instance.post("/attendance/", data);
       return res.data;
     } catch (err) {
-      const message =
-        err?.response?.data || err?.message || "Failed to create attendance";
-      setError(message);
+      setError(getFriendlyErrorMessage(err, "Unable to save attendance."));
       throw err;
     } finally {
       setLoading(false);
@@ -46,9 +43,7 @@ export default function useAttendance() {
       const res = await instance.put(`/attendance/${id}/`, data);
       return res.data;
     } catch (err) {
-      const message =
-        err?.response?.data || err?.message || "Failed to update attendance";
-      setError(message);
+      setError(getFriendlyErrorMessage(err, "Unable to save attendance."));
       throw err;
     } finally {
       setLoading(false);
@@ -62,9 +57,7 @@ export default function useAttendance() {
       await instance.delete(`/attendance/${id}/`);
       return { success: true };
     } catch (err) {
-      const message =
-        err?.response?.data || err?.message || "Failed to delete attendance";
-      setError(message);
+      setError(getFriendlyErrorMessage(err, "Unable to delete attendance."));
       throw err;
     } finally {
       setLoading(false);
@@ -78,9 +71,7 @@ export default function useAttendance() {
       const res = await instance.post("/attendance/bulk_mark/", data);
       return res.data;
     } catch (err) {
-      const message =
-        err?.response?.data || err?.message || "Failed to bulk mark attendance";
-      setError(message);
+      setError(getFriendlyErrorMessage(err, "Unable to save attendance."));
       throw err;
     } finally {
       setLoading(false);
@@ -94,11 +85,7 @@ export default function useAttendance() {
       const res = await instance.get(`/attendance/daily/?date=${date}`);
       return res.data;
     } catch (err) {
-      const message =
-        err?.response?.data ||
-        err?.message ||
-        "Failed to fetch daily attendance";
-      setError(message);
+      setError(getFriendlyErrorMessage(err, "Unable to load daily attendance."));
       throw err;
     } finally {
       setLoading(false);
@@ -113,11 +100,7 @@ export default function useAttendance() {
       const res = await instance.get(`/attendance/summary/?${params}`);
       return res.data;
     } catch (err) {
-      const message =
-        err?.response?.data ||
-        err?.message ||
-        "Failed to fetch monthly summary";
-      setError(message);
+      setError(getFriendlyErrorMessage(err, "Unable to load monthly summary."));
       throw err;
     } finally {
       setLoading(false);

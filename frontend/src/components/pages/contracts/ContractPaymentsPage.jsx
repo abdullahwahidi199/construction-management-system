@@ -10,6 +10,7 @@ import Button from "../../ui/Button";
 import DeleteConfirmModal from "../../ui/DeleteConfirmModal";
 import PaymentTable from "../../contracts/PaymentTable";
 import PaymentFormModal from "../../contracts/PaymentFormModal";
+import toast from "react-hot-toast";
 const TYPE_FILTER_OPTIONS = [
   { value: "", label: "All Types" },
   { value: "advance", label: "Advance" },
@@ -49,8 +50,9 @@ export default function ContractPaymentsPage() {
       setEditingPayment(null);
       setShowForm(false);
       refetch();
+      toast.success("Payment updated.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -61,8 +63,9 @@ export default function ContractPaymentsPage() {
       await instance.delete(`contract-payments/${deletingPayment.id}/`);
       setDeletingPayment(null);
       refetch();
+      toast.success("Payment deleted.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     } finally {
       setDeleteLoading(false);
     }

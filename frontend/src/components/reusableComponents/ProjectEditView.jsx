@@ -8,11 +8,13 @@ import {
   RotateCcw,
   Info,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import instance from "../../api/axiosInstance";
 import Input from "../ui/Input";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import Button from "../ui/Button";
 import { useLanguage } from "../../hooks/useLanguage";
+import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 
 export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
   const [form, setForm] = useState({
@@ -109,7 +111,9 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
       setOriginalForm(populated);
       setHasChanges(false);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to load project details");
+      setError(
+        getFriendlyErrorMessage(err, "The requested item could not be found."),
+      );
     } finally {
       setFetching(false);
     }
@@ -153,20 +157,10 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
 
       const payload = sanitizeForm(form);
       await instance.put(`/projects/${projectId}/`, payload);
+      toast.success("Project updated.");
       onSaved && onSaved();
     } catch (err) {
-      const data = err.response?.data;
-      if (data && typeof data === "object" && !Array.isArray(data)) {
-        const messages = Object.entries(data)
-          .map(
-            ([key, val]) =>
-              `${key}: ${Array.isArray(val) ? val.join(", ") : val}`,
-          )
-          .join(" | ");
-        setError(messages);
-      } else {
-        setError("Failed to update project. Please try again.");
-      }
+      setError(getFriendlyErrorMessage(err, "Unable to save changes."));
     } finally {
       setLoading(false);
     }
@@ -280,7 +274,6 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
             id="project-edit-form"
             onSubmit={handleSubmit}
             className="flex-1 overflow-y-auto px-7 py-6"
-            noValidate
           >
             {/* Error Alert */}
             {error && (

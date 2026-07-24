@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import instance from "../api/axiosInstance";
+import { getFriendlyErrorMessage } from "../utils/apiErrors";
 
 export default function useReport(endpoint) {
   const [data, setData] = useState(null);
@@ -27,7 +28,7 @@ export default function useReport(endpoint) {
         });
         setData(res.data);
       } catch (err) {
-        setError(err);
+        setError(getFriendlyErrorMessage(err, "Unable to load report."));
         setData(null);
       } finally {
         setLoading(false);
@@ -56,7 +57,7 @@ export default function useReport(endpoint) {
         link.remove();
         window.URL.revokeObjectURL(url);
       } catch (err) {
-        setError(err);
+        setError(getFriendlyErrorMessage(err, "Unable to export report."));
       } finally {
         setExporting(false);
       }

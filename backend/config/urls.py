@@ -73,6 +73,7 @@ urlpatterns = [
     path('api/contracts/', include("subcontractor.urls")),
     path('api/dashboard/', include("dashboard.urls")),
     path('api/reports/', include("reports.urls")),
+    path('api/notifications/', include("notifications.urls")),
     path('api/audit/', include("audit.urls")),
     path('api/schema/', schema_view, name="openapi-schema"),
     path('api/docs/swagger/', swagger_ui, name="swagger-ui"),

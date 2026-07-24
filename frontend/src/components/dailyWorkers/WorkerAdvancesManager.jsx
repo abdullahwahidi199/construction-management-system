@@ -3,6 +3,9 @@ import { Edit2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { hasAnyPermission } from "../../../utils/permissions";
+import ConfirmDialog from "../common/ConfirmDialog";
+import { getFriendlyErrorMessage } from "../../utils/apiErrors";
+import toast from "react-hot-toast";
 
 const blankAdvance = {
   worker: "",
@@ -42,6 +45,7 @@ export default function WorkerAdvancesManager() {
   const [statusFilter, setStatusFilter] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedAdvance, setSelectedAdvance] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const load = async () => {
     const params = {};
@@ -56,7 +60,7 @@ export default function WorkerAdvancesManager() {
   };
 
   useEffect(() => {
-    load().catch(console.error);
+    load().catch(() => {});
   }, [workerFilter, statusFilter]);
 
   const summary = useMemo(
@@ -80,8 +84,10 @@ export default function WorkerAdvancesManager() {
   const handleSubmit = async (payload) => {
     if (selectedAdvance?.id) {
       await updateAdvance(selectedAdvance.id, payload);
+      toast.success("Advance updated.");
     } else {
       await createAdvance(payload);
+      toast.success("Advance created.");
     }
     setModalOpen(false);
     setSelectedAdvance(null);
@@ -89,9 +95,19 @@ export default function WorkerAdvancesManager() {
   };
 
   const handleDelete = async (advance) => {
-    if (!window.confirm(`Delete advance for ${advance.worker_name}?`)) return;
-    await deleteAdvance(advance.id);
-    await load();
+    setDeleteTarget(advance);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteAdvance(deleteTarget.id);
+      toast.success("Advance deleted.");
+      setDeleteTarget(null);
+      await load();
+    } catch {
+      // Central axios handling shows the user-facing error.
+    }
   };
 
   return (
@@ -106,6 +122,15 @@ export default function WorkerAdvancesManager() {
         advance={selectedAdvance}
         workers={workers}
         loading={loading}
+      />
+      <ConfirmDialog
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        title="Delete advance"
+        message={`Delete advance for ${deleteTarget?.worker_name || "this worker"}? This action cannot be undone.`}
+        loading={loading}
+        confirmLabel="Delete"
       />
 
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -344,8 +369,7 @@ function AdvanceModal({ open, onClose, onSubmit, advance, workers, loading }) {
     try {
       await onSubmit(payload);
     } catch (err) {
-      console.error(err);
-      setError("Please check the advance details and try again.");
+      setError(getFriendlyErrorMessage(err, "Please check the advance details and try again."));
     }
   };
 

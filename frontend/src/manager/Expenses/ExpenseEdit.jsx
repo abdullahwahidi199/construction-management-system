@@ -3,6 +3,7 @@ import { X, Save, DollarSign, User, FileText, Calendar } from "lucide-react";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import Button from "../../components/ui/Button";
 import { useLanguage } from "../../hooks/useLanguage";
+import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -102,8 +103,9 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
       await onSave?.(updatedExpense);
       onClose();
     } catch (error) {
-      console.error("Failed to save expense:", error);
-      setErrors({ submit: t("ExpenseEdit.saveFailed") });
+      setErrors({
+        submit: getFriendlyErrorMessage(error, t("ExpenseEdit.saveFailed")),
+      });
     } finally {
       setIsSubmitting(false);
     }

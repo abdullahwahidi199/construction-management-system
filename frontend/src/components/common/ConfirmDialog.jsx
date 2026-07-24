@@ -7,6 +7,9 @@ export default function ConfirmDialog({
   title,
   message,
   loading = false,
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
+  destructive = true,
 }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
@@ -23,15 +26,15 @@ export default function ConfirmDialog({
             color: "var(--text)",
           }}
         >
-          Cancel
+          {cancelLabel}
         </button>
         <button
           onClick={onConfirm}
           disabled={loading}
           className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors disabled:opacity-50"
-          style={{ backgroundColor: "var(--danger)" }}
+          style={{ backgroundColor: destructive ? "var(--danger)" : "var(--primary)" }}
         >
-          {loading ? "Processing..." : "Confirm"}
+          {loading ? "Processing..." : confirmLabel}
         </button>
       </div>
     </Modal>

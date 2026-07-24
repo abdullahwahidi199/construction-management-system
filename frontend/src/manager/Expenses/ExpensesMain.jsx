@@ -26,10 +26,11 @@ import usePost from "../../hooks/usePost";
 import useDelete from "../../hooks/useDelete";
 import ExpenseList from "./ExpenseList";
 import instance from "../../api/axiosInstance";
-import { use } from "react";
 import ExpenseCreateModal from "./ExpenseCreateModal";
 import { useLanguage } from "../../hooks/useLanguage";
+import useRealtimeEvents from "../../hooks/useRealtimeEvents";
 import Button from "../../components/ui/Button";
+import toast from "react-hot-toast";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -43,6 +44,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterProject, setFilterProject] = useState("");
   const [filterType, setFilterType] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
   const [filterDateFrom, setFilterDateFrom] = useState("");
   const [filterDateTo, setFilterDateTo] = useState("");
   const [sortBy, setSortBy] = useState("-expense_date");
@@ -70,6 +72,9 @@ export default function ExpensesMain({ dataEntryMode = false }) {
     }
     if (filterType) {
       params.append("expense_type", filterType);
+    }
+    if (filterStatus) {
+      params.append("status", filterStatus);
     }
     if (filterDateFrom) {
       params.append("expense_date__gte", filterDateFrom);
@@ -101,8 +106,9 @@ export default function ExpensesMain({ dataEntryMode = false }) {
       await postData("expenses/", formData);
       setOpen(false);
       refetch();
+      toast.success("Expense submitted successfully.");
     } catch (err) {
-      console.log(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -110,8 +116,9 @@ export default function ExpensesMain({ dataEntryMode = false }) {
     try {
       await deleteData(`expenses/${id}/`);
       refetch();
+      toast.success("Expense deleted.");
     } catch (err) {
-      console.log(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -119,12 +126,18 @@ export default function ExpensesMain({ dataEntryMode = false }) {
     try {
       await instance.put(`expenses/${id}/`, updatedData);
       refetch();
+      toast.success("Expense updated.");
     } catch (err) {
-      console.log(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
   const handleExportPdf = async () => {
+    if (filterStatus && filterStatus !== "approved") {
+      toast.error("Only approved expenses can be exported.");
+      return;
+    }
+
     try {
       const response = await instance.get(
         `/expenses/export-pdf/?${queryString}`,
@@ -143,8 +156,10 @@ export default function ExpensesMain({ dataEntryMode = false }) {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Expense report exported.");
     } catch (error) {
-      console.error(error);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -159,6 +174,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
     setDebouncedSearch("");
     setFilterProject("");
     setFilterType("");
+    setFilterStatus("");
     setFilterDateFrom("");
     setFilterDateTo("");
     setSortBy("-expense_date");
@@ -169,6 +185,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
     debouncedSearch,
     filterProject,
     filterType,
+    filterStatus,
     filterDateFrom,
     filterDateTo,
     sortBy !== "-expense_date",
@@ -273,6 +290,13 @@ export default function ExpensesMain({ dataEntryMode = false }) {
   ];
 
   const averageUSD = count > 0 ? totals.usd / count : 0;
+  const exportBlocked = filterStatus && filterStatus !== "approved";
+
+  useRealtimeEvents((message) => {
+    if (message.event?.startsWith("expense.")) {
+      refetch();
+    }
+  });
 
   // RTL-aware pagination icons
   const FirstPageIcon = isRTL ? ChevronsRight : ChevronsLeft;
@@ -321,7 +345,12 @@ export default function ExpensesMain({ dataEntryMode = false }) {
             <Plus className="h-4 w-4" strokeWidth={2.5} />
             {t("ExpensesMain.newExpense")}
           </button>
-          <Button variant="secondary" onClick={handleExportPdf}>
+          <Button
+            variant="secondary"
+            onClick={handleExportPdf}
+            disabled={exportBlocked}
+            title={exportBlocked ? "Only approved expenses can be exported." : ""}
+          >
             {t("ProjectDetails.downloadPdf")}
           </Button>
         </div>
@@ -543,7 +572,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
 
         {/* Expanded Filters */}
         {showFilters && (
-          <div className="mt-4 grid grid-cols-1 gap-3 border-t border-[var(--border)] pt-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-4 grid grid-cols-1 gap-3 border-t border-[var(--border)] pt-4 sm:grid-cols-2 lg:grid-cols-5">
             {/* Project Filter */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-[var(--muted)]">
@@ -587,6 +616,26 @@ export default function ExpensesMain({ dataEntryMode = false }) {
                     {type.label}
                   </option>
                 ))}
+              </select>
+            </div>
+
+            {/* Approval Status Filter */}
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--muted)]">
+                Approval Status
+              </label>
+              <select
+                value={filterStatus}
+                onChange={(e) => {
+                  setFilterStatus(e.target.value);
+                  setPage(1);
+                }}
+                className="h-10 w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 text-sm text-[var(--text)] transition-all focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 cursor-pointer"
+              >
+                <option value="">All statuses</option>
+                <option value="approved">Approved</option>
+                <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
               </select>
             </div>
 
@@ -636,7 +685,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
 
             {/* Clear Filters Button */}
             {activeFilterCount > 0 && (
-              <div className="flex items-end sm:col-span-2 lg:col-span-4">
+              <div className="flex items-end sm:col-span-2 lg:col-span-5">
                 <button
                   onClick={clearAllFilters}
                   className="inline-flex h-10 items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 text-sm font-medium text-red-600 transition-all hover:bg-red-100 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
@@ -686,6 +735,17 @@ export default function ExpensesMain({ dataEntryMode = false }) {
                   filterType}
                 <button
                   onClick={() => setFilterType("")}
+                  className="ms-1 hover:text-[var(--primary)]/70"
+                >
+                  <X className="h-3 w-3" strokeWidth={2.5} />
+                </button>
+              </span>
+            )}
+            {filterStatus && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-[var(--primary)]/10 px-2.5 py-1 text-xs font-medium text-[var(--primary)]">
+                Status {filterStatus}
+                <button
+                  onClick={() => setFilterStatus("")}
                   className="ms-1 hover:text-[var(--primary)]/70"
                 >
                   <X className="h-3 w-3" strokeWidth={2.5} />

@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     CalendarSettingsView,
+    CustomRoleViewSet,
     LoginView,
     LogoutView,
     MeView,
@@ -17,6 +18,7 @@ from .views import (
 
 router = DefaultRouter()
 router.register("users", UserViewSet, basename="users")
+router.register("roles", CustomRoleViewSet, basename="roles")
 router.register(
     "permissions",
     PermissionViewSet

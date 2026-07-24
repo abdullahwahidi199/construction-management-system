@@ -15,6 +15,12 @@ import { useLanguage } from "../../hooks/useLanguage";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
+const approvalStyles = {
+  pending: "bg-amber-500/10 text-amber-700 dark:text-amber-300",
+  approved: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+  rejected: "bg-red-500/10 text-red-700 dark:text-red-300",
+};
+
 export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
   const { t, lang } = useLanguage();
   const isRTL = RTL_LANGS.includes(lang);
@@ -77,8 +83,13 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-3 py-1.5 text-sm font-medium text-blue-600">
                 {expense.expense_type || t("ExpenseDetail.general")}
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-sm font-medium text-emerald-600">
-                {t("ExpenseDetail.active")}
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium capitalize ${
+                  approvalStyles[expense.approval_status] ||
+                  approvalStyles.approved
+                }`}
+              >
+                {expense.approval_status || "approved"}
               </span>
             </div>
 
@@ -225,6 +236,34 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                 </div>
               </div>
             )}
+
+            <div className="rounded-xl border border-[var(--border)] p-4">
+              <p className="mb-3 text-sm font-medium text-[var(--muted)]">
+                Approval History
+              </p>
+              <div className="space-y-3">
+                {(expense.approval_history || []).map((entry, index) => (
+                  <div key={`${entry.status}-${index}`} className="border-l-2 border-[var(--border)] pl-3">
+                    <p className="text-sm font-semibold capitalize text-[var(--text)]">
+                      {entry.status}
+                    </p>
+                    <p className="text-xs text-[var(--muted)]">
+                      {formatDateTime(entry.at)} · {entry.by || "-"}
+                    </p>
+                    {entry.notes && (
+                      <p className="mt-1 text-sm text-[var(--text)]">
+                        {entry.notes}
+                      </p>
+                    )}
+                  </div>
+                ))}
+                {expense.approval_status === "rejected" && expense.approval_notes && (
+                  <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-600">
+                    {expense.approval_notes}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

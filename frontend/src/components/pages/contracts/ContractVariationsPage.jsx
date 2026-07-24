@@ -9,6 +9,7 @@ import Button from "../../ui/Button";
 import DeleteConfirmModal from "../../ui/DeleteConfirmModal";
 import VariationTable from "../../contracts/VariationTable";
 import VariationFormModal from "../../contracts/VariationFormModal";
+import toast from "react-hot-toast";
 export default function ContractVariationsPage() {
   const navigate = useNavigate();
 
@@ -41,8 +42,9 @@ export default function ContractVariationsPage() {
       setEditingVariation(null);
       setShowForm(false);
       refetch();
+      toast.success("Variation updated.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -53,9 +55,10 @@ export default function ContractVariationsPage() {
       await instance.patch(`contract-variations/${variation.id}/`, {
         approved: true,
       });
+      toast.success("Variation approved.");
       refetch();
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -66,8 +69,9 @@ export default function ContractVariationsPage() {
       await instance.delete(`contract-variations/${deletingVariation.id}/`);
       setDeletingVariation(null);
       refetch();
+      toast.success("Variation deleted.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     } finally {
       setActionLoading(false);
     }

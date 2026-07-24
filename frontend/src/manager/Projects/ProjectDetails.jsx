@@ -28,6 +28,8 @@ import DeleteConfirmModal from "../../components/ui/DeleteConfirmModal";
 import Button from "../../components/ui/Button";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
+import useRealtimeEvents from "../../hooks/useRealtimeEvents";
+import toast from "react-hot-toast";
 const getStatusConfig = (status, t) => {
   const s = status?.toLowerCase();
   if (s === "active" || s === "in progress")
@@ -210,7 +212,7 @@ export default function ProjectDetails() {
       const response = await instance.get(`/projects/${id}/`);
       setProjectDetails(response.data);
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+      setError(err.userMessage || "The requested item could not be found.");
     } finally {
       setLoading(false);
     }
@@ -220,15 +222,25 @@ export default function ProjectDetails() {
     fetchProjectDetails();
   }, [id]);
 
+  useRealtimeEvents((message) => {
+    if (
+      message.event?.startsWith("expense.") &&
+      String(message.payload?.project_id) === String(id)
+    ) {
+        fetchProjectDetails();
+    }
+  });
+
   /* ── Delete handler ────────────────────────────── */
   const handleDelete = async () => {
     try {
       setDeleting(true);
       await instance.delete(`/projects/${id}/`);
       setDeleteOpen(false);
+      toast.success("Project deleted.");
       navigate("/manager/projects");
     } catch (err) {
-      console.error(err.message);
+      // Central axios handling shows the user-facing error.
     } finally {
       setDeleting(false);
     }
@@ -249,8 +261,10 @@ export default function ProjectDetails() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Project PDF downloaded.");
     } catch (err) {
-      console.error("PDF download failed:", err);
+      // Central axios handling shows the user-facing error.
     }
   };
   const formatAFN = (amount) => {
@@ -635,7 +649,7 @@ export default function ProjectDetails() {
               <span>{formatDate(project.start_date)}</span>
               {project.expected_completion_date && (
                 <span>
-                  {formatRelativeDate(project.expected_completion_date)}
+                  {formatRelativeDate(project.expected_completion_date, t)}
                 </span>
               )}
             </div>

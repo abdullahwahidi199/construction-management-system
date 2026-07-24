@@ -1,4 +1,3 @@
-import "./App.css";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -6,9 +5,10 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import RootLayout from "./RootLayout";
+import { NotFoundPage, UnauthorizedPage } from "./components/common/StatusPage";
 import LoginPage from "./auth/LoginPage";
 import { ProtectedRoute, RoleRedirect } from "./auth/ProtectedRoute";
-import { ROLES } from "./auth/roles";
+import { ADMIN_PANEL_PERMISSIONS, OPERATIONAL_PERMISSIONS, ROLES } from "./auth/roles";
 import AdminRootLayout from "./admin/AdminRootLayout";
 import AdminDashboard from "./admin/AdminDashboard";
 import UserManagement from "./admin/UserManagement";
@@ -21,6 +21,7 @@ import ManagerRootLayout from "./manager/ManagerRootLayout";
 import ProjectsBase from "./manager/Projects/ProjectsBase";
 import ProjectDetails from "./manager/Projects/ProjectDetails";
 import ExpensesMain from "./manager/Expenses/ExpensesMain";
+import ExpenseApprovalsPage from "./manager/Expenses/ExpenseApprovalsPage";
 import EmployeesPage from "./components/pages/EmployeesPage";
 import PayrollPage from "./components/pages/PayrollPage";
 import AttendanceLayout from "./components/pages/attendance/AttendanceLayout";
@@ -40,8 +41,16 @@ const router = createBrowserRouter(
     <Route path="/" element={<RootLayout />}>
       <Route index element={<RoleRedirect />} />
       <Route path="login" element={<LoginPage />} />
+      <Route path="unauthorized" element={<UnauthorizedPage />} />
 
-      <Route element={<ProtectedRoute roles={[ROLES.ADMIN]} />}>
+      <Route
+        element={
+          <ProtectedRoute
+            roles={[ROLES.ADMIN]}
+            permissions={ADMIN_PANEL_PERMISSIONS}
+          />
+        }
+      >
         <Route path="admin" element={<AdminRootLayout />}>
           <Route index element={<RoleRedirect />} />
           <Route path="dashboard" element={<AdminDashboard />} />
@@ -52,7 +61,14 @@ const router = createBrowserRouter(
         </Route>
       </Route>
 
-      <Route element={<ProtectedRoute roles={[ROLES.ADMIN, ROLES.MANAGER]} />}>
+      <Route
+        element={
+          <ProtectedRoute
+            roles={[ROLES.ADMIN, ROLES.MANAGER]}
+            permissions={OPERATIONAL_PERMISSIONS}
+          />
+        }
+      >
         <Route path="manager" element={<ManagerRootLayout />}>
           <Route index element={<RoleRedirect />} />
           <Route path="dashboard" element={<Dashboard />} />
@@ -61,6 +77,7 @@ const router = createBrowserRouter(
           <Route path="projects/:id" element={<ProjectDetails />} />
 
           <Route path="expenses" element={<ExpensesMain />} />
+          <Route path="expense-approvals" element={<ExpenseApprovalsPage />} />
           <Route path="employees" element={<EmployeesPage />} />
           <Route path="daily-workers" element={<DailyWorkersLayout />} />
 
@@ -123,6 +140,8 @@ const router = createBrowserRouter(
           <Route path="reports" element={<ReportsPage />} />
         </Route>
       </Route>
+
+      <Route path="*" element={<NotFoundPage />} />
     </Route>,
   ),
 );

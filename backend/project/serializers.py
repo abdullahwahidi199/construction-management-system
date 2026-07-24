@@ -30,12 +30,12 @@ class ProjectSerializer(CalendarModelSerializer):
 
     def get_total_expenses_usd(self, obj):
         return round(
-            sum(float(exp.total_usd) for exp in obj.expenses.all()),
+            sum(float(exp.total_usd) for exp in obj.expenses.approved()),
             2
         )
     def get_total_expenses_afn(self, obj):
         return round(
-            sum(float(exp.total_afn) for exp in obj.expenses.all()),
+            sum(float(exp.total_afn) for exp in obj.expenses.approved()),
             2
         )
     # def get_contracts(self, obj):

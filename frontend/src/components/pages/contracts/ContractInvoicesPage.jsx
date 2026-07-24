@@ -44,6 +44,11 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
     loading,
     error,
   } = useFetch(`invoices/?contract=${contractID}`);
+  const invoiceList = Array.isArray(invoices)
+    ? invoices
+    : Array.isArray(invoices?.results)
+      ? invoices.results
+      : [];
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -83,12 +88,12 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
 
   // --- Advanced Filtering Logic ---
   const filteredInvoices = useMemo(() => {
-    if (!invoices) return [];
+    if (!invoiceList.length) return [];
 
     const start = dateRange.start ? formatDate(dateRange.start) : "";
     const end = dateRange.end ? formatDate(dateRange.end) : "";
 
-    return invoices.filter((inv) => {
+    return invoiceList.filter((inv) => {
       // 1. Status Filter
       const matchesStatus = !statusFilter || inv.status === statusFilter;
 
@@ -116,7 +121,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
 
       return matchesStatus && matchesSearch && matchesDate;
     });
-  }, [invoices, searchQuery, statusFilter, dateRange, formatDate]);
+  }, [invoiceList, searchQuery, statusFilter, dateRange, formatDate]);
 
   const hasActiveFilters =
     searchQuery || statusFilter || dateRange.start || dateRange.end;
@@ -137,8 +142,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
       <div
         style={{ padding: "2rem", textAlign: "center", color: "var(--danger)" }}
       >
-        {t("ContractInvoicesPage.error")}:{" "}
-        {typeof error === "object" ? JSON.stringify(error) : error}
+        {t("ContractInvoicesPage.error")}: {error}
       </div>
     );
 
@@ -275,7 +279,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
         <span style={{ color: "var(--text)", fontWeight: "bold" }}>
           {filteredInvoices.length}
         </span>{" "}
-        {t("ContractInvoicesPage.of")} {invoices?.length || 0}{" "}
+        {t("ContractInvoicesPage.of")} {invoiceList.length}{" "}
         {t("ContractInvoicesPage.invoices")}
       </div>
 

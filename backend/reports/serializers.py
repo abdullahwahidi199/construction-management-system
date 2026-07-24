@@ -38,6 +38,14 @@ class ProjectReportFilterSerializer(BaseReportFilterSerializer):
 class ExpenseReportFilterSerializer(BaseReportFilterSerializer):
     project_id = serializers.IntegerField(required=False)
     expense_type = serializers.CharField(required=False)
+    status = serializers.ChoiceField(
+        choices=["pending", "approved", "rejected"],
+        required=False,
+    )
+    approval_status = serializers.ChoiceField(
+        choices=["pending", "approved", "rejected"],
+        required=False,
+    )
 
 
 class PayrollReportFilterSerializer(BaseReportFilterSerializer):

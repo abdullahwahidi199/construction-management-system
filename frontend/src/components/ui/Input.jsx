@@ -25,6 +25,7 @@ export default function Input({
   name,
   className = "",
   module = "dashboard",
+  ...props
 }) {
   if (type === "date") {
     return (
@@ -37,6 +38,7 @@ export default function Input({
         module={inferCalendarModule(name, module)}
         className={className}
         placeholder={placeholder}
+        {...props}
       />
     );
   }
@@ -55,6 +57,7 @@ export default function Input({
         value={value ?? ""}
         onChange={(e) => onChange?.(e.target.value)}
         placeholder={placeholder}
+        {...props}
         className={`
           w-full px-4 py-2.5 rounded-lg border 
           bg-[var(--bg)] text-[var(--text)] 

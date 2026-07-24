@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
 from accounts.permissions import RBACPermission
 
 from .pdf_utils import generate_pdf
@@ -94,6 +95,12 @@ class ExpenseReportView(BaseReportView):
         ("total_usd", "Total USD"),
         ("expense_type", "Type"),
     ]
+
+    def get(self, request, *args, **kwargs):
+        requested_status = request.query_params.get("status") or request.query_params.get("approval_status")
+        if request.query_params.get("export") == "pdf" and requested_status and requested_status != "approved":
+            raise PermissionDenied("Only approved expenses can be exported.")
+        return super().get(request, *args, **kwargs)
 
 
 class PayrollReportView(BaseReportView):

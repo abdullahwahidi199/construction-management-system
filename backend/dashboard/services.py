@@ -7,7 +7,7 @@ from collections import defaultdict
 from django.db.models import (
     Sum, Count, Avg, Q, F, Value, CharField,
     DecimalField, Case, When, ExpressionWrapper,
-    Subquery, OuterRef
+    Subquery, OuterRef, Prefetch
 )
 from django.db.models.functions import (
     TruncMonth, TruncWeek, Coalesce, ExtractMonth, ExtractYear
@@ -113,11 +113,17 @@ class DashboardService:
         """
         projects = Project.objects.filter(
             status__in=["planning", "ongoing"]
-        ).prefetch_related("expenses")
+        ).prefetch_related(
+            Prefetch(
+                "expenses",
+                queryset=Expense.objects.approved(),
+                to_attr="approved_expenses",
+            )
+        )
 
         results = []
         for project in projects:
-            expenses = project.expenses.all()
+            expenses = getattr(project, "approved_expenses", [])
             total_expense_usd = sum(
                 float(exp.total_usd) for exp in expenses
             )
@@ -159,7 +165,7 @@ class DashboardService:
         """
         Overall expense totals, category breakdown, and monthly trends.
         """
-        expenses = Expense.objects.all()
+        expenses = Expense.objects.approved()
 
         # --- Overall totals ---
         totals = expenses.aggregate(
@@ -236,7 +242,7 @@ class DashboardService:
         today = date.today()
         first_of_month = today.replace(day=1)
 
-        current_month = Expense.objects.filter(
+        current_month = Expense.objects.approved().filter(
             expense_date__gte=first_of_month,
             expense_date__lte=today,
         ).aggregate(
@@ -249,7 +255,7 @@ class DashboardService:
         prev_month_start = (first_of_month - timedelta(days=1)).replace(day=1)
         prev_month_end = first_of_month - timedelta(days=1)
 
-        previous_month = Expense.objects.filter(
+        previous_month = Expense.objects.approved().filter(
             expense_date__gte=prev_month_start,
             expense_date__lte=prev_month_end,
         ).aggregate(
@@ -779,11 +785,17 @@ class DashboardService:
         over_budget_projects = Project.objects.filter(
             status__in=["planning", "ongoing"],
             estimated_budget__gt=0,
-        ).prefetch_related("expenses")
+        ).prefetch_related(
+            Prefetch(
+                "expenses",
+                queryset=Expense.objects.approved(),
+                to_attr="approved_expenses",
+            )
+        )
 
         for project in over_budget_projects:
             total_spent = sum(
-                float(exp.total_usd) for exp in project.expenses.all()
+                float(exp.total_usd) for exp in getattr(project, "approved_expenses", [])
             )
             budget = float(project.estimated_budget)
             if budget > 0 and total_spent > budget:
@@ -924,7 +936,7 @@ class DashboardService:
 
         # Recent expenses
         recent_expenses = (
-            Expense.objects.select_related("project")
+            Expense.objects.approved().select_related("project")
             .order_by("-created_at")[:limit]
         )
         for expense in recent_expenses:
@@ -1039,11 +1051,11 @@ class DashboardService:
         """
 
         # ── Direct Expenses ─────────────────────────
-        total_expenses_usd = Expense.objects.aggregate(
+        total_expenses_usd = Expense.objects.approved().aggregate(
             total=Coalesce(Sum("amount_usd"), Decimal("0.00"))
         )["total"]
 
-        total_expenses_afn = Expense.objects.aggregate(
+        total_expenses_afn = Expense.objects.approved().aggregate(
             total=Coalesce(Sum("amount_afn"), Decimal("0.00"))
         )["total"]
 

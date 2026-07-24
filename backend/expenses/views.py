@@ -1,4 +1,5 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
+from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
@@ -14,11 +15,25 @@ from django.db.models import (
     ExpressionWrapper)
 
 from .models import Expense
-from .serializers import ExpenseSerializer
+from .serializers import (
+    ExpenseApprovalActionSerializer,
+    ExpenseApprovalSettingsSerializer,
+    ExpenseSerializer,
+)
+from .services import (
+    apply_approval_filters,
+    approval_summary,
+    approve_expense,
+    create_expense,
+    get_expense_approval_settings,
+    is_expense_approval_enabled,
+    reject_expense,
+    set_expense_approval_settings,
+    update_expense,
+)
 
 from accounts.permissions import RBACPermission
-from accounts.constants import Role
-from accounts.services import get_user_role, has_permission
+from accounts.services import has_permission
 from common.calendar_utils import get_module_calendar, parse_calendar_date
 
 
@@ -36,7 +51,12 @@ class ExpensePagination(PageNumberPagination):
 # ViewSet
 # =========================
 class ExpenseViewSet(viewsets.ModelViewSet):
-    queryset = Expense.objects.select_related("project").annotate(
+    queryset = Expense.objects.select_related(
+        "project",
+        "created_by",
+        "approved_by",
+        "rejected_by",
+    ).annotate(
         total_usd_calc=ExpressionWrapper(
             F("amount_usd") + (F("amount_afn") / F("exchange_rate")),
             output_field=DecimalField(max_digits=20, decimal_places=2),
@@ -46,6 +66,15 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     serializer_class = ExpenseSerializer
     permission_classes = [RBACPermission]
     rbac_resource = "expenses"
+    rbac_action_permissions = {
+        "retrieve": ("expenses.view", "expenses.approve"),
+        "approve": ("expenses.approve",),
+        "reject": ("expenses.approve",),
+        "approvals": ("expenses.approve",),
+        "approval_summary": ("expenses.view", "expenses.approve"),
+        "approval_settings": ("settings.view", "settings.manage"),
+        "save_approval_settings": ("settings.manage",),
+    }
 
     filter_backends = [
         filters.SearchFilter,
@@ -89,12 +118,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         expense_lte = self.request.query_params.get("expense_date__lte")
         serial_number = self.request.query_params.get("serial_number")
 
-        if get_user_role(self.request.user) == Role.DATA_ENTRY:
-            assigned_project_ids = self.request.user.project_assignments.values_list(
-                "project_id",
-                flat=True,
-            )
-            queryset = queryset.filter(project_id__in=assigned_project_ids)
         if project:
             queryset = queryset.filter(project=project)
         if expense_type:
@@ -108,23 +131,13 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         if expense_lte:
             queryset = queryset.filter(expense_date__lte=parse_calendar_date(expense_lte, calendar_type))
 
-        return queryset
+        return apply_approval_filters(queryset, self.request.query_params)
 
     # =========================
     # CREATE
     # =========================
     def perform_create(self, serializer):
-        project = serializer.validated_data.get("project")
-
-        if get_user_role(self.request.user) == Role.DATA_ENTRY:
-            assigned = self.request.user.project_assignments.filter(
-                project=project
-            ).exists()
-
-            if not assigned:
-                raise PermissionDenied("You are not assigned to this project.")
-
-        serializer.save(created_by=self.request.user)
+        create_expense(serializer, self.request.user, request=self.request)
 
     # =========================
     # UPDATE
@@ -138,16 +151,70 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                     "You can only update your own expense entries."
                 )
 
-        serializer.save()
+        update_expense(serializer, self.request.user, request=self.request)
+
+    @action(detail=True, methods=["post"])
+    def approve(self, request, pk=None):
+        expense = approve_expense(
+            self.get_object(),
+            request.user,
+            notes=request.data.get("approval_notes", ""),
+            request=request,
+        )
+        return Response(self.get_serializer(expense).data)
+
+    @action(detail=True, methods=["post"])
+    def reject(self, request, pk=None):
+        serializer = ExpenseApprovalActionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        expense = reject_expense(
+            self.get_object(),
+            request.user,
+            notes=serializer.validated_data.get("approval_notes", ""),
+            request=request,
+        )
+        return Response(self.get_serializer(expense).data)
+
+    @action(detail=False, methods=["get"])
+    def approvals(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page or queryset, many=True)
+        payload = {
+            "results": serializer.data,
+            "summary": approval_summary(self.get_queryset()),
+        }
+        if page is not None:
+            return self.get_paginated_response(payload)
+        return Response(payload)
+
+    @action(detail=False, methods=["get"], url_path="approval-summary")
+    def approval_summary(self, request):
+        return Response(approval_summary(self.get_queryset()))
+
+    @action(detail=False, methods=["get"], url_path="approval-settings")
+    def approval_settings(self, request):
+        return Response(ExpenseApprovalSettingsSerializer(get_expense_approval_settings()).data)
+
+    @approval_settings.mapping.put
+    def save_approval_settings(self, request):
+        serializer = ExpenseApprovalSettingsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        settings_data = set_expense_approval_settings(
+            serializer.validated_data["enabled"],
+            user=request.user,
+        )
+        return Response(ExpenseApprovalSettingsSerializer(settings_data).data)
 
     # =========================
     # LIST with TOTALS
     # =========================
     def list(self, request, *args, **kwargs):
         base_qs = self.filter_queryset(self.get_queryset())
+        financial_qs = base_qs.filter(approval_status=Expense.ApprovalStatus.APPROVED)
 
         # -------- USD TOTAL (converted unified model) --------
-        usd_total = base_qs.aggregate(
+        usd_total = financial_qs.aggregate(
         total=Sum(
             ExpressionWrapper(
                 F("amount_usd")
@@ -166,7 +233,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     )["total"] or 0
 
         # -------- AFN TOTAL (converted unified model) --------
-        afn_total = base_qs.aggregate(
+        afn_total = financial_qs.aggregate(
             total=Sum(
                 ExpressionWrapper(
                     F("amount_afn") + (F("amount_usd") * F("exchange_rate")),
@@ -185,7 +252,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 "totals": {
                     "usd": usd_total,
                     "afn": afn_total,
-                }
+                },
+                "approval": approval_summary(base_qs),
             })
 
         serializer = self.get_serializer(base_qs, many=True)
@@ -194,7 +262,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             "totals": {
                 "usd": usd_total,
                 "afn": afn_total,
-            }
+            },
+            "approval": approval_summary(base_qs),
         })
 
 
@@ -252,15 +321,23 @@ def rtl(text):
 
 
 class ExpensePDFExportView(APIView):
+    permission_classes = [RBACPermission]
+    rbac_resource = "expenses"
 
     def get_queryset(self):
-        qs = Expense.objects.select_related("project")
+        status_filter = self.request.GET.get("status") or self.request.GET.get("approval_status")
+        if status_filter and status_filter != Expense.ApprovalStatus.APPROVED:
+            raise PermissionDenied("Only approved expenses can be exported.")
+
+        qs = Expense.objects.approved().select_related("project")
 
         search = self.request.GET.get("search")
         project = self.request.GET.get("project")
         expense_type = self.request.GET.get("expense_type")
         date_from = self.request.GET.get("expense_date__gte")
         date_to = self.request.GET.get("expense_date__lte")
+        creator = self.request.GET.get("creator") or self.request.GET.get("created_by")
+        approver = self.request.GET.get("approver") or self.request.GET.get("approved_by")
         ordering = self.request.GET.get(
             "ordering",
             "-expense_date",
@@ -278,6 +355,12 @@ class ExpensePDFExportView(APIView):
             qs = qs.filter(
                 expense_type=expense_type
             )
+
+        if creator:
+            qs = qs.filter(created_by_id=creator)
+
+        if approver:
+            qs = qs.filter(approved_by_id=approver)
 
         if date_from:
             date_from = parse_calendar_date(date_from, get_module_calendar("expenses", request=self.request))

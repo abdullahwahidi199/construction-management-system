@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Building2, X, Plus, Loader2, AlertCircle, Info } from "lucide-react";
 import Input from "../ui/Input";
 import PermissionWrapper from "../../auth/PermissionWrapper";
@@ -26,6 +26,7 @@ export default function ProjectCreateModal({
   error,
 }) {
   const [form, setForm] = useState(INITIAL_FORM);
+  const [localError, setLocalError] = useState("");
   const { t } = useLanguage();
 
   const PROPERTY_TYPE_OPTIONS = [
@@ -56,6 +57,13 @@ export default function ProjectCreateModal({
     { value: "on_hold", label: t("ProjectCreateModal.options.status.on_hold") },
   ];
 
+  useEffect(() => {
+    if (open) {
+      setForm(INITIAL_FORM);
+      setLocalError("");
+    }
+  }, [open]);
+
   if (!open) return null;
 
   const handleChange = (name, value) => {
@@ -78,9 +86,22 @@ export default function ProjectCreateModal({
     return sanitized;
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    if (!form.name.trim()) return "Project name is required.";
+    if (!form.location.trim()) return "Project location is required.";
+    if (!form.start_date) return "Project start date is required.";
+    return "";
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(sanitizeForm(form));
+    const validationMessage = validateForm();
+    if (validationMessage) {
+      setLocalError(validationMessage);
+      return;
+    }
+    setLocalError("");
+    await onSubmit(sanitizeForm(form));
   };
 
   const handleClose = () => {
@@ -97,7 +118,8 @@ export default function ProjectCreateModal({
     "text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-3 flex items-center gap-2";
 
   const errorMessage =
-    typeof error === "string" ? error : t("ProjectCreateModal.errors.default");
+    localError ||
+    (typeof error === "string" ? error : t("ProjectCreateModal.errors.default"));
 
   return (
     <div
@@ -150,9 +172,8 @@ export default function ProjectCreateModal({
           id="project-create-form"
           onSubmit={handleSubmit}
           className="flex-1 overflow-y-auto px-7 py-6"
-          noValidate
         >
-          {error && (
+          {(localError || error) && (
             <div className="mb-5 p-3.5 rounded-lg flex items-start gap-2.5 border border-[var(--danger)]/30 bg-[var(--danger)]/10">
               <AlertCircle className="w-5 h-5 text-[var(--danger)] flex-shrink-0 mt-0.5" />
               <p className="text-sm text-[var(--danger)] leading-relaxed">

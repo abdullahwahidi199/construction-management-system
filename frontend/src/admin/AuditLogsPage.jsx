@@ -1,16 +1,19 @@
-/* eslint-disable react-hooks/exhaustive-deps, react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useState } from "react";
 import {
   Activity,
   AlertTriangle,
   CalendarClock,
+  CheckCircle2,
   Download,
   FileSpreadsheet,
   Filter,
+  Info,
   Search,
   ShieldCheck,
   User,
   X,
+  XCircle,
 } from "lucide-react";
 import api from "../api/axiosInstance";
 import Card from "../components/ui/Card";
@@ -21,16 +24,113 @@ const PAGE_SIZE = 25;
 const inputClass =
   "h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 text-sm text-[var(--text)] shadow-sm outline-none transition focus:border-[var(--primary)] focus:ring-2 focus:ring-[color:rgba(37,99,235,0.18)]";
 
+const ACTION_LABELS = {
+  "auth.login": "Signed in",
+  "auth.login_failed": "Tried to sign in",
+  "auth.logout": "Signed out",
+  "auth.password_change": "Changed a password",
+  "audit_logs.export_csv": "Downloaded audit logs as CSV",
+  "audit_logs.export_excel": "Downloaded audit logs as Excel",
+  "audit_logs.delete": "Deleted an audit log",
+  "audit_retention.update": "Updated audit retention",
+};
+
+const VERB_BY_ACTION = {
+  create: "Created",
+  update: "Updated",
+  delete: "Deleted",
+  view: "Viewed",
+  export: "Downloaded",
+  login: "Signed in",
+  logout: "Signed out",
+};
+
+const AREA_LABELS = {
+  application_settings: "Settings",
+  attendance: "Attendance",
+  contract: "Contracts",
+  contractdocument: "Contract documents",
+  contractinvoice: "Contract invoices",
+  contractpayment: "Contract payments",
+  contractvariation: "Contract variations",
+  employee: "Employees",
+  expense: "Expenses",
+  payroll: "Payroll",
+  project: "Projects",
+  subcontractor: "Subcontractors",
+  user: "Users",
+  workeradvance: "Worker advances",
+  workerattendance: "Worker attendance",
+  workerpayroll: "Worker payroll",
+};
+
 const formatDateTime = (value) => {
   if (!value) return "-";
-  return new Date(value).toLocaleString();
+  return new Date(value).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 };
 
 const formatValue = (value) => {
   if (value === null || value === undefined || value === "") return "-";
+  if (typeof value === "boolean") return value ? "Yes" : "No";
   if (typeof value === "object") return JSON.stringify(value, null, 2);
   return String(value);
 };
+
+const titleCase = (value = "") =>
+  String(value)
+    .replace(/[_-]+/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .trim()
+    .replace(/\w\S*/g, (word) => word[0].toUpperCase() + word.slice(1).toLowerCase());
+
+const getActionPart = (action = "") => action.split(".").pop() || action;
+
+const getAreaLabel = (log = {}) => {
+  const modelKey = String(log.model_name || "").replace(/\s+/g, "").toLowerCase();
+  if (AREA_LABELS[modelKey]) return AREA_LABELS[modelKey];
+  const actionArea = String(log.action || "").split(".")[0];
+  return titleCase(log.model_name || actionArea || "System");
+};
+
+const getActionLabel = (action = "") => {
+  if (ACTION_LABELS[action]) return ACTION_LABELS[action];
+  const actionPart = getActionPart(action);
+  const area = action.split(".")[0];
+  const verb = VERB_BY_ACTION[actionPart] || titleCase(actionPart || "Changed");
+  if (!area || area === actionPart) return verb;
+  return `${verb} ${titleCase(area)}`;
+};
+
+const getActivityText = (log = {}) => {
+  if (log.description) return log.description;
+  const actionPart = getActionPart(log.action);
+  const verb = VERB_BY_ACTION[actionPart] || getActionLabel(log.action);
+  const target = log.object_repr || getAreaLabel(log);
+  return `${verb} ${target}`;
+};
+
+const getChangeSummary = (log = {}) => {
+  const count = log.changed_field_count ?? Object.keys(log.field_changes || {}).length;
+  if (count > 0) return `${count} detail${count === 1 ? "" : "s"} changed`;
+  if (log.is_financial) return "Financial activity";
+  return "No detailed changes";
+};
+
+const getStatusMeta = (status) =>
+  status === "failed"
+    ? {
+        label: "Needs attention",
+        icon: XCircle,
+        className: "bg-red-500/10 text-red-600",
+      }
+    : {
+        label: "Completed",
+        icon: CheckCircle2,
+        className: "bg-green-500/10 text-green-600",
+      };
 
 function SummaryCard({ icon: Icon, label, value, tone = "var(--primary)" }) {
   return (
@@ -51,17 +151,21 @@ function SummaryCard({ icon: Icon, label, value, tone = "var(--primary)" }) {
   );
 }
 
+function Pill({ children, className = "" }) {
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold ${className}`}>
+      {children}
+    </span>
+  );
+}
+
 function InfoRow({ label, value, wrap = false }) {
   return (
-    <div className="grid gap-1 border-b border-[var(--border)] py-2 last:border-b-0 sm:grid-cols-[140px_1fr]">
+    <div className="grid gap-1 border-b border-[var(--border)] py-2 last:border-b-0 sm:grid-cols-[150px_1fr]">
       <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
         {label}
       </dt>
-      <dd
-        className={`text-sm font-medium text-[var(--text)] ${
-          wrap ? "break-all" : ""
-        }`}
-      >
+      <dd className={`text-sm font-medium text-[var(--text)] ${wrap ? "break-all" : ""}`}>
         {value || "-"}
       </dd>
     </div>
@@ -69,37 +173,40 @@ function InfoRow({ label, value, wrap = false }) {
 }
 
 function ChangeRow({ field, change, financial }) {
-  const isCurrency = field.toLowerCase().includes("currency");
-  const highlighted = financial || isCurrency;
+  const highlighted = financial || field.toLowerCase().includes("currency");
 
   return (
     <div
-      className={`rounded-lg border p-3 shadow-sm ${
+      className={`rounded-lg border p-3 ${
         highlighted
           ? "border-yellow-500/50 bg-yellow-500/10"
           : "border-[var(--border)] bg-[var(--bg)]"
       }`}
     >
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <div className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
-          {field}
-        </div>
+        <div className="text-sm font-semibold text-[var(--text)]">{titleCase(field)}</div>
         {highlighted && (
-          <span className="rounded-full bg-yellow-500/15 px-2 py-1 text-xs font-medium text-yellow-700 dark:text-yellow-300">
-            {isCurrency ? "Currency" : "Financial"}
-          </span>
+          <Pill className="bg-yellow-500/15 text-yellow-700 dark:text-yellow-300">
+            Financial
+          </Pill>
         )}
       </div>
       <div className="grid gap-2 text-sm lg:grid-cols-[1fr_auto_1fr] lg:items-stretch">
-        <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 font-sans text-[var(--text)]">
-          {formatValue(change.old)}
-        </pre>
+        <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2">
+          <div className="mb-1 text-xs font-semibold uppercase text-[var(--muted)]">Before</div>
+          <pre className="max-h-36 overflow-auto whitespace-pre-wrap font-sans text-[var(--text)]">
+            {formatValue(change.old)}
+          </pre>
+        </div>
         <div className="flex items-center justify-center text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
           changed to
         </div>
-        <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-lg border border-green-500/20 bg-green-500/10 px-3 py-2 font-sans text-[var(--text)]">
-          {formatValue(change.new)}
-        </pre>
+        <div className="rounded-lg border border-green-500/20 bg-green-500/10 px-3 py-2">
+          <div className="mb-1 text-xs font-semibold uppercase text-[var(--muted)]">After</div>
+          <pre className="max-h-36 overflow-auto whitespace-pre-wrap font-sans text-[var(--text)]">
+            {formatValue(change.new)}
+          </pre>
+        </div>
       </div>
     </div>
   );
@@ -107,27 +214,32 @@ function ChangeRow({ field, change, financial }) {
 
 function DetailPanel({ log, onClose }) {
   if (!log) return null;
+
   const changes = log.field_changes || {};
   const financialFields = new Set(Object.keys(log.financial_changes || {}));
+  const status = getStatusMeta(log.status);
+  const StatusIcon = status.icon;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-3 backdrop-blur-sm">
-      <section className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--bg)] shadow-2xl">
+      <section className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-2xl">
         <header className="flex items-start justify-between gap-3 border-b border-[var(--border)] bg-[var(--card)] px-5 py-4">
           <div className="min-w-0">
-            <div className="mb-1 flex flex-wrap items-center gap-2">
-              <h2 className="text-xl font-bold text-[var(--text)]">Audit Detail</h2>
-              <span
-                className={`rounded-full px-2 py-1 text-xs font-semibold ${
-                  log.status === "failed"
-                    ? "bg-red-500/10 text-red-600"
-                    : "bg-green-500/10 text-green-600"
-                }`}
-              >
-                {log.status}
-              </span>
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <Pill className={status.className}>
+                <StatusIcon className="h-3.5 w-3.5" />
+                {status.label}
+              </Pill>
+              {log.is_financial || Object.keys(log.financial_changes || {}).length > 0 ? (
+                <Pill className="bg-yellow-500/15 text-yellow-700 dark:text-yellow-300">
+                  Financial
+                </Pill>
+              ) : null}
             </div>
-            <p className="break-all text-sm text-[var(--muted)]">{log.action}</p>
+            <h2 className="text-xl font-bold text-[var(--text)]">{getActivityText(log)}</h2>
+            <p className="mt-1 text-sm text-[var(--muted)]">
+              {log.username || "System"} in {getAreaLabel(log)} on {formatDateTime(log.timestamp)}
+            </p>
           </div>
           <button
             className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[var(--muted)] transition hover:bg-[var(--hover)] hover:text-[var(--text)]"
@@ -151,37 +263,33 @@ function DetailPanel({ log, onClose }) {
           )}
 
           <div className="mb-4 grid gap-4 lg:grid-cols-2">
-            <Card title="Request">
+            <Card title="Activity Summary">
               <dl>
-                <InfoRow label="User" value={log.username || "System"} />
-                <InfoRow label="Timestamp" value={formatDateTime(log.timestamp)} />
-                <InfoRow label="IP address" value={log.ip_address || "-"} />
-                <InfoRow label="Method" value={log.request_method || "-"} />
-                <InfoRow label="Endpoint" value={log.endpoint || "-"} wrap />
+                <InfoRow label="Person" value={log.username || "System"} />
+                <InfoRow label="Activity" value={getActionLabel(log.action)} />
+                <InfoRow label="Area" value={getAreaLabel(log)} />
+                <InfoRow label="When" value={formatDateTime(log.timestamp)} />
+                <InfoRow label="Result" value={status.label} />
               </dl>
             </Card>
 
-            <Card title="Object">
+            <Card title="Record Affected">
               <dl>
-                <InfoRow label="Model" value={log.model_name || "-"} />
-                <InfoRow label="Object ID" value={log.object_id || "-"} />
-                <InfoRow label="Object" value={log.object_repr || "-"} wrap />
-                <InfoRow label="Description" value={log.description || "-"} wrap />
+                <InfoRow label="Name" value={log.object_repr || getAreaLabel(log)} wrap />
+                <InfoRow label="Notes" value={log.description || "No extra note was recorded."} wrap />
+                <InfoRow label="Changed" value={getChangeSummary(log)} />
+                <InfoRow label="Location" value={log.ip_address ? `IP ${log.ip_address}` : "Not recorded"} />
               </dl>
             </Card>
           </div>
 
           <Card
-            title="Field Changes"
-            right={
-              <span className="text-sm text-[var(--muted)]">
-                {Object.keys(changes).length} changed fields
-              </span>
-            }
+            title="What Changed"
+            right={<span className="text-sm text-[var(--muted)]">{Object.keys(changes).length} changes</span>}
           >
             {Object.keys(changes).length === 0 ? (
               <div className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4 text-sm text-[var(--muted)]">
-                No field-level changes recorded.
+                This activity did not record individual field changes.
               </div>
             ) : (
               <div className="space-y-3">
@@ -196,6 +304,22 @@ function DetailPanel({ log, onClose }) {
               </div>
             )}
           </Card>
+
+          <details className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--card)]">
+            <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-[var(--text)]">
+              Technical information
+            </summary>
+            <div className="border-t border-[var(--border)] p-4">
+              <dl>
+                <InfoRow label="Action code" value={log.action} wrap />
+                <InfoRow label="Method" value={log.request_method || "-"} />
+                <InfoRow label="Endpoint" value={log.endpoint || "-"} wrap />
+                <InfoRow label="Internal type" value={log.model_name || "-"} />
+                <InfoRow label="Record ID" value={log.object_id || "-"} wrap />
+                <InfoRow label="User agent" value={log.user_agent || "-"} wrap />
+              </dl>
+            </div>
+          </details>
         </div>
       </section>
     </div>
@@ -306,9 +430,9 @@ export default function AuditLogsPage() {
     <div className="space-y-5">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text)]">Audit Logs</h1>
+          <h1 className="text-2xl font-bold text-[var(--text)]">Activity History</h1>
           <p className="text-sm text-[var(--muted)]">
-            Security, financial, and operational activity across the system.
+            A readable timeline of important work, security events, and financial changes.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -324,14 +448,14 @@ export default function AuditLogsPage() {
       </div>
 
       <div className="grid gap-3 md:grid-cols-4">
-        <SummaryCard icon={ShieldCheck} label="Total audit logs" value={summary?.total_logs} />
-        <SummaryCard icon={AlertTriangle} label="Failed actions" value={summary?.failed_actions} tone="var(--danger)" />
+        <SummaryCard icon={ShieldCheck} label="Total activities" value={summary?.total_logs} />
+        <SummaryCard icon={AlertTriangle} label="Needs attention" value={summary?.failed_actions} tone="var(--danger)" />
         <SummaryCard icon={CalendarClock} label="Financial changes today" value={summary?.financial_modifications_today} tone="var(--warning)" />
         <SummaryCard icon={Activity} label="Recent activity" value={summary?.recent_activity?.length} tone="var(--success)" />
       </div>
 
       <Card
-        title="Filters"
+        title="Find Activity"
         right={
           <button className="text-sm font-medium text-[var(--primary)]" onClick={resetFilters}>
             Reset
@@ -343,7 +467,7 @@ export default function AuditLogsPage() {
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-[var(--muted)]" />
             <input
               className={`${inputClass} pl-9`}
-              placeholder="Search action, model, endpoint, object..."
+              placeholder="Search by person, activity, record, or page..."
               value={filters.search}
               onChange={(e) => updateFilter("search", e.target.value)}
             />
@@ -353,19 +477,21 @@ export default function AuditLogsPage() {
             type="date"
             value={filters.start_date}
             onChange={(e) => updateFilter("start_date", e.target.value)}
+            title="From date"
           />
           <input
             className={inputClass}
             type="date"
             value={filters.end_date}
             onChange={(e) => updateFilter("end_date", e.target.value)}
+            title="To date"
           />
           <select
             className={inputClass}
             value={filters.user}
             onChange={(e) => updateFilter("user", e.target.value)}
           >
-            <option value="">All users</option>
+            <option value="">Everyone</option>
             {options.users.map((user) => (
               <option key={user.id} value={user.id}>
                 {user.username}
@@ -377,10 +503,10 @@ export default function AuditLogsPage() {
             value={filters.action}
             onChange={(e) => updateFilter("action", e.target.value)}
           >
-            <option value="">All actions</option>
+            <option value="">Any activity</option>
             {options.actions.map((action) => (
               <option key={action} value={action}>
-                {action}
+                {getActionLabel(action)}
               </option>
             ))}
           </select>
@@ -389,10 +515,10 @@ export default function AuditLogsPage() {
             value={filters.model}
             onChange={(e) => updateFilter("model", e.target.value)}
           >
-            <option value="">All models</option>
+            <option value="">Any area</option>
             {options.models.map((model) => (
               <option key={model} value={model}>
-                {model}
+                {getAreaLabel({ model_name: model })}
               </option>
             ))}
           </select>
@@ -401,15 +527,15 @@ export default function AuditLogsPage() {
             value={filters.status}
             onChange={(e) => updateFilter("status", e.target.value)}
           >
-            <option value="">All statuses</option>
-            <option value="success">Success</option>
-            <option value="failed">Failed</option>
+            <option value="">Any result</option>
+            <option value="success">Completed</option>
+            <option value="failed">Needs attention</option>
           </select>
         </div>
       </Card>
 
       <Card
-        title="Activity"
+        title="Activity Timeline"
         right={
           <div className="flex items-center gap-2 text-sm text-[var(--muted)]">
             <Filter className="h-4 w-4" />
@@ -417,69 +543,67 @@ export default function AuditLogsPage() {
           </div>
         }
       >
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-[var(--border)] text-xs uppercase text-[var(--muted)]">
-              <tr>
-                <th className="px-3 py-2">Timestamp</th>
-                <th className="px-3 py-2">User</th>
-                <th className="px-3 py-2">Action</th>
-                <th className="px-3 py-2">Object</th>
-                <th className="px-3 py-2">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td className="px-3 py-6 text-center text-[var(--muted)]" colSpan="5">
-                    Loading audit logs...
-                  </td>
-                </tr>
-              ) : logs.length === 0 ? (
-                <tr>
-                  <td className="px-3 py-6 text-center text-[var(--muted)]" colSpan="5">
-                    No audit logs found.
-                  </td>
-                </tr>
-              ) : (
-                logs.map((log) => (
-                  <tr
-                    key={log.id}
-                    className="cursor-pointer border-b border-[var(--border)] transition hover:bg-[var(--hover)]"
-                    onClick={() => openDetail(log.id)}
-                  >
-                    <td className="whitespace-nowrap px-3 py-3 text-[var(--text)]">
-                      {formatDateTime(log.timestamp)}
-                    </td>
-                    <td className="px-3 py-3 text-[var(--text)]">
+        <div className="space-y-2">
+          {loading ? (
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-8 text-center text-sm text-[var(--muted)]">
+              Loading activity...
+            </div>
+          ) : logs.length === 0 ? (
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-8 text-center text-sm text-[var(--muted)]">
+              No activity found.
+            </div>
+          ) : (
+            logs.map((log) => {
+              const status = getStatusMeta(log.status);
+              const StatusIcon = status.icon;
+
+              return (
+                <button
+                  key={log.id}
+                  type="button"
+                  className="grid w-full gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4 text-left transition hover:border-[var(--primary)]/40 hover:bg-[var(--hover)] lg:grid-cols-[minmax(0,1fr)_170px_150px]"
+                  onClick={() => openDetail(log.id)}
+                >
+                  <div className="min-w-0">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      <Pill className={status.className}>
+                        <StatusIcon className="h-3.5 w-3.5" />
+                        {status.label}
+                      </Pill>
+                      {log.is_financial ? (
+                        <Pill className="bg-yellow-500/15 text-yellow-700 dark:text-yellow-300">
+                          Financial
+                        </Pill>
+                      ) : null}
+                    </div>
+                    <div className="text-sm font-semibold text-[var(--text)]">
+                      {getActivityText(log)}
+                    </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--muted)]">
                       <span className="inline-flex items-center gap-1">
-                        <User className="h-3.5 w-3.5 text-[var(--muted)]" />
+                        <User className="h-3.5 w-3.5" />
                         {log.username || "System"}
                       </span>
-                    </td>
-                    <td className="px-3 py-3 font-medium text-[var(--text)]">{log.action}</td>
-                    <td className="px-3 py-3 text-[var(--text)]">
-                      <div>{log.model_name || "-"}</div>
-                      <div className="max-w-xs truncate text-xs text-[var(--muted)]">
-                        {log.object_repr || log.object_id}
-                      </div>
-                    </td>
-                    <td className="px-3 py-3">
-                      <span
-                        className={`rounded-full px-2 py-1 text-xs font-semibold ${
-                          log.status === "failed"
-                            ? "bg-red-500/10 text-red-600"
-                            : "bg-green-500/10 text-green-600"
-                        }`}
-                      >
-                        {log.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                      <span>{getAreaLabel(log)}</span>
+                      <span>{getChangeSummary(log)}</span>
+                    </div>
+                  </div>
+
+                  <div className="text-sm text-[var(--text)]">
+                    <div className="font-medium">{formatDateTime(log.timestamp)}</div>
+                    <div className="mt-1 text-xs text-[var(--muted)]">
+                      {log.ip_address ? `From ${log.ip_address}` : "Location not recorded"}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-xs text-[var(--muted)] lg:justify-end">
+                    <Info className="h-4 w-4" />
+                    View details
+                  </div>
+                </button>
+              );
+            })
+          )}
         </div>
 
         <div className="mt-4 flex items-center justify-between">

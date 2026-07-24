@@ -1,14 +1,13 @@
 from rest_framework.permissions import BasePermission
 
-from accounts.constants import Role
-from accounts.services import get_user_role, has_permission
+from accounts.services import has_permission
 
 
 class AuditLogPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
-        if get_user_role(request.user) == Role.ADMIN:
+        if has_permission(request.user, "*"):
             return True
 
         action = getattr(view, "action", "")
@@ -21,4 +20,3 @@ class AuditLogPermission(BasePermission):
         if action in {"retention", "update_retention"}:
             return has_permission(request.user, "audit_logs.manage_retention")
         return False
-

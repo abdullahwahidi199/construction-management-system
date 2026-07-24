@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import instance from "../api/axiosInstance";
 import { useAuth } from "../auth/AuthContext";
 import Button from "../components/ui/Button";
+import { getFriendlyErrorMessage } from "../utils/apiErrors";
 import {
   CALENDAR_MODULES,
   CALENDAR_TYPES,
@@ -33,14 +35,29 @@ export default function SettingsPage() {
   const canManage =
     permissions.includes("*") || permissions.includes("settings.manage");
   const [settings, setSettings] = useState(defaultCalendarSettings);
+  const [expenseApproval, setExpenseApproval] = useState({ enabled: false });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [approvalSaving, setApprovalSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [approvalMessage, setApprovalMessage] = useState("");
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
-    instance
-      .get("auth/settings/calendar/")
-      .then((res) => setSettings(normalizeCalendarSettings(res.data)))
+    setLoadError("");
+    Promise.all([
+      instance.get("auth/settings/calendar/"),
+      instance.get("expenses/approval-settings/"),
+    ])
+      .then(([calendarRes, approvalRes]) => {
+        setSettings(normalizeCalendarSettings(calendarRes.data));
+        setExpenseApproval({ enabled: Boolean(approvalRes.data?.enabled) });
+      })
+      .catch((err) => {
+        const message = getFriendlyErrorMessage(err, "Unable to load settings.");
+        setLoadError(message);
+        toast.error(message);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -60,15 +77,41 @@ export default function SettingsPage() {
       setSettings(normalized);
       localStorage.setItem("cms.calendar.settings", JSON.stringify(normalized));
       setMessage("Calendar settings saved.");
-    } catch {
-      setMessage("Unable to save calendar settings.");
+      toast.success("Settings saved.");
+    } catch (err) {
+      const message = getFriendlyErrorMessage(err, "Unable to save changes.");
+      setMessage(message);
     } finally {
       setSaving(false);
     }
   };
 
+  const saveExpenseApproval = async () => {
+    setApprovalSaving(true);
+    setApprovalMessage("");
+    try {
+      const res = await instance.put("expenses/approval-settings/", expenseApproval);
+      setExpenseApproval({ enabled: Boolean(res.data?.enabled) });
+      setApprovalMessage("Expense approval settings saved.");
+      toast.success("Expense approval settings saved.");
+    } catch (err) {
+      const message = getFriendlyErrorMessage(err, "Unable to save changes.");
+      setApprovalMessage(message);
+    } finally {
+      setApprovalSaving(false);
+    }
+  };
+
   if (loading) {
     return <div className="text-sm text-[var(--muted)]">Loading settings...</div>;
+  }
+
+  if (loadError) {
+    return (
+      <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-5 text-sm text-red-600">
+        {loadError}
+      </div>
+    );
   }
 
   if (!canView) {
@@ -115,6 +158,49 @@ export default function SettingsPage() {
         <div className="mt-6 flex items-center gap-3">
           {canManage && <Button onClick={save} disabled={saving}>{saving ? "Saving..." : "Save Settings"}</Button>}
           {message && <span className="text-sm text-[var(--muted)]">{message}</span>}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-5">
+        <h2 className="text-lg font-semibold text-[var(--text)]">Expense Approval</h2>
+        <div className="mt-4 flex items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4">
+          <div>
+            <p className="text-sm font-medium text-[var(--text)]">
+              Expense Approval Enabled
+            </p>
+            <p className="mt-1 text-sm text-[var(--muted)]">
+              {expenseApproval.enabled ? "Pending approval workflow is active." : "Expenses are approved immediately."}
+            </p>
+          </div>
+          <button
+            type="button"
+            disabled={!canManage}
+            onClick={() =>
+              setExpenseApproval((current) => ({
+                enabled: !current.enabled,
+              }))
+            }
+            className={`relative h-7 w-12 rounded-full transition ${
+              expenseApproval.enabled ? "bg-[var(--primary)]" : "bg-[var(--border)]"
+            } disabled:cursor-not-allowed disabled:opacity-60`}
+            aria-pressed={expenseApproval.enabled}
+          >
+            <span
+              className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${
+                expenseApproval.enabled ? "left-6" : "left-1"
+              }`}
+            />
+          </button>
+        </div>
+        <div className="mt-4 flex items-center gap-3">
+          {canManage && (
+            <Button onClick={saveExpenseApproval} disabled={approvalSaving}>
+              {approvalSaving ? "Saving..." : "Save Expense Approval"}
+            </Button>
+          )}
+          {approvalMessage && (
+            <span className="text-sm text-[var(--muted)]">{approvalMessage}</span>
+          )}
         </div>
       </section>
     </div>

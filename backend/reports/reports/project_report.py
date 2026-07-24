@@ -2,7 +2,9 @@ from collections import defaultdict
 from decimal import Decimal
 
 from django.db.models import Count
+from django.db.models import Prefetch
 
+from expenses.models import Expense
 from project.models import Project
 from .base import BaseReport
 
@@ -33,7 +35,11 @@ class ProjectSummaryReport(BaseReport):
 
     def _base_queryset(self):
         qs = Project.objects.prefetch_related(
-            "expenses",
+            Prefetch(
+                "expenses",
+                queryset=Expense.objects.approved(),
+                to_attr="approved_expenses",
+            ),
             "subcontractor_contracts__payments",
             "subcontractor_contracts__variations",
             "worker_payrolls",
@@ -138,7 +144,7 @@ class ProjectSummaryReport(BaseReport):
             budget = money(project.estimated_budget)
             budget_currency = (project.budget_currency or "AFN").upper()
 
-            expenses = self._expense_totals(project.expenses.all())
+            expenses = self._expense_totals(getattr(project, "approved_expenses", []))
             contracts = self._contract_totals(project.subcontractor_contracts.all())
             worker_payroll = self._worker_payroll_totals(project.worker_payrolls.all())
 

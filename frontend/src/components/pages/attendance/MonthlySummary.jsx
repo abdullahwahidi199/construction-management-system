@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import useAttendance from "../../../hooks/useAttendance";
 import instance from "../../../api/axiosInstance";
 import { useLanguage } from "../../../hooks/useLanguage";
+import { getFriendlyErrorMessage } from "../../../utils/apiErrors";
 
 function MonthlySummary() {
   const { fetchMonthlySummary, loading, error } = useAttendance();
@@ -16,6 +17,7 @@ function MonthlySummary() {
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
   const [summary, setSummary] = useState(null);
+  const [localError, setLocalError] = useState("");
 
   useEffect(() => {
     loadEmployees();
@@ -32,7 +34,7 @@ function MonthlySummary() {
       const res = await instance.get("/employees");
       setEmployees(res.data.results || res.data);
     } catch (err) {
-      console.error("Failed to load employees:", err);
+      setLocalError(getFriendlyErrorMessage(err, "Unable to load employees."));
     }
   };
 
@@ -41,7 +43,7 @@ function MonthlySummary() {
       const data = await fetchMonthlySummary(selectedEmployee, month, year);
       setSummary(data);
     } catch (err) {
-      console.error(err);
+      setLocalError(getFriendlyErrorMessage(err, "Unable to load monthly summary."));
     }
   };
 
@@ -177,9 +179,9 @@ function MonthlySummary() {
           </div>
         </div>
 
-        {error && (
+        {(localError || error) && (
           <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
-            {error}
+            {localError || error}
           </div>
         )}
 

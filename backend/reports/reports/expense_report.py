@@ -13,7 +13,12 @@ class ExpenseReport(BaseReport):
     # BASE QUERYSET
     # ---------------------------------------------------------
     def _base_queryset(self):
+        requested_status = self.filters.get("status") or self.filters.get("approval_status")
         qs = Expense.objects.select_related("project")
+        if requested_status:
+            qs = qs.filter(approval_status=requested_status)
+        else:
+            qs = qs.approved()
 
         project_id = self.filters.get("project_id")
         expense_type = self.filters.get("expense_type")
@@ -90,7 +95,11 @@ class ExpenseReport(BaseReport):
                 "expense_type",
                 "amount_afn",
                 "amount_usd",
+                "total_usd",
+                "total_afn",
                 "project_id",
+                "project__name",
+                "approval_status",
             )
         )
 

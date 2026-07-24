@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import usePost from "../../hooks/usePost";
 import instance from "../../api/axiosInstance";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import Button from "../ui/Button";
 import { useLanguage } from "../../hooks/useLanguage";
+import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 
 const initialFormData = {
   employee: "",
@@ -32,9 +34,9 @@ export default function PayrollForm({
   const [formData, setFormData] = useState(initialFormData);
   const { postData, loading, error } = usePost();
   const [payroll, setPayroll] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [localError, setLocalError] = useState("");
   const { t } = useLanguage();
-
-  console.log(payrollId);
 
   useEffect(() => {
     if (!payrollId) return;
@@ -44,7 +46,9 @@ export default function PayrollForm({
         const res = await instance.get(`/payrolls/${payrollId}/`);
         setPayroll(res.data);
       } catch (err) {
-        console.error(err);
+        setLocalError(
+          getFriendlyErrorMessage(err, "The requested item could not be found."),
+        );
       }
     };
 
@@ -93,6 +97,7 @@ export default function PayrollForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLocalError("");
 
     const payload = {};
     Object.keys(formData).forEach((key) => {
@@ -115,14 +120,19 @@ export default function PayrollForm({
     });
 
     try {
+      setSaving(true);
       if (payroll?.id) {
         await instance.put(`/payrolls/${payroll.id}/`, payload);
+        toast.success("Payroll updated.");
       } else {
         await postData("/payrolls/", payload);
+        toast.success("Payroll created.");
       }
       onSuccess?.();
     } catch (err) {
-      console.error("Error saving payroll:", err);
+      setLocalError(getFriendlyErrorMessage(err, "Unable to save changes."));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -132,12 +142,12 @@ export default function PayrollForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
+      {(localError || error) && (
         <div
           className="p-3 rounded-lg text-sm"
           style={{ backgroundColor: "var(--danger)", color: "#fff" }}
         >
-          {typeof error === "object" ? JSON.stringify(error) : error}
+          {localError || error}
         </div>
       )}
 
@@ -455,11 +465,11 @@ export default function PayrollForm({
         >
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || saving}
             className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors disabled:opacity-50"
             style={{ backgroundColor: "var(--primary)" }}
           >
-            {loading
+            {loading || saving
               ? t("PayrollForm.buttons.processing")
               : payroll
                 ? t("PayrollForm.buttons.update")

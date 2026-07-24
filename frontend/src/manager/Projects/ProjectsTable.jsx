@@ -13,6 +13,7 @@ import {
   Eye,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import DeleteConfirmModal from "../../components/ui/DeleteConfirmModal";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
@@ -133,7 +134,7 @@ export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
       await onDelete(projectToDelete.id);
       setProjectToDelete(null); // Close modal on success
     } catch (err) {
-      console.error(err);
+      toast.error(err?.userMessage || "Unable to delete this project.");
     } finally {
       setDeleteLoading(false);
     }

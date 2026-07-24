@@ -4,6 +4,7 @@ import {
   BarChart3,
   BriefcaseBusiness,
   CalendarCheck,
+  ClipboardCheck,
   ChevronDown,
   CircleDollarSign,
   Command,
@@ -25,6 +26,8 @@ import {
 import ThemeToggle from "../components/ui/ToggleButton";
 import { useLanguage } from "../hooks/useLanguage";
 import LanguageSwitcher from "../components/LanguageSwitcher";
+import NotificationBell from "../components/notifications/NotificationBell";
+import { useRealtimeNotifications } from "../components/notifications/RealtimeNotificationCenter";
 import { useAuth } from "../auth/AuthContext";
 import { hasAnyPermission } from "../../utils/permissions";
 
@@ -53,6 +56,17 @@ function IconButton({ children, label, className = "", ...props }) {
   );
 }
 
+function PendingBadge({ value }) {
+  if (!value || Number(value) <= 0) return null;
+  const label = Number(value) > 99 ? "99+" : value;
+
+  return (
+    <span className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white shadow-sm">
+      {label}
+    </span>
+  );
+}
+
 function DesktopNavItem({ item, active, onClick }) {
   const Icon = item.icon;
 
@@ -73,6 +87,7 @@ function DesktopNavItem({ item, active, onClick }) {
         strokeWidth={1.9}
       />
       <span className="truncate">{item.name}</span>
+      <PendingBadge value={item.badge} />
       <span
         className={`absolute inset-x-3 -bottom-[13px] h-0.5 rounded-full bg-(--primary) transition duration-200 ${
           active ? "opacity-100" : "opacity-0"
@@ -156,6 +171,7 @@ function MoreNavMenu({ groups, pathname, open, onToggle, onClose, t }) {
                   >
                     <Icon className="h-4 w-4 shrink-0" strokeWidth={1.9} />
                     <span className="truncate">{group.name}</span>
+                    <PendingBadge value={group.badge} />
                   </NavLink>
                 );
               }
@@ -183,6 +199,7 @@ function MoreNavMenu({ groups, pathname, open, onToggle, onClose, t }) {
                       >
                         <Icon className="h-4 w-4 shrink-0" strokeWidth={1.9} />
                         <span className="truncate">{item.name}</span>
+                        <PendingBadge value={item.badge} />
                       </NavLink>
                     );
                   })}
@@ -303,6 +320,7 @@ function SearchPanel({
                           {item.path}
                         </span>
                       </span>
+                      <PendingBadge value={item.badge} />
                     </button>
                   );
                 })}
@@ -413,6 +431,7 @@ export default function ManagerNavbar() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { logout, user } = useAuth();
+  const { pendingExpenseApprovals } = useRealtimeNotifications();
   const permissions = user?.permissions || [];
   const username = user?.username || "Manager";
   const role = user?.role || "manager";
@@ -500,6 +519,13 @@ export default function ManagerNavbar() {
           "expenses.delete",
         ],
       },
+      expenseApprovals: {
+        name: "Expense Approvals",
+        path: "/manager/expense-approvals",
+        icon: ClipboardCheck,
+        permissions: ["expenses.approve"],
+        badge: pendingExpenseApprovals,
+      },
       payrolls: {
         name: t("managerNavbar.payrolls"),
         path: "/manager/payrolls",
@@ -555,7 +581,7 @@ export default function ManagerNavbar() {
         key: "finance",
         name: t("managerNavbar.finance"),
         icon: CircleDollarSign,
-        items: visible(["expenses", "payrolls"]),
+        items: visible(["expenses", "expenseApprovals", "payrolls"]),
       },
       {
         type: "group",
@@ -695,6 +721,8 @@ export default function ManagerNavbar() {
             <ThemeToggle />
           </div>
 
+          <NotificationBell />
+
           <ProfileDropdown
             open={profileOpen}
             onToggle={() => setProfileOpen((open) => !open)}
@@ -747,6 +775,7 @@ export default function ManagerNavbar() {
                 >
                   <Icon className="h-4 w-4" />
                   <span>{item.name}</span>
+                  <PendingBadge value={item.badge} />
                 </button>
               );
             })}
@@ -821,6 +850,7 @@ export default function ManagerNavbar() {
                   >
                     <Icon className="h-5 w-5" />
                     <span>{group.name}</span>
+                    <PendingBadge value={group.badge} />
                   </NavLink>
                 );
               }
@@ -850,6 +880,7 @@ export default function ManagerNavbar() {
                         >
                           <Icon className="h-5 w-5" />
                           <span>{item.name}</span>
+                          <PendingBadge value={item.badge} />
                         </NavLink>
                       );
                     })}

@@ -27,6 +27,7 @@ import DocumentTable from "../../contracts/DocumentTable";
 import DocumentUploadModal from "../../contracts/DocumentUploadModal";
 import ContractInvoicesPage from "./ContractInvoicesPage";
 import { useLanguage } from "../../../hooks/useLanguage";
+import toast from "react-hot-toast";
 
 export default function ContractDetailsPage() {
   const { id } = useParams();
@@ -105,8 +106,9 @@ export default function ContractDetailsPage() {
       await instance.post(`contracts/${id}/payments/`, payload);
       setShowPaymentForm(false);
       refetch();
+      toast.success("Payment added.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -116,8 +118,9 @@ export default function ContractDetailsPage() {
       setEditingPayment(null);
       setShowPaymentForm(false);
       refetch();
+      toast.success("Payment updated.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -127,8 +130,9 @@ export default function ContractDetailsPage() {
       await instance.delete(`contract-payments/${deletePayment.id}/`);
       setDeletePayment(null);
       refetch();
+      toast.success("Payment deleted.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     } finally {
       setActionLoading(false);
     }
@@ -140,8 +144,9 @@ export default function ContractDetailsPage() {
       await instance.post(`contracts/${id}/variations/`, payload);
       setShowVariationForm(false);
       refetch();
+      toast.success("Variation added.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -154,8 +159,9 @@ export default function ContractDetailsPage() {
       setEditingVariation(null);
       setShowVariationForm(false);
       refetch();
+      toast.success("Variation updated.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -165,8 +171,9 @@ export default function ContractDetailsPage() {
       await instance.delete(`contract-variations/${deleteVariation.id}/`);
       setDeleteVariation(null);
       refetch();
+      toast.success("Variation deleted.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     } finally {
       setActionLoading(false);
     }
@@ -175,9 +182,10 @@ export default function ContractDetailsPage() {
   const handleApproveVariation = async (variation) => {
     try {
       await instance.post(`contract-variations/${variation.id}/approve/`);
+      toast.success("Variation approved.");
       refetch();
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
   const handleDownloadContractPDF = async () => {
@@ -195,8 +203,10 @@ export default function ContractDetailsPage() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Contract PDF downloaded.");
     } catch (err) {
-      console.error("PDF download failed:", err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -208,8 +218,9 @@ export default function ContractDetailsPage() {
       });
       setShowDocUpload(false);
       refetch();
+      toast.success("Document uploaded.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -219,8 +230,9 @@ export default function ContractDetailsPage() {
       await instance.delete(`contract-documents/${deleteDoc.id}/`);
       setDeleteDoc(null);
       refetch();
+      toast.success("Document deleted.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     } finally {
       setActionLoading(false);
     }
@@ -324,7 +336,7 @@ export default function ContractDetailsPage() {
               />
               <Row
                 label={t("ContractDetailsPage.subcontractor")}
-                value={contract.subcontractor.name}
+                value={contract.subcontractor?.name || t("ContractDetailsPage.noData")}
               />
               <Row
                 label={t("ContractDetailsPage.scopeOfWork")}

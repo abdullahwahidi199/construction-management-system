@@ -12,6 +12,7 @@ import DeleteConfirmModal from "../../ui/DeleteConfirmModal";
 import SubcontractorTable from "../../contracts/SubcontractorTable";
 import SubcontractorFormModal from "../../contracts/SubcontractorFormModal";
 import { useLanguage } from "../../../hooks/useLanguage";
+import toast from "react-hot-toast";
 
 export default function SubcontractorsPage() {
   const navigate = useNavigate();
@@ -84,8 +85,9 @@ export default function SubcontractorsPage() {
       await postData("subcontractors/", payload);
       setShowForm(false);
       refetch();
+      toast.success("Subcontractor created.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -100,8 +102,9 @@ export default function SubcontractorsPage() {
       setEditingSub(null);
       setShowForm(false);
       refetch();
+      toast.success("Subcontractor updated.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     }
   };
 
@@ -112,8 +115,9 @@ export default function SubcontractorsPage() {
       await instance.delete(`subcontractors/${deletingSub.id}/`);
       setDeletingSub(null);
       refetch();
+      toast.success("Subcontractor deleted.");
     } catch (err) {
-      console.error(err);
+      // Central axios handling shows the user-facing error.
     } finally {
       setDeleteLoading(false);
     }

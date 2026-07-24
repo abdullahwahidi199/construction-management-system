@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 import instance from "../api/axiosInstance";
 import { useLanguage } from "../hooks/useLanguage";
 import usePost from "../hooks/usePost";
+import { getFriendlyErrorMessage } from "../utils/apiErrors";
 
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -61,6 +63,9 @@ export default function UserManagement() {
       ]);
       setUsers(usersRes.data.results || usersRes.data);
       setMeta(metaRes.data);
+    } catch (err) {
+      toast.error(getFriendlyErrorMessage(err, "Unable to load users."));
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -71,15 +76,25 @@ export default function UserManagement() {
   }, []);
 
   const updateRole = async (id, role) => {
-    await instance.post(`auth/users/${id}/set_role/`, { role });
-    load();
+    try {
+      await instance.post(`auth/users/${id}/set_role/`, { role });
+      toast.success("User role updated.");
+      await load();
+    } catch (err) {
+      toast.error(getFriendlyErrorMessage(err, "Unable to save changes."));
+    }
   };
 
   const toggleActive = async (user) => {
-    await instance.patch(`auth/users/${user.id}/`, {
-      is_active: !user.is_active,
-    });
-    load();
+    try {
+      await instance.patch(`auth/users/${user.id}/`, {
+        is_active: !user.is_active,
+      });
+      toast.success(!user.is_active ? "User enabled." : "User disabled.");
+      await load();
+    } catch (err) {
+      toast.error(getFriendlyErrorMessage(err, "Unable to save changes."));
+    }
   };
 
   if (loading) {
@@ -347,6 +362,16 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    if (form.newPassword && form.newPassword.length < 6) {
+      setError(t("admin.users.errors.passwordLength"));
+      return;
+    }
+    if (form.newPassword && form.newPassword !== form.confirmPassword) {
+      setError(t("admin.users.errors.passwordMatch"));
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -362,33 +387,15 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
       }
 
       if (form.newPassword) {
-        if (form.newPassword.length < 6) {
-          throw new Error(t("admin.users.errors.passwordLength"));
-        }
-        if (form.newPassword !== form.confirmPassword) {
-          throw new Error(t("admin.users.errors.passwordMatch"));
-        }
         await instance.post(`auth/users/${user.id}/set_password/`, {
           new_password: form.newPassword,
         });
       }
 
+      toast.success("User updated.");
       onUpdated();
     } catch (err) {
-      if (err.message) {
-        setError(err.message);
-      } else if (err.response?.data) {
-        const data = err.response.data;
-        const msg = Object.entries(data)
-          .map(
-            ([key, val]) =>
-              `${key}: ${Array.isArray(val) ? val.join(", ") : val}`,
-          )
-          .join(" | ");
-        setError(msg);
-      } else {
-        setError(t("common.error"));
-      }
+      setError(getFriendlyErrorMessage(err, t("common.error")));
     } finally {
       setSaving(false);
     }
@@ -649,6 +656,7 @@ function CreateUserModal({
         password: form.password,
         role: form.role,
       });
+      toast.success("User created.");
       onCreated();
     } catch {}
   };
@@ -656,14 +664,6 @@ function CreateUserModal({
   const renderApiError = () => {
     if (!createError) return null;
     if (typeof createError === "string") return createError;
-    if (typeof createError === "object") {
-      return Object.entries(createError)
-        .map(
-          ([key, val]) =>
-            `${key}: ${Array.isArray(val) ? val.join(", ") : val}`,
-        )
-        .join(" | ");
-    }
     return t("common.error");
   };
 

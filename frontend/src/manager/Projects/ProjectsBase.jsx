@@ -3,14 +3,9 @@ import {
   FolderKanban,
   Plus,
   RefreshCw,
-  Search,
-  LayoutGrid,
-  List,
-  Filter,
-  Download,
   Loader2,
-  AlertCircle,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import useFetch from "../../hooks/useFetch";
 import usePost from "../../hooks/usePost";
 import useDelete from "../../hooks/useDelete";
@@ -30,25 +25,32 @@ export default function ProjectsBase() {
     try {
       await postData("projects/", formData);
       setOpen(false);
-      refetch();
+      await refetch();
+      toast.success("Project created.");
     } catch (err) {
-      console.log(err);
+      // Central API handling displays the user-facing error toast.
+      throw err;
     }
   };
 
   const handleProjectDelete = async (id) => {
     try {
       await deleteData(`projects/${id}/`);
-      refetch();
+      await refetch();
+      toast.success("Project deleted.");
     } catch (err) {
-      console.log(err);
+      // Central API handling displays the user-facing error toast.
+      throw err;
     }
   };
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await refetch();
-    setTimeout(() => setRefreshing(false), 600);
+    try {
+      await refetch();
+    } finally {
+      setTimeout(() => setRefreshing(false), 600);
+    }
   };
 
   /* ── Stat helpers ─────────────────────────────── */
@@ -98,17 +100,17 @@ export default function ProjectsBase() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Left: Title */}
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--primary)/10 shadow-sm">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--primary)]/10 shadow-sm">
             <FolderKanban
-              className="h-6 w-6 text-[var(--primary)"
+              className="h-6 w-6 text-[var(--primary)]"
               strokeWidth={1.8}
             />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-[var(--text)">
+            <h1 className="text-2xl font-bold tracking-tight text-[var(--text)]">
               {t("ProjectsBase.title")}
             </h1>
-            <p className="text-sm text-[var(--muted)">
+            <p className="text-sm text-[var(--muted)]">
               {t("ProjectsBase.subtitle")}
             </p>
           </div>
@@ -120,7 +122,7 @@ export default function ProjectsBase() {
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border) bg-[var(--card) text-[var(--muted) shadow-sm transition-all hover:bg-[var(--hover) hover:text-[var(--text) disabled:opacity-50"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--card)] text-[var(--muted)] shadow-sm transition-all hover:bg-[var(--hover)] hover:text-[var(--text)] disabled:opacity-50"
             title={t("ProjectsBase.refresh")}
           >
             <RefreshCw
@@ -132,7 +134,7 @@ export default function ProjectsBase() {
           {/* Create Button */}
           <button
             onClick={() => setOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl bg-[var(--primary) px-5 py-2.5 text-sm font-semibold text-(--text) shadow-lg shadow-[var(--primary)/25 transition-all hover:opacity-90 active:scale-[0.98"
+            className="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[var(--primary)]/25 transition-all hover:opacity-90 active:scale-[0.98]"
           >
             <Plus className="h-4 w-4" strokeWidth={2.5} />
             {t("ProjectsBase.newProject")}
@@ -145,7 +147,7 @@ export default function ProjectsBase() {
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="group flex items-center gap-3 rounded-xl border border-[var(--border) bg-[var(--card) p-4 shadow-sm transition-all hover:shadow-md"
+            className="group flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-sm transition-all hover:shadow-md"
           >
             <div
               className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${stat.color} transition-transform group-hover:scale-105`}
@@ -153,12 +155,12 @@ export default function ProjectsBase() {
               <span className="text-base font-bold">{stat.value}</span>
             </div>
             <div>
-              <p className="text-xs font-medium text-[var(--muted)">
+              <p className="text-xs font-medium text-[var(--muted)]">
                 {stat.label}
               </p>
               <div className="mt-1 flex items-center gap-1.5">
                 <span className={`h-1.5 w-1.5 rounded-full ${stat.dotColor}`} />
-                <span className="text-xs text-[var(--muted)">
+                <span className="text-xs text-[var(--muted)]">
                   {totalProjects > 0
                     ? `${Math.round((stat.value / totalProjects) * 100)}%`
                     : "0%"}
@@ -171,10 +173,10 @@ export default function ProjectsBase() {
 
       {/* ── Loading State ────────────────────────── */}
       {fetching && !projectList.length ? (
-        <div className="flex items-center justify-center rounded-xl border border-[var(--border) bg-[var(--card) py-20 shadow-sm">
+        <div className="flex items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--card)] py-20 shadow-sm">
           <div className="flex flex-col items-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-[var(--primary)" />
-            <p className="text-sm text-[var(--muted)">
+            <Loader2 className="h-8 w-8 animate-spin text-[var(--primary)]" />
+            <p className="text-sm text-[var(--muted)]">
               {t("ProjectsBase.loadingProjects")}
             </p>
           </div>
@@ -186,17 +188,17 @@ export default function ProjectsBase() {
 
       {/* ── Empty state when no projects at all ──── */}
       {!fetching && projectList.length === 0 && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[var(--border) bg-[var(--card) py-20 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--primary)/10 mb-4">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[var(--border)] bg-[var(--card)] py-20 text-center">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--primary)]/10">
             <FolderKanban
-              className="h-8 w-8 text-[var(--primary)"
+              className="h-8 w-8 text-[var(--primary)]"
               strokeWidth={1.5}
             />
           </div>
-          <h3 className="text-lg font-semibold text-[var(--text) mb-1">
+          <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">
             {t("ProjectsBase.noProjectsTitle")}
           </h3>
-          <p className="max-w-sm text-sm text-[var(--muted) mb-5">
+          <p className="mb-5 max-w-sm text-sm text-[var(--muted)]">
             {t("ProjectsBase.noProjectsDescription")}
           </p>
           <button

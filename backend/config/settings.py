@@ -10,37 +10,66 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def env_bool(name, default=False):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def env_list(name, default=None):
+    value = os.environ.get(name)
+    if value is None:
+        return list(default or [])
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-c3mgpze0q&kse)nj8%zisw883f0-x^2!%wql_1k3j7w&de-5pv'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env_bool("DJANGO_DEBUG", True)
 
-ALLOWED_HOSTS = [
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-c3mgpze0q&kse)nj8%zisw883f0-x^2!%wql_1k3j7w&de-5pv",
+)
+
+if not DEBUG and (
+    not os.environ.get("DJANGO_SECRET_KEY")
+    or SECRET_KEY.startswith("django-insecure-")
+):
+    raise ImproperlyConfigured(
+        "DJANGO_SECRET_KEY must be set to a strong unique value when DEBUG=False."
+    )
+
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", [
     "192.168.100.71",
     "127.0.0.1",
-    "localhost"
-]
-CORS_ALLOWED_ORIGINS = [
+    "localhost",
+])
+CORS_ALLOWED_ORIGINS = env_list("DJANGO_CORS_ALLOWED_ORIGINS", [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 
     "http://192.168.100.71:3000",
-]
+])
+CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", [])
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +77,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "corsheaders",
+    "channels",
     'django_filters',
     "rest_framework",
     "rest_framework.authtoken",
@@ -59,13 +89,24 @@ INSTALLED_APPS = [
     "subcontractor",
     "dashboard",
     "reports",
+    "notifications",
     "audit.apps.AuditConfig",
 ]
 
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")],
+        },
+    },
+}
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'LOCATION': os.environ.get("DJANGO_CACHE_URL", 'redis://127.0.0.1:6379/1'),
         # Fallback for development:
         # 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
@@ -79,6 +120,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'audit.middleware.AuditRequestMiddleware',
+    'common.middleware.ApiExceptionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -111,8 +153,14 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
-    ]
+    ],
+    'EXCEPTION_HANDLER': 'common.exceptions.custom_exception_handler',
 }
+
+if not DEBUG:
+    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = [
+        "rest_framework.renderers.JSONRenderer",
+    ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
@@ -170,3 +218,53 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", not DEBUG)
+CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", not DEBUG)
+SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", not DEBUG)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_HSTS_SECONDS = int(os.environ.get("DJANGO_SECURE_HSTS_SECONDS", "0" if DEBUG else "31536000"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", not DEBUG)
+SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", not DEBUG)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "redact_sensitive": {
+            "()": "common.logging.SensitiveDataFilter",
+        },
+    },
+    "formatters": {
+        "standard": {
+            "format": "%(levelname)s %(asctime)s %(name)s %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
+            "filters": ["redact_sensitive"],
+        },
+    },
+    "loggers": {
+        "cms.errors": {
+            "handlers": ["console"],
+            "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+    },
+}

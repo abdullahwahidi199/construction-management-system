@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import useFetch from "../../hooks/useFetch";
 import useDelete from "../../hooks/useDelete";
 import Header from "../../components/Layout/Header";
@@ -11,6 +12,7 @@ import instance from "../../api/axiosInstance";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
 import PayrollPrintModal from "./payrollPrintModal";
+import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 
 export default function PayrollPage() {
   // const { data: payrolls, loading, refetch } = useFetch("/payrolls/");
@@ -25,6 +27,7 @@ export default function PayrollPage() {
   const [endDateFilter, setEndDateFilter] = useState("");
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [selectedPayrollId, setSelectedPayrollId] = useState(null);
+  const [exporting, setExporting] = useState(false);
 
   const { t } = useLanguage();
 
@@ -42,9 +45,14 @@ export default function PayrollPage() {
   } = useFetch(`/payrolls/?${query.toString()}`);
   const handleDelete = async () => {
     if (deleteConfirm) {
-      await deleteData(`/payrolls/${deleteConfirm.id}/`);
-      setDeleteConfirm(null);
-      refetch();
+      try {
+        await deleteData(`/payrolls/${deleteConfirm.id}/`);
+        setDeleteConfirm(null);
+        await refetch();
+        toast.success("Payroll record deleted.");
+      } catch {
+        // Central API handling displays the user-facing error toast.
+      }
     }
   };
 
@@ -59,13 +67,15 @@ export default function PayrollPage() {
       await instance.patch(`/payrolls/${payrollId}/update_payment_status/`, {
         payment_status: newStatus,
       });
-      refetch();
+      await refetch();
+      toast.success("Payroll status updated.");
     } catch (err) {
-      console.error("Error updating status:", err);
+      toast.error(getFriendlyErrorMessage(err, "Unable to save changes."));
     }
   };
 
   const handleDownloadPDF = async () => {
+    setExporting(true);
     try {
       const response = await instance.get(
         `/employees/payrolls/export-pdf/?${query}`,
@@ -84,8 +94,12 @@ export default function PayrollPage() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Payroll PDF exported.");
     } catch (error) {
-      console.error(error);
+      toast.error(getFriendlyErrorMessage(error, "Unable to export PDF."));
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -157,10 +171,11 @@ export default function PayrollPage() {
         <div className="flex gap-2">
           <button
             onClick={handleDownloadPDF}
+            disabled={exporting}
             className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
             style={{ backgroundColor: "var(--success)" }}
           >
-            {t("PayrollPage.downloadPdf")}
+            {exporting ? t("common.loading") : t("PayrollPage.downloadPdf")}
           </button>
 
           <button
