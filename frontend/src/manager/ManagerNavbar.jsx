@@ -19,6 +19,7 @@ import {
   Receipt,
   Search,
   Settings,
+  ShieldCheck,
   User,
   Users,
   X,
@@ -33,6 +34,11 @@ import { hasAnyPermission } from "../../utils/permissions";
 
 const isRouteActive = (pathname, itemPath) =>
   pathname === itemPath || pathname.startsWith(`${itemPath}/`);
+
+const labelOr = (t, key, fallback) => {
+  const value = t(key);
+  return value === key ? fallback : value;
+};
 
 const initialsFor = (name = "Manager") =>
   name
@@ -340,6 +346,7 @@ function SearchPanel({
 function ProfileDropdown({ open, onToggle, onClose, user, logout, t }) {
   const username = user?.username || "Manager";
   const role = user?.role || "manager";
+  const isAdmin = role === "admin";
 
   return (
     <div className="relative hidden sm:block">
@@ -384,6 +391,17 @@ function ProfileDropdown({ open, onToggle, onClose, user, logout, t }) {
               <p className="truncate text-sm font-semibold text-(--text)">{username}</p>
               <p className="truncate text-xs capitalize text-(--muted)">{role}</p>
             </div>
+            {isAdmin && (
+              <NavLink
+                to="/admin/dashboard"
+                role="menuitem"
+                onClick={onClose}
+                className="mt-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-(--muted) transition duration-200 hover:bg-(--hover) hover:text-(--text) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                <span>{labelOr(t, "managerNavbar.adminHome", "Admin home")}</span>
+              </NavLink>
+            )}
             <NavLink
               to="/manager/settings"
               role="menuitem"
@@ -435,12 +453,18 @@ export default function ManagerNavbar() {
   const permissions = user?.permissions || [];
   const username = user?.username || "Manager";
   const role = user?.role || "manager";
+  const isAdmin = role === "admin";
 
   const navGroups = (() => {
     const canView = (requiredPermissions) =>
       !requiredPermissions || hasAnyPermission(permissions, requiredPermissions);
 
     const pages = {
+      adminHome: {
+        name: labelOr(t, "managerNavbar.adminHome", "Admin home"),
+        path: "/admin/dashboard",
+        icon: ShieldCheck,
+      },
       dashboard: {
         name: t("managerNavbar.dashboard"),
         path: "/manager/dashboard",
@@ -566,6 +590,7 @@ export default function ManagerNavbar() {
       keys.map((key) => pages[key]).filter((page) => canView(page.permissions));
 
     return [
+      ...(isAdmin ? [{ type: "link", ...pages.adminHome }] : []),
       { type: "link", ...pages.dashboard },
       { type: "link", ...pages.projects, hidden: !canView(pages.projects.permissions) },
       { type: "link", ...pages.contracts, hidden: !canView(pages.contracts.permissions) },
@@ -601,6 +626,7 @@ export default function ManagerNavbar() {
       : [group],
   );
   const primaryDesktopPaths = new Set([
+    "/admin/dashboard",
     "/manager/dashboard",
     "/manager/projects",
     "/manager/contracts",
@@ -614,6 +640,7 @@ export default function ManagerNavbar() {
   );
   const recentPages = allPages.slice(0, 5);
   const mobilePrimaryPaths = new Set([
+    "/admin/dashboard",
     "/manager/dashboard",
     "/manager/projects",
     "/manager/expenses",

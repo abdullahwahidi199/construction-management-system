@@ -191,15 +191,17 @@ button {
   }
 
   .mobile-modal-surface {
-    align-items: flex-end;
-    padding: var(--safe-top) 0 0;
+    align-items: flex-start;
+    overflow-y: auto;
+    padding: calc(var(--safe-top) + 0.75rem) 0 0;
   }
 
   .mobile-modal-panel {
     display: flex;
     width: 100%;
     max-width: none;
-    max-height: calc(100dvh - var(--safe-top));
+    min-height: calc(100dvh - var(--safe-top) - 0.75rem);
+    max-height: calc(100dvh - var(--safe-top) - 0.75rem);
     flex-direction: column;
     border-bottom-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
@@ -207,7 +209,7 @@ button {
   }
 
   .mobile-modal-panel.mobile-modal-full {
-    min-height: calc(100dvh - var(--safe-top));
+    min-height: calc(100dvh - var(--safe-top) - 0.75rem);
     border-radius: 0 !important;
   }
 

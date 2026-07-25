@@ -1,6 +1,7 @@
 {
   "managerNavbar": {
     "dashboard": "Dashboard",
+    "adminHome": "Admin home",
     "projects": "Projects",
     "subContractors": "Sub Contractors",
     "contracts": "Contracts",
@@ -1324,6 +1325,10 @@
     "allStatus": "All Status",
     "active": "Active",
     "inactive": "Inactive",
+    "filters": {
+      "title": "Filters",
+      "clearFilters": "Clear"
+    },
 
     "loading": "Loading employees...",
 

@@ -7,6 +7,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.utils import timezone
 
+from common.ip import get_client_ip
+
 
 SENSITIVE_KEYS = {
     "password",
@@ -52,13 +54,6 @@ FINANCIAL_MODELS = {
     "contractinvoice",
     "project",
 }
-
-
-def get_client_ip(request):
-    forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR")
 
 
 def _json_safe(value):

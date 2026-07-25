@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from django.core.exceptions import PermissionDenied as DjangoPermissionDenied
 from django.db import DatabaseError, IntegrityError
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from rest_framework import serializers, status
 from rest_framework.exceptions import (
     AuthenticationFailed,
@@ -44,6 +44,7 @@ from common.exceptions import (
     json_response_for_exception,
     response_for_exception,
 )
+from common.ip import get_client_ip
 
 
 class CalendarUtilityTests(SimpleTestCase):
@@ -161,3 +162,27 @@ class ExceptionUtilityTests(SimpleTestCase):
         json_response = json_response_for_exception(NotAuthenticated())
         self.assertEqual(json_response.status_code, 401)
         self.assertIn(b"authentication_required", json_response.content)
+
+
+class ClientIPUtilityTests(SimpleTestCase):
+    @override_settings(TRUSTED_PROXY_IPS=["127.0.0.1"])
+    def test_ignores_forwarded_for_from_untrusted_direct_clients(self):
+        request = SimpleNamespace(
+            META={
+                "REMOTE_ADDR": "198.51.100.20",
+                "HTTP_X_FORWARDED_FOR": "203.0.113.50",
+            }
+        )
+
+        self.assertEqual(get_client_ip(request), "198.51.100.20")
+
+    @override_settings(TRUSTED_PROXY_IPS=["127.0.0.1"])
+    def test_uses_forwarded_for_from_trusted_reverse_proxy(self):
+        request = SimpleNamespace(
+            META={
+                "REMOTE_ADDR": "127.0.0.1",
+                "HTTP_X_FORWARDED_FOR": "198.51.100.30, 127.0.0.1",
+            }
+        )
+
+        self.assertEqual(get_client_ip(request), "198.51.100.30")

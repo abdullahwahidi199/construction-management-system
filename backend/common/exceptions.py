@@ -1,4 +1,5 @@
 import logging
+from math import ceil
 
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied as DjangoPermissionDenied
 from django.db import DatabaseError, IntegrityError
@@ -124,6 +125,21 @@ def custom_exception_handler(exc, context):
 
     if response is not None:
         status_code = response.status_code
+        if status_code == status.HTTP_429_TOO_MANY_REQUESTS:
+            retry_after = getattr(exc, "wait", None) or response.headers.get("Retry-After")
+            retry_after = int(ceil(float(retry_after))) if retry_after else None
+            detail = response.data.get("detail") if isinstance(response.data, dict) else response.data
+            if isinstance(detail, dict):
+                payload = detail
+            else:
+                payload = build_error_payload(status_code)
+                if detail:
+                    payload["detail"] = str(detail)
+            if retry_after:
+                payload["retry_after"] = retry_after
+                response.headers["Retry-After"] = str(retry_after)
+            _log_exception(exc, status_code, request=request)
+            return Response(payload, status=status_code, headers=response.headers)
         errors = response.data if status_code in {400, 422} else None
         payload = build_error_payload(status_code, errors=errors)
         _log_exception(exc, status_code, request=request)

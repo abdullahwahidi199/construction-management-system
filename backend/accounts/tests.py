@@ -1,6 +1,9 @@
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
@@ -10,6 +13,23 @@ from accounts.models import CustomRole, Permission, ProjectAssignment, RolePermi
 from common.test_helpers import create_admin, create_project, create_user
 
 
+TEST_CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "auth-rate-limit-tests",
+    }
+}
+
+
+class AuthenticationRateLimitConfigurationTests(SimpleTestCase):
+    def test_default_cache_is_redis_backed_for_shared_worker_throttling(self):
+        self.assertEqual(
+            settings.CACHES["default"]["BACKEND"],
+            "django.core.cache.backends.redis.RedisCache",
+        )
+
+
+@override_settings(CACHES=TEST_CACHES)
 class AuthenticationAndRBACAPITests(APITestCase):
     def setUp(self):
         self.admin_password = "StrongPass123!"
@@ -200,3 +220,77 @@ class AuthenticationAndRBACAPITests(APITestCase):
         self.assertEqual(get_response.status_code, 200)
         self.assertEqual(put_forbidden.status_code, 403)
         self.assertEqual(put_allowed.status_code, 200, put_allowed.data)
+
+
+@override_settings(CACHES=TEST_CACHES)
+class LoginRateLimitingTests(APITestCase):
+    def setUp(self):
+        cache.clear()
+        self.password = "StrongPass123!"
+        self.admin = create_admin(username="rate-admin", password=self.password)
+        self.login_url = "/api/auth/login/"
+        self.ip = "203.0.113.10"
+
+    def post_login(self, username, password, ip=None):
+        return self.client.post(
+            self.login_url,
+            {"username": username, "password": password},
+            format="json",
+            REMOTE_ADDR=ip or self.ip,
+            HTTP_USER_AGENT="RateLimitTest/1.0",
+        )
+
+    def test_successful_login_does_not_create_failed_rate_limit(self):
+        response = self.post_login(self.admin.username, self.password)
+
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertIn("token", response.data)
+
+    def test_failed_login_is_rejected_without_hiding_validation_response(self):
+        response = self.post_login(self.admin.username, "wrong-password")
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_exceeding_minute_limit_returns_429_payload_and_retry_after_header(self):
+        for _ in range(settings.LOGIN_RATE_LIMIT_PER_MINUTE):
+            response = self.post_login(self.admin.username, "wrong-password")
+            self.assertEqual(response.status_code, 400, response.data)
+
+        limited = self.post_login(self.admin.username, "wrong-password")
+
+        self.assertEqual(limited.status_code, 429)
+        self.assertEqual(limited.data["detail"], "Too many login attempts. Please try again in 15 minutes.")
+        self.assertEqual(limited.data["retry_after"], settings.LOGIN_BLOCK_TIME)
+        self.assertEqual(limited["Retry-After"], str(settings.LOGIN_BLOCK_TIME))
+
+    def test_successful_login_resets_failed_attempt_counter_for_ip(self):
+        for _ in range(settings.LOGIN_RATE_LIMIT_PER_MINUTE - 1):
+            self.assertEqual(self.post_login(self.admin.username, "wrong-password").status_code, 400)
+
+        self.assertEqual(self.post_login(self.admin.username, self.password).status_code, 200)
+
+        for _ in range(settings.LOGIN_RATE_LIMIT_PER_MINUTE):
+            self.assertEqual(self.post_login(self.admin.username, "wrong-password").status_code, 400)
+
+        self.assertEqual(self.post_login(self.admin.username, "wrong-password").status_code, 429)
+
+    @override_settings(LOGIN_RATE_LIMIT_PER_MINUTE=100, LOGIN_RATE_LIMIT_PER_HOUR=20)
+    def test_exceeding_hourly_limit_blocks_login_attempts(self):
+        cache.clear()
+        for _ in range(settings.LOGIN_RATE_LIMIT_PER_HOUR):
+            self.assertEqual(self.post_login(self.admin.username, "wrong-password").status_code, 400)
+
+        self.assertEqual(self.post_login(self.admin.username, "wrong-password").status_code, 429)
+
+    def test_rate_limited_login_attempt_is_logged(self):
+        for _ in range(settings.LOGIN_RATE_LIMIT_PER_MINUTE):
+            self.post_login(self.admin.username, "wrong-password")
+
+        with self.assertLogs("cms.auth.rate_limit", level="WARNING") as logs:
+            self.post_login(self.admin.username, "wrong-password")
+
+        message = "\n".join(logs.output)
+        self.assertIn(self.ip, message)
+        self.assertIn(self.admin.username, message)
+        self.assertIn("RateLimitTest/1.0", message)
+        self.assertIn(self.login_url, message)

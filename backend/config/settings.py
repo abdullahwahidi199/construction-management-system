@@ -32,6 +32,13 @@ def env_list(name, default=None):
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
+def env_int(name, default):
+    try:
+        return int(os.environ.get(name, default))
+    except (TypeError, ValueError):
+        return default
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -64,6 +71,7 @@ CORS_ALLOWED_ORIGINS = env_list("DJANGO_CORS_ALLOWED_ORIGINS", [
     "http://192.168.100.71:3000",
 ])
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", [])
+TRUSTED_PROXY_IPS = env_list("DJANGO_TRUSTED_PROXY_IPS", ["127.0.0.1", "::1"])
 
 
 # Application definition
@@ -107,10 +115,12 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': os.environ.get("DJANGO_CACHE_URL", 'redis://127.0.0.1:6379/1'),
-        # Fallback for development:
-        # 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
+
+LOGIN_RATE_LIMIT_PER_MINUTE = env_int("LOGIN_RATE_LIMIT_PER_MINUTE", 5)
+LOGIN_RATE_LIMIT_PER_HOUR = env_int("LOGIN_RATE_LIMIT_PER_HOUR", 20)
+LOGIN_BLOCK_TIME = env_int("LOGIN_BLOCK_TIME", 900)
 
 MIDDLEWARE = [
      "corsheaders.middleware.CorsMiddleware",
@@ -274,6 +284,11 @@ LOGGING = {
         "django.security": {
             "handlers": ["console"],
             "level": "WARNING",
+            "propagate": False,
+        },
+        "cms.auth.rate_limit": {
+            "handlers": ["console"],
+            "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO"),
             "propagate": False,
         },
     },

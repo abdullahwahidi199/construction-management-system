@@ -1322,6 +1322,10 @@
     "allStatus": "همه وضعیت‌ها",
     "active": "فعال",
     "inactive": "غیرفعال",
+    "filters": {
+      "title": "فیلترها",
+      "clearFilters": "پاک کردن"
+    },
 
     "loading": "در حال بارگذاری کارمندان...",
 

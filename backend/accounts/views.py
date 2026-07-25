@@ -11,6 +11,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from audit.utils import create_audit_log
 
 from .permissions import AccountPermission
+from .throttles import AuthRateLimitExceeded, LoginFailedRateThrottle
 from .serializers import (
     CalendarSettingsSerializer,
     CustomRoleSerializer,
@@ -40,12 +41,19 @@ User = get_user_model()
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [LoginFailedRateThrottle]
+
+    def throttled(self, request, wait):
+        raise AuthRateLimitExceeded(wait=wait)
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data, context={"request": request})
         try:
             serializer.is_valid(raise_exception=True)
         except ValidationError:
+            for throttle in self.get_throttles():
+                if isinstance(throttle, LoginFailedRateThrottle):
+                    throttle.record_failure(request)
             create_audit_log(
                 user=None,
                 action="auth.login_failed",
@@ -56,6 +64,9 @@ class LoginView(APIView):
             )
             raise
         user = serializer.validated_data["user"]
+        for throttle in self.get_throttles():
+            if isinstance(throttle, LoginFailedRateThrottle):
+                throttle.reset(request)
         token, _ = Token.objects.get_or_create(user=user)
         create_audit_log(
             user=user,

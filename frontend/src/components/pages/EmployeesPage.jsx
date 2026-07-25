@@ -11,6 +11,7 @@ import EmployeeCard from "../../components/employees/EmployeeCard";
 import EmployeeForm from "../../components/employees/EmployeeForm";
 import EmployeeDetail from "../../components/employees/EmployeeDetail";
 import { useLanguage } from "../../hooks/useLanguage";
+import { Filter, Search, X } from "lucide-react";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -77,9 +78,18 @@ export default function EmployeesPage() {
 
   const departments = [
     ...new Set(
-      (Array.isArray(employees) ? employees : []).map((emp) => emp.department),
+      (Array.isArray(employees) ? employees : [])
+        .map((emp) => emp.department)
+        .filter(Boolean),
     ),
   ];
+  const hasActiveFilters = Boolean(searchQuery || deptFilter || statusFilter);
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setDeptFilter("");
+    setStatusFilter("");
+  };
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"}>
@@ -102,52 +112,73 @@ export default function EmployeesPage() {
       </Header>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-6">
-        <input
-          type="text"
-          placeholder={t("EmployeesPage.searchPlaceholder")}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 px-4 py-2 rounded-lg border text-sm"
-          style={{
-            backgroundColor: "var(--card)",
-            color: "var(--text)",
-            borderColor: "var(--border)",
-            maxWidth: "300px",
-          }}
-        />
-        <select
-          value={deptFilter}
-          onChange={(e) => setDeptFilter(e.target.value)}
-          className="px-4 py-2 rounded-lg border text-sm"
-          style={{
-            backgroundColor: "var(--card)",
-            color: "var(--text)",
-            borderColor: "var(--border)",
-          }}
-        >
-          <option value="">{t("EmployeesPage.allDepartments")}</option>
-          {departments.map((dept) => (
-            <option key={dept} value={dept}>
-              {dept.replace("_", " ").toUpperCase()}
-            </option>
-          ))}
-        </select>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 rounded-lg border text-sm"
-          style={{
-            backgroundColor: "var(--card)",
-            color: "var(--text)",
-            borderColor: "var(--border)",
-          }}
-        >
-          <option value="">{t("EmployeesPage.allStatus")}</option>
-          <option value="active">{t("EmployeesPage.active")}</option>
-          <option value="inactive">{t("EmployeesPage.inactive")}</option>
-        </select>
-      </div>
+      <section className="mb-6 rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 sm:p-4">
+        <div className="mb-3 flex items-center justify-between gap-3 sm:hidden">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text)]">
+            <Filter className="h-4 w-4 text-[var(--primary)]" />
+            {t("EmployeesPage.filters.title") || "Filters"}
+          </div>
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--border)] px-3 text-sm text-[var(--text)]"
+            >
+              <X className="h-4 w-4" />
+              {t("EmployeesPage.filters.clearFilters") || "Clear"}
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(14rem,1fr)_minmax(11rem,auto)_minmax(10rem,auto)_auto] sm:items-center">
+          <div className="relative min-w-0">
+            <Search
+              className={`absolute top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)] ${
+                isRTL ? "right-3" : "left-3"
+              }`}
+            />
+            <input
+              type="text"
+              placeholder={t("EmployeesPage.searchPlaceholder")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={`min-h-12 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-base text-[var(--text)] outline-none focus:border-[var(--primary)] sm:min-h-10 sm:py-2 sm:text-sm ${
+                isRTL ? "pr-10" : "pl-10"
+              }`}
+            />
+          </div>
+          <select
+            value={deptFilter}
+            onChange={(e) => setDeptFilter(e.target.value)}
+            className="min-h-12 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-base text-[var(--text)] outline-none focus:border-[var(--primary)] sm:min-h-10 sm:py-2 sm:text-sm"
+          >
+            <option value="">{t("EmployeesPage.allDepartments")}</option>
+            {departments.map((dept) => (
+              <option key={dept} value={dept}>
+                {dept.replace("_", " ").toUpperCase()}
+              </option>
+            ))}
+          </select>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="min-h-12 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-base text-[var(--text)] outline-none focus:border-[var(--primary)] sm:min-h-10 sm:py-2 sm:text-sm"
+          >
+            <option value="">{t("EmployeesPage.allStatus")}</option>
+            <option value="active">{t("EmployeesPage.active")}</option>
+            <option value="inactive">{t("EmployeesPage.inactive")}</option>
+          </select>
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="hidden h-10 items-center justify-center gap-2 rounded-lg border border-[var(--border)] px-3 text-sm font-medium text-[var(--text)] hover:bg-[var(--hover)] sm:inline-flex"
+            >
+              <X className="h-4 w-4" />
+              {t("EmployeesPage.filters.clearFilters") || "Clear"}
+            </button>
+          )}
+        </div>
+      </section>
 
       {loading ? (
         <Loading message={t("EmployeesPage.loading")} />

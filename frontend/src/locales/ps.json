@@ -1322,6 +1322,10 @@
     "allStatus": "ټول حالتونه",
     "active": "فعال",
     "inactive": "غیرفعال",
+    "filters": {
+      "title": "فلټرونه",
+      "clearFilters": "پاکول"
+    },
 
     "loading": "کارکوونکي بارېږي...",
 

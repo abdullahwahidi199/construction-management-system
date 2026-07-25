@@ -59,6 +59,20 @@ function pushReadable(messages, label, value) {
   messages.push(label ? `${label}: ${text}` : text);
 }
 
+function retryAfterSeconds(error) {
+  const value =
+    error?.response?.data?.retry_after ||
+    error?.response?.headers?.["retry-after"] ||
+    error?.response?.headers?.["Retry-After"];
+  const seconds = Number(value);
+  return Number.isFinite(seconds) && seconds > 0 ? seconds : 0;
+}
+
+export function formatRetryAfterMessage(seconds) {
+  const minutes = Math.max(1, Math.ceil(Number(seconds || 0) / 60));
+  return `Too many login attempts. Please wait ${minutes} minute${minutes === 1 ? "" : "s"} before trying again.`;
+}
+
 export function extractValidationMessages(data) {
   const messages = [];
 
@@ -102,6 +116,12 @@ export function getFriendlyErrorMessage(error, fallback = "Unable to complete th
 
   const status = error.response?.status;
   if (status >= 500) return STATUS_MESSAGES[status] || STATUS_MESSAGES[500];
+  if (status === 429) {
+    const retryAfter = retryAfterSeconds(error);
+    if (retryAfter) return formatRetryAfterMessage(retryAfter);
+    const messages = extractValidationMessages(error.response?.data);
+    return messages[0] || STATUS_MESSAGES[429];
+  }
   if (STATUS_MESSAGES[status] && ![400, 422].includes(status)) {
     return STATUS_MESSAGES[status];
   }

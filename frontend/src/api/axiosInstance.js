@@ -75,7 +75,10 @@ instance.interceptors.response.use(
         id: "session-expired",
       });
     } else if (!shouldSkipGlobalToast(normalized.config)) {
-      showErrorToast(message);
+      showErrorToast(
+        message,
+        status === 429 && isLoginRequest(normalized.config) ? { id: "login-rate-limit" } : {},
+      );
     }
 
     return Promise.reject(normalized);
