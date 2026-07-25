@@ -103,6 +103,7 @@ export default function VariationFormModal({
                   value={form.date}
                   onChange={(val) => handleChange("date", val)}
                   error={errors.date}
+                  module="contract_variations"
                 />
               </div>
 

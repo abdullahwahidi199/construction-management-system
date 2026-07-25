@@ -67,7 +67,7 @@ export default function PaymentFormModal({
       e.amount = t("PaymentFormModal.amountMustBePositive");
     if (maxAmount !== null && Number(form.amount) > maxAmount)
       e.amount = t("PaymentFormModal.amountExceedsRemaining", {
-        amount: `$${maxAmount.toLocaleString()}`,
+        amount: `${currency || ""}${maxAmount.toLocaleString()}`,
       });
     if (!form.payment_date)
       e.payment_date = t("PaymentFormModal.paymentDateRequired");
@@ -128,6 +128,7 @@ export default function PaymentFormModal({
                 value={form.payment_date}
                 onChange={(val) => handleChange("payment_date", val)}
                 error={errors.payment_date}
+                module="contract_payments"
               />
 
               <Select

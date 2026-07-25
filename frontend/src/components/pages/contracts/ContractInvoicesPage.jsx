@@ -26,6 +26,8 @@ const inputStyle = {
   outline: "none",
 };
 
+const dateKey = (value) => String(value || "").slice(0, 10);
+
 export default function ContractInvoicesPage({ contractID, contractCurrency }) {
   const { t } = useLanguage();
   const { formatDate } = useCalendar("invoices");
@@ -43,6 +45,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
     data: invoices,
     loading,
     error,
+    refetch,
   } = useFetch(`invoices/?contract=${contractID}`);
   const invoiceList = Array.isArray(invoices)
     ? invoices
@@ -77,6 +80,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
   };
 
   const handleSuccess = () => {
+    refetch();
     handleCloseModal();
   };
 
@@ -90,8 +94,8 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
   const filteredInvoices = useMemo(() => {
     if (!invoiceList.length) return [];
 
-    const start = dateRange.start ? formatDate(dateRange.start) : "";
-    const end = dateRange.end ? formatDate(dateRange.end) : "";
+    const start = dateKey(dateRange.start);
+    const end = dateKey(dateRange.end);
 
     return invoiceList.filter((inv) => {
       // 1. Status Filter
@@ -101,7 +105,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
       const q = searchQuery.toLowerCase().trim();
       if (!q) {
         // If no text query, check status + date
-        const invDate = inv.formatted_invoice_date || inv.invoice_date || "";
+        const invDate = dateKey(inv.invoice_date);
         let matchesDate = true;
         if (start && invDate < start) matchesDate = false;
         if (end && invDate > end) matchesDate = false;
@@ -114,14 +118,14 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
         inv.project_name?.toLowerCase().includes(q) ||
         inv.subcontractor_name?.toLowerCase().includes(q);
 
-      const invDate = inv.formatted_invoice_date || inv.invoice_date || "";
+      const invDate = dateKey(inv.invoice_date);
       let matchesDate = true;
       if (start && invDate < start) matchesDate = false;
       if (end && invDate > end) matchesDate = false;
 
       return matchesStatus && matchesSearch && matchesDate;
     });
-  }, [invoiceList, searchQuery, statusFilter, dateRange, formatDate]);
+  }, [invoiceList, searchQuery, statusFilter, dateRange]);
 
   const hasActiveFilters =
     searchQuery || statusFilter || dateRange.start || dateRange.end;
@@ -367,10 +371,16 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
                     {inv.subcontractor_name || "-"}
                   </td>
                   <td style={{ padding: "1rem" }}>
-                    {inv.formatted_invoice_date || inv.invoice_date || "-"}
+                    {formatDate(inv.invoice_date) ||
+                      inv.formatted_invoice_date ||
+                      inv.invoice_date ||
+                      "-"}
                   </td>
                   <td style={{ padding: "1rem" }}>
-                    {inv.formatted_due_date || inv.due_date || "-"}
+                    {formatDate(inv.due_date) ||
+                      inv.formatted_due_date ||
+                      inv.due_date ||
+                      "-"}
                   </td>
                   <td
                     style={{
@@ -379,7 +389,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
                       fontFamily: "monospace",
                     }}
                   >
-                    {contractCurrency || "$"}
+                    {contractCurrency || ""}
                     {Number(inv.amount).toFixed(2)}
                   </td>
                   <td style={{ padding: "1rem" }}>
@@ -451,6 +461,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
       {isViewOpen && (
         <ContractInvoiceDetails
           id={viewInvoiceId}
+          currency={contractCurrency}
           onClose={() => {
             setIsViewOpen(false);
             setViewInvoiceId(null);

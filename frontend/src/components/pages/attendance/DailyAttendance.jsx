@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import useAttendance from "../../../hooks/useAttendance";
 import { useLanguage } from "../../../hooks/useLanguage";
 import { getFriendlyErrorMessage } from "../../../utils/apiErrors";
+import CalendarDatePicker from "../../common/CalendarDatePicker";
+import { todayIso } from "../../../utils/calendar";
 
 function DailyAttendance() {
   const { fetchDailyAttendance, loading, error } = useAttendance();
@@ -11,9 +13,7 @@ function DailyAttendance() {
   // RTL languages (Dari / Pashto)
   const isRTL = ["fa", "ps", "dari", "pashto"].includes(language);
 
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
+  const [selectedDate, setSelectedDate] = useState(todayIso());
   const [data, setData] = useState(null);
   const [localError, setLocalError] = useState("");
 
@@ -98,10 +98,10 @@ function DailyAttendance() {
             >
               {t("DailyAttendance.selectDate")}
             </label>
-            <input
-              type="date"
+            <CalendarDatePicker
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              onChange={setSelectedDate}
+              module="attendance"
               className="px-3 py-2 border rounded-lg"
               style={{
                 borderColor: "var(--border)",

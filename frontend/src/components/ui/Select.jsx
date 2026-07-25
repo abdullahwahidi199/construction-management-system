@@ -1,3 +1,11 @@
+import {
+  fieldControlClass,
+  fieldControlErrorClass,
+  fieldErrorClass,
+  fieldLabelClass,
+  RequiredMark,
+} from "./formStyles.jsx";
+
 export default function Select({
   label,
   value,
@@ -6,32 +14,23 @@ export default function Select({
   className = "",
   placeholder,
   disabled = false,
+  error,
+  required = false,
 }) {
   return (
     <label className={`block ${className}`}>
-      {label && <div className="mb-1 text-sm text-[var(--text)]">{label}</div>}
+      {label && (
+        <div className={fieldLabelClass}>
+          {label} {required && <RequiredMark />}
+        </div>
+      )}
 
       <select
         value={value ?? ""}
         disabled={disabled}
+        required={required}
         onChange={(e) => onChange?.(e.target.value)}
-        className="
-          w-full
-          rounded-lg
-          border
-          px-3
-          py-2
-          text-sm
-          outline-none
-          transition-colors
-          bg-[var(--bg)]
-          text-[var(--text)]
-          border-[var(--border)]
-          focus:ring-2
-          focus:ring-[var(--primary)]
-          disabled:opacity-50
-          disabled:cursor-not-allowed
-        "
+        className={`${fieldControlClass} ${error ? fieldControlErrorClass : ""}`}
       >
         {placeholder && <option value="">{placeholder}</option>}
 
@@ -48,6 +47,7 @@ export default function Select({
           </option>
         ))}
       </select>
+      {error && <p className={fieldErrorClass}>{error}</p>}
     </label>
   );
 }

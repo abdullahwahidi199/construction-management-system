@@ -164,7 +164,7 @@ export default function ContractsPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
+        <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-bold text-[var(--text)]">
             {t("ContractsPage.title")}
           </h1>
@@ -183,7 +183,11 @@ export default function ContractsPage() {
             <Plus size={16} className="mr-1" />
             {t("ContractsPage.buttons.newContract")}
           </Button>
-          <Button variant="secondary" onClick={handleExportPdf}>
+          <Button
+            variant="secondary"
+            onClick={handleExportPdf}
+            leftIcon={<Download size={16} />}
+          >
             {t("ProjectDetails.downloadPdf")}
           </Button>
         </div>

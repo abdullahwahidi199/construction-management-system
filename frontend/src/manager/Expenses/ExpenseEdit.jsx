@@ -4,6 +4,7 @@ import PermissionWrapper from "../../auth/PermissionWrapper";
 import Button from "../../components/ui/Button";
 import { useLanguage } from "../../hooks/useLanguage";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
+import CalendarDatePicker from "../../components/common/CalendarDatePicker";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -177,15 +178,11 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
               </label>
               <div className="relative">
                 <Calendar className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
-                <input
-                  type="date"
+                <CalendarDatePicker
                   value={formData.expense_date}
-                  onChange={(e) => handleChange("expense_date", e.target.value)}
-                  className={`w-full rounded-xl border ${
-                    errors.expense_date
-                      ? "border-red-500"
-                      : "border-[var(--border)]"
-                  } bg-[var(--bg)] ps-10 pe-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
+                  onChange={(value) => handleChange("expense_date", value)}
+                  module="expenses"
+                  className="ps-10"
                 />
               </div>
               {errors.expense_date && (

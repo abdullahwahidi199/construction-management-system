@@ -21,6 +21,7 @@ import {
   CheckCircle2,
   Timer,
   TrendingUp,
+  Download,
 } from "lucide-react";
 import instance from "../../api/axiosInstance";
 import ProjectEditView from "../../components/reusableComponents/ProjectEditView";
@@ -394,7 +395,11 @@ export default function ProjectDetails() {
                 {t("ProjectDetails.delete")}
               </button>
             </PermissionWrapper>
-            <Button variant="secondary" onClick={handleDownloadContractPDF}>
+            <Button
+              variant="secondary"
+              onClick={handleDownloadContractPDF}
+              leftIcon={<Download className="h-4 w-4" />}
+            >
               {t("ProjectDetails.downloadPdf")}
             </Button>
           </div>

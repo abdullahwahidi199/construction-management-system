@@ -766,7 +766,7 @@
       "title": "Title",
       "scopeOfWork": "Scope of Work",
       "currency": "Currency",
-      "contractValue": "Contract Value ($)",
+      "contractValue": "Contract Value",
       "retentionPercentage": "Retention %",
       "completionPercentage": "Progress %",
       "startDate": "Start Date",

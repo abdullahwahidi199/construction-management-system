@@ -4,12 +4,15 @@ import Loading from "../common/Loading";
 import instance from "../../api/axiosInstance";
 import { useLanguage } from "../../hooks/useLanguage";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
+import { useCalendar } from "../../hooks/useCalendar";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
 export default function EmployeeDetail({ employeeId, onClose }) {
   const { t, lang } = useLanguage();
   const isRTL = RTL_LANGS.includes(lang);
+  const { formatDate: formatEmployeeDate } = useCalendar("employees");
+  const { formatDate: formatPayrollDate } = useCalendar("payroll");
 
   const [activeTab, setActiveTab] = useState("info");
   const [employee, setEmployee] = useState({});
@@ -178,6 +181,7 @@ export default function EmployeeDetail({ employeeId, onClose }) {
                 {
                   label: t("EmployeeDetail.hireDate"),
                   value:
+                    formatEmployeeDate(employee.hire_date) ||
                     employee.formatted_hire_date ||
                     employee.hire_date ||
                     t("EmployeeDetail.emptyValue"),
@@ -237,8 +241,11 @@ export default function EmployeeDetail({ employeeId, onClose }) {
                         className="font-medium"
                         style={{ color: "var(--text)" }}
                       >
-                        {payroll.payroll_period_start} {t("EmployeeDetail.to")}{" "}
-                        {payroll.payroll_period_end}
+                        {formatPayrollDate(payroll.payroll_period_start) ||
+                          payroll.payroll_period_start}{" "}
+                        {t("EmployeeDetail.to")}{" "}
+                        {formatPayrollDate(payroll.payroll_period_end) ||
+                          payroll.payroll_period_end}
                       </p>
                       <p className="text-xs" style={{ color: "var(--muted)" }}>
                         {t("EmployeeDetail.status")}: {payroll.payment_status}

@@ -31,11 +31,14 @@ import { useLanguage } from "../../hooks/useLanguage";
 import useRealtimeEvents from "../../hooks/useRealtimeEvents";
 import Button from "../../components/ui/Button";
 import toast from "react-hot-toast";
+import CalendarDatePicker from "../../components/common/CalendarDatePicker";
+import { useCalendar } from "../../hooks/useCalendar";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
 export default function ExpensesMain({ dataEntryMode = false }) {
   const { t, lang } = useLanguage();
+  const { formatDate } = useCalendar("expenses");
   const isRTL = RTL_LANGS.includes(lang);
   const [page, setPage] = useState(1);
 
@@ -350,6 +353,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
             onClick={handleExportPdf}
             disabled={exportBlocked}
             title={exportBlocked ? "Only approved expenses can be exported." : ""}
+            leftIcon={<Download className="h-4 w-4" />}
           >
             {t("ProjectDetails.downloadPdf")}
           </Button>
@@ -649,14 +653,14 @@ export default function ExpensesMain({ dataEntryMode = false }) {
                   className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]"
                   strokeWidth={2}
                 />
-                <input
-                  type="date"
+                <CalendarDatePicker
                   value={filterDateFrom}
-                  onChange={(e) => {
-                    setFilterDateFrom(e.target.value);
+                  onChange={(value) => {
+                    setFilterDateFrom(value);
                     setPage(1);
                   }}
-                  className="h-10 w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] ps-10 pe-3 text-sm text-[var(--text)] transition-all focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+                  module="expenses"
+                  className="ps-10"
                 />
               </div>
             </div>
@@ -671,14 +675,14 @@ export default function ExpensesMain({ dataEntryMode = false }) {
                   className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]"
                   strokeWidth={2}
                 />
-                <input
-                  type="date"
+                <CalendarDatePicker
                   value={filterDateTo}
-                  onChange={(e) => {
-                    setFilterDateTo(e.target.value);
+                  onChange={(value) => {
+                    setFilterDateTo(value);
                     setPage(1);
                   }}
-                  className="h-10 w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] ps-10 pe-3 text-sm text-[var(--text)] transition-all focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+                  module="expenses"
+                  className="ps-10"
                 />
               </div>
             </div>
@@ -754,8 +758,9 @@ export default function ExpensesMain({ dataEntryMode = false }) {
             )}
             {(filterDateFrom || filterDateTo) && (
               <span className="inline-flex items-center gap-1 rounded-lg bg-[var(--primary)]/10 px-2.5 py-1 text-xs font-medium text-[var(--primary)]">
-                {t("ExpensesMain.activeFilters.date")} {filterDateFrom || "..."}{" "}
-                - {filterDateTo || "..."}
+                {t("ExpensesMain.activeFilters.date")}{" "}
+                {formatDate(filterDateFrom) || "..."} -{" "}
+                {formatDate(filterDateTo) || "..."}
                 <button
                   onClick={() => {
                     setFilterDateFrom("");

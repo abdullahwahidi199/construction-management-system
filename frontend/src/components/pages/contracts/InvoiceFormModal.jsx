@@ -5,6 +5,7 @@ import instance from "../../../api/axiosInstance";
 import PermissionWrapper from "../../../auth/PermissionWrapper";
 import Button from "../../ui/Button";
 import { useLanguage } from "../../../hooks/useLanguage";
+import CalendarDatePicker from "../../common/CalendarDatePicker";
 
 const INITIAL_STATE = {
   invoice_date: "",
@@ -43,6 +44,10 @@ export default function InvoiceFormModal({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleDateChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -191,22 +196,22 @@ export default function InvoiceFormModal({
             <label style={labelStyle}>
               {t("InvoiceFormModal.invoiceDate")} *
             </label>
-            <input
+            <CalendarDatePicker
               name="invoice_date"
-              type="date"
               value={formData.invoice_date}
-              onChange={handleChange}
+              onChange={(value) => handleDateChange("invoice_date", value)}
+              module="invoices"
               required
               style={inputStyle}
             />
           </div>
           <div>
             <label style={labelStyle}>{t("InvoiceFormModal.dueDate")}</label>
-            <input
+            <CalendarDatePicker
               name="due_date"
-              type="date"
               value={formData.due_date}
-              onChange={handleChange}
+              onChange={(value) => handleDateChange("due_date", value)}
+              module="invoices"
               style={inputStyle}
             />
           </div>

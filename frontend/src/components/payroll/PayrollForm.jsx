@@ -6,6 +6,7 @@ import PermissionWrapper from "../../auth/PermissionWrapper";
 import Button from "../ui/Button";
 import { useLanguage } from "../../hooks/useLanguage";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
+import CalendarDatePicker from "../common/CalendarDatePicker";
 
 const initialFormData = {
   employee: "",
@@ -93,6 +94,10 @@ export default function PayrollForm({
         }));
       }
     }
+  };
+
+  const handleDateChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -202,11 +207,11 @@ export default function PayrollForm({
           <label className={labelClass} style={{ color: "var(--text)" }}>
             {t("PayrollForm.periodStart")} *
           </label>
-          <input
-            type="date"
+          <CalendarDatePicker
             name="payroll_period_start"
             value={formData.payroll_period_start}
-            onChange={handleChange}
+            onChange={(value) => handleDateChange("payroll_period_start", value)}
+            module="payroll"
             className={inputClass}
             style={{
               backgroundColor: "var(--bg)",
@@ -220,11 +225,11 @@ export default function PayrollForm({
           <label className={labelClass} style={{ color: "var(--text)" }}>
             {t("PayrollForm.periodEnd")} *
           </label>
-          <input
-            type="date"
+          <CalendarDatePicker
             name="payroll_period_end"
             value={formData.payroll_period_end}
-            onChange={handleChange}
+            onChange={(value) => handleDateChange("payroll_period_end", value)}
+            module="payroll"
             className={inputClass}
             style={{
               backgroundColor: "var(--bg)",
@@ -402,11 +407,11 @@ export default function PayrollForm({
             <label className={labelClass} style={{ color: "var(--text)" }}>
               {t("PayrollForm.paymentDate")}
             </label>
-            <input
-              type="date"
+            <CalendarDatePicker
               name="payment_date"
               value={formData.payment_date}
-              onChange={handleChange}
+              onChange={(value) => handleDateChange("payment_date", value)}
+              module="payroll"
               className={inputClass}
               style={{
                 backgroundColor: "var(--bg)",

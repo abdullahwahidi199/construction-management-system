@@ -4,6 +4,8 @@ import useFetch from "../../hooks/useFetch";
 import instance from "../../api/axiosInstance";
 import { useLanguage } from "../../hooks/useLanguage";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
+import { useCalendar } from "../../hooks/useCalendar";
+import { resolveFileUrl } from "../../utils/fileUrls";
 
 const ACCEPTED_EXTENSIONS = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png"];
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
@@ -13,8 +15,9 @@ function isAcceptedFile(file) {
   return ACCEPTED_EXTENSIONS.some((extension) => lowerName.endsWith(extension));
 }
 
-export default function ContractInvoiceDetails({ id, onClose }) {
+export default function ContractInvoiceDetails({ id, onClose, currency }) {
   const { t } = useLanguage();
+  const { formatDate } = useCalendar("invoices");
   // Force refetch after successful upload
   const [refreshKey, setRefreshKey] = useState(0);
   const {
@@ -213,7 +216,7 @@ export default function ContractInvoiceDetails({ id, onClose }) {
           />
           <DetailItem
             label={t("ContractInvoiceDetails.amount")}
-            value={`$${Number(invoiceDetails.amount).toFixed(2)}`}
+            value={`${currency || invoiceDetails.currency || ""}${Number(invoiceDetails.amount).toFixed(2)}`}
           />
           <DetailItem
             label={t("ContractInvoiceDetails.status")}
@@ -221,11 +224,11 @@ export default function ContractInvoiceDetails({ id, onClose }) {
           />
           <DetailItem
             label={t("ContractInvoiceDetails.invoiceDate")}
-            value={invoiceDetails.invoice_date}
+            value={formatDate(invoiceDetails.invoice_date) || "-"}
           />
           <DetailItem
             label={t("ContractInvoiceDetails.dueDate")}
-            value={invoiceDetails.due_date || "-"}
+            value={formatDate(invoiceDetails.due_date) || "-"}
           />
         </div>
         <div style={{ marginBottom: "1.5rem" }}>
@@ -370,7 +373,7 @@ export default function ContractInvoiceDetails({ id, onClose }) {
                     `${t("ContractInvoiceDetails.document")} ${doc.id}`}
                 </span>
                 <a
-                  href={doc.file}
+                  href={resolveFileUrl(doc.file)}
                   target="_blank"
                   rel="noreferrer"
                   style={{

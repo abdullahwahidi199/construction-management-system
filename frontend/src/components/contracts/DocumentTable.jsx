@@ -1,5 +1,7 @@
 import { FileText, Download, Trash2 } from "lucide-react";
 import { useLanguage } from "../../hooks/useLanguage";
+import { useCalendar } from "../../hooks/useCalendar";
+import { resolveFileUrl } from "../../utils/fileUrls";
 
 const TYPE_COLORS = {
   signed_contract: "bg-[var(--success)]/15 text-[var(--success)]",
@@ -15,16 +17,13 @@ function getFileExtension(filename) {
   return filename?.split(".").pop()?.toUpperCase() || "FILE";
 }
 
-const BASE_URL = "http://127.0.0.1:8000";
-
 const getFileUrl = (file) => {
-  if (!file) return "";
-  if (file.startsWith("http")) return file;
-  return `${BASE_URL}${file}`;
+  return resolveFileUrl(file);
 };
 
 export default function DocumentTable({ documents = [], onDelete, loading }) {
   const { t } = useLanguage();
+  const { formatDateTime } = useCalendar("documents");
 
   const TYPE_LABELS = {
     signed_contract: t("DocumentTable.signedContract"),
@@ -106,7 +105,9 @@ export default function DocumentTable({ documents = [], onDelete, loading }) {
                   </div>
                 </td>
                 <td className="px-4 py-3 text-[var(--muted)] text-sm text-start">
-                  {doc.formatted_uploaded_at || doc.uploaded_at || "-"}
+                  {formatDateTime(doc.uploaded_at) ||
+                    doc.formatted_uploaded_at ||
+                    "-"}
                 </td>
                 <td className="px-4 py-3 text-end">
                   <div className="flex items-center justify-end gap-1">
@@ -152,7 +153,9 @@ export default function DocumentTable({ documents = [], onDelete, loading }) {
             </div>
             <p className="text-xs text-[var(--muted)]">
               {getFileExtension(doc.file_url || doc.file)} &middot;{" "}
-              {doc.formatted_uploaded_at || doc.uploaded_at || ""}
+              {formatDateTime(doc.uploaded_at) ||
+                doc.formatted_uploaded_at ||
+                ""}
             </p>
             <div className="flex items-center justify-end gap-2">
               {doc.file && (

@@ -2,11 +2,13 @@ import { useState } from "react";
 import instance from "../../api/axiosInstance";
 import Loading from "../common/Loading";
 import { useLanguage } from "../../hooks/useLanguage";
+import { useCalendar } from "../../hooks/useCalendar";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
 export default function EmployeeCard({ employee, onEdit, onView, onDelete }) {
   const { t, lang } = useLanguage();
+  const { formatDate } = useCalendar("employees");
   const isRTL = RTL_LANGS.includes(lang);
 
   const statusColor = employee.is_active ? "var(--success)" : "var(--danger)";
@@ -87,7 +89,9 @@ export default function EmployeeCard({ employee, onEdit, onView, onDelete }) {
             {t("EmployeeCard.hired")}
           </span>
           <span style={{ color: "var(--text)" }}>
-            {employee.formatted_hire_date || employee.hire_date || "-"}
+            {formatDate(employee.hire_date) ||
+              employee.formatted_hire_date ||
+              "-"}
           </span>
         </div>
       </div>

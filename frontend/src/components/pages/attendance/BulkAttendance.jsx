@@ -6,6 +6,8 @@ import PermissionWrapper from "../../../auth/PermissionWrapper";
 import Button from "../../ui/Button";
 import { useLanguage } from "../../../hooks/useLanguage";
 import { getFriendlyErrorMessage } from "../../../utils/apiErrors";
+import CalendarDatePicker from "../../common/CalendarDatePicker";
+import { todayIso } from "../../../utils/calendar";
 
 // Compact status indicator dot
 const StatusDot = ({ status }) => {
@@ -27,9 +29,7 @@ function BulkAttendance() {
   const { bulkMarkAttendance, loading, error, setError } = useAttendance();
 
   const [employees, setEmployees] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
+  const [selectedDate, setSelectedDate] = useState(todayIso());
   const [attendanceData, setAttendanceData] = useState({});
   const [isLoadingExisting, setIsLoadingExisting] = useState(false);
   const [result, setResult] = useState(null);
@@ -238,10 +238,10 @@ function BulkAttendance() {
           </div>
 
           <div className="flex items-center gap-3">
-            <input
-              type="date"
+            <CalendarDatePicker
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              onChange={setSelectedDate}
+              module="attendance"
               className="rounded border px-3 py-1.5 text-sm"
               style={{
                 borderColor: "var(--border)",

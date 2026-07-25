@@ -1,9 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import { X, Printer } from "lucide-react";
 import useFetch from "../../hooks/useFetch";
+import { useCalendar } from "../../hooks/useCalendar";
 
 export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
   const printRef = useRef();
+  const {
+    formatDate: formatPayrollDate,
+    parseDate: parsePayrollDate,
+  } = useCalendar("payroll");
   const { data: payroll, loading } = useFetch(
     payrollID ? `/payrolls/${payrollID}/` : null,
   );
@@ -21,14 +26,14 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
 
   if (!isOpen) return null;
 
-  const formatDate = (dateString) => {
+  const displayDate = (dateString) => {
     if (!dateString) return "__ / __ / ____";
-    return dateString;
+    return formatPayrollDate(dateString) || dateString;
   };
 
   const formatFullDate = (dateString) => {
     if (!dateString) return "—";
-    return dateString;
+    return formatPayrollDate(dateString) || dateString;
   };
 
   const formatNumber = (num) => {
@@ -41,8 +46,9 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
 
   const getDaysWorked = (start, end) => {
     if (!start || !end) return 30;
-    const s = new Date(start);
-    const e = new Date(end);
+    const s = new Date(`${parsePayrollDate(start) || start}T00:00:00`);
+    const e = new Date(`${parsePayrollDate(end) || end}T00:00:00`);
+    if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return 30;
     const diff = Math.ceil((e - s) / (1000 * 60 * 60 * 24));
     return diff > 0 ? diff : 30;
   };
@@ -55,7 +61,9 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
 
   const getPeriodLabel = (start, end) => {
     if (!start) return "";
-    return end ? `${start} - ${end}` : start;
+    return end
+      ? `${formatFullDate(start)} - ${formatFullDate(end)}`
+      : formatFullDate(start);
   };
 
   const currencyLabel = payroll?.currency || "AFN";
@@ -315,7 +323,7 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
               <td class="label-cell">Payee :</td>
               <td class="value-cell" colspan="2">${payroll.employee_name || "—"}</td>
               <td rowspan="2" style="text-align:center; font-size:12px;">
-                <span style="font-weight:600;">Date:</span> ${formatDate(payroll.payment_date)}
+                <span style="font-weight:600;">Date:</span> ${displayDate(payroll.payment_date)}
               </td>
               <td class="sn-cell" style="width:50px;">SN#</td>
               <td class="sn-cell" style="width:40px;">${payroll.employee_id?.replace("EMP-", "") || "—"}</td>
@@ -585,7 +593,7 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
                           rowSpan={2}
                         >
                           <span className="font-semibold">Date:</span>{" "}
-                          {formatDate(payroll.payment_date)}
+                          {displayDate(payroll.payment_date)}
                         </td>
                         <td className="border-[1.5px] border-gray-900 px-2 py-1.5 bg-gray-50 font-bold text-center text-xs w-[50px]">
                           SN#

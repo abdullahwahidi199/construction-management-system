@@ -3,25 +3,69 @@ import useAttendance from "../../../hooks/useAttendance";
 import instance from "../../../api/axiosInstance";
 import { useLanguage } from "../../../hooks/useLanguage";
 import { getFriendlyErrorMessage } from "../../../utils/apiErrors";
+import { useCalendar } from "../../../hooks/useCalendar";
+import {
+  AFGHAN_MONTH_NAMES,
+  CALENDAR_TYPES,
+  todayIso,
+  toShamsi,
+} from "../../../utils/calendar";
+
+function currentCalendarParts(calendar) {
+  if (calendar === CALENDAR_TYPES.SHAMSI) {
+    const today = toShamsi(todayIso());
+    return { month: today.month, year: today.year };
+  }
+
+  const today = new Date();
+  return { month: today.getMonth() + 1, year: today.getFullYear() };
+}
 
 function MonthlySummary() {
   const { fetchMonthlySummary, loading, error } = useAttendance();
 
   const { t, language } = useLanguage();
+  const { calendar } = useCalendar("attendance");
 
   // RTL languages (Dari / Pashto)
   const isRTL = ["fa", "ps", "dari", "pashto"].includes(language);
 
   const [employees, setEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState("");
-  const [month, setMonth] = useState(new Date().getMonth() + 1);
-  const [year, setYear] = useState(new Date().getFullYear());
+  const initialDate = currentCalendarParts(calendar);
+  const [month, setMonth] = useState(initialDate.month);
+  const [year, setYear] = useState(initialDate.year);
   const [summary, setSummary] = useState(null);
   const [localError, setLocalError] = useState("");
+
+  const yearOptions = Array.from(
+    { length: 7 },
+    (_, index) => Number(year || currentCalendarParts(calendar).year) - 3 + index,
+  );
+  const monthOptions = Array.from({ length: 12 }, (_, index) => ({
+    value: index + 1,
+    label:
+      calendar === CALENDAR_TYPES.SHAMSI
+        ? AFGHAN_MONTH_NAMES.en[index]
+        : new Intl.DateTimeFormat("en-US", { month: "long" }).format(
+            new Date(2024, index, 1),
+          ),
+  }));
+
+  const getMonthLabel = (value) =>
+    monthOptions.find((option) => Number(option.value) === Number(value))
+      ?.label || value;
 
   useEffect(() => {
     loadEmployees();
   }, []);
+
+  useEffect(() => {
+    const current = currentCalendarParts(calendar);
+    setMonth(current.month);
+    setYear(current.year);
+    setSummary(null);
+  }, [calendar]);
 
   useEffect(() => {
     if (selectedEmployee) {
@@ -143,11 +187,9 @@ function MonthlySummary() {
                 color: "var(--text)",
               }}
             >
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {new Date(2024, i).toLocaleString("default", {
-                    month: "long",
-                  })}
+              {monthOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </select>
@@ -170,7 +212,7 @@ function MonthlySummary() {
                 color: "var(--text)",
               }}
             >
-              {[2023, 2024, 2025, 2026].map((y) => (
+              {yearOptions.map((y) => (
                 <option key={y} value={y}>
                   {y}
                 </option>
@@ -207,10 +249,7 @@ function MonthlySummary() {
                   <p className="text-sm" style={{ color: "var(--muted)" }}>
                     {t("MonthlySummary.employeeInfo.id")}:{" "}
                     {summary.employee.employee_id} •{" "}
-                    {new Date(summary.month, 0).toLocaleString("default", {
-                      month: "long",
-                    })}{" "}
-                    {summary.year}
+                    {getMonthLabel(summary.month)} {summary.year}
                   </p>
                 </div>
                 <div className="text-end">

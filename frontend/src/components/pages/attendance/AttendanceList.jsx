@@ -5,6 +5,15 @@ import instance from "../../../api/axiosInstance";
 import { useLanguage } from "../../../hooks/useLanguage";
 import ConfirmDialog from "../../common/ConfirmDialog";
 import toast from "react-hot-toast";
+import { pdfButtonClass } from "../../ui/formStyles.jsx";
+import CalendarDatePicker from "../../common/CalendarDatePicker";
+import { useCalendar } from "../../../hooks/useCalendar";
+import {
+  AFGHAN_MONTH_NAMES,
+  CALENDAR_TYPES,
+  todayIso,
+  toShamsi,
+} from "../../../utils/calendar";
 
 function AttendanceList() {
   const { loading, error, setError, fetchAttendance, updateAttendance, deleteAttendance } =
@@ -30,6 +39,25 @@ function AttendanceList() {
     isRtlHook ??
     ["dari", "pashto", "fa", "ps", "dr", "ar"].includes(currentLang);
   const textAlignment = isRTL ? "text-right" : "text-left";
+  const { calendar, formatDate } = useCalendar("attendance");
+
+  const currentCalendarYear =
+    calendar === CALENDAR_TYPES.SHAMSI
+      ? toShamsi(todayIso()).year
+      : new Date().getFullYear();
+  const yearOptions = Array.from(
+    { length: 7 },
+    (_, index) => currentCalendarYear - 3 + index,
+  );
+  const monthOptions = Array.from({ length: 12 }, (_, index) => ({
+    value: index + 1,
+    label:
+      calendar === CALENDAR_TYPES.SHAMSI
+        ? AFGHAN_MONTH_NAMES.en[index]
+        : new Intl.DateTimeFormat("en-US", { month: "long" }).format(
+            new Date(2024, index, 1),
+          ),
+  }));
 
   useEffect(() => {
     loadAttendance();
@@ -187,7 +215,7 @@ function AttendanceList() {
       />
       <button
         onClick={handleDownloadAttendancePDF}
-        className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] px-4 py-2"
+        className={pdfButtonClass}
       >
         <Download className="h-4 w-4" />
         {t("AttendanceList.exportPdf")}
@@ -271,12 +299,10 @@ function AttendanceList() {
               >
                 {t("AttendanceList.date")}
               </label>
-              <input
-                type="date"
+              <CalendarDatePicker
                 value={filters.date}
-                onChange={(e) =>
-                  setFilters({ ...filters, date: e.target.value })
-                }
+                onChange={(value) => setFilters({ ...filters, date: value })}
+                module="attendance"
                 className="w-full px-3 py-2 border rounded-lg"
                 style={{
                   borderColor: "var(--border)",
@@ -306,11 +332,9 @@ function AttendanceList() {
                 }}
               >
                 <option value="">{t("AttendanceList.allMonths")}</option>
-                {Array.from({ length: 12 }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {new Date(2024, i).toLocaleString("default", {
-                      month: "long",
-                    })}
+                {monthOptions.map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.label}
                   </option>
                 ))}
               </select>
@@ -336,7 +360,7 @@ function AttendanceList() {
                 }}
               >
                 <option value="">{t("AttendanceList.allYears")}</option>
-                {[2024, 2025, 2026].map((year) => (
+                {yearOptions.map((year) => (
                   <option key={year} value={year}>
                     {year}
                   </option>
@@ -495,7 +519,7 @@ function AttendanceList() {
                       </div>
                     </td>
                     <td className={`px-6 py-4 text-sm ${textAlignment}`}>
-                      {record.date}
+                      {formatDate(record.date) || record.date}
                     </td>
                     <td className={`px-6 py-4 ${textAlignment}`}>
                       {getStatusBadge(record.status)}

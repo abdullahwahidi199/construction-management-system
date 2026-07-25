@@ -16,6 +16,7 @@ import ExpenseEdit from "./ExpenseEdit";
 import ExpenseReceiptPrintModal from "./ExpenseReceiptPrintModal";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
+import { useCalendar } from "../../hooks/useCalendar";
 import DeleteConfirmModal from "../../components/ui/DeleteConfirmModal";
 
 const categoryConfig = {
@@ -80,6 +81,7 @@ export default function ExpenseList({
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const { t, lang } = useLanguage();
+  const { formatDate, formatDateTime } = useCalendar("expenses");
 
   const isRTL = RTL_LANGS.includes(lang);
 
@@ -159,8 +161,12 @@ export default function ExpenseList({
     }
   };
 
-  const formatDate = (dateString) => {
-    return dateString || "-";
+  const displayDate = (dateString, fallback) => {
+    return formatDate(dateString) || fallback || "-";
+  };
+
+  const displayDateTime = (dateString, fallback) => {
+    return formatDateTime(dateString) || fallback || "-";
   };
 
   const handleViewDetails = (expense) => {
@@ -345,7 +351,7 @@ export default function ExpenseList({
                       {expense.approval_status === "approved" && (
                         <p className="mt-1 text-xs text-[var(--muted)]">
                           {expense.approved_by_name || "-"} ·{" "}
-                          {(expense.approved_at || "").slice(0, 10) || "-"}
+                          {displayDateTime(expense.approved_at)}
                         </p>
                       )}
                       {expense.approval_status === "rejected" && (
@@ -358,9 +364,9 @@ export default function ExpenseList({
                       <div className="flex items-center gap-2 text-[var(--muted)]">
                         <Calendar className="h-3.5 w-3.5" />
                         <span className="text-sm">
-                          {formatDate(
-                            expense.formatted_expense_date ||
-                              expense.expense_date,
+                          {displayDate(
+                            expense.expense_date,
+                            expense.formatted_expense_date,
                           )}
                         </span>
                       </div>

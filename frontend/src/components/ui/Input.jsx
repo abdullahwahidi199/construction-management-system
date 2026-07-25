@@ -1,4 +1,11 @@
 import CalendarDatePicker from "../common/CalendarDatePicker";
+import {
+  fieldControlClass,
+  fieldControlErrorClass,
+  fieldErrorClass,
+  fieldLabelClass,
+  RequiredMark,
+} from "./formStyles.jsx";
 
 function inferCalendarModule(name, fallback) {
   if (fallback && fallback !== "dashboard") return fallback;
@@ -25,12 +32,21 @@ export default function Input({
   name,
   className = "",
   module = "dashboard",
+  required = false,
   ...props
 }) {
   if (type === "date") {
     return (
       <CalendarDatePicker
-        label={label}
+        label={
+          label ? (
+            <>
+              {label} {required && <RequiredMark />}
+            </>
+          ) : (
+            label
+          )
+        }
         name={name}
         value={value}
         onChange={onChange}
@@ -38,6 +54,7 @@ export default function Input({
         module={inferCalendarModule(name, module)}
         className={className}
         placeholder={placeholder}
+        required={required}
         {...props}
       />
     );
@@ -46,8 +63,8 @@ export default function Input({
   return (
     <div className="w-full">
       {label && (
-        <div className="mb-1.5 text-sm font-medium text-[var(--text)]">
-          {label}
+        <div className={fieldLabelClass}>
+          {label} {required && <RequiredMark />}
         </div>
       )}
 
@@ -57,19 +74,16 @@ export default function Input({
         value={value ?? ""}
         onChange={(e) => onChange?.(e.target.value)}
         placeholder={placeholder}
+        required={required}
         {...props}
         className={`
-          w-full px-4 py-2.5 rounded-lg border 
-          bg-[var(--bg)] text-[var(--text)] 
-          placeholder:text-[var(--muted)]
-          transition-colors duration-200
-          focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20
-          ${error ? "border-red-500" : "border-[var(--border)]"}
+          ${fieldControlClass}
+          ${error ? fieldControlErrorClass : ""}
           ${className}
         `}
       />
 
-      {error && <p className="mt-1 text-xs text-[var(--danger)]">{error}</p>}
+      {error && <p className={fieldErrorClass}>{error}</p>}
     </div>
   );
 }

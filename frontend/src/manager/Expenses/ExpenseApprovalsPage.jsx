@@ -17,6 +17,8 @@ import instance from "../../api/axiosInstance";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import useRealtimeEvents from "../../hooks/useRealtimeEvents";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
+import CalendarDatePicker from "../../components/common/CalendarDatePicker";
+import { useCalendar } from "../../hooks/useCalendar";
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pending" },
@@ -29,11 +31,6 @@ const statusClass = {
   approved: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
   rejected: "bg-red-500/10 text-red-700 dark:text-red-300",
 };
-
-function formatDate(value) {
-  if (!value) return "-";
-  return String(value).replace("T", " ").slice(0, 16);
-}
 
 function money(value, currency) {
   const number = Number(value || 0);
@@ -145,6 +142,7 @@ export default function ExpenseApprovalsPage() {
     date_from: "",
     date_to: "",
   });
+  const { formatDate, formatDateTime } = useCalendar("expenses");
 
   const activeFilters = useMemo(
     () => Object.values(filters).filter(Boolean).length,
@@ -439,20 +437,20 @@ export default function ExpenseApprovalsPage() {
             </div>
             <div className="relative">
               <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
-              <input
-                type="date"
+              <CalendarDatePicker
                 value={filters.date_from}
-                onChange={(event) => updateFilter("date_from", event.target.value)}
-                className="h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] pl-9 pr-3 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)]"
+                onChange={(value) => updateFilter("date_from", value)}
+                module="expenses"
+                className="pl-9"
               />
             </div>
             <div className="relative">
               <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
-              <input
-                type="date"
+              <CalendarDatePicker
                 value={filters.date_to}
-                onChange={(event) => updateFilter("date_to", event.target.value)}
-                className="h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] pl-9 pr-3 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)]"
+                onChange={(value) => updateFilter("date_to", value)}
+                module="expenses"
+                className="pl-9"
               />
             </div>
           </div>
@@ -556,7 +554,8 @@ export default function ExpenseApprovalsPage() {
                             </span>
                             {expense.approval_status === "approved" && (
                               <p className="mt-1 text-xs text-[var(--muted)]">
-                                {expense.approved_by_name || "-"} - {formatDate(expense.approved_at)}
+                                {expense.approved_by_name || "-"} -{" "}
+                                {formatDateTime(expense.approved_at) || "-"}
                               </p>
                             )}
                             {expense.approval_status === "rejected" && (
@@ -638,8 +637,8 @@ export default function ExpenseApprovalsPage() {
                   <DetailItem label="Type" value={selectedExpense.expense_type} />
                   <DetailItem label="Paid To" value={selectedExpense.paid_to} />
                   <DetailItem label="Prepared By" value={selectedExpense.created_by_name} />
-                  <DetailItem label="Created" value={formatDate(selectedExpense.created_at)} />
-                  <DetailItem label="Updated" value={formatDate(selectedExpense.updated_at)} />
+                  <DetailItem label="Created" value={formatDateTime(selectedExpense.created_at)} />
+                  <DetailItem label="Updated" value={formatDateTime(selectedExpense.updated_at)} />
                 </div>
 
                 <div className="rounded-xl border border-[var(--border)] p-4">
@@ -682,9 +681,9 @@ export default function ExpenseApprovalsPage() {
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <DetailItem label="Approved By" value={selectedExpense.approved_by_name} />
-                  <DetailItem label="Approved At" value={formatDate(selectedExpense.approved_at)} />
+                  <DetailItem label="Approved At" value={formatDateTime(selectedExpense.approved_at)} />
                   <DetailItem label="Rejected By" value={selectedExpense.rejected_by_name} />
-                  <DetailItem label="Rejected At" value={formatDate(selectedExpense.rejected_at)} />
+                  <DetailItem label="Rejected At" value={formatDateTime(selectedExpense.rejected_at)} />
                 </div>
 
                 {selectedExpense.approval_status === "pending" && (
@@ -719,7 +718,7 @@ export default function ExpenseApprovalsPage() {
                       {entry.status}
                     </p>
                     <p className="text-xs text-[var(--muted)]">
-                      {formatDate(entry.at)} - {entry.by || "-"}
+                      {formatDateTime(entry.at) || "-"} - {entry.by || "-"}
                     </p>
                     {entry.notes && (
                       <p className="mt-1 text-sm text-[var(--text)]">

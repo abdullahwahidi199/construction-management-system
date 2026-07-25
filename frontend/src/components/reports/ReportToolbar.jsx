@@ -2,6 +2,7 @@ import { Download, FileBarChart2 } from "lucide-react";
 
 import { useLanguage } from "../../hooks/useLanguage";
 import { translateOrFallback } from "./reportUtils";
+import { pdfButtonClass } from "../ui/formStyles.jsx";
 
 export default function ReportToolbar({
   report,
@@ -52,7 +53,7 @@ export default function ReportToolbar({
       <button
         onClick={onExportPdf}
         disabled={exporting}
-        className="inline-flex h-10 items-center gap-2 rounded-md bg-[var(--text)] px-3.5 text-sm font-medium text-[var(--bg)] shadow-sm shadow-black/10 transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        className={pdfButtonClass}
       >
         <Download size={16} />
         {exporting

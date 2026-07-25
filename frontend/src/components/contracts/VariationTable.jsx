@@ -1,6 +1,7 @@
 import { Edit, Trash2, CheckCircle, XCircle, GitBranch } from "lucide-react";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
+import { useCalendar } from "../../hooks/useCalendar";
 
 const formatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -16,6 +17,10 @@ export default function VariationTable({
   currency,
 }) {
   const { t } = useLanguage();
+  const { formatDate } = useCalendar("contract_variations");
+
+  const displayDate = (variation) =>
+    formatDate(variation.date) || variation.formatted_date || "-";
 
   if (loading) {
     return (
@@ -79,7 +84,7 @@ export default function VariationTable({
                   {v.variation_number}
                 </td>
                 <td className="px-4 py-3 text-[var(--text)] text-start">
-                  {v.formatted_date || v.date || "-"}
+                  {displayDate(v)}
                 </td>
                 <td className="px-4 py-3 text-[var(--text)] max-w-[250px] truncate text-start">
                   {v.description}
@@ -177,8 +182,9 @@ export default function VariationTable({
                     : "text-[var(--danger)]"
                 }`}
               >
-                {v.amount_change >= 0 ? "+" : ""}$
+                {v.amount_change >= 0 ? "+" : ""}
                 {formatter.format(v.amount_change)}
+                {currency ? ` ${currency}` : ""}
               </span>
               <span className="text-sm text-[var(--muted)]">
                 {v.days_added >= 0 ? "+" : ""}

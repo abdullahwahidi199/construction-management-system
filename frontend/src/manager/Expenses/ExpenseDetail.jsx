@@ -12,6 +12,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useLanguage } from "../../hooks/useLanguage";
+import { useCalendar } from "../../hooks/useCalendar";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -23,16 +24,17 @@ const approvalStyles = {
 
 export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
   const { t, lang } = useLanguage();
+  const { formatDate, formatDateTime } = useCalendar("expenses");
   const isRTL = RTL_LANGS.includes(lang);
 
   if (!isOpen || !expense) return null;
 
-  const formatDate = (dateString) => {
-    return dateString || "-";
+  const displayDate = (dateString, fallback) => {
+    return formatDate(dateString) || fallback || "-";
   };
 
-  const formatDateTime = (dateString) => {
-    return dateString || "-";
+  const displayDateTime = (dateString, fallback) => {
+    return formatDateTime(dateString) || fallback || "-";
   };
 
   return (
@@ -168,9 +170,9 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                       {t("ExpenseDetail.expenseDate")}
                     </p>
                     <p className="text-[var(--text)] font-medium">
-                      {formatDate(
-                        expense.formatted_expense_date ||
-                          expense.expense_date,
+                      {displayDate(
+                        expense.expense_date,
+                        expense.formatted_expense_date,
                       )}
                     </p>
                   </div>
@@ -183,8 +185,9 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                       {t("ExpenseDetail.created")}
                     </p>
                     <p className="text-[var(--text)] font-medium">
-                      {formatDateTime(
-                        expense.formatted_created_at || expense.created_at,
+                      {displayDateTime(
+                        expense.created_at,
+                        expense.formatted_created_at,
                       )}
                     </p>
                   </div>
@@ -211,8 +214,9 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                       {t("ExpenseDetail.updated")}
                     </p>
                     <p className="text-[var(--text)] font-medium">
-                      {formatDateTime(
-                        expense.formatted_updated_at || expense.updated_at,
+                      {displayDateTime(
+                        expense.updated_at,
+                        expense.formatted_updated_at,
                       )}
                     </p>
                   </div>
@@ -248,7 +252,7 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                       {entry.status}
                     </p>
                     <p className="text-xs text-[var(--muted)]">
-                      {formatDateTime(entry.at)} · {entry.by || "-"}
+                      {displayDateTime(entry.at)} · {entry.by || "-"}
                     </p>
                     {entry.notes && (
                       <p className="mt-1 text-sm text-[var(--text)]">

@@ -5,6 +5,7 @@ import Card from "../ui/Card";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
+import { fieldLabelClass, textareaControlClass } from "../ui/formStyles.jsx";
 import useFetch from "../../hooks/useFetch";
 import { hasAnyPermission } from "../../../utils/permissions";
 import PermissionWrapper from "../../auth/PermissionWrapper";
@@ -165,6 +166,12 @@ export default function ContractFormModal({
     value: s.id,
     label: s.name,
   }));
+  const contractValuePlaceholder =
+    form.currency === "USD"
+      ? "$0.00"
+      : form.currency
+        ? `${form.currency} 0.00`
+        : "0.00";
 
   if (!isOpen) return null;
 
@@ -204,6 +211,7 @@ export default function ContractFormModal({
                   placeholder={t("ContractFormModal.placeholders.project")}
                   // disabled={isEdit}
                   error={errors.project}
+                  required
                 />
                 <Select
                   label={t("ContractFormModal.fields.subcontractor")}
@@ -215,6 +223,7 @@ export default function ContractFormModal({
                   )}
                   // disabled={isEdit}
                   error={errors.subcontractor}
+                  required
                 />
               </div>
 
@@ -224,10 +233,11 @@ export default function ContractFormModal({
                 onChange={(val) => handleChange("title", val)}
                 placeholder={t("ContractFormModal.placeholders.title")}
                 error={errors.title}
+                required
               />
 
               <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1">
+                <label className={fieldLabelClass}>
                   {t("ContractFormModal.fields.scopeOfWork")}
                 </label>
                 <textarea
@@ -237,7 +247,7 @@ export default function ContractFormModal({
                   }
                   rows={3}
                   placeholder={t("ContractFormModal.placeholders.scopeOfWork")}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none"
+                  className={textareaControlClass}
                 />
               </div>
 
@@ -248,18 +258,18 @@ export default function ContractFormModal({
                   onChange={(value) => handleChange("currency", value)}
                   options={CURRENCY_OPTIONS}
                   error={errors.currency}
+                  required
                 />
                 <Input
                   label={t("ContractFormModal.fields.contractValue")}
                   type="number"
                   value={form.contract_value}
                   onChange={(val) => handleChange("contract_value", val)}
-                  placeholder={t(
-                    "ContractFormModal.placeholders.contractValue",
-                  )}
+                  placeholder={contractValuePlaceholder}
                   min="0"
                   step="0.01"
                   error={errors.contract_value}
+                  required
                 />
                 <Input
                   label={t("ContractFormModal.fields.retentionPercentage")}
@@ -295,6 +305,8 @@ export default function ContractFormModal({
                   value={form.start_date}
                   onChange={(val) => handleChange("start_date", val)}
                   error={errors.start_date}
+                  module="contracts"
+                  required
                 />
                 <Input
                   label={t("ContractFormModal.fields.endDate")}
@@ -302,6 +314,7 @@ export default function ContractFormModal({
                   value={form.end_date}
                   onChange={(val) => handleChange("end_date", val)}
                   error={errors.end_date}
+                  module="contracts"
                 />
               </div>
 
@@ -313,7 +326,7 @@ export default function ContractFormModal({
               />
 
               <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1">
+                <label className={fieldLabelClass}>
                   {t("ContractFormModal.fields.notes")}
                 </label>
                 <textarea
@@ -321,7 +334,7 @@ export default function ContractFormModal({
                   onChange={(e) => handleChange("notes", e.target.value)}
                   rows={2}
                   placeholder={t("ContractFormModal.placeholders.notes")}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none"
+                  className={textareaControlClass}
                 />
               </div>
             </div>

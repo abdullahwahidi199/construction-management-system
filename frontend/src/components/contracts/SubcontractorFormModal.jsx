@@ -7,6 +7,7 @@ import Input from "../ui/Input";
 import Select from "../ui/Select";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
+import { fieldLabelClass, textareaControlClass } from "../ui/formStyles.jsx";
 
 const SPECIALIZATION_OPTIONS = [
   { value: "concrete", label: "Concrete Works" },
@@ -149,6 +150,7 @@ export default function SubcontractorFormModal({
                   "SubcontractorFormModal.fields.company_name.placeholder",
                 )}
                 error={errors.name}
+                required
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -194,7 +196,7 @@ export default function SubcontractorFormModal({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1">
+                <label className={fieldLabelClass}>
                   {t("SubcontractorFormModal.fields.address.label")}
                 </label>
                 <textarea
@@ -204,7 +206,7 @@ export default function SubcontractorFormModal({
                   placeholder={t(
                     "SubcontractorFormModal.fields.address.placeholder",
                   )}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none"
+                  className={textareaControlClass}
                 />
               </div>
 
@@ -249,7 +251,7 @@ export default function SubcontractorFormModal({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1">
+                <label className={fieldLabelClass}>
                   {t("SubcontractorFormModal.fields.notes.label")}
                 </label>
                 <textarea
@@ -259,7 +261,7 @@ export default function SubcontractorFormModal({
                   placeholder={t(
                     "SubcontractorFormModal.fields.notes.placeholder",
                   )}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none"
+                  className={textareaControlClass}
                 />
               </div>
             </div>

@@ -261,10 +261,15 @@ class ContractDocumentCreateSerializer(CalendarModelSerializer):
 # ──────────────────────────────────────────────
 
 class ContractPaymentSerializer(CalendarModelSerializer):
-    calendar_module = "payments"
+    calendar_module = "contract_payments"
     payment_type_display = serializers.CharField(
         source='get_payment_type_display', read_only=True,
     )
+    contract_number = serializers.CharField(source='contract.contract_number', read_only=True)
+    contract_title = serializers.CharField(source='contract.title', read_only=True)
+    project_name = serializers.CharField(source='contract.project.name', read_only=True)
+    subcontractor_name = serializers.CharField(source='contract.subcontractor.name', read_only=True)
+    currency = serializers.CharField(source='contract.currency', read_only=True)
 
     class Meta:
         model  = ContractPayment
@@ -272,6 +277,8 @@ class ContractPaymentSerializer(CalendarModelSerializer):
             'id', 'contract', 'amount', 'payment_date',
             'payment_type', 'payment_type_display',
             'reference_number', 'notes', 'created_at',
+            'contract_number', 'contract_title', 'project_name',
+            'subcontractor_name', 'currency',
         ]
         read_only_fields = ['created_at']
 
@@ -300,7 +307,7 @@ class ContractPaymentSerializer(CalendarModelSerializer):
 
 
 class ContractPaymentCreateSerializer(CalendarModelSerializer):
-    calendar_module = "payments"
+    calendar_module = "contract_payments"
     """
     Used when creating through the nested endpoint
     /contracts/{id}/payments/ — the contract comes from the URL.
@@ -308,6 +315,11 @@ class ContractPaymentCreateSerializer(CalendarModelSerializer):
     payment_type_display = serializers.CharField(
         source='get_payment_type_display', read_only=True,
     )
+    contract_number = serializers.CharField(source='contract.contract_number', read_only=True)
+    contract_title = serializers.CharField(source='contract.title', read_only=True)
+    project_name = serializers.CharField(source='contract.project.name', read_only=True)
+    subcontractor_name = serializers.CharField(source='contract.subcontractor.name', read_only=True)
+    currency = serializers.CharField(source='contract.currency', read_only=True)
 
     class Meta:
         model  = ContractPayment
@@ -315,6 +327,8 @@ class ContractPaymentCreateSerializer(CalendarModelSerializer):
             'id', 'amount', 'payment_date',
             'payment_type', 'payment_type_display',
             'reference_number', 'notes', 'created_at',
+            'contract_number', 'contract_title', 'project_name',
+            'subcontractor_name', 'currency',
         ]
         read_only_fields = ['created_at']
 

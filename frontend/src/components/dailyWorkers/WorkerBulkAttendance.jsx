@@ -4,6 +4,8 @@ import { useLanguage } from "../../hooks/useLanguage";
 import { useAuth } from "../../auth/AuthContext";
 import { hasAnyPermission } from "../../../utils/permissions";
 import toast from "react-hot-toast";
+import CalendarDatePicker from "../common/CalendarDatePicker";
+import { todayIso } from "../../utils/calendar";
 function WorkerBulkAttendance() {
   const { fetchDailyStatus, fetchProjects, bulkMarkAttendance, loading } =
     useDailyWorkers();
@@ -17,7 +19,7 @@ function WorkerBulkAttendance() {
   const isRTL = ["fa", "ps", "dari", "pashto"].includes(language);
   const textAlignment = isRTL ? "text-right" : "text-left";
 
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState(todayIso());
   const [projectSite, setProjectSite] = useState("");
   const [projects, setProjects] = useState([]);
   const [workersData, setWorkersData] = useState([]);
@@ -117,10 +119,10 @@ function WorkerBulkAttendance() {
             <label className="text-xs" style={{ color: "var(--muted)" }}>
               {t("WorkerBulkAttendance.date")}
             </label>
-            <input
-              type="date"
+            <CalendarDatePicker
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={setDate}
+              module="daily_worker_attendance"
               className="block rounded border px-3 py-1.5 text-sm"
               style={{
                 borderColor: "var(--border)",

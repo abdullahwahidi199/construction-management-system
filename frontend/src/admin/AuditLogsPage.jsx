@@ -18,6 +18,7 @@ import {
 import api from "../api/axiosInstance";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
+import CalendarDatePicker from "../components/common/CalendarDatePicker";
 
 const PAGE_SIZE = 25;
 
@@ -472,18 +473,18 @@ export default function AuditLogsPage() {
               onChange={(e) => updateFilter("search", e.target.value)}
             />
           </label>
-          <input
+          <CalendarDatePicker
             className={inputClass}
-            type="date"
             value={filters.start_date}
-            onChange={(e) => updateFilter("start_date", e.target.value)}
+            onChange={(value) => updateFilter("start_date", value)}
+            module="reports"
             title="From date"
           />
-          <input
+          <CalendarDatePicker
             className={inputClass}
-            type="date"
             value={filters.end_date}
-            onChange={(e) => updateFilter("end_date", e.target.value)}
+            onChange={(value) => updateFilter("end_date", value)}
+            module="reports"
             title="To date"
           />
           <select

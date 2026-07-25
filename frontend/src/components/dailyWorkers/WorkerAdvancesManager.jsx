@@ -1,17 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Edit2, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Edit2, Plus, Printer, RefreshCw, Trash2 } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { hasAnyPermission } from "../../../utils/permissions";
 import ConfirmDialog from "../common/ConfirmDialog";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 import toast from "react-hot-toast";
+import CalendarDatePicker from "../common/CalendarDatePicker";
+import { useCalendar } from "../../hooks/useCalendar";
+import { todayIso } from "../../utils/calendar";
+import PrintableReceiptModal from "../common/PrintableReceiptModal";
 
 const blankAdvance = {
   worker: "",
   amount: "",
   currency: "AFN",
-  date: new Date().toISOString().slice(0, 10),
+  date: todayIso(),
   description: "",
   remaining_balance: "",
 };
@@ -37,7 +41,7 @@ export default function WorkerAdvancesManager() {
   const canCreate = hasAnyPermission(permissions, ["worker_advances.create"]);
   const canUpdate = hasAnyPermission(permissions, ["worker_advances.update"]);
   const canDelete = hasAnyPermission(permissions, ["worker_advances.delete"]);
-  const canManage = canUpdate || canDelete;
+  const { formatDate, formatDateTime } = useCalendar("worker_advances");
 
   const [workers, setWorkers] = useState([]);
   const [advances, setAdvances] = useState([]);
@@ -46,6 +50,7 @@ export default function WorkerAdvancesManager() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedAdvance, setSelectedAdvance] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [receiptAdvance, setReceiptAdvance] = useState(null);
 
   const load = async () => {
     const params = {};
@@ -110,8 +115,66 @@ export default function WorkerAdvancesManager() {
     }
   };
 
+  const displayDate = (value) => formatDate(value) || value || "-";
+
+  const buildAdvanceReceipt = (advance) => {
+    const currency = advance.currency || "AFN";
+    const recoveredAmount =
+      Number(advance.amount || 0) - Number(advance.remaining_balance || 0);
+
+    return {
+      title: "Daily Worker Advance Receipt",
+      subtitle: "Advance payment record",
+      receiptNumber: `ADV-${String(advance.id || "").padStart(6, "0")}`,
+      receiptDate: displayDate(advance.date),
+      status: advance.status || "open",
+      amountLabel: "Advance Amount",
+      amount: advance.amount,
+      currency,
+      details: [
+        { label: "Worker", value: advance.worker_name },
+        { label: "Worker ID", value: advance.worker_code },
+        { label: "Advance Date", value: displayDate(advance.date) },
+        { label: "Status", value: advance.status || "open" },
+        { label: "Remaining Balance", value: money(advance.remaining_balance, currency) },
+        { label: "Recovered Amount", value: money(recoveredAmount, currency) },
+        { label: "Recorded At", value: formatDateTime(advance.created_at) || "-" },
+        { label: "Updated At", value: formatDateTime(advance.updated_at) || "-" },
+        { label: "Advance ID", value: advance.id ? `#${advance.id}` : "-" },
+      ],
+      sections: [
+        {
+          title: "Advance Details",
+          rows: [
+            { label: "Original Advance", value: money(advance.amount, currency) },
+            { label: "Recovered / Deducted", value: money(recoveredAmount, currency) },
+            { label: "Outstanding Balance", value: money(advance.remaining_balance, currency) },
+            { label: "Currency", value: currency },
+            { label: "Description", value: advance.description || "-" },
+          ],
+        },
+      ],
+      notes: advance.description,
+      signatures: [
+        "Prepared By",
+        "Approved By",
+        "Paid By",
+        "Worker Signature",
+      ],
+    };
+  };
+
+  const receipt = receiptAdvance ? buildAdvanceReceipt(receiptAdvance) : null;
+
   return (
     <div className="space-y-5">
+      {receipt && (
+        <PrintableReceiptModal
+          isOpen={Boolean(receiptAdvance)}
+          onClose={() => setReceiptAdvance(null)}
+          {...receipt}
+        />
+      )}
       <AdvanceModal
         open={modalOpen}
         onClose={() => {
@@ -243,20 +306,20 @@ export default function WorkerAdvancesManager() {
               <th className="px-4 py-3 text-left font-medium">Remaining</th>
               <th className="px-4 py-3 text-left font-medium">Status</th>
               <th className="px-4 py-3 text-left font-medium">Description</th>
-              {canManage && <th className="px-4 py-3 text-left font-medium">Actions</th>}
+              <th className="px-4 py-3 text-left font-medium">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y" style={{ borderColor: "var(--border)" }}>
             {loading ? (
               <tr>
-                <td colSpan={canManage ? 7 : 6} className="py-6 text-center">
+                <td colSpan={7} className="py-6 text-center">
                   Loading...
                 </td>
               </tr>
             ) : advances.length === 0 ? (
               <tr>
                 <td
-                  colSpan={canManage ? 7 : 6}
+                  colSpan={7}
                   className="py-6 text-center"
                   style={{ color: "var(--muted)" }}
                 >
@@ -272,7 +335,9 @@ export default function WorkerAdvancesManager() {
                       {advance.worker_code}
                     </div>
                   </td>
-                  <td className="px-4 py-3">{advance.date}</td>
+                  <td className="px-4 py-3">
+                    {displayDate(advance.date)}
+                  </td>
                   <td className="px-4 py-3 font-medium">
                     {money(advance.amount, advance.currency)}
                   </td>
@@ -281,35 +346,42 @@ export default function WorkerAdvancesManager() {
                   </td>
                   <td className="px-4 py-3 capitalize">{advance.status}</td>
                   <td className="px-4 py-3">{advance.description || "-"}</td>
-                  {canManage && (
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        {canUpdate && (
-                          <button
-                            onClick={() => {
-                              setSelectedAdvance(advance);
-                              setModalOpen(true);
-                            }}
-                            className="rounded border p-2"
-                            style={{ borderColor: "var(--border)" }}
-                            title="Edit advance"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </button>
-                        )}
-                        {canDelete && (
-                          <button
-                            onClick={() => handleDelete(advance)}
-                            className="rounded border p-2 text-red-600"
-                            style={{ borderColor: "var(--border)" }}
-                            title="Delete advance"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  )}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setReceiptAdvance(advance)}
+                        className="rounded border p-2"
+                        style={{ borderColor: "var(--border)" }}
+                        title="Print receipt"
+                        aria-label="Print advance receipt"
+                      >
+                        <Printer className="h-4 w-4" />
+                      </button>
+                      {canUpdate && (
+                        <button
+                          onClick={() => {
+                            setSelectedAdvance(advance);
+                            setModalOpen(true);
+                          }}
+                          className="rounded border p-2"
+                          style={{ borderColor: "var(--border)" }}
+                          title="Edit advance"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </button>
+                      )}
+                      {canDelete && (
+                        <button
+                          onClick={() => handleDelete(advance)}
+                          className="rounded border p-2 text-red-600"
+                          style={{ borderColor: "var(--border)" }}
+                          title="Delete advance"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))
             )}
@@ -356,6 +428,10 @@ function AdvanceModal({ open, onClose, onSubmit, advance, workers, loading }) {
       }));
       return;
     }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleDateChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -425,12 +501,12 @@ function AdvanceModal({ open, onClose, onSubmit, advance, workers, loading }) {
               </select>
             </Field>
             <Field label="Date *">
-              <input
+              <CalendarDatePicker
                 required
-                type="date"
                 name="date"
                 value={formData.date}
-                onChange={handleChange}
+                onChange={(value) => handleDateChange("date", value)}
+                module="worker_advances"
                 className={inputClass}
                 style={inputStyle}
               />

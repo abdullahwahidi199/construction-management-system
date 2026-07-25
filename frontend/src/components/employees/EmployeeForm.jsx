@@ -5,8 +5,10 @@ import instance from "../../api/axiosInstance";
 import Loading from "../common/Loading";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import Button from "../ui/Button";
+import { fieldControlClass, fieldLabelClass } from "../ui/formStyles.jsx";
 import { useLanguage } from "../../hooks/useLanguage";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
+import CalendarDatePicker from "../common/CalendarDatePicker";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -85,6 +87,10 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
     }));
   };
 
+  const handleDateChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLocalError("");
@@ -118,9 +124,8 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
     return <Loading />;
   }
 
-  const inputClass =
-    "w-full px-3 py-2.5 rounded-xl border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/30 focus:border-[var(--primary)]";
-  const labelClass = "block text-sm font-medium mb-1.5";
+  const inputClass = fieldControlClass;
+  const labelClass = fieldLabelClass;
 
   return (
     <form
@@ -332,11 +337,11 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
           <label className={labelClass} style={{ color: "var(--text)" }}>
             {t("EmployeeForm.hireDate")} <span className="text-red-500">*</span>
           </label>
-          <input
-            type="date"
+          <CalendarDatePicker
             name="hire_date"
             value={formData.hire_date}
-            onChange={handleChange}
+            onChange={(value) => handleDateChange("hire_date", value)}
+            module="employees"
             className={inputClass}
             style={{
               backgroundColor: "var(--bg)",
@@ -461,14 +466,9 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
         className="flex gap-3 justify-end pt-4 border-t"
         style={{ borderColor: "var(--border)" }}
       >
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-5 py-2.5 rounded-xl text-sm font-medium transition-colors"
-          style={{ backgroundColor: "var(--hover)", color: "var(--text)" }}
-        >
+        <Button type="button" variant="secondary" onClick={onCancel}>
           {t("EmployeeForm.cancel")}
-        </button>
+        </Button>
         <PermissionWrapper
           permissions={[effectiveEmployeeId ? "employees.update" : "employees.create"]}
           fallback={
@@ -484,18 +484,13 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
             </Button>
           }
         >
-          <button
-            type="submit"
-            disabled={loading || saving}
-            className="px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-colors disabled:opacity-50"
-            style={{ backgroundColor: "var(--primary)" }}
-          >
+          <Button type="submit" variant="primary" disabled={loading || saving}>
             {loading || saving
               ? t("EmployeeForm.saving")
               : currentEmployee
                 ? t("EmployeeForm.updateEmployee")
                 : t("EmployeeForm.addEmployee")}
-          </button>
+          </Button>
         </PermissionWrapper>
       </div>
     </form>

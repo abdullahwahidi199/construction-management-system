@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Edit2, Plus, Trash2 } from "lucide-react";
+import { Edit2, Plus, Printer, Trash2 } from "lucide-react";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { useLanguage } from "../../hooks/useLanguage";
 import { useAuth } from "../../auth/AuthContext";
@@ -7,6 +7,21 @@ import { hasAnyPermission } from "../../../utils/permissions";
 import ConfirmDialog from "../common/ConfirmDialog";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 import toast from "react-hot-toast";
+import CalendarDatePicker from "../common/CalendarDatePicker";
+import { useCalendar } from "../../hooks/useCalendar";
+import { todayIso } from "../../utils/calendar";
+import PrintableReceiptModal from "../common/PrintableReceiptModal";
+
+function money(value, currency) {
+  return `${currency ? `${currency} ` : ""}${Number(value || 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+function labelize(value) {
+  return String(value || "-").replace(/_/g, " ");
+}
 
 function WorkerPayrollManager() {
   const {
@@ -27,9 +42,9 @@ function WorkerPayrollManager() {
   const canCreate = hasAnyPermission(permissions, ["daily_worker_payroll.create"]);
   const canUpdate = hasAnyPermission(permissions, ["daily_worker_payroll.update"]);
   const canDelete = hasAnyPermission(permissions, ["daily_worker_payroll.delete"]);
-  const canManage = canUpdate || canDelete;
   const isRTL = ["fa", "ps", "dari", "pashto"].includes(language);
   const textAlignment = isRTL ? "text-right" : "text-left";
+  const { formatDate, formatDateTime } = useCalendar("daily_worker_payroll");
 
   const [payrolls, setPayrolls] = useState([]);
   const [workers, setWorkers] = useState([]);
@@ -43,6 +58,7 @@ function WorkerPayrollManager() {
   const [generationProject, setGenerationProject] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [markPaidTarget, setMarkPaidTarget] = useState(null);
+  const [receiptPayroll, setReceiptPayroll] = useState(null);
 
   useEffect(() => {
     loadPayrolls();
@@ -141,7 +157,7 @@ function WorkerPayrollManager() {
   const confirmMarkPaid = async () => {
     if (!markPaidTarget) return;
     try {
-      await markPayrollPaid(markPaidTarget.id, new Date().toISOString().split("T")[0]);
+      await markPayrollPaid(markPaidTarget.id, todayIso());
       toast.success("Payroll marked as paid.");
       setMarkPaidTarget(null);
       loadPayrolls();
@@ -150,8 +166,74 @@ function WorkerPayrollManager() {
     }
   };
 
+  const displayDate = (value) => formatDate(value) || value || "-";
+
+  const buildPayrollReceipt = (payroll) => {
+    const currency = payroll.currency || "";
+    const netPay = payroll.net_pay ?? payroll.net_amount;
+    const totalDeductions =
+      Number(payroll.advances || 0) + Number(payroll.deductions || 0);
+
+    return {
+      title: "Daily Worker Payroll Receipt",
+      subtitle: payroll.project_name || "Daily worker payment",
+      receiptNumber: `DWP-${String(payroll.id || "").padStart(6, "0")}`,
+      receiptDate: displayDate(payroll.payment_date || payroll.period_end),
+      status: payroll.is_paid ? "Paid" : labelize(payroll.status),
+      amountLabel: "Net Payment",
+      amount: netPay,
+      currency,
+      details: [
+        { label: "Worker", value: payroll.worker_name },
+        { label: "Worker ID", value: payroll.worker_id_code },
+        { label: "Project", value: payroll.project_name || "General" },
+        {
+          label: "Payroll Period",
+          value: `${displayDate(payroll.period_start)} to ${displayDate(payroll.period_end)}`,
+        },
+        { label: "Payment Date", value: displayDate(payroll.payment_date) },
+        { label: "Payment Method", value: labelize(payroll.payment_method) },
+        { label: "Status", value: payroll.is_paid ? "Paid" : labelize(payroll.status) },
+        { label: "Recorded At", value: formatDateTime(payroll.created_at) || "-" },
+        { label: "Payroll ID", value: payroll.id ? `#${payroll.id}` : "-" },
+      ],
+      sections: [
+        {
+          title: "Payroll Breakdown",
+          rows: [
+            { label: "Days Worked", value: payroll.total_days_worked || "0" },
+            { label: "Overtime Hours", value: payroll.total_overtime_hours || "0" },
+            { label: "Daily Rate", value: money(payroll.daily_rate_applied, currency) },
+            { label: "Overtime Rate", value: money(payroll.overtime_rate_applied, currency) },
+            { label: "Gross Amount", value: money(payroll.gross_amount, currency) },
+            { label: "Advances Deducted", value: money(payroll.advances, currency) },
+            { label: "Other Deductions", value: money(payroll.deductions, currency) },
+            { label: "Total Deductions", value: money(totalDeductions, currency) },
+            { label: "Net Payment", value: money(netPay, currency) },
+          ],
+        },
+      ],
+      notes: payroll.notes,
+      signatures: [
+        "Prepared By",
+        "Approved By",
+        "Paid By",
+        "Worker Signature",
+      ],
+    };
+  };
+
+  const receipt = receiptPayroll ? buildPayrollReceipt(receiptPayroll) : null;
+
   return (
     <div className="space-y-6" dir={isRTL ? "rtl" : "ltr"}>
+      {receipt && (
+        <PrintableReceiptModal
+          isOpen={Boolean(receiptPayroll)}
+          onClose={() => setReceiptPayroll(null)}
+          {...receipt}
+        />
+      )}
       <PayrollFormModal
         isOpen={isFormOpen}
         onClose={() => {
@@ -228,12 +310,12 @@ function WorkerPayrollManager() {
             >
               {t("WorkerPayrollManager.periodStart")}
             </label>
-            <input
+            <CalendarDatePicker
               id="worker-payroll-period-start"
-              type="date"
               required
               value={periodStart}
-              onChange={(e) => setPeriodStart(e.target.value)}
+              onChange={setPeriodStart}
+              module="daily_worker_payroll"
               className="rounded border px-3 py-2"
               style={{
                 borderColor: "var(--border)",
@@ -250,12 +332,12 @@ function WorkerPayrollManager() {
             >
               {t("WorkerPayrollManager.periodEnd")}
             </label>
-            <input
+            <CalendarDatePicker
               id="worker-payroll-period-end"
-              type="date"
               required
               value={periodEnd}
-              onChange={(e) => setPeriodEnd(e.target.value)}
+              onChange={setPeriodEnd}
+              module="daily_worker_payroll"
               className="rounded border px-3 py-2"
               style={{
                 borderColor: "var(--border)",
@@ -374,11 +456,9 @@ function WorkerPayrollManager() {
                 <th className={`px-4 py-3 font-medium ${textAlignment}`}>
                   {t("WorkerPayrollManager.status")}
                 </th>
-                {canManage && (
-                  <th className={`px-4 py-3 font-medium ${textAlignment}`}>
-                    {t("WorkerPayrollManager.actions")}
-                  </th>
-                )}
+                <th className={`px-4 py-3 font-medium ${textAlignment}`}>
+                  {t("WorkerPayrollManager.actions")}
+                </th>
               </tr>
             </thead>
             <tbody
@@ -388,7 +468,7 @@ function WorkerPayrollManager() {
               {payrolls.length === 0 && (
                 <tr>
                   <td
-                    colSpan={canManage ? 6 : 5}
+                    colSpan={6}
                     className="text-center py-6"
                     style={{ color: "var(--muted)" }}
                   >
@@ -405,7 +485,8 @@ function WorkerPayrollManager() {
                     </div>
                   </td>
                   <td className={`px-4 py-3 ${textAlignment}`}>
-                    {pay.period_start} {t("to")} {pay.period_end}
+                    {displayDate(pay.period_start)} {t("to")}{" "}
+                    {displayDate(pay.period_end)}
                   </td>
                   <td className={`px-4 py-3 ${textAlignment}`}>
                     {pay.total_days_worked} {t("WorkerPayrollManager.days")}
@@ -441,7 +522,8 @@ function WorkerPayrollManager() {
                   <td className={`px-4 py-3 ${textAlignment}`}>
                     {pay.is_paid ? (
                       <span className="px-2 py-1 rounded bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 text-xs">
-                        {t("WorkerPayrollManager.paidOn")} {pay.payment_date}
+                        {t("WorkerPayrollManager.paidOn")}{" "}
+                        {displayDate(pay.payment_date)}
                       </span>
                     ) : (
                       <span className="px-2 py-1 rounded bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300 text-xs">
@@ -449,52 +531,59 @@ function WorkerPayrollManager() {
                       </span>
                     )}
                   </td>
-                  {canManage && (
-                    <td className={`px-4 py-3 ${textAlignment}`}>
-                      <div className="flex flex-wrap items-center gap-2">
-                        {canUpdate && !pay.is_paid && pay.status === "draft" && (
-                          <button
-                            onClick={() => handleApprove(pay.id)}
-                            className="rounded border px-2 py-1 text-xs font-medium"
-                            style={{ borderColor: "var(--border)" }}
-                          >
-                            {t("WorkerPayrollManager.approve")}
-                          </button>
-                        )}
-                        {canUpdate && !pay.is_paid && (
-                          <button
-                            onClick={() => handleMarkPaid(pay.id)}
-                            className="rounded border px-2 py-1 text-xs font-medium text-blue-600"
-                            style={{ borderColor: "var(--border)" }}
-                          >
-                            {t("WorkerPayrollManager.markPaid")}
-                          </button>
-                        )}
-                        {canUpdate && (
-                          <button
-                            onClick={() => handleEdit(pay)}
-                            className="rounded border p-2"
-                            style={{ borderColor: "var(--border)" }}
-                            title={t("WorkerPayrollManager.editPayroll")}
-                            aria-label={t("WorkerPayrollManager.editPayroll")}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </button>
-                        )}
-                        {canDelete && (
-                          <button
-                            onClick={() => handleDelete(pay)}
-                            className="rounded border p-2 text-red-600"
-                            style={{ borderColor: "var(--border)" }}
-                            title={t("WorkerPayrollManager.deletePayroll")}
-                            aria-label={t("WorkerPayrollManager.deletePayroll")}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  )}
+                  <td className={`px-4 py-3 ${textAlignment}`}>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => setReceiptPayroll(pay)}
+                        className="rounded border p-2"
+                        style={{ borderColor: "var(--border)" }}
+                        title="Print receipt"
+                        aria-label="Print payroll receipt"
+                      >
+                        <Printer className="h-4 w-4" />
+                      </button>
+                      {canUpdate && !pay.is_paid && pay.status === "draft" && (
+                        <button
+                          onClick={() => handleApprove(pay.id)}
+                          className="rounded border px-2 py-1 text-xs font-medium"
+                          style={{ borderColor: "var(--border)" }}
+                        >
+                          {t("WorkerPayrollManager.approve")}
+                        </button>
+                      )}
+                      {canUpdate && !pay.is_paid && (
+                        <button
+                          onClick={() => handleMarkPaid(pay.id)}
+                          className="rounded border px-2 py-1 text-xs font-medium text-blue-600"
+                          style={{ borderColor: "var(--border)" }}
+                        >
+                          {t("WorkerPayrollManager.markPaid")}
+                        </button>
+                      )}
+                      {canUpdate && (
+                        <button
+                          onClick={() => handleEdit(pay)}
+                          className="rounded border p-2"
+                          style={{ borderColor: "var(--border)" }}
+                          title={t("WorkerPayrollManager.editPayroll")}
+                          aria-label={t("WorkerPayrollManager.editPayroll")}
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </button>
+                      )}
+                      {canDelete && (
+                        <button
+                          onClick={() => handleDelete(pay)}
+                          className="rounded border p-2 text-red-600"
+                          style={{ borderColor: "var(--border)" }}
+                          title={t("WorkerPayrollManager.deletePayroll")}
+                          aria-label={t("WorkerPayrollManager.deletePayroll")}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -562,6 +651,10 @@ function PayrollFormModal({
       }));
       return;
     }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleDateChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -664,23 +757,23 @@ function PayrollFormModal({
               </select>
             </Field>
             <Field label={t("WorkerPayrollManager.modal.periodStart")}>
-              <input
+              <CalendarDatePicker
                 required
-                type="date"
                 name="period_start"
                 value={formData.period_start}
-                onChange={handleChange}
+                onChange={(value) => handleDateChange("period_start", value)}
+                module="daily_worker_payroll"
                 className={inputClass}
                 style={inputStyle}
               />
             </Field>
             <Field label={t("WorkerPayrollManager.modal.periodEnd")}>
-              <input
+              <CalendarDatePicker
                 required
-                type="date"
                 name="period_end"
                 value={formData.period_end}
-                onChange={handleChange}
+                onChange={(value) => handleDateChange("period_end", value)}
+                module="daily_worker_payroll"
                 className={inputClass}
                 style={inputStyle}
               />
@@ -763,11 +856,11 @@ function PayrollFormModal({
               </select>
             </Field>
             <Field label={t("WorkerPayrollManager.modal.paymentDate")}>
-              <input
-                type="date"
+              <CalendarDatePicker
                 name="payment_date"
                 value={formData.payment_date || ""}
-                onChange={handleChange}
+                onChange={(value) => handleDateChange("payment_date", value)}
+                module="daily_worker_payroll"
                 className={inputClass}
                 style={inputStyle}
               />

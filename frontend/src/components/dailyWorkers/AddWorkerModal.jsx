@@ -4,6 +4,8 @@ import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { useLanguage } from "../../hooks/useLanguage";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 import toast from "react-hot-toast";
+import CalendarDatePicker from "../common/CalendarDatePicker";
+import { todayIso } from "../../utils/calendar";
 
 const blankForm = {
   full_name: "",
@@ -18,7 +20,7 @@ const blankForm = {
   skill_type: "helper",
   specialization: "",
   status: "active",
-  joining_date: new Date().toISOString().slice(0, 10),
+  joining_date: todayIso(),
   assigned_project: "",
   notes: "",
 };
@@ -59,6 +61,10 @@ function AddWorkerModal({ isOpen, onClose, onSuccess, worker, projects = [] }) {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleDateChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -174,12 +180,12 @@ function AddWorkerModal({ isOpen, onClose, onSuccess, worker, projects = [] }) {
               />
             </Field>
             <Field label={t("AddWorkerModal.joiningDate")}>
-              <input
+              <CalendarDatePicker
                 required
-                type="date"
                 name="joining_date"
                 value={formData.joining_date}
-                onChange={handleChange}
+                onChange={(value) => handleDateChange("joining_date", value)}
+                module="daily_workers"
                 className={inputClass}
                 style={inputStyle}
               />

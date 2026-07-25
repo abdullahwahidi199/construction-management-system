@@ -9,6 +9,7 @@ import {
   FileText,
   GitBranch,
   TrendingUp,
+  Download,
 } from "lucide-react";
 import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
@@ -27,6 +28,7 @@ import DocumentTable from "../../contracts/DocumentTable";
 import DocumentUploadModal from "../../contracts/DocumentUploadModal";
 import ContractInvoicesPage from "./ContractInvoicesPage";
 import { useLanguage } from "../../../hooks/useLanguage";
+import { useCalendar } from "../../../hooks/useCalendar";
 import toast from "react-hot-toast";
 
 export default function ContractDetailsPage() {
@@ -49,6 +51,7 @@ export default function ContractDetailsPage() {
   const { t, lang } = useLanguage();
   const isRTL = lang === "dr" || lang === "ps";
   const BackIcon = isRTL ? ArrowRight : ArrowLeft;
+  const { formatDate } = useCalendar("contracts");
 
   const TABS = [
     {
@@ -93,7 +96,8 @@ export default function ContractDetailsPage() {
   const { postData, loading: posting } = usePost();
   const [actionLoading, setActionLoading] = useState(false);
 
-  const formatDate = (d) => d || t("ContractDetailsPage.noData");
+  const displayDate = (date) =>
+    formatDate(date) || t("ContractDetailsPage.noData");
 
   const fmt = new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
@@ -294,7 +298,11 @@ export default function ContractDetailsPage() {
           <div className="w-32">
             <ProgressBar value={contract.completion_percentage} size="sm" />
           </div>
-          <Button variant="secondary" onClick={handleDownloadContractPDF}>
+          <Button
+            variant="secondary"
+            onClick={handleDownloadContractPDF}
+            leftIcon={<Download className="h-4 w-4" />}
+          >
             {t("ContractDetailsPage.downloadPdf")}
           </Button>
         </div>
@@ -357,15 +365,18 @@ export default function ContractDetailsPage() {
             <div className="space-y-3 text-sm">
               <Row
                 label={t("ContractDetailsPage.startDate")}
-                value={formatDate(contract.start_date)}
+                value={displayDate(contract.start_date)}
               />
               <Row
                 label={t("ContractDetailsPage.endDate")}
-                value={formatDate(contract.end_date)}
+                value={displayDate(contract.end_date)}
               />
               <Row
                 label={t("ContractDetailsPage.adjustedEndDate")}
-                value={formatDate(contract.adjusted_end_date)}
+                value={displayDate(
+                  contract.adjusted_end_date ||
+                    contract.financial_summary?.adjusted_end_date,
+                )}
               />
               <Row
                 label={t("ContractDetailsPage.completion")}
@@ -442,6 +453,7 @@ export default function ContractDetailsPage() {
           </div>
           <PaymentTable
             currency={contract.currency}
+            contractContext={contract}
             payments={contract.payments || []}
             onEdit={(p) => {
               setEditingPayment(p);

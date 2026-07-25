@@ -13,6 +13,10 @@ import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
 import PayrollPrintModal from "./PayrollPrintModal";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
+import Button from "../ui/Button";
+import { Download } from "lucide-react";
+import CalendarDatePicker from "../common/CalendarDatePicker";
+import { useCalendar } from "../../hooks/useCalendar";
 
 export default function PayrollPage() {
   // const { data: payrolls, loading, refetch } = useFetch("/payrolls/");
@@ -30,6 +34,7 @@ export default function PayrollPage() {
   const [exporting, setExporting] = useState(false);
 
   const { t } = useLanguage();
+  const { formatDate } = useCalendar("payroll");
 
   const query = new URLSearchParams();
 
@@ -169,14 +174,14 @@ export default function PayrollPage() {
         subtitle={t("PayrollPage.records", { count: payrolls.length })}
       >
         <div className="flex gap-2">
-          <button
+          <Button
+            variant="secondary"
             onClick={handleDownloadPDF}
             disabled={exporting}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
-            style={{ backgroundColor: "var(--success)" }}
+            leftIcon={<Download className="h-4 w-4" />}
           >
             {exporting ? t("common.loading") : t("PayrollPage.downloadPdf")}
-          </button>
+          </Button>
 
           <button
             onClick={() => {
@@ -231,29 +236,33 @@ export default function PayrollPage() {
               </option>
             ))}
         </select>
-        <input
-          type="date"
+        <div className="min-w-[160px]">
+          <CalendarDatePicker
           value={startDateFilter}
-          onChange={(e) => setStartDateFilter(e.target.value)}
+          onChange={setStartDateFilter}
+          module="payroll"
           className="px-4 py-2 rounded-lg border text-sm"
           style={{
             backgroundColor: "var(--card)",
             color: "var(--text)",
             borderColor: "var(--border)",
           }}
-        />
+          />
+        </div>
 
-        <input
-          type="date"
+        <div className="min-w-[160px]">
+          <CalendarDatePicker
           value={endDateFilter}
-          onChange={(e) => setEndDateFilter(e.target.value)}
+          onChange={setEndDateFilter}
+          module="payroll"
           className="px-4 py-2 rounded-lg border text-sm"
           style={{
             backgroundColor: "var(--card)",
             color: "var(--text)",
             borderColor: "var(--border)",
           }}
-        />
+          />
+        </div>
 
         <button
           onClick={() => {
@@ -401,15 +410,16 @@ export default function PayrollPage() {
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-sm" style={{ color: "var(--text)" }}>
-                      {payroll.payroll_period_start}
+                      {formatDate(payroll.payroll_period_start) || "-"}
                     </p>
                     <p className="text-xs" style={{ color: "var(--muted)" }}>
-                      {t("PayrollPage.table.to")} {payroll.payroll_period_end}
+                      {t("PayrollPage.table.to")}{" "}
+                      {formatDate(payroll.payroll_period_end) || "-"}
                     </p>
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-sm" style={{ color: "var(--text)" }}>
-                      {payroll.payment_date}
+                      {formatDate(payroll.payment_date) || "-"}
                     </p>
                   </td>
 

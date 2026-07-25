@@ -15,6 +15,11 @@ import PermissionWrapper from "../../auth/PermissionWrapper";
 import Button from "../ui/Button";
 import { useLanguage } from "../../hooks/useLanguage";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
+import {
+  fieldControlClass,
+  fieldLabelClass,
+  textareaControlClass,
+} from "../ui/formStyles.jsx";
 
 export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
   const [form, setForm] = useState({
@@ -180,10 +185,8 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
   };
 
   /* ── Shared styles ────────────────────────────── */
-  const baseControl =
-    "w-full px-4 py-2.5 rounded-lg border bg-[var(--bg)] text-[var(--text)] placeholder:text-[var(--muted)] transition-all duration-200 focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 border-[var(--border)] disabled:opacity-50 disabled:cursor-not-allowed";
-
-  const labelClass = "block text-sm font-medium text-[var(--text)] mb-1.5";
+  const baseControl = fieldControlClass;
+  const labelClass = fieldLabelClass;
   const helperClass = "text-xs text-[var(--muted)] mt-1";
   const sectionTitleClass =
     "text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-3 flex items-center gap-2";
@@ -315,7 +318,7 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
                       handleChange("description", e.target.value)
                     }
                     rows={3}
-                    className={`${baseControl} resize-none ${fieldHighlight(
+                    className={`${textareaControlClass} ${fieldHighlight(
                       "description",
                     )}`}
                   />
@@ -467,7 +470,7 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
                   value={form.notes}
                   onChange={(e) => handleChange("notes", e.target.value)}
                   rows={3}
-                  className={`${baseControl} resize-none ${fieldHighlight(
+                  className={`${textareaControlClass} ${fieldHighlight(
                     "notes",
                   )}`}
                 />
