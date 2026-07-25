@@ -181,7 +181,10 @@ export default function ContractFormModal({
         onClick={onClose}
       />
       <div className="mobile-modal-panel relative w-full max-w-2xl overflow-hidden rounded-2xl">
-        <Card className="flex h-full flex-col p-0">
+        <Card
+          className="flex h-full min-h-0 flex-col p-0"
+          contentClassName="flex min-h-0 flex-1 flex-col p-0"
+        >
           <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
             {/* Header */}
             <div className="mobile-modal-header flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">

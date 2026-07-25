@@ -174,8 +174,12 @@ class AuthenticationAndRBACAPITests(APITestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_calendar_settings_permission_checks(self):
+        ordinary = create_user(username="settings-reader", role="data_entry", permissions=["expenses.view"])
         viewer = create_user(username="settings-viewer", role="hr", permissions=["settings.view"])
         manager = create_user(username="settings-manager", role="admin_ops", permissions=["settings.manage"])
+
+        self.client.force_authenticate(ordinary)
+        ordinary_get_response = self.client.get("/api/auth/settings/calendar/")
 
         self.client.force_authenticate(viewer)
         get_response = self.client.get("/api/auth/settings/calendar/")
@@ -192,6 +196,7 @@ class AuthenticationAndRBACAPITests(APITestCase):
             format="json",
         )
 
+        self.assertEqual(ordinary_get_response.status_code, 200)
         self.assertEqual(get_response.status_code, 200)
         self.assertEqual(put_forbidden.status_code, 403)
         self.assertEqual(put_allowed.status_code, 200, put_allowed.data)

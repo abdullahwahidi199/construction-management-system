@@ -25,6 +25,7 @@ export default function useReport(endpoint) {
       try {
         const res = await instance.get(endpoint, {
           params: buildParams(filters),
+          skipGlobalErrorToast: true,
         });
         setData(res.data);
       } catch (err) {

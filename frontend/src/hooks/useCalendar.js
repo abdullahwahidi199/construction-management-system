@@ -24,7 +24,7 @@ export function useCalendar(module = "dashboard") {
   useEffect(() => {
     let cancelled = false;
     instance
-      .get("auth/settings/calendar/")
+      .get("auth/settings/calendar/", { skipGlobalErrorToast: true })
       .then((res) => {
         if (cancelled) return;
         const normalized = normalizeCalendarSettings(res.data);

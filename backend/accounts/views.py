@@ -265,11 +265,6 @@ class CalendarSettingsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        if not (
-            has_permission(request.user, "settings.view")
-            or has_permission(request.user, "settings.manage")
-        ):
-            raise PermissionDenied()
         return Response(CalendarSettingsSerializer(ApplicationSettings.get_solo()).data)
 
     def put(self, request):

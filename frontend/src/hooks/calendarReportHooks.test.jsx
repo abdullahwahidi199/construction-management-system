@@ -42,7 +42,11 @@ describe("calendar and report hooks", () => {
     api.get.mockRejectedValueOnce(new Error("offline"));
     const { result } = renderHook(() => useCalendar("projects"));
 
-    await waitFor(() => expect(api.get).toHaveBeenCalledWith("auth/settings/calendar/"));
+    await waitFor(() =>
+      expect(api.get).toHaveBeenCalledWith("auth/settings/calendar/", {
+        skipGlobalErrorToast: true,
+      }),
+    );
     expect(result.current.calendar).toBe(CALENDAR_TYPES.SHAMSI);
 
     act(() => {
@@ -64,6 +68,7 @@ describe("calendar and report hooks", () => {
 
     expect(api.get).toHaveBeenCalledWith("reports/projects/", {
       params: { status: "ongoing" },
+      skipGlobalErrorToast: true,
     });
     expect(result.current.data).toEqual({ summary: { total: 2 } });
     expect(result.current.loading).toBe(false);

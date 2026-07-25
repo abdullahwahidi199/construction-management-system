@@ -1,4 +1,10 @@
-export default function Card({ title, right, children, className = "" }) {
+export default function Card({
+  title,
+  right,
+  children,
+  className = "",
+  contentClassName = "p-4 sm:p-5",
+}) {
   return (
     <div
       className={`overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm shadow-black/5 ${className}`}
@@ -11,7 +17,7 @@ export default function Card({ title, right, children, className = "" }) {
           {right && <div className="shrink-0">{right}</div>}
         </div>
       )}
-      <div className="p-4 sm:p-5">{children}</div>
+      <div className={contentClassName}>{children}</div>
     </div>
   );
 }

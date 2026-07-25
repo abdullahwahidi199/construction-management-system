@@ -124,7 +124,10 @@ export default function SubcontractorFormModal({
     <div className="mobile-modal-surface fixed inset-0 z-50 flex">
       <div className="absolute inset-0  backdrop-blur-sm" onClick={onClose} />
       <div className="mobile-modal-panel relative w-full max-w-2xl overflow-hidden rounded-2xl">
-        <Card className="flex h-full flex-col p-0">
+        <Card
+          className="flex h-full min-h-0 flex-col p-0"
+          contentClassName="flex min-h-0 flex-1 flex-col p-0"
+        >
           <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
             <div className="mobile-modal-header flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
               <h2 className="text-lg font-semibold text-[var(--text)]">

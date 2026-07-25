@@ -95,15 +95,25 @@ button {
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  overflow: hidden;
 }
 
 .mobile-modal-panel {
+  display: flex;
   max-height: min(92dvh, 900px);
+  flex-direction: column;
 }
 
 .mobile-modal-header,
 .mobile-modal-footer {
   flex-shrink: 0;
+}
+
+.mobile-modal-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 @media (min-width: 768px) {

@@ -142,7 +142,7 @@ export default function DataEntryRootLayout() {
       icon: BarChart3,
       visible: hasAnyPermission(permissions, [
         "reports.view",
-        "reports.create",
+        "reports.export",
       ]),
     },
   ].filter((link) => link.visible);

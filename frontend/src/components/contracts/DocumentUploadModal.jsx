@@ -172,7 +172,10 @@ export default function DocumentUploadModal({
       />
 
       <div className="mobile-modal-panel relative w-full max-w-md animate-in fade-in zoom-in-95">
-        <Card className="flex h-full flex-col overflow-hidden p-0 shadow-2xl border-[var(--border)]">
+        <Card
+          className="flex h-full min-h-0 flex-col overflow-hidden p-0 shadow-2xl border-[var(--border)]"
+          contentClassName="flex min-h-0 flex-1 flex-col p-0"
+        >
           <form onSubmit={handleSubmit} noValidate className="flex min-h-0 flex-1 flex-col">
             {/* Header */}
             <div className="mobile-modal-header flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--card)]">

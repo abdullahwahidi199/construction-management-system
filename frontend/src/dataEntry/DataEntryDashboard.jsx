@@ -126,7 +126,7 @@ export default function DataEntryDashboard() {
       icon: BarChart3,
       visible: hasAnyPermission(permissions, [
         "reports.view",
-        "reports.create",
+        "reports.export",
       ]),
     },
 

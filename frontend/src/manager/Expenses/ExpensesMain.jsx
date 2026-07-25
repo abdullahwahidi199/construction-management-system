@@ -102,7 +102,9 @@ export default function ExpensesMain({ dataEntryMode = false }) {
   const [open, setOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const { data: projects } = useFetch("projects/");
+  const { data: projects } = useFetch("projects/", {
+    skipGlobalErrorToast: true,
+  });
 
   const createExpense = async (formData) => {
     try {

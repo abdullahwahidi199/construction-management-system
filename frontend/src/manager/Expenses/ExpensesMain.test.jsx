@@ -311,7 +311,10 @@ describe("ExpensesMain", () => {
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Download PDF" }));
     });
-    expect(api.get).not.toHaveBeenCalled();
+    expect(api.get).not.toHaveBeenCalledWith(
+      expect.stringContaining("/expenses/export-pdf/?"),
+      expect.anything(),
+    );
 
     fireEvent.change(screen.getByDisplayValue("Pending"), { target: { value: "approved" } });
     await act(async () => {
