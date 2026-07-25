@@ -197,7 +197,7 @@ export default function PayrollPage() {
       </Header>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:flex-wrap">
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
@@ -236,12 +236,12 @@ export default function PayrollPage() {
               </option>
             ))}
         </select>
-        <div className="min-w-[160px]">
+        <div className="min-w-0 lg:min-w-[160px]">
           <CalendarDatePicker
           value={startDateFilter}
           onChange={setStartDateFilter}
           module="payroll"
-          className="px-4 py-2 rounded-lg border text-sm"
+          className="h-12 rounded-lg border px-4 py-2 text-base sm:text-sm"
           style={{
             backgroundColor: "var(--card)",
             color: "var(--text)",
@@ -250,12 +250,12 @@ export default function PayrollPage() {
           />
         </div>
 
-        <div className="min-w-[160px]">
+        <div className="min-w-0 lg:min-w-[160px]">
           <CalendarDatePicker
           value={endDateFilter}
           onChange={setEndDateFilter}
           module="payroll"
-          className="px-4 py-2 rounded-lg border text-sm"
+          className="h-12 rounded-lg border px-4 py-2 text-base sm:text-sm"
           style={{
             backgroundColor: "var(--card)",
             color: "var(--text)",
@@ -271,7 +271,7 @@ export default function PayrollPage() {
             setStartDateFilter("");
             setEndDateFilter("");
           }}
-          className="px-4 py-2 rounded-lg text-sm"
+          className="h-12 rounded-lg px-4 py-2 text-sm"
           style={{
             backgroundColor: "var(--hover)",
             color: "var(--text)",
@@ -363,7 +363,7 @@ export default function PayrollPage() {
           className="rounded-xl border overflow-hidden"
           style={{ borderColor: "var(--border)" }}
         >
-          <table className="w-full">
+          <table className="hidden w-full md:table">
             <thead style={{ backgroundColor: "var(--hover)" }}>
               <tr>
                 {[
@@ -481,6 +481,99 @@ export default function PayrollPage() {
               ))}
             </tbody>
           </table>
+          <div className="divide-y divide-[var(--border)] md:hidden">
+            {payrolls.map((payroll) => (
+              <article key={payroll.id} className="grid gap-4 p-4">
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="break-words text-base font-semibold text-[var(--text)]">
+                      {payroll.employee_name}
+                    </h3>
+                    <p className="mt-1 text-sm text-[var(--muted)]">
+                      {payroll.employee_id}
+                    </p>
+                  </div>
+                  <span
+                    className="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold capitalize"
+                    style={getStatusBadge(payroll.payment_status)}
+                  >
+                    {payroll.payment_status || "pending"}
+                  </span>
+                </div>
+
+                <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("PayrollPage.table.period")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                      {formatDate(payroll.payroll_period_start) || "-"}{" "}
+                      {t("PayrollPage.table.to")}{" "}
+                      {formatDate(payroll.payroll_period_end) || "-"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("PayrollPage.table.paymentDate")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                      {formatDate(payroll.payment_date) || "-"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("PayrollPage.table.grossPay")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                      {payroll.currency}
+                      {parseFloat(payroll.gross_pay).toLocaleString()}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("PayrollPage.table.netPay")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-bold text-[var(--success)]">
+                      {payroll.currency}
+                      {parseFloat(payroll.net_pay).toLocaleString()}
+                    </dd>
+                  </div>
+                </dl>
+
+                <div className="flex flex-wrap items-center justify-end gap-2 border-t border-[var(--border)] pt-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedPayroll(payroll);
+                      setShowForm(true);
+                    }}
+                    className="h-12 rounded-xl border border-[var(--border)] px-4 text-sm font-medium text-[var(--primary)]"
+                  >
+                    {t("PayrollPage.table.edit")}
+                  </button>
+                  <PermissionWrapper permissions={["payrolls.delete"]}>
+                    <button
+                      type="button"
+                      onClick={() => setDeleteConfirm(payroll)}
+                      className="h-12 rounded-xl border border-red-500/20 px-4 text-sm font-medium text-[var(--danger)]"
+                    >
+                      {t("PayrollPage.table.delete")}
+                    </button>
+                  </PermissionWrapper>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedPayrollId(payroll.id);
+                      setShowPrintModal(true);
+                    }}
+                    className="h-12 rounded-xl border border-[var(--border)] px-4 text-sm font-medium text-[var(--success)]"
+                  >
+                    Print
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       )}
 

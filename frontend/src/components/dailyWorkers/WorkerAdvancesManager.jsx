@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Edit2, Plus, Printer, RefreshCw, Trash2 } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
@@ -291,10 +291,10 @@ export default function WorkerAdvancesManager() {
       </div>
 
       <div
-        className="overflow-x-auto rounded-lg border"
+        className="rounded-lg border md:overflow-x-auto"
         style={{ borderColor: "var(--border)", backgroundColor: "var(--bg)" }}
       >
-        <table className="w-full text-sm">
+        <table className="hidden w-full text-sm md:table">
           <thead
             className="uppercase text-xs"
             style={{ backgroundColor: "var(--hover)", color: "var(--muted)" }}
@@ -387,6 +387,105 @@ export default function WorkerAdvancesManager() {
             )}
           </tbody>
         </table>
+        <div className="divide-y divide-[var(--border)] md:hidden">
+          {loading ? (
+            <div className="px-4 py-6 text-center text-sm">Loading...</div>
+          ) : advances.length === 0 ? (
+            <div className="px-4 py-6 text-center text-sm" style={{ color: "var(--muted)" }}>
+              No advances found.
+            </div>
+          ) : (
+            advances.map((advance) => (
+              <article key={advance.id} className="grid gap-4 p-4">
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="break-words text-base font-semibold">
+                      {advance.worker_name}
+                    </h3>
+                    <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+                      {advance.worker_code}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-[var(--hover)] px-2.5 py-1 text-xs font-semibold capitalize">
+                    {advance.status}
+                  </span>
+                </div>
+
+                <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                      Date
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium">
+                      {displayDate(advance.date)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                      Amount
+                    </dt>
+                    <dd className="mt-1 text-sm font-bold">
+                      {money(advance.amount, advance.currency)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                      Remaining
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium">
+                      {money(advance.remaining_balance, advance.currency)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                      Description
+                    </dt>
+                    <dd className="mt-1 break-words text-sm font-medium">
+                      {advance.description || "-"}
+                    </dd>
+                  </div>
+                </dl>
+
+                <div className="flex flex-wrap items-center justify-end gap-2 border-t border-[var(--border)] pt-3">
+                  <button
+                    onClick={() => setReceiptAdvance(advance)}
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium"
+                    style={{ borderColor: "var(--border)" }}
+                    type="button"
+                  >
+                    <Printer className="h-4 w-4" />
+                    Print
+                  </button>
+                  {canUpdate && (
+                    <button
+                      onClick={() => {
+                        setSelectedAdvance(advance);
+                        setModalOpen(true);
+                      }}
+                      className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium"
+                      style={{ borderColor: "var(--border)" }}
+                      type="button"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                      Edit
+                    </button>
+                  )}
+                  {canDelete && (
+                    <button
+                      onClick={() => handleDelete(advance)}
+                      className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium text-red-600"
+                      style={{ borderColor: "var(--border)" }}
+                      type="button"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </article>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
@@ -411,7 +510,8 @@ function AdvanceModal({ open, onClose, onSubmit, advance, workers, loading }) {
 
   if (!open) return null;
 
-  const inputClass = "w-full rounded border px-3 py-2 text-sm outline-none";
+  const inputClass =
+    "min-h-12 w-full rounded border px-3 py-3 text-base outline-none sm:text-sm";
   const inputStyle = {
     borderColor: "var(--border)",
     backgroundColor: "var(--bg)",
@@ -450,9 +550,9 @@ function AdvanceModal({ open, onClose, onSubmit, advance, workers, loading }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="mobile-modal-surface fixed inset-0 z-50 flex bg-black/50">
       <div
-        className="w-full max-w-2xl rounded-lg border shadow-lg"
+        className="mobile-modal-panel flex w-full max-w-2xl flex-col overflow-hidden rounded-lg border shadow-lg"
         style={{
           backgroundColor: "var(--card)",
           borderColor: "var(--border)",
@@ -460,7 +560,7 @@ function AdvanceModal({ open, onClose, onSubmit, advance, workers, loading }) {
         }}
       >
         <div
-          className="flex items-center justify-between border-b p-4"
+          className="mobile-modal-header flex items-center justify-between border-b p-4"
           style={{ borderColor: "var(--border)" }}
         >
           <h2 className="text-lg font-semibold">
@@ -469,20 +569,21 @@ function AdvanceModal({ open, onClose, onSubmit, advance, workers, loading }) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded border px-3 py-1 text-sm"
+            className="inline-flex min-h-11 items-center justify-center rounded border px-3 py-1 text-sm"
             style={{ borderColor: "var(--border)" }}
           >
             Close
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 p-4">
-          {error && (
-            <p className="rounded bg-red-500/10 px-3 py-2 text-sm text-red-600">
-              {error}
-            </p>
-          )}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="mobile-modal-content space-y-4 p-4">
+            {error && (
+              <p className="rounded bg-red-500/10 px-3 py-2 text-sm text-red-600">
+                {error}
+              </p>
+            )}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Field label="Worker *">
               <select
                 required
@@ -560,16 +661,17 @@ function AdvanceModal({ open, onClose, onSubmit, advance, workers, loading }) {
                 />
               </Field>
             </div>
+            </div>
           </div>
 
           <div
-            className="flex justify-end gap-3 border-t pt-4"
+            className="mobile-modal-footer flex justify-end gap-3 border-t px-4 py-4"
             style={{ borderColor: "var(--border)" }}
           >
             <button
               type="button"
               onClick={onClose}
-              className="rounded border px-4 py-2 text-sm"
+              className="min-h-12 rounded border px-4 py-2 text-sm"
               style={{ borderColor: "var(--border)" }}
             >
               Cancel
@@ -577,7 +679,7 @@ function AdvanceModal({ open, onClose, onSubmit, advance, workers, loading }) {
             <button
               type="submit"
               disabled={loading}
-              className="rounded px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+              className="min-h-12 rounded px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
               style={{ backgroundColor: "var(--primary)" }}
             >
               {loading ? "Saving..." : "Save Advance"}

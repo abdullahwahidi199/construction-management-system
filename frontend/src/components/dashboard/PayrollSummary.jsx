@@ -57,7 +57,7 @@ export default function PayrollSummary({ data }) {
     >
       <div className="space-y-5">
         {/* CURRENT vs PREVIOUS */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 min-[380px]:grid-cols-2">
           <div className="p-4 rounded-lg bg-[var(--bg)] border border-[var(--border)]">
             <p className="text-xs text-[var(--muted)] mb-1">
               {t("payrollSummary.thisMonthNet")}
@@ -107,7 +107,7 @@ export default function PayrollSummary({ data }) {
         </div>
 
         {/* BREAKDOWN */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:grid-cols-4">
           {[
             {
               label: t("payrollSummary.tax"),
@@ -187,9 +187,9 @@ export default function PayrollSummary({ data }) {
               {data.recent_payrolls.map((pr) => (
                 <div
                   key={pr.id}
-                  className="flex items-center justify-between py-2 px-3 rounded-lg bg-[var(--bg)]"
+                  className="flex flex-col gap-2 rounded-lg bg-[var(--bg)] px-3 py-2 min-[380px]:flex-row min-[380px]:items-center min-[380px]:justify-between"
                 >
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-medium">
                       {pr.employee__first_name} {pr.employee__last_name}
                     </p>
@@ -198,7 +198,7 @@ export default function PayrollSummary({ data }) {
                     </p>
                   </div>
 
-                  <div className="text-right">
+                  <div className="shrink-0 min-[380px]:text-right">
                     <div className="text-sm font-semibold">
                       {formatMoney(pr.net_pay, pr.currency)}
                     </div>

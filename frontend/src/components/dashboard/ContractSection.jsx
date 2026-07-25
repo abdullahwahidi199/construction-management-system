@@ -73,7 +73,7 @@ export default function ContractSection({ contracts, subcontractors }) {
     >
       <div className="space-y-6">
         {/* KPI GRID */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
           <div className="p-3 rounded-lg bg-[var(--bg)]">
             <p className="text-xs text-[var(--muted)]">
               {t("contractSection.totalValue")}
@@ -183,7 +183,7 @@ export default function ContractSection({ contracts, subcontractors }) {
               {t("contractSection.subcontractors")}
             </h4>
 
-            <div className="flex gap-4 mb-3">
+            <div className="mb-3 flex flex-wrap gap-4">
               <div>
                 <p className="text-xl font-bold">
                   {subcontractors.active_subcontractors}

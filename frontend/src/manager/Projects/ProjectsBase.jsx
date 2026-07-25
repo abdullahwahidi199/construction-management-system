@@ -143,7 +143,7 @@ export default function ProjectsBase() {
       </div>
 
       {/* ── Stats Row ────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:grid-cols-4">
         {stats.map((stat) => (
           <div
             key={stat.label}

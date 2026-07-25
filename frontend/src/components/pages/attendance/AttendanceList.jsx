@@ -426,7 +426,7 @@ function AttendanceList() {
         style={{ borderColor: "var(--border)" }}
         dir={isRTL ? "rtl" : "ltr"}
       >
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto md:block mobile-scrollbar">
           <table className="w-full">
             <thead>
               <tr style={{ backgroundColor: "var(--card)" }}>
@@ -543,6 +543,76 @@ function AttendanceList() {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="divide-y divide-[var(--border)] md:hidden">
+          {loading ? (
+            <div className="px-6 py-8 text-center text-sm" style={{ color: "var(--muted)" }}>
+              {t("AttendanceList.loading")}
+            </div>
+          ) : attendance.length === 0 ? (
+            <div className="px-6 py-8 text-center text-sm" style={{ color: "var(--muted)" }}>
+              {t("AttendanceList.noAttendanceRecords")}
+            </div>
+          ) : (
+            attendance.map((record) => (
+              <article key={record.id} className="grid gap-4 p-4">
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="break-words text-base font-semibold text-[var(--text)]">
+                      {record.employee_name}
+                    </h3>
+                    <p className="mt-1 text-sm text-[var(--muted)]">
+                      {record.employee_identifier}
+                    </p>
+                  </div>
+                  <div className="shrink-0">{getStatusBadge(record.status)}</div>
+                </div>
+
+                <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("AttendanceList.date")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                      {formatDate(record.date) || record.date}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("AttendanceList.checkIn")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                      {record.check_in || "-"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("AttendanceList.checkOut")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                      {record.check_out || "-"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("AttendanceList.overtime")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                      {record.overtime_hours || 0}h
+                    </dd>
+                  </div>
+                  <div className="min-[380px]:col-span-2">
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("AttendanceList.note")}
+                    </dt>
+                    <dd className="mt-1 break-words text-sm font-medium text-[var(--text)]">
+                      {record.note || "-"}
+                    </dd>
+                  </div>
+                </dl>
+              </article>
+            ))
+          )}
         </div>
       </div>
     </div>

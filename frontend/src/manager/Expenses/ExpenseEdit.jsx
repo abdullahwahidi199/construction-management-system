@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Save, DollarSign, User, FileText, Calendar } from "lucide-react";
+import { X, Save, DollarSign, User, Calendar } from "lucide-react";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import Button from "../../components/ui/Button";
 import { useLanguage } from "../../hooks/useLanguage";
@@ -121,13 +121,13 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="mobile-modal-surface fixed inset-0 z-50 flex">
         <div
           dir={isRTL ? "rtl" : "ltr"}
-          className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-2xl"
+          className="mobile-modal-panel relative w-full max-w-2xl overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-2xl"
         >
           {/* Header */}
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur-sm px-6 py-4">
+          <div className="mobile-modal-header sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur-sm px-6 py-4">
             <div>
               <h2 className="text-xl font-semibold text-[var(--text)]">
                 {t("ExpenseEdit.title")}
@@ -138,14 +138,16 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
             </div>
             <button
               onClick={onClose}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--text)] transition-colors"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--text)] transition-colors sm:h-10 sm:w-10"
+              aria-label="Close"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+            <div className="mobile-modal-content p-6 space-y-6">
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
@@ -316,13 +318,14 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
                 <p className="text-sm text-red-600">{errors.submit}</p>
               </div>
             )}
+            </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--border)]">
+            <div className="mobile-modal-footer flex items-center justify-end gap-3 border-t border-[var(--border)] px-6 py-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] px-6 py-2.5 text-sm font-medium text-[var(--text)] hover:bg-[var(--hover)] transition-colors"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-6 py-2.5 text-sm font-medium text-[var(--text)] hover:bg-[var(--hover)] transition-colors"
               >
                 {t("ExpenseEdit.cancel")}
               </button>
@@ -342,7 +345,7 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-6 py-2.5 text-sm font-medium text-white hover:bg-[var(--primary)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-6 py-2.5 text-sm font-medium text-white hover:bg-[var(--primary)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <Save className="h-4 w-4" />
                   {isSubmitting

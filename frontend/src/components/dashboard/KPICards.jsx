@@ -32,19 +32,21 @@ function KPICard({
   const bgColor = colorMap[color] || colorMap.primary;
 
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 flex items-start gap-4 hover:shadow-md transition-shadow">
+    <div className="flex items-start gap-4 rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 transition-shadow hover:shadow-md active:scale-[0.99]">
       <div
-        className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
+        className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl sm:h-12 sm:w-12"
         style={{ backgroundColor: `${bgColor}15` }}
       >
-        <span className="text-2xl" style={{ color: bgColor }}>
+        <span className="text-3xl leading-none sm:text-2xl" style={{ color: bgColor }}>
           {icon}
         </span>
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-[var(--muted)] truncate">{label}</p>
-        <p className="text-2xl font-bold text-[var(--text)] mt-0.5">{value}</p>
-        <div className="flex items-center gap-2 mt-1">
+      <div className="min-w-0 flex-1">
+        <p className="break-words text-sm text-[var(--muted)]">{label}</p>
+        <p className="mt-0.5 break-words text-3xl font-bold leading-tight text-[var(--text)] sm:text-2xl">
+          {value}
+        </p>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
           {trend && (
             <span
               className={`inline-flex items-center text-xs font-medium px-1.5 py-0.5 rounded ${
@@ -59,7 +61,7 @@ function KPICard({
             </span>
           )}
           {sub && (
-            <span className="text-xs text-[var(--muted)] whitespace-pre-line">
+            <span className="break-words text-xs leading-5 text-[var(--muted)] whitespace-pre-line">
               {sub}
             </span>
           )}

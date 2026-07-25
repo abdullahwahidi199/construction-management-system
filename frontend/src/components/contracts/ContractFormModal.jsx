@@ -7,7 +7,6 @@ import Input from "../ui/Input";
 import Select from "../ui/Select";
 import { fieldLabelClass, textareaControlClass } from "../ui/formStyles.jsx";
 import useFetch from "../../hooks/useFetch";
-import { hasAnyPermission } from "../../../utils/permissions";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
 
@@ -176,16 +175,16 @@ export default function ContractFormModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="mobile-modal-surface fixed inset-0 z-50 flex">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <Card className="p-0">
-          <form onSubmit={handleSubmit}>
+      <div className="mobile-modal-panel relative w-full max-w-2xl overflow-hidden rounded-2xl">
+        <Card className="flex h-full flex-col p-0">
+          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+            <div className="mobile-modal-header flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
               <h2 className="text-lg font-semibold text-[var(--text)]">
                 {isEdit
                   ? t("ContractFormModal.titleEdit")
@@ -194,14 +193,15 @@ export default function ContractFormModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="p-1 rounded-lg hover:bg-[var(--hover)] text-[var(--text)]"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-lg hover:bg-[var(--hover)] text-[var(--text)] sm:h-9 sm:w-9"
+                aria-label={t("common.close")}
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Body */}
-            <div className="px-6 py-4 space-y-4">
+            <div className="mobile-modal-content px-6 py-4 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Select
                   label={t("ContractFormModal.fields.project")}
@@ -251,7 +251,7 @@ export default function ContractFormModal({
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <Select
                   label={t("ContractFormModal.fields.currency")}
                   value={form.currency}
@@ -340,7 +340,7 @@ export default function ContractFormModal({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--border)]">
+            <div className="mobile-modal-footer flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--border)]">
               <Button
                 type="button"
                 variant="secondary"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { useLanguage } from "../../hooks/useLanguage";
 import { useAuth } from "../../auth/AuthContext";
@@ -174,7 +174,7 @@ function WorkerBulkAttendance() {
         className="rounded-lg border"
         style={{ borderColor: "var(--border)", backgroundColor: "var(--bg)" }}
       >
-        <table className="w-full text-sm">
+        <table className="hidden w-full text-sm md:table">
           <thead
             className="uppercase text-xs"
             style={{ backgroundColor: "var(--hover)", color: "var(--muted)" }}
@@ -298,6 +298,111 @@ function WorkerBulkAttendance() {
             ))}
           </tbody>
         </table>
+        <div className="divide-y divide-[var(--border)] md:hidden">
+          {loading ? (
+            <div className="px-4 py-6 text-center text-sm" style={{ color: "var(--muted)" }}>
+              Loading attendance...
+            </div>
+          ) : workersData.length === 0 ? (
+            <div className="px-4 py-6 text-center text-sm" style={{ color: "var(--muted)" }}>
+              No workers available for this date.
+            </div>
+          ) : (
+            workersData.map((w) => (
+              <article
+                key={w.workerId}
+                className="grid gap-4 p-4"
+                style={{
+                  backgroundColor: w.isMarked
+                    ? "rgba(34, 197, 94, 0.05)"
+                    : "transparent",
+                }}
+              >
+                <div className="min-w-0">
+                  <h3 className="break-words text-base font-semibold">
+                    {w.name}
+                  </h3>
+                  <p className="mt-1 text-sm capitalize" style={{ color: "var(--muted)" }}>
+                    {(w.trade || "").replace("_", " ") || "-"}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                  <label className="block">
+                    <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                      {t("WorkerBulkAttendance.status")}
+                    </span>
+                    <select
+                      value={w.status}
+                      onChange={(e) =>
+                        handleUpdate(w.workerId, "status", e.target.value)
+                      }
+                      disabled={!canSaveAttendance}
+                      className="h-12 w-full rounded-lg border px-3 text-base"
+                      style={{
+                        borderColor: "var(--border)",
+                        backgroundColor: "var(--bg)",
+                        color: "var(--text)",
+                      }}
+                    >
+                      <option value="present">
+                        {t("WorkerBulkAttendance.present")}
+                      </option>
+                      <option value="half_day">
+                        {t("WorkerBulkAttendance.halfDay")}
+                      </option>
+                      <option value="absent">
+                        {t("WorkerBulkAttendance.absent")}
+                      </option>
+                    </select>
+                  </label>
+
+                  <label className="block">
+                    <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                      {t("WorkerBulkAttendance.overtimeHours")}
+                    </span>
+                    <input
+                      type="number"
+                      step="0.5"
+                      disabled={!canSaveAttendance || w.status === "absent"}
+                      value={w.overtime_hours}
+                      onChange={(e) =>
+                        handleUpdate(w.workerId, "overtime_hours", e.target.value)
+                      }
+                      className="h-12 w-full rounded-lg border px-3 text-base disabled:opacity-50"
+                      style={{
+                        borderColor: "var(--border)",
+                        backgroundColor: "var(--bg)",
+                        color: "var(--text)",
+                      }}
+                    />
+                  </label>
+
+                  <label className="block">
+                    <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                      {t("WorkerBulkAttendance.notes")}
+                    </span>
+                    <input
+                      type="text"
+                      value={w.notes}
+                      onChange={(e) =>
+                        handleUpdate(w.workerId, "notes", e.target.value)
+                      }
+                      disabled={!canSaveAttendance}
+                      className="h-12 w-full rounded-lg border px-3 text-base"
+                      placeholder={t("WorkerBulkAttendance.optionalNote")}
+                      style={{
+                        borderColor: "var(--border)",
+                        backgroundColor: "var(--bg)",
+                        color: "var(--text)",
+                      }}
+                    />
+                  </label>
+                </div>
+              </article>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

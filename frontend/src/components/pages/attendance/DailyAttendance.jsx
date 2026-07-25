@@ -218,7 +218,7 @@ function DailyAttendance() {
                 style={{ borderColor: "var(--border)" }}
                 dir={isRTL ? "rtl" : "ltr"}
               >
-                <table className="w-full">
+                <table className="hidden w-full md:table">
                   <thead>
                     <tr style={{ backgroundColor: "var(--card)" }}>
                       <th
@@ -299,6 +299,63 @@ function DailyAttendance() {
                     ))}
                   </tbody>
                 </table>
+                <div className="divide-y divide-[var(--border)] md:hidden">
+                  {(data.records || []).length === 0 ? (
+                    <div className="px-4 py-8 text-center text-sm" style={{ color: "var(--muted)" }}>
+                      {t("DailyAttendance.empty")}
+                    </div>
+                  ) : (
+                    (data.records || []).map((record) => (
+                      <article key={record.id} className="grid gap-4 p-4">
+                        <div className="flex min-w-0 items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <h4 className="break-words text-base font-semibold text-[var(--text)]">
+                              {record.employee_name}
+                            </h4>
+                            <p className="mt-1 text-sm text-[var(--muted)]">
+                              {record.employee_identifier}
+                            </p>
+                          </div>
+                          <div className="shrink-0">{getStatusBadge(record.status)}</div>
+                        </div>
+                        <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                          <div>
+                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                              {t("DailyAttendance.checkIn")}
+                            </dt>
+                            <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                              {record.check_in || t("DailyAttendance.empty")}
+                            </dd>
+                          </div>
+                          <div>
+                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                              {t("DailyAttendance.checkOut")}
+                            </dt>
+                            <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                              {record.check_out || t("DailyAttendance.empty")}
+                            </dd>
+                          </div>
+                          <div>
+                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                              {t("DailyAttendance.overtime")}
+                            </dt>
+                            <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                              {record.overtime_hours || 0}h
+                            </dd>
+                          </div>
+                          <div>
+                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                              {t("DailyAttendance.note")}
+                            </dt>
+                            <dd className="mt-1 break-words text-sm font-medium text-[var(--text)]">
+                              {record.note || t("DailyAttendance.empty")}
+                            </dd>
+                          </div>
+                        </dl>
+                      </article>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
 
@@ -315,7 +372,7 @@ function DailyAttendance() {
                   style={{ borderColor: "var(--border)" }}
                   dir={isRTL ? "rtl" : "ltr"}
                 >
-                  <table className="w-full">
+                  <table className="hidden w-full md:table">
                     <thead>
                       <tr style={{ backgroundColor: "var(--card)" }}>
                         <th
@@ -363,6 +420,28 @@ function DailyAttendance() {
                       ))}
                     </tbody>
                   </table>
+                  <div className="divide-y divide-[var(--border)] md:hidden">
+                    {(data.unmarked_employees || []).map((emp) => (
+                      <article key={emp.id} className="grid gap-3 p-4">
+                        <div>
+                          <h4 className="break-words text-base font-semibold text-[var(--text)]">
+                            {emp.first_name} {emp.last_name}
+                          </h4>
+                          <p className="mt-1 text-sm text-[var(--muted)]">
+                            {emp.employee_id}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                            {t("DailyAttendance.department")}
+                          </p>
+                          <p className="mt-1 break-words text-sm font-medium text-[var(--text)]">
+                            {emp.department || t("DailyAttendance.empty")}
+                          </p>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

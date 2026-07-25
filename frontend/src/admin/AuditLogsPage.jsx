@@ -222,9 +222,9 @@ function DetailPanel({ log, onClose }) {
   const StatusIcon = status.icon;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-3 backdrop-blur-sm">
-      <section className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-2xl">
-        <header className="flex items-start justify-between gap-3 border-b border-[var(--border)] bg-[var(--card)] px-5 py-4">
+    <div className="mobile-modal-surface fixed inset-0 z-50 flex bg-black/55 backdrop-blur-sm">
+      <section className="mobile-modal-panel mobile-modal-full flex w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-2xl">
+        <header className="mobile-modal-header flex items-start justify-between gap-3 border-b border-[var(--border)] bg-[var(--card)] px-5 py-4">
           <div className="min-w-0">
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <Pill className={status.className}>
@@ -243,15 +243,16 @@ function DetailPanel({ log, onClose }) {
             </p>
           </div>
           <button
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[var(--muted)] transition hover:bg-[var(--hover)] hover:text-[var(--text)]"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-[var(--muted)] transition hover:bg-[var(--hover)] hover:text-[var(--text)] sm:h-9 sm:w-9"
             onClick={onClose}
             title="Close"
+            aria-label="Close"
           >
             <X className="h-5 w-5" />
           </button>
         </header>
 
-        <div className="overflow-y-auto p-5">
+        <div className="mobile-modal-content overflow-y-auto p-5">
           {log.warnings?.length > 0 && (
             <div className="mb-4 rounded-lg border border-yellow-500/40 bg-yellow-500/10 p-3 text-sm text-yellow-700 dark:text-yellow-300">
               {log.warnings.map((warning) => (

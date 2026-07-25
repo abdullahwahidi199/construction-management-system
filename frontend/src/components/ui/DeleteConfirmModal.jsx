@@ -18,7 +18,7 @@ export default function DeleteConfirmModal({
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="mobile-bottom-sheet fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         onClick={onClose}
@@ -26,7 +26,7 @@ export default function DeleteConfirmModal({
       ></div>
 
       {/* Modal Panel */}
-      <div className="relative w-full max-w-sm bg-(--card) rounded-xl shadow-2xl p-6 border border-(--border) transform transition-all duration-300 scale-100 animate-in fade-in zoom-in-95">
+      <div className="mobile-bottom-sheet-panel relative w-full max-w-sm transform rounded-xl border border-(--border) bg-(--card) p-5 shadow-2xl transition-all duration-300 animate-in fade-in zoom-in-95 sm:p-6">
         <h2 className="text-xl font-bold text-(--text) mb-2">
           {title || t("DeleteConfirmModal.title")}
         </h2>
@@ -40,7 +40,7 @@ export default function DeleteConfirmModal({
           )}
         </p>
 
-        <div className="flex justify-end gap-3 mt-4">
+        <div className="mt-4 flex flex-col justify-end gap-3 sm:flex-row">
           <Button variant="ghost" onClick={onClose} disabled={loading}>
             {t("DeleteConfirmModal.cancel")}
           </Button>

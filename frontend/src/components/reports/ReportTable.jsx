@@ -76,7 +76,7 @@ export default function ReportTable({ columns, rows }) {
         </div>
       </div>
 
-      <div className="overflow-x-auto max-h-[640px]">
+      <div className="hidden max-h-[640px] overflow-x-auto md:block mobile-scrollbar">
         <table className="w-full text-sm">
           <thead className="sticky top-0 z-10 bg-[color:color-mix(in_srgb,var(--hover)_70%,var(--card))]">
             <tr>
@@ -118,6 +118,55 @@ export default function ReportTable({ columns, rows }) {
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="divide-y divide-[color:color-mix(in_srgb,var(--border)_55%,transparent)] md:hidden">
+        {rows.map((row, idx) => {
+          const titleColumn = columns[0];
+          const subtitleColumn = columns[1];
+          const title = titleColumn
+            ? formatCell(row, titleColumn, formatDate, t)
+            : `#${idx + 1}`;
+          const subtitle = subtitleColumn
+            ? formatCell(row, subtitleColumn, formatDate, t)
+            : "";
+
+          return (
+            <article key={row.id ?? idx} className="grid gap-4 p-4">
+              <div className="min-w-0">
+                <h3 className="break-words text-base font-semibold text-text">
+                  {title}
+                </h3>
+                {subtitleColumn && (
+                  <p className="mt-1 break-words text-sm text-muted">
+                    {subtitle}
+                  </p>
+                )}
+              </div>
+              <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                {columns.slice(1).map((col) => (
+                  <div key={col.key} className="min-w-0">
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                      {translateReportKey(t, "columns", col.key, col.label)}
+                    </dt>
+                    <dd className="mt-1 break-words text-sm font-medium text-text">
+                      {col.type === "badge" ? (
+                        <span
+                          className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium capitalize ${badgeClass(
+                            row[col.key],
+                          )}`}
+                        >
+                          {row[col.key] ?? EMPTY_VALUE}
+                        </span>
+                      ) : (
+                        formatCell(row, col, formatDate, t)
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
+          );
+        })}
       </div>
     </section>
   );

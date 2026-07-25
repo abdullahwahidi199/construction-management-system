@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   X,
   Calendar,
@@ -6,10 +5,6 @@ import {
   User,
   FileText,
   RefreshCw,
-  Copy,
-  ExternalLink,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import { useLanguage } from "../../hooks/useLanguage";
 import { useCalendar } from "../../hooks/useCalendar";
@@ -46,32 +41,33 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="mobile-modal-surface fixed inset-0 z-50 flex">
         <div
           dir={isRTL ? "rtl" : "ltr"}
-          className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-2xl"
+          className="mobile-modal-panel relative w-full max-w-2xl overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-2xl"
         >
           {/* Header */}
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur-sm px-6 py-4">
-            <div>
+          <div className="mobile-modal-header sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur-sm px-6 py-4">
+            <div className="min-w-0">
               <h2 className="text-xl font-semibold text-[var(--text)]">
                 {t("ExpenseDetail.title")}
               </h2>
-              <p className="text-sm text-[var(--muted)] mt-0.5">
+              <p className="mt-0.5 break-words text-sm text-[var(--muted)]">
                 #{expense.serial_number} • {expense.project_name}
               </p>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => onEdit?.(expense)}
-                className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary)]/90 transition-colors"
+                className="hidden items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary)]/90 transition-colors sm:inline-flex"
               >
                 <FileText className="h-4 w-4" />
                 {t("ExpenseDetail.edit")}
               </button>
               <button
                 onClick={onClose}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--text)] transition-colors"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--text)] transition-colors sm:h-10 sm:w-10"
+                aria-label="Close"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -79,7 +75,7 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
           </div>
 
           {/* Content */}
-          <div className="p-6 space-y-6">
+          <div className="mobile-modal-content p-6 space-y-6">
             {/* Status & Type Badge */}
             <div className="flex items-center gap-3">
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-3 py-1.5 text-sm font-medium text-blue-600">
@@ -268,6 +264,23 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                 )}
               </div>
             </div>
+          </div>
+          <div className="mobile-modal-footer flex items-center justify-end gap-3 border-t border-[var(--border)] px-6 py-4 sm:hidden">
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-[var(--border)] px-4 text-sm font-medium text-[var(--text)]"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              onClick={() => onEdit?.(expense)}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 text-sm font-medium text-white"
+            >
+              <FileText className="h-4 w-4" />
+              {t("ExpenseDetail.edit")}
+            </button>
           </div>
         </div>
       </div>

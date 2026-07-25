@@ -18,9 +18,6 @@ export const CALENDAR_MODULES = [
   "reports",
   "notifications",
   "documents",
-  "purchases",
-  "inventory",
-  "equipment",
   "subcontractors",
   "worker_advances",
   "daily_worker_attendance",
@@ -30,28 +27,80 @@ export const CALENDAR_MODULES = [
 ];
 
 export const AFGHAN_MONTH_NAMES = {
-  "fa-AF": ["حمل", "ثور", "جوزا", "سرطان", "اسد", "سنبله", "میزان", "عقرب", "قوس", "جدی", "دلو", "حوت"],
-  "ps-AF": ["وری", "غویی", "غبرګولی", "چنګاښ", "زمری", "وږی", "تله", "لړم", "لیندۍ", "مرغومی", "سلواغه", "کب"],
-  en: ["Hamal", "Sawr", "Jawza", "Saratan", "Asad", "Sunbula", "Mizan", "Aqrab", "Qaws", "Jadi", "Dalwa", "Hut"],
+  "fa-AF": [
+    "حمل",
+    "ثور",
+    "جوزا",
+    "سرطان",
+    "اسد",
+    "سنبله",
+    "میزان",
+    "عقرب",
+    "قوس",
+    "جدی",
+    "دلو",
+    "حوت",
+  ],
+  "ps-AF": [
+    "وری",
+    "غویی",
+    "غبرګولی",
+    "چنګاښ",
+    "زمری",
+    "وږی",
+    "تله",
+    "لړم",
+    "لیندۍ",
+    "مرغومی",
+    "سلواغه",
+    "کب",
+  ],
+  en: [
+    "Hamal",
+    "Sawr",
+    "Jawza",
+    "Saratan",
+    "Asad",
+    "Sunbula",
+    "Mizan",
+    "Aqrab",
+    "Qaws",
+    "Jadi",
+    "Dalwa",
+    "Hut",
+  ],
 };
 
 export const defaultCalendarSettings = {
   default_calendar: CALENDAR_TYPES.SHAMSI,
-  modules: Object.fromEntries(CALENDAR_MODULES.map((module) => [module, CALENDAR_TYPES.INHERIT])),
+  modules: Object.fromEntries(
+    CALENDAR_MODULES.map((module) => [module, CALENDAR_TYPES.INHERIT]),
+  ),
 };
 
 const VALID_GLOBAL = new Set([CALENDAR_TYPES.SHAMSI, CALENDAR_TYPES.GREGORIAN]);
-const VALID_MODULE = new Set([CALENDAR_TYPES.SHAMSI, CALENDAR_TYPES.GREGORIAN, CALENDAR_TYPES.INHERIT]);
+const VALID_MODULE = new Set([
+  CALENDAR_TYPES.SHAMSI,
+  CALENDAR_TYPES.GREGORIAN,
+  CALENDAR_TYPES.INHERIT,
+]);
 
 export function normalizeCalendarSettings(value) {
   const incoming = value && typeof value === "object" ? value : {};
   const modules = { ...defaultCalendarSettings.modules };
-  const incomingModules = incoming.modules && typeof incoming.modules === "object" ? incoming.modules : {};
+  const incomingModules =
+    incoming.modules && typeof incoming.modules === "object"
+      ? incoming.modules
+      : {};
   Object.keys(incomingModules).forEach((module) => {
-    modules[module] = VALID_MODULE.has(incomingModules[module]) ? incomingModules[module] : CALENDAR_TYPES.INHERIT;
+    modules[module] = VALID_MODULE.has(incomingModules[module])
+      ? incomingModules[module]
+      : CALENDAR_TYPES.INHERIT;
   });
   return {
-    default_calendar: VALID_GLOBAL.has(incoming.default_calendar) ? incoming.default_calendar : CALENDAR_TYPES.SHAMSI,
+    default_calendar: VALID_GLOBAL.has(incoming.default_calendar)
+      ? incoming.default_calendar
+      : CALENDAR_TYPES.SHAMSI,
     modules,
   };
 }
@@ -75,9 +124,16 @@ export function normalizeDigits(value) {
 
 function parseYmd(value) {
   if (!value) return null;
-  const match = normalizeDigits(value).trim().replace(/\//g, "-").match(/^(-?\d{1,4})-(\d{1,2})-(\d{1,2})/);
+  const match = normalizeDigits(value)
+    .trim()
+    .replace(/\//g, "-")
+    .match(/^(-?\d{1,4})-(\d{1,2})-(\d{1,2})/);
   if (!match) return null;
-  return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
+  return {
+    year: Number(match[1]),
+    month: Number(match[2]),
+    day: Number(match[3]),
+  };
 }
 
 function pad(value) {
@@ -85,10 +141,15 @@ function pad(value) {
 }
 
 function gregorianToJdn(year, month, day) {
-  return Math.floor((1461 * (year + 4800 + Math.floor((month - 14) / 12))) / 4)
-    + Math.floor((367 * (month - 2 - 12 * Math.floor((month - 14) / 12))) / 12)
-    - Math.floor((3 * Math.floor((year + 4900 + Math.floor((month - 14) / 12)) / 100)) / 4)
-    + day - 32075;
+  return (
+    Math.floor((1461 * (year + 4800 + Math.floor((month - 14) / 12))) / 4) +
+    Math.floor((367 * (month - 2 - 12 * Math.floor((month - 14) / 12))) / 12) -
+    Math.floor(
+      (3 * Math.floor((year + 4900 + Math.floor((month - 14) / 12)) / 100)) / 4,
+    ) +
+    day -
+    32075
+  );
 }
 
 function jdnToGregorian(jdn) {
@@ -108,12 +169,14 @@ function jdnToGregorian(jdn) {
 function jalaliToJdn(year, month, day) {
   const epbase = year >= 0 ? year - 474 : year - 473;
   const epyear = 474 + positiveMod(epbase, 2820);
-  return day
-    + (month <= 7 ? (month - 1) * 31 : (month - 1) * 30 + 6)
-    + Math.floor((epyear * 682 - 110) / 2816)
-    + (epyear - 1) * 365
-    + Math.floor(epbase / 2820) * 1029983
-    + 1948320;
+  return (
+    day +
+    (month <= 7 ? (month - 1) * 31 : (month - 1) * 30 + 6) +
+    Math.floor((epyear * 682 - 110) / 2816) +
+    (epyear - 1) * 365 +
+    Math.floor(epbase / 2820) * 1029983 +
+    1948320
+  );
 }
 
 function jdnToJalali(jdn) {
@@ -126,7 +189,8 @@ function jdnToJalali(jdn) {
   } else {
     const aux1 = Math.floor(cyear / 366);
     const aux2 = cyear % 366;
-    ycycle = Math.floor((2134 * aux1 + 2816 * aux2 + 2815) / 1028522) + aux1 + 1;
+    ycycle =
+      Math.floor((2134 * aux1 + 2816 * aux2 + 2815) / 1028522) + aux1 + 1;
   }
   let year = ycycle + 2820 * cycle + 474;
   if (year <= 0) year -= 1;
@@ -142,7 +206,9 @@ function positiveMod(value, divisor) {
 
 export function isShamsiLeapYear(year) {
   const lastDay = toShamsi(`${Number(year) + 622}-03-20`);
-  return lastDay?.year === Number(year) && lastDay.month === 12 && lastDay.day === 30;
+  return (
+    lastDay?.year === Number(year) && lastDay.month === 12 && lastDay.day === 30
+  );
 }
 
 export function shamsiMonthLength(year, month) {
@@ -165,7 +231,8 @@ export function toShamsi(value) {
     timeZone: "UTC",
   }).formatToParts(date);
 
-  const getPart = (type) => Number(parts.find((part) => part.type === type)?.value);
+  const getPart = (type) =>
+    Number(parts.find((part) => part.type === type)?.value);
   const year = getPart("year");
   const month = getPart("month");
   const day = getPart("day");
@@ -175,7 +242,13 @@ export function toShamsi(value) {
 export function toGregorian(value) {
   const parsed = parseYmd(value);
   if (!parsed) return "";
-  if (parsed.month < 1 || parsed.month > 12 || parsed.day < 1 || parsed.day > shamsiMonthLength(parsed.year, parsed.month)) return "";
+  if (
+    parsed.month < 1 ||
+    parsed.month > 12 ||
+    parsed.day < 1 ||
+    parsed.day > shamsiMonthLength(parsed.year, parsed.month)
+  )
+    return "";
   const g = jdnToGregorian(jalaliToJdn(parsed.year, parsed.month, parsed.day));
   return `${g.year}-${pad(g.month)}-${pad(g.day)}`;
 }
@@ -184,9 +257,18 @@ export function parseDate(value, calendar = CALENDAR_TYPES.GREGORIAN) {
   if (!value) return "";
   const parsed = parseYmd(value);
   if (!parsed) return "";
-  if (calendar === CALENDAR_TYPES.SHAMSI) return toGregorian(`${parsed.year}-${pad(parsed.month)}-${pad(parsed.day)}`);
+  if (calendar === CALENDAR_TYPES.SHAMSI)
+    return toGregorian(
+      `${parsed.year}-${pad(parsed.month)}-${pad(parsed.day)}`,
+    );
   const max = new Date(parsed.year, parsed.month, 0).getDate();
-  if (parsed.month < 1 || parsed.month > 12 || parsed.day < 1 || parsed.day > max) return "";
+  if (
+    parsed.month < 1 ||
+    parsed.month > 12 ||
+    parsed.day < 1 ||
+    parsed.day > max
+  )
+    return "";
   return `${parsed.year}-${pad(parsed.month)}-${pad(parsed.day)}`;
 }
 
@@ -194,9 +276,14 @@ export function normalizeDateInput(value, calendar = CALENDAR_TYPES.GREGORIAN) {
   return parseDate(value, calendar);
 }
 
-export function formatDate(value, calendar = CALENDAR_TYPES.GREGORIAN, locale = "en") {
+export function formatDate(
+  value,
+  calendar = CALENDAR_TYPES.GREGORIAN,
+  locale = "en",
+) {
   if (!value) return "";
-  if (calendar !== CALENDAR_TYPES.SHAMSI) return parseDate(value, CALENDAR_TYPES.GREGORIAN) || "";
+  if (calendar !== CALENDAR_TYPES.SHAMSI)
+    return parseDate(value, CALENDAR_TYPES.GREGORIAN) || "";
   const parsed = parseYmd(value);
   if (parsed && parsed.year < 1700) {
     return `${parsed.year}-${pad(parsed.month)}-${pad(parsed.day)}`;
@@ -205,11 +292,17 @@ export function formatDate(value, calendar = CALENDAR_TYPES.GREGORIAN, locale = 
   return shamsi ? `${shamsi.year}-${pad(shamsi.month)}-${pad(shamsi.day)}` : "";
 }
 
-export function formatDateTime(value, calendar = CALENDAR_TYPES.GREGORIAN, locale = "en") {
+export function formatDateTime(
+  value,
+  calendar = CALENDAR_TYPES.GREGORIAN,
+  locale = "en",
+) {
   if (!value) return "";
   const [datePart, timePart = ""] = String(value).replace("T", " ").split(" ");
   const formattedDate = formatDate(datePart, calendar, locale);
-  return formattedDate ? `${formattedDate}${timePart ? ` ${timePart.slice(0, 5)}` : ""}` : "";
+  return formattedDate
+    ? `${formattedDate}${timePart ? ` ${timePart.slice(0, 5)}` : ""}`
+    : "";
 }
 
 export function formatByModule(value, module, settings, locale = "en") {

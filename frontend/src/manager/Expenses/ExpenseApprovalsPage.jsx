@@ -490,7 +490,8 @@ export default function ExpenseApprovalsPage() {
                 Loading approvals
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+              <div className="hidden overflow-x-auto md:block mobile-scrollbar">
                 <table className="w-full">
                   <thead className="border-b border-[var(--border)] bg-[var(--bg)]/60">
                     <tr>
@@ -600,6 +601,76 @@ export default function ExpenseApprovalsPage() {
                   </tbody>
                 </table>
               </div>
+              <div className="divide-y divide-[var(--border)] md:hidden">
+                {rows.length === 0 ? (
+                  <div className="px-4 py-12 text-center text-sm text-[var(--muted)]">
+                    No expenses found
+                  </div>
+                ) : (
+                  rows.map((expense) => (
+                    <article
+                      key={expense.id}
+                      onClick={() => setSelectedExpense(expense)}
+                      className="grid gap-4 p-4 active:bg-[var(--hover)]"
+                    >
+                      <div className="flex min-w-0 items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-[var(--text)]">
+                            #{expense.serial_number}
+                          </h3>
+                          <p className="mt-1 break-words text-sm text-[var(--muted)]">
+                            {expense.description || "-"}
+                          </p>
+                        </div>
+                        <span className={`inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${statusClass[expense.approval_status]}`}>
+                          {expense.approval_status}
+                        </span>
+                      </div>
+
+                      <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                        <DetailItem label="Project" value={expense.project_name} />
+                        <DetailItem label="Creator" value={expense.created_by_name} />
+                        <DetailItem
+                          label="Amount USD"
+                          value={money(expense.total_usd, "USD")}
+                        />
+                        <DetailItem
+                          label="Amount AFN"
+                          value={money(expense.total_afn, "AFN")}
+                        />
+                      </dl>
+
+                      {expense.approval_status === "pending" && (
+                        <div className="flex flex-col gap-2 border-t border-[var(--border)] pt-3 min-[380px]:flex-row">
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              openAction(expense, "approve");
+                            }}
+                            className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3 text-sm font-semibold text-white"
+                          >
+                            <CheckCircle2 className="h-4 w-4" />
+                            Approve
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              openAction(expense, "reject");
+                            }}
+                            className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-3 text-sm font-semibold text-white"
+                          >
+                            <XCircle className="h-4 w-4" />
+                            Reject
+                          </button>
+                        </div>
+                      )}
+                    </article>
+                  ))
+                )}
+              </div>
+              </>
             )}
           </div>
 
@@ -740,9 +811,9 @@ export default function ExpenseApprovalsPage() {
         </div>
 
         {actionTarget && (
-          <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/50 p-4">
-            <div className="w-full max-w-lg rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-2xl">
-              <div className="flex items-start justify-between gap-4">
+          <div className="mobile-modal-surface fixed inset-0 z-[90] flex bg-black/50">
+            <div className="mobile-modal-panel flex w-full max-w-lg flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-2xl">
+              <div className="mobile-modal-header flex items-start justify-between gap-4 border-b border-[var(--border)] p-5">
                 <div>
                   <h2 className="text-lg font-semibold capitalize text-[var(--text)]">
                     {actionMode} Expense #{actionTarget.serial_number}
@@ -754,23 +825,26 @@ export default function ExpenseApprovalsPage() {
                 <button
                   type="button"
                   onClick={closeAction}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--hover)]"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--hover)] sm:h-9 sm:w-9"
+                  aria-label="Close"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <textarea
-                value={notes}
-                onChange={(event) => setNotes(event.target.value)}
-                rows={4}
-                placeholder={actionMode === "reject" ? "Reject reason" : "Approval notes"}
-                className="mt-4 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)]"
-              />
-              <div className="mt-5 flex justify-end gap-2">
+              <div className="mobile-modal-content p-5">
+                <textarea
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
+                  rows={4}
+                  placeholder={actionMode === "reject" ? "Reject reason" : "Approval notes"}
+                  className="min-h-32 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-3 text-base text-[var(--text)] outline-none focus:border-[var(--primary)] sm:text-sm"
+                />
+              </div>
+              <div className="mobile-modal-footer flex justify-end gap-2 border-t border-[var(--border)] px-5 py-4">
                 <button
                   type="button"
                   onClick={closeAction}
-                  className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm text-[var(--text)] hover:bg-[var(--hover)]"
+                  className="min-h-12 rounded-lg border border-[var(--border)] px-4 py-2 text-sm text-[var(--text)] hover:bg-[var(--hover)]"
                 >
                   Cancel
                 </button>
@@ -778,7 +852,7 @@ export default function ExpenseApprovalsPage() {
                   type="button"
                   disabled={saving}
                   onClick={submitAction}
-                  className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60 ${
+                  className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60 ${
                     actionMode === "approve" ? "bg-emerald-600" : "bg-red-600"
                   }`}
                 >

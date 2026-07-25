@@ -289,6 +289,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
 
       {/* Table */}
       <div
+        className="hidden md:block"
         style={{
           overflowX: "auto",
           background: "var(--card)",
@@ -447,6 +448,101 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] md:hidden">
+        {filteredInvoices?.length === 0 ? (
+          <div className="px-4 py-12 text-center text-sm text-[var(--muted)]">
+            {emptyMessage}
+          </div>
+        ) : (
+          <div className="divide-y divide-[var(--border)]">
+            {filteredInvoices.map((inv) => (
+              <article key={inv.id} className="grid gap-4 p-4">
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="break-words text-base font-semibold text-[var(--text)]">
+                      {inv.invoice_number}
+                    </h3>
+                    <p className="mt-1 break-words text-sm text-[var(--muted)]">
+                      {inv.project_name || "-"}
+                    </p>
+                  </div>
+                  <span
+                    className="inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold capitalize text-white"
+                    style={{
+                      background: STATUS_COLORS[inv.status] || "var(--muted)",
+                    }}
+                  >
+                    {inv.status.replace("_", " ")}
+                  </span>
+                </div>
+
+                <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("ContractInvoicesPage.subcontractor")}
+                    </dt>
+                    <dd className="mt-1 break-words text-sm font-medium text-[var(--text)]">
+                      {inv.subcontractor_name || "-"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("ContractInvoicesPage.date")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                      {formatDate(inv.invoice_date) ||
+                        inv.formatted_invoice_date ||
+                        inv.invoice_date ||
+                        "-"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("ContractInvoicesPage.dueDate")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                      {formatDate(inv.due_date) ||
+                        inv.formatted_due_date ||
+                        inv.due_date ||
+                        "-"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("ContractInvoicesPage.amount")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-bold text-[var(--text)]">
+                      {contractCurrency || ""}
+                      {Number(inv.amount).toFixed(2)}
+                    </dd>
+                  </div>
+                </dl>
+
+                <div className="flex flex-wrap items-center justify-end gap-2 border-t border-[var(--border)] pt-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setViewInvoiceId(inv.id);
+                      setIsViewOpen(true);
+                    }}
+                    className="h-12 rounded-xl border border-[var(--border)] px-4 text-sm font-medium text-[var(--text)]"
+                  >
+                    {t("ContractInvoicesPage.view")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEdit(inv)}
+                    className="h-12 rounded-xl border border-[var(--border)] px-4 text-sm font-medium text-[var(--text)]"
+                  >
+                    {t("ContractInvoicesPage.edit")}
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
 
       {isModalOpen && (

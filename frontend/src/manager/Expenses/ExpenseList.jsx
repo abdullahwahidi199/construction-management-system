@@ -253,7 +253,7 @@ export default function ExpenseList({
             {printBlockMessage}
           </div>
         )}
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto md:block mobile-scrollbar">
           <table className="w-full">
             <thead>
               <tr className="border-b border-[var(--border)] bg-[var(--bg)]/50">
@@ -487,6 +487,141 @@ export default function ExpenseList({
               })}
             </tbody>
           </table>
+        </div>
+        <div className="divide-y divide-[var(--border)] md:hidden">
+          {filteredExpenses.map((expense) => {
+            const displayAmount = getDisplayAmount(expense);
+            const category =
+              categoryConfig[expense.category] || categoryConfig.other;
+
+            return (
+              <article key={expense.id} className="grid gap-4 p-4">
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      <span className="inline-flex min-h-8 min-w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 text-sm font-semibold text-[var(--text)]">
+                        {expense.serial_number}
+                      </span>
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
+                          approvalStyles[expense.approval_status] ||
+                          approvalStyles.approved
+                        }`}
+                      >
+                        {expense.approval_status || "approved"}
+                      </span>
+                    </div>
+                    <h3 className="break-words text-base font-semibold leading-6 text-[var(--text)]">
+                      {expense.description || t("ExpenseList.unnamedExpense")}
+                    </h3>
+                    <p className="mt-1 break-words text-sm text-[var(--muted)]">
+                      {expense.paid_to ||
+                        expense.project_name ||
+                        t("ExpenseList.noVendor")}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-end">
+                    <p className="text-base font-bold tabular-nums text-[var(--text)]">
+                      {displayAmount.currency === "USD" ? "$" : "AFN "}
+                      {displayAmount.value.toLocaleString()}
+                    </p>
+                    <p className="mt-1 text-xs text-[var(--muted)]">
+                      {displayDate(
+                        expense.expense_date,
+                        expense.formatted_expense_date,
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("ExpenseList.type")}
+                    </dt>
+                    <dd className="mt-1">
+                      <span className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${category.color}`}>
+                        <span>{expense.expense_type || t("ExpenseList.general")}</span>
+                      </span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("ExpenseList.total")}
+                    </dt>
+                    <dd className="mt-1 break-words text-sm font-medium text-[var(--text)]">
+                      ${parseFloat(expense.total_usd || 0).toLocaleString()} / AFN{" "}
+                      {parseFloat(expense.total_afn || 0).toLocaleString()}
+                    </dd>
+                  </div>
+                  {expense.created_by_name && (
+                    <div>
+                      <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                        Created by
+                      </dt>
+                      <dd className="mt-1 break-words text-sm font-medium text-[var(--text)]">
+                        {expense.created_by_name}
+                      </dd>
+                    </div>
+                  )}
+                  {expense.approval_status === "approved" && (
+                    <div>
+                      <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                        Approved
+                      </dt>
+                      <dd className="mt-1 break-words text-sm font-medium text-[var(--text)]">
+                        {expense.approved_by_name || "-"} ·{" "}
+                        {displayDateTime(expense.approved_at)}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+
+                <div className="flex flex-wrap items-center justify-end gap-2 border-t border-[var(--border)] pt-3">
+                  <button
+                    type="button"
+                    onClick={() => handleViewDetails(expense)}
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-3 text-sm font-medium text-[var(--text)]"
+                  >
+                    <Eye className="h-4 w-4" />
+                    {t("ExpenseList.viewDetails")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleEdit(expense)}
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-3 text-sm font-medium text-[var(--text)]"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                    {t("ExpenseList.edit")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handlePrint(expense)}
+                    className={`inline-flex h-12 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium ${
+                      expense.approval_status === "approved"
+                        ? "border-[var(--border)] text-[var(--success)]"
+                        : "border-[var(--border)] text-[var(--muted)]"
+                    }`}
+                  >
+                    <Printer className="h-4 w-4" />
+                    {t("ExpenseList.printReceipt")}
+                  </button>
+                  {canDelete && (
+                    <PermissionWrapper permissions={["expenses.delete"]}>
+                      <button
+                        type="button"
+                        onClick={() => setDeleteTarget(expense)}
+                        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-red-500/20 px-3 text-sm font-medium text-[var(--danger)]"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        {t("ExpenseList.delete")}
+                      </button>
+                    </PermissionWrapper>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
 

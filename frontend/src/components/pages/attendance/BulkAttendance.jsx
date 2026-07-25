@@ -341,7 +341,7 @@ function BulkAttendance() {
         style={{ borderColor: "var(--border)", backgroundColor: "var(--bg)" }}
         dir={isRTL ? "rtl" : "ltr"}
       >
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto md:block mobile-scrollbar">
           <table className="w-full text-sm">
             <thead
               className={`sticky top-0 ${textAlignment} text-xs uppercase`}
@@ -547,6 +547,181 @@ function BulkAttendance() {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="divide-y divide-[var(--border)] md:hidden">
+          {filteredEmployees.length === 0 ? (
+            <div className="px-3 py-8 text-center text-sm" style={{ color: "var(--muted)" }}>
+              {t("BulkAttendance.noEmployees")}
+            </div>
+          ) : (
+            filteredEmployees.map((emp) => {
+              const data = attendanceData[emp.id] || {};
+              const isAbsent = data.status === "absent";
+              const hasData = !!data.status;
+              const isExisting = data.isExisting && !data.isModified;
+              const isModified = data.isModified;
+
+              return (
+                <article
+                  key={emp.id}
+                  className="grid gap-4 p-4"
+                  style={{
+                    backgroundColor: isModified
+                      ? "rgba(251, 191, 36, 0.1)"
+                      : isExisting
+                        ? "rgba(34, 197, 94, 0.05)"
+                        : "transparent",
+                  }}
+                >
+                  <div className="flex min-w-0 items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="break-words text-base font-semibold">
+                        {emp.full_name || `${emp.first_name} ${emp.last_name}`}
+                      </h3>
+                      <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+                        {emp.employee_id}
+                      </p>
+                    </div>
+                    <div className="shrink-0">
+                      {isExisting && <StatusDot status={data.status} />}
+                      {isModified && (
+                        <span
+                          className="text-xs font-bold text-amber-600"
+                          title={t("BulkAttendance.modified")}
+                        >
+                          *
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    <label className="block">
+                      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                        {t("BulkAttendance.status")}
+                      </span>
+                      <select
+                        value={data.status || ""}
+                        onChange={(e) =>
+                          handleStatusChange(emp.id, e.target.value)
+                        }
+                        className="h-12 w-full rounded-lg border px-3 text-base"
+                        style={{
+                          borderColor: "var(--border)",
+                          backgroundColor: "var(--bg)",
+                          color: "var(--text)",
+                        }}
+                      >
+                        <option value="">
+                          {t("BulkAttendance.statusOptions.empty")}
+                        </option>
+                        <option value="present">
+                          {t("BulkAttendance.statusOptions.present")}
+                        </option>
+                        <option value="absent">
+                          {t("BulkAttendance.statusOptions.absent")}
+                        </option>
+                        <option value="half_day">
+                          {t("BulkAttendance.statusOptions.halfDay")}
+                        </option>
+                        <option value="leave">
+                          {t("BulkAttendance.statusOptions.leave")}
+                        </option>
+                      </select>
+                    </label>
+
+                    <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                      <label className="block">
+                        <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                          {t("BulkAttendance.in")}
+                        </span>
+                        <input
+                          type="time"
+                          value={data.check_in || ""}
+                          onChange={(e) =>
+                            handleFieldChange(emp.id, "check_in", e.target.value)
+                          }
+                          disabled={!hasData || isAbsent}
+                          className="h-12 w-full rounded-lg border px-3 text-base disabled:opacity-40"
+                          style={{
+                            borderColor: "var(--border)",
+                            backgroundColor: "var(--bg)",
+                            color: "var(--text)",
+                          }}
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                          {t("BulkAttendance.out")}
+                        </span>
+                        <input
+                          type="time"
+                          value={data.check_out || ""}
+                          onChange={(e) =>
+                            handleFieldChange(emp.id, "check_out", e.target.value)
+                          }
+                          disabled={!hasData || isAbsent || !data.check_in}
+                          className="h-12 w-full rounded-lg border px-3 text-base disabled:opacity-40"
+                          style={{
+                            borderColor: "var(--border)",
+                            backgroundColor: "var(--bg)",
+                            color: "var(--text)",
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    <label className="block">
+                      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                        {t("BulkAttendance.ot")}
+                      </span>
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="0"
+                        value={data.overtime_hours ?? ""}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            emp.id,
+                            "overtime_hours",
+                            e.target.value,
+                          )
+                        }
+                        disabled={!hasData || isAbsent}
+                        className="h-12 w-full rounded-lg border px-3 text-base disabled:opacity-40"
+                        style={{
+                          borderColor: "var(--border)",
+                          backgroundColor: "var(--bg)",
+                          color: "var(--text)",
+                        }}
+                        placeholder={t("BulkAttendance.placeholderOvertime")}
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                        {t("BulkAttendance.note")}
+                      </span>
+                      <input
+                        type="text"
+                        value={data.note || ""}
+                        onChange={(e) =>
+                          handleFieldChange(emp.id, "note", e.target.value)
+                        }
+                        className="h-12 w-full rounded-lg border px-3 text-base"
+                        style={{
+                          borderColor: "var(--border)",
+                          backgroundColor: "var(--bg)",
+                          color: "var(--text)",
+                        }}
+                        placeholder={t("BulkAttendance.placeholderNote")}
+                      />
+                    </label>
+                  </div>
+                </article>
+              );
+            })
+          )}
         </div>
       </div>
 

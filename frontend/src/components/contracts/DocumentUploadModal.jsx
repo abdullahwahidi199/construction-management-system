@@ -160,7 +160,7 @@ export default function DocumentUploadModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="mobile-modal-surface fixed inset-0 z-50 flex"
       role="dialog"
       aria-modal="true"
       aria-labelledby="upload-modal-title"
@@ -171,11 +171,11 @@ export default function DocumentUploadModal({
         aria-hidden="true"
       />
 
-      <div className="relative w-full max-w-md animate-in fade-in zoom-in-95">
-        <Card className="p-0 shadow-2xl border-[var(--border)]">
-          <form onSubmit={handleSubmit} noValidate>
+      <div className="mobile-modal-panel relative w-full max-w-md animate-in fade-in zoom-in-95">
+        <Card className="flex h-full flex-col overflow-hidden p-0 shadow-2xl border-[var(--border)]">
+          <form onSubmit={handleSubmit} noValidate className="flex min-h-0 flex-1 flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--card)]">
+            <div className="mobile-modal-header flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--card)]">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-[var(--primary)]/10 text-[var(--primary)]">
                   <Upload size={18} />
@@ -191,7 +191,7 @@ export default function DocumentUploadModal({
                 type="button"
                 onClick={handleClose}
                 disabled={submitting}
-                className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--text)] transition-colors disabled:opacity-50"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--text)] transition-colors disabled:opacity-50 sm:h-9 sm:w-9"
                 aria-label={t("DocumentUploadModal.close")}
               >
                 <X size={18} />
@@ -199,7 +199,7 @@ export default function DocumentUploadModal({
             </div>
 
             {/* Body */}
-            <div className="px-6 py-5 space-y-5">
+            <div className="mobile-modal-content px-6 py-5 space-y-5">
               <Input
                 label={t("DocumentUploadModal.documentTitle")}
                 value={title}
@@ -228,7 +228,7 @@ export default function DocumentUploadModal({
                 </label>
                 <div
                   className={`
-                    relative border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer
+                    relative border-2 border-dashed rounded-xl p-5 text-center transition-all cursor-pointer sm:p-6
                     ${
                       dropZoneState === "active"
                         ? "border-[var(--primary)] bg-[var(--primary)]/10 scale-[1.02]"
@@ -280,7 +280,7 @@ export default function DocumentUploadModal({
                       <button
                         type="button"
                         onClick={removeFile}
-                        className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--danger)] transition-colors shrink-0"
+                        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--danger)] transition-colors sm:h-8 sm:w-8"
                         aria-label={t("DocumentUploadModal.removeFile")}
                       >
                         <X size={16} />
@@ -313,7 +313,7 @@ export default function DocumentUploadModal({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-[var(--border)] bg-[var(--card)]">
+            <div className="mobile-modal-footer flex items-center justify-end gap-2 px-6 py-4 border-t border-[var(--border)] bg-[var(--card)]">
               <Button
                 type="button"
                 variant="secondary"

@@ -6,6 +6,7 @@ import Button from "../ui/Button";
 import Input from "../ui/Input";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
+import { fieldLabelClass, textareaControlClass } from "../ui/formStyles.jsx";
 
 const emptyForm = {
   description: "",
@@ -72,15 +73,15 @@ export default function VariationFormModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="mobile-modal-surface fixed inset-0 z-50 flex">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-md">
-        <Card className="p-0">
-          <form onSubmit={handleSubmit}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+      <div className="mobile-modal-panel relative w-full max-w-md overflow-hidden rounded-2xl">
+        <Card className="flex h-full flex-col p-0">
+          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+            <div className="mobile-modal-header flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
               <h2 className="text-lg font-semibold text-[var(--text)]">
                 {isEdit
                   ? t("VariationFormModal.editVariation")
@@ -89,14 +90,15 @@ export default function VariationFormModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="p-1 rounded-lg hover:bg-[var(--hover)] text-[var(--text)]"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-lg hover:bg-[var(--hover)] text-[var(--text)] sm:h-9 sm:w-9"
+                aria-label="Close"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="px-6 py-4 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="mobile-modal-content px-6 py-4 space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Input
                   label={t("VariationFormModal.date")}
                   type="date"
@@ -108,7 +110,7 @@ export default function VariationFormModal({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1">
+                <label className={fieldLabelClass}>
                   {t("VariationFormModal.description")}
                 </label>
                 <textarea
@@ -116,7 +118,7 @@ export default function VariationFormModal({
                   onChange={(e) => handleChange("description", e.target.value)}
                   rows={3}
                   placeholder={t("VariationFormModal.descriptionPlaceholder")}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none"
+                  className={textareaControlClass}
                 />
                 {errors.description && (
                   <p className="text-xs text-[var(--danger)] mt-1">
@@ -125,7 +127,7 @@ export default function VariationFormModal({
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Input
                   label={`${t("VariationFormModal.amountChange")} (${currency})`}
                   type="number"
@@ -152,15 +154,16 @@ export default function VariationFormModal({
                   <button
                     type="button"
                     onClick={() => handleChange("approved", !form.approved)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors sm:h-6 sm:w-11 ${
                       form.approved
                         ? "bg-[var(--success)]"
                         : "bg-[var(--muted)]"
                     }`}
+                    aria-pressed={form.approved}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        form.approved ? "translate-x-6" : "translate-x-1"
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform sm:h-4 sm:w-4 ${
+                        form.approved ? "translate-x-8 sm:translate-x-6" : "translate-x-1"
                       }`}
                     />
                   </button>
@@ -168,7 +171,7 @@ export default function VariationFormModal({
               )}
             </div>
 
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--border)]">
+            <div className="mobile-modal-footer flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--border)]">
               <Button
                 type="button"
                 variant="secondary"

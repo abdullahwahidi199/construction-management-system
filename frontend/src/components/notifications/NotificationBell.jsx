@@ -111,7 +111,7 @@ export default function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-(--muted) transition hover:bg-(--hover) hover:text-(--text)"
+        className="relative inline-flex h-11 w-11 items-center justify-center rounded-xl text-(--muted) transition hover:bg-(--hover) hover:text-(--text) sm:h-10 sm:w-10 sm:rounded-lg"
         aria-label="Notifications"
         title="Notifications"
       >
@@ -128,10 +128,10 @@ export default function NotificationBell() {
           <button
             type="button"
             aria-label="Close notifications"
-            className="fixed inset-0 z-[80] cursor-default"
+            className="fixed inset-0 z-[80] cursor-default bg-black/10 backdrop-blur-[1px] sm:bg-transparent sm:backdrop-blur-0"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute right-0 z-[90] mt-3 w-[min(24rem,calc(100vw-1.5rem))] overflow-hidden rounded-xl border border-(--border) bg-(--card) shadow-2xl shadow-black/15">
+          <div className="fixed inset-x-0 bottom-0 z-[90] max-h-[86dvh] overflow-hidden rounded-t-2xl border border-(--border) bg-(--card) pb-[var(--safe-bottom)] shadow-2xl shadow-black/20 sm:absolute sm:inset-x-auto sm:bottom-auto sm:right-0 sm:mt-3 sm:w-[min(24rem,calc(100vw-1.5rem))] sm:rounded-xl sm:pb-0">
             <div className="flex items-center justify-between border-b border-(--border) px-4 py-3">
               <div>
                 <h2 className="text-sm font-semibold text-(--text)">Notifications</h2>
@@ -140,14 +140,14 @@ export default function NotificationBell() {
               <button
                 type="button"
                 onClick={markAllRead}
-                className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-(--muted) hover:bg-(--hover) hover:text-(--text)"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-(--muted) hover:bg-(--hover) hover:text-(--text)"
               >
                 <CheckCheck className="h-3.5 w-3.5" />
                 Read all
               </button>
             </div>
 
-            <div className="max-h-96 overflow-y-auto p-2">
+            <div className="max-h-[65dvh] overflow-y-auto p-2 mobile-scrollbar sm:max-h-96">
               {notifications.length === 0 ? (
                 <div className="px-3 py-8 text-center text-sm text-(--muted)">
                   No notifications
@@ -156,7 +156,7 @@ export default function NotificationBell() {
                 notifications.map((item) => (
                   <div
                     key={item.id}
-                    className={`rounded-lg px-3 py-3 text-sm ${
+                    className={`rounded-xl px-3 py-3 text-sm transition active:translate-x-1 ${
                       item.is_read ? "text-(--muted)" : "bg-(--primary)/10 text-(--text)"
                     }`}
                   >
@@ -176,7 +176,7 @@ export default function NotificationBell() {
                         <button
                           type="button"
                           onClick={() => markRead(item.id)}
-                          className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md hover:bg-(--hover)"
+                          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg hover:bg-(--hover) sm:h-7 sm:w-7"
                           title="Mark as read"
                         >
                           <Check className="h-3.5 w-3.5" />

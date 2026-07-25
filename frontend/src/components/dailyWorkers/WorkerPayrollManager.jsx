@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Edit2, Plus, Printer, Trash2 } from "lucide-react";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { useLanguage } from "../../hooks/useLanguage";
@@ -434,8 +434,8 @@ function WorkerPayrollManager() {
             {t("WorkerPayrollManager.generatedPayrollHistory")}
           </h3>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="md:overflow-x-auto">
+          <table className="hidden w-full text-sm md:table">
             <thead
               className="uppercase text-xs"
               style={{ backgroundColor: "var(--hover)", color: "var(--muted)" }}
@@ -588,6 +588,126 @@ function WorkerPayrollManager() {
               ))}
             </tbody>
           </table>
+          <div className="divide-y divide-[var(--border)] md:hidden">
+            {payrolls.length === 0 ? (
+              <div className="px-4 py-6 text-center text-sm" style={{ color: "var(--muted)" }}>
+                {t("WorkerPayrollManager.noPayrolls")}
+              </div>
+            ) : (
+              payrolls.map((pay) => (
+                <article key={pay.id} className="grid gap-4 p-4">
+                  <div className="flex min-w-0 items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="break-words text-base font-semibold">
+                        {pay.worker_name}
+                      </h3>
+                      <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+                        {pay.worker_id_code}
+                      </p>
+                    </div>
+                    {pay.is_paid ? (
+                      <span className="shrink-0 rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700 dark:bg-green-900 dark:text-green-300">
+                        {t("WorkerPayrollManager.paidOn")} {displayDate(pay.payment_date)}
+                      </span>
+                    ) : (
+                      <span className="shrink-0 rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-semibold text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300">
+                        {t(`WorkerPayrollManager.modal.${pay.status}`)}
+                      </span>
+                    )}
+                  </div>
+
+                  <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                    <div>
+                      <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                        {t("WorkerPayrollManager.period")}
+                      </dt>
+                      <dd className="mt-1 text-sm font-medium">
+                        {displayDate(pay.period_start)} {t("to")} {displayDate(pay.period_end)}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                        {t("WorkerPayrollManager.daysWorked")}
+                      </dt>
+                      <dd className="mt-1 text-sm font-medium">
+                        {pay.total_days_worked} {t("WorkerPayrollManager.days")} + {pay.total_overtime_hours} {t("WorkerPayrollManager.overtime")}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                        Gross
+                      </dt>
+                      <dd className="mt-1 text-sm font-medium">
+                        {pay.gross_amount} {pay.currency}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                        Net
+                      </dt>
+                      <dd className="mt-1 text-sm font-bold" style={{ color: "var(--success)" }}>
+                        {pay.net_pay} {pay.currency}
+                      </dd>
+                    </div>
+                  </dl>
+
+                  <div className="flex flex-wrap items-center justify-end gap-2 border-t border-[var(--border)] pt-3">
+                    <button
+                      onClick={() => setReceiptPayroll(pay)}
+                      className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium"
+                      style={{ borderColor: "var(--border)" }}
+                      type="button"
+                    >
+                      <Printer className="h-4 w-4" />
+                      Print
+                    </button>
+                    {canUpdate && !pay.is_paid && pay.status === "draft" && (
+                      <button
+                        onClick={() => handleApprove(pay.id)}
+                        className="h-12 rounded-xl border px-3 text-sm font-medium"
+                        style={{ borderColor: "var(--border)" }}
+                        type="button"
+                      >
+                        {t("WorkerPayrollManager.approve")}
+                      </button>
+                    )}
+                    {canUpdate && !pay.is_paid && (
+                      <button
+                        onClick={() => handleMarkPaid(pay.id)}
+                        className="h-12 rounded-xl border px-3 text-sm font-medium text-blue-600"
+                        style={{ borderColor: "var(--border)" }}
+                        type="button"
+                      >
+                        {t("WorkerPayrollManager.markPaid")}
+                      </button>
+                    )}
+                    {canUpdate && (
+                      <button
+                        onClick={() => handleEdit(pay)}
+                        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium"
+                        style={{ borderColor: "var(--border)" }}
+                        type="button"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                        {t("WorkerPayrollManager.editPayroll")}
+                      </button>
+                    )}
+                    {canDelete && (
+                      <button
+                        onClick={() => handleDelete(pay)}
+                        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium text-red-600"
+                        style={{ borderColor: "var(--border)" }}
+                        type="button"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        {t("WorkerPayrollManager.deletePayroll")}
+                      </button>
+                    )}
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -675,7 +795,8 @@ function PayrollFormModal({
     }
   };
 
-  const inputClass = "w-full rounded border px-3 py-2 text-sm outline-none";
+  const inputClass =
+    "min-h-12 w-full rounded border px-3 py-3 text-base outline-none sm:text-sm";
   const inputStyle = {
     borderColor: "var(--border)",
     backgroundColor: "var(--bg)",
@@ -683,9 +804,9 @@ function PayrollFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="mobile-modal-surface fixed inset-0 z-50 flex bg-black/50">
       <div
-        className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-lg border shadow-lg"
+        className="mobile-modal-panel flex w-full max-w-3xl flex-col overflow-hidden rounded-lg border shadow-lg"
         style={{
           backgroundColor: "var(--card)",
           borderColor: "var(--border)",
@@ -693,7 +814,7 @@ function PayrollFormModal({
         }}
       >
         <div
-          className="flex items-center justify-between border-b p-4"
+          className="mobile-modal-header flex items-center justify-between border-b p-4"
           style={{ borderColor: "var(--border)" }}
         >
           <h2 className="text-lg font-semibold">
@@ -704,20 +825,21 @@ function PayrollFormModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded border px-3 py-1 text-sm"
+            className="inline-flex min-h-11 items-center justify-center rounded border px-3 py-1 text-sm"
             style={{ borderColor: "var(--border)" }}
           >
             {t("WorkerPayrollManager.modal.close")}
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 p-4">
-          {error && (
-            <p className="rounded bg-red-500/10 px-3 py-2 text-sm text-red-600">
-              {error}
-            </p>
-          )}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="mobile-modal-content space-y-4 p-4">
+            {error && (
+              <p className="rounded bg-red-500/10 px-3 py-2 text-sm text-red-600">
+                {error}
+              </p>
+            )}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Field label={t("WorkerPayrollManager.modal.worker")}>
               <select
                 required
@@ -877,16 +999,17 @@ function PayrollFormModal({
                 />
               </Field>
             </div>
+            </div>
           </div>
 
           <div
-            className="flex justify-end gap-3 border-t pt-4"
+            className="mobile-modal-footer flex justify-end gap-3 border-t px-4 py-4"
             style={{ borderColor: "var(--border)" }}
           >
             <button
               type="button"
               onClick={onClose}
-              className="rounded border px-4 py-2 text-sm"
+              className="min-h-12 rounded border px-4 py-2 text-sm"
               style={{ borderColor: "var(--border)" }}
             >
               {t("WorkerPayrollManager.modal.cancel")}
@@ -894,7 +1017,7 @@ function PayrollFormModal({
             <button
               type="submit"
               disabled={loading}
-              className="rounded px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+              className="min-h-12 rounded px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
               style={{ backgroundColor: "var(--primary)" }}
             >
               {loading

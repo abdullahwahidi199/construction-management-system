@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { useLanguage } from "../../hooks/useLanguage";
@@ -90,7 +90,7 @@ function AddWorkerModal({ isOpen, onClose, onSuccess, worker, projects = [] }) {
   };
 
   const inputClass =
-    "w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-(--primary)/30";
+    "min-h-12 w-full rounded-lg border px-3 py-3 text-base outline-none focus:ring-2 focus:ring-(--primary)/30 sm:text-sm";
   const inputStyle = {
     borderColor: "var(--border)",
     backgroundColor: "var(--bg)",
@@ -98,9 +98,9 @@ function AddWorkerModal({ isOpen, onClose, onSuccess, worker, projects = [] }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="mobile-modal-surface fixed inset-0 z-50 flex bg-black/50">
       <div
-        className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-lg border shadow-lg"
+        className="mobile-modal-panel flex w-full max-w-4xl flex-col overflow-hidden rounded-lg border shadow-lg"
         style={{
           backgroundColor: "var(--card)",
           borderColor: "var(--border)",
@@ -108,7 +108,7 @@ function AddWorkerModal({ isOpen, onClose, onSuccess, worker, projects = [] }) {
         }}
       >
         <div
-          className="flex items-center justify-between border-b p-4"
+          className="mobile-modal-header flex items-center justify-between border-b p-4"
           style={{ borderColor: "var(--border)" }}
         >
           <h2 className="text-lg font-semibold">
@@ -118,20 +118,21 @@ function AddWorkerModal({ isOpen, onClose, onSuccess, worker, projects = [] }) {
           </h2>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 hover:bg-(--hover)"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg hover:bg-(--hover)"
             aria-label={t("AddWorkerModal.close")}
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5 p-4">
-          {error && (
-            <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-600">
-              {error}
-            </p>
-          )}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="mobile-modal-content space-y-5 p-4">
+            {error && (
+              <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-600">
+                {error}
+              </p>
+            )}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Field label={t("AddWorkerModal.fullName")}>
               <input
                 required
@@ -302,16 +303,17 @@ function AddWorkerModal({ isOpen, onClose, onSuccess, worker, projects = [] }) {
                 />
               </Field>
             </div>
+            </div>
           </div>
 
           <div
-            className="flex justify-end gap-3 border-t pt-4"
+            className="mobile-modal-footer flex justify-end gap-3 border-t px-4 py-4"
             style={{ borderColor: "var(--border)" }}
           >
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border px-4 py-2 text-sm"
+              className="min-h-12 rounded-lg border px-4 py-2 text-sm"
               style={{ borderColor: "var(--border)" }}
             >
               {t("AddWorkerModal.cancel")}
@@ -319,7 +321,7 @@ function AddWorkerModal({ isOpen, onClose, onSuccess, worker, projects = [] }) {
             <button
               type="submit"
               disabled={loading}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+              className="min-h-12 rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
               style={{ backgroundColor: "var(--primary)" }}
             >
               {loading

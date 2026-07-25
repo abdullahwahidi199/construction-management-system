@@ -126,18 +126,18 @@ export default function ProjectCreateModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in"
+      className="mobile-modal-surface fixed inset-0 z-50 flex bg-black/60 backdrop-blur-sm animate-in fade-in"
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="create-project-title"
     >
       <div
-        className="bg-[var(--bg)] text-[var(--text)] w-full max-w-2xl max-h-[90vh] rounded-2xl shadow-2xl border border-[var(--border)] overflow-hidden flex flex-col animate-in zoom-in-95"
+        className="mobile-modal-panel bg-[var(--bg)] text-[var(--text)] w-full max-w-2xl rounded-2xl shadow-2xl border border-[var(--border)] overflow-hidden flex flex-col animate-in zoom-in-95"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-7 py-5 border-b border-[var(--border)] bg-[var(--card)]">
+        <div className="mobile-modal-header px-7 py-5 border-b border-[var(--border)] bg-[var(--card)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center">
@@ -174,7 +174,7 @@ export default function ProjectCreateModal({
         <form
           id="project-create-form"
           onSubmit={handleSubmit}
-          className="flex-1 overflow-y-auto px-7 py-6"
+          className="mobile-modal-content flex-1 overflow-y-auto px-7 py-6"
         >
           {(localError || error) && (
             <div className="mb-5 p-3.5 rounded-lg flex items-start gap-2.5 border border-[var(--danger)]/30 bg-[var(--danger)]/10">
@@ -365,16 +365,16 @@ export default function ProjectCreateModal({
         </form>
 
         {/* Footer */}
-        <div className="px-7 py-4 border-t border-[var(--border)] bg-[var(--card)] flex items-center justify-between gap-3">
+        <div className="mobile-modal-footer px-7 py-4 border-t border-[var(--border)] bg-[var(--card)] flex items-center justify-between gap-3">
           <p className="text-xs text-[var(--muted)]">
             <span className="text-[var(--danger)]">*</span> Required fields
           </p>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 max-sm:w-full max-sm:flex-col-reverse">
             <button
               type="button"
               onClick={handleClose}
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-[var(--text)] bg-[var(--bg)] border border-[var(--border)] rounded-lg hover:bg-[var(--hover)] transition-all disabled:opacity-50"
+              className="min-h-12 px-4 py-2 text-sm font-medium text-[var(--text)] bg-[var(--bg)] border border-[var(--border)] rounded-lg hover:bg-[var(--hover)] transition-all disabled:opacity-50 max-sm:w-full"
             >
               {t("ProjectCreateModal.buttons.cancel")}
             </button>
@@ -396,7 +396,7 @@ export default function ProjectCreateModal({
                 type="submit"
                 form="project-create-form"
                 disabled={loading}
-                className="px-5 py-2 text-sm font-medium text-white bg-[var(--primary)] rounded-lg hover:opacity-90 shadow-lg shadow-[var(--primary)]/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="flex min-h-12 items-center justify-center gap-2 px-5 py-2 text-sm font-medium text-white bg-[var(--primary)] rounded-lg hover:opacity-90 shadow-lg shadow-[var(--primary)]/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed max-sm:w-full"
               >
                 {loading ? (
                   <>

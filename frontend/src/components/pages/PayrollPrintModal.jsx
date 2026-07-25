@@ -498,28 +498,29 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
       <div className="fixed inset-0 bg-black/50 z-[60]" onClick={onClose} />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+      <div className="mobile-modal-surface fixed inset-0 z-[70] flex">
         <div
-          className="w-full max-w-5xl max-h-[90vh] bg-[var(--card)] rounded-2xl shadow-2xl border border-[var(--border)] overflow-hidden flex flex-col"
+          className="mobile-modal-panel mobile-modal-full w-full max-w-5xl bg-[var(--card)] rounded-2xl shadow-2xl border border-[var(--border)] overflow-hidden flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Modal Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
+          <div className="mobile-modal-header flex flex-col gap-3 px-6 py-4 border-b border-[var(--border)] shrink-0 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-semibold text-[var(--text)]">
               Cash Payment Voucher Preview
             </h2>
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center gap-2 sm:w-auto">
               <button
                 onClick={handlePrint}
                 disabled={loading || !payroll}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed sm:flex-none"
               >
                 <Printer className="h-4 w-4" />
                 Print
               </button>
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--text)] transition-colors"
+                className="inline-flex h-12 w-12 items-center justify-center rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--text)] transition-colors"
+                aria-label="Close"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -527,7 +528,7 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
           </div>
 
           {/* Scrollable Preview */}
-          <div className="overflow-y-auto flex-1 bg-gray-100">
+          <div className="overflow-auto flex-1 bg-gray-100 mobile-scrollbar">
             {loading ? (
               <div className="flex items-center justify-center h-64">
                 <div className="flex flex-col items-center gap-3">
@@ -544,8 +545,8 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
                 </p>
               </div>
             ) : (
-              <div ref={printRef} className="p-6 md:p-8 max-w-5xl mx-auto">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-8">
+              <div ref={printRef} className="mx-auto max-w-5xl p-4 md:p-8">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-8">
                   {/* ===== VOUCHER HEADER ===== */}
                   <div className="flex items-start justify-between mb-1">
                     <div className="w-20 h-20 border-2 border-gray-800 rounded-full flex items-center justify-center text-[10px] font-bold uppercase text-gray-700">

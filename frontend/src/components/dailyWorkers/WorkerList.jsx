@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Edit2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { useLanguage } from "../../hooks/useLanguage";
@@ -135,7 +135,7 @@ function WorkersList() {
         className="rounded-lg border"
         style={{ borderColor: "var(--border)", backgroundColor: "var(--bg)" }}
       >
-        <table className="w-full text-sm">
+        <table className="hidden w-full text-sm md:table">
           <thead
             className="uppercase text-xs"
             style={{ backgroundColor: "var(--hover)", color: "var(--muted)" }}
@@ -251,6 +251,102 @@ function WorkersList() {
             )}
           </tbody>
         </table>
+        <div className="divide-y divide-[var(--border)] md:hidden">
+          {loading ? (
+            <div className="px-4 py-6 text-center text-sm">
+              {t("workersList.loading")}
+            </div>
+          ) : workers.length === 0 ? (
+            <div className="px-4 py-6 text-center text-sm" style={{ color: "var(--muted)" }}>
+              {t("workersList.noWorkersFound")}
+            </div>
+          ) : (
+            workers.map((w) => (
+              <article key={w.id} className="grid gap-4 p-4">
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="break-words text-base font-semibold">
+                      {w.full_name}
+                    </h3>
+                    <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+                      {w.worker_id}
+                    </p>
+                  </div>
+                  <span className="inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                    style={{
+                      backgroundColor:
+                        w.status === "active"
+                          ? "color-mix(in srgb, var(--success) 14%, transparent)"
+                          : "color-mix(in srgb, var(--danger) 14%, transparent)",
+                      color:
+                        w.status === "active"
+                          ? "var(--success)"
+                          : "var(--danger)",
+                    }}
+                  >
+                    {w.status === "active" ? t("active") : t("inactive")}
+                  </span>
+                </div>
+
+                <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                      {t("workersList.trade")}
+                    </dt>
+                    <dd className="mt-1 break-words text-sm font-medium">
+                      {(w.trade || w.skill_type || "").replace("_", " ") || "-"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                      {t("workersList.dailyRate")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium">
+                      {w.daily_rate} {w.currency}
+                    </dd>
+                  </div>
+                  {w.assigned_project_name && (
+                    <div className="min-[380px]:col-span-2">
+                      <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                        Project
+                      </dt>
+                      <dd className="mt-1 break-words text-sm font-medium">
+                        {w.assigned_project_name}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+
+                {canManage && (
+                  <div className="flex flex-wrap items-center justify-end gap-2 border-t border-[var(--border)] pt-3">
+                    {canUpdate && (
+                      <button
+                        onClick={() => handleEdit(w.id)}
+                        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium"
+                        style={{ borderColor: "var(--border)" }}
+                        type="button"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                        {t("editWorker")}
+                      </button>
+                    )}
+                    {canDelete && (
+                      <button
+                        onClick={() => handleDelete(w)}
+                        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium text-red-600"
+                        style={{ borderColor: "var(--border)" }}
+                        type="button"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        {t("deleteWorker")}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </article>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

@@ -26,7 +26,12 @@ export default function Modal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      className="mobile-bottom-sheet fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={title ? "modal-title" : undefined}
+    >
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -35,7 +40,7 @@ export default function Modal({
 
       {/* Modal */}
       <div
-        className={`relative w-full ${sizeClasses[size]} rounded-xl border shadow-2xl animate-slide-up`}
+        className={`mobile-bottom-sheet-panel relative flex w-full ${sizeClasses[size]} max-h-[92dvh] flex-col overflow-hidden rounded-xl border shadow-2xl animate-slide-up sm:max-h-[86vh]`}
         style={{
           backgroundColor: "var(--card)",
           borderColor: "var(--border)",
@@ -44,19 +49,21 @@ export default function Modal({
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between p-6 border-b"
+          className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b p-4 sm:p-6"
           style={{ borderColor: "var(--border)" }}
         >
           <h2
-            className="text-xl font-semibold"
+            id={title ? "modal-title" : undefined}
+            className="min-w-0 break-words text-lg font-semibold sm:text-xl"
             style={{ color: "var(--text)" }}
           >
             {title}
           </h2>
 
           <button
+            type="button"
             onClick={onClose}
-            className="flex items-center justify-center w-10 h-10 rounded-lg border transition-colors"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border transition-colors sm:h-10 sm:w-10"
             style={{
               color: "var(--text)",
               borderColor: "var(--border)",
@@ -69,7 +76,7 @@ export default function Modal({
 
         {/* Body */}
         <div
-          className="p-6 max-h-[70vh] overflow-y-auto"
+          className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6 mobile-scrollbar"
           style={{ color: "var(--text)" }}
         >
           {children}

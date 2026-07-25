@@ -121,12 +121,12 @@ export default function SubcontractorFormModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0  z-50 flex items-center justify-center p-4">
+    <div className="mobile-modal-surface fixed inset-0 z-50 flex">
       <div className="absolute inset-0  backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <Card className="p-0">
-          <form onSubmit={handleSubmit}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+      <div className="mobile-modal-panel relative w-full max-w-2xl overflow-hidden rounded-2xl">
+        <Card className="flex h-full flex-col p-0">
+          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+            <div className="mobile-modal-header flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
               <h2 className="text-lg font-semibold text-[var(--text)]">
                 {isEdit
                   ? t("SubcontractorFormModal.title.edit")
@@ -135,13 +135,14 @@ export default function SubcontractorFormModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="p-1 rounded-lg hover:bg-[var(--hover)] text-[var(--text)]"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-lg hover:bg-[var(--hover)] text-[var(--text)] sm:h-9 sm:w-9"
+                aria-label="Close"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="px-6 py-4 space-y-4">
+            <div className="mobile-modal-content px-6 py-4 space-y-4">
               <Input
                 label={t("SubcontractorFormModal.fields.company_name.label")}
                 value={form.name}
@@ -238,13 +239,14 @@ export default function SubcontractorFormModal({
                 <button
                   type="button"
                   onClick={() => handleChange("is_active", !form.is_active)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors sm:h-6 sm:w-11 ${
                     form.is_active ? "bg-[var(--success)]" : "bg-[var(--muted)]"
                   }`}
+                  aria-pressed={form.is_active}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      form.is_active ? "translate-x-6" : "translate-x-1"
+                    className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform sm:h-4 sm:w-4 ${
+                      form.is_active ? "translate-x-8 sm:translate-x-6" : "translate-x-1"
                     }`}
                   />
                 </button>
@@ -266,7 +268,7 @@ export default function SubcontractorFormModal({
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--border)]">
+            <div className="mobile-modal-footer flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--border)]">
               <Button
                 type="button"
                 variant="secondary"

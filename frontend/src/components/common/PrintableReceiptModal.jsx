@@ -336,9 +336,9 @@ export default function PrintableReceiptModal({
   return (
     <>
       <div className="fixed inset-0 z-[70] bg-black/50" onClick={onClose} />
-      <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+      <div className="mobile-modal-surface fixed inset-0 z-[80] flex">
         <div
-          className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl border shadow-2xl"
+          className="mobile-modal-panel mobile-modal-full flex w-full max-w-4xl flex-col overflow-hidden rounded-xl border shadow-2xl"
           style={{
             backgroundColor: "var(--card)",
             borderColor: "var(--border)",
@@ -347,7 +347,7 @@ export default function PrintableReceiptModal({
           onClick={(event) => event.stopPropagation()}
         >
           <div
-            className="flex items-center justify-between border-b px-5 py-4"
+            className="mobile-modal-header flex flex-col gap-3 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
             style={{ borderColor: "var(--border)" }}
           >
             <div>
@@ -356,11 +356,11 @@ export default function PrintableReceiptModal({
                 {receiptNumber}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center gap-2 sm:w-auto">
               <button
                 type="button"
                 onClick={handlePrint}
-                className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
+                className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white sm:flex-none"
                 style={{ backgroundColor: "var(--primary)" }}
               >
                 <Printer className="h-4 w-4" />
@@ -369,7 +369,7 @@ export default function PrintableReceiptModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg hover:bg-[var(--hover)]"
+                className="inline-flex h-12 w-12 items-center justify-center rounded-lg hover:bg-[var(--hover)]"
                 aria-label="Close receipt"
               >
                 <X className="h-5 w-5" />
@@ -377,9 +377,9 @@ export default function PrintableReceiptModal({
             </div>
           </div>
 
-          <div className="overflow-y-auto bg-[var(--bg)] p-5">
-            <div className="mx-auto max-w-3xl rounded-lg bg-white p-7 text-slate-900 shadow-sm">
-              <div className="mb-5 flex items-start justify-between gap-6 border-b-[3px] border-slate-900 pb-4">
+          <div className="flex-1 overflow-auto bg-[var(--bg)] p-4 mobile-scrollbar sm:p-5">
+            <div className="mx-auto max-w-3xl rounded-lg bg-white p-4 text-slate-900 shadow-sm sm:p-7">
+              <div className="mb-5 flex flex-col gap-4 border-b-[3px] border-slate-900 pb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
                 <div>
                   <h1 className="text-2xl font-extrabold tracking-normal">
                     {title}
@@ -398,7 +398,7 @@ export default function PrintableReceiptModal({
                 </div>
               </div>
 
-              <div className="mb-5 flex items-center justify-between rounded-lg bg-slate-900 px-5 py-4 text-white">
+              <div className="mb-5 flex flex-col gap-3 rounded-lg bg-slate-900 px-5 py-4 text-white sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wide text-slate-300">
                     {amountLabel}
@@ -433,7 +433,7 @@ export default function PrintableReceiptModal({
                     {normalizedRows(section.rows).map((row) => (
                       <div
                         key={`${section.title}-${row.label}`}
-                        className="grid grid-cols-[38%_1fr] border-b border-slate-200 last:border-b-0"
+                        className="grid grid-cols-1 border-b border-slate-200 last:border-b-0 sm:grid-cols-[38%_1fr]"
                       >
                         <div className="bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-500">
                           {row.label}

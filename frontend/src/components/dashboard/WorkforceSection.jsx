@@ -50,7 +50,7 @@ export default function WorkforceSection({ workforce, attendance }) {
     >
       <div className="space-y-6">
         {/* Top stats row */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-3">
           <div className="text-center p-3 rounded-lg bg-[var(--bg)]">
             <p className="text-2xl font-bold text-[var(--text)]">
               {workforce.total_employees}
@@ -83,7 +83,7 @@ export default function WorkforceSection({ workforce, attendance }) {
             <h4 className="text-sm font-medium text-[var(--muted)] mb-3">
               {t("workforceSection.todayAttendance")}
             </h4>
-            <div className="grid grid-cols-5 gap-2 mb-3">
+            <div className="mb-3 grid grid-cols-2 gap-2 min-[380px]:grid-cols-3 sm:grid-cols-5">
               {[
                 {
                   label: t("workforceSection.present"),
@@ -111,7 +111,7 @@ export default function WorkforceSection({ workforce, attendance }) {
                   color: "var(--muted)",
                 },
               ].map((item) => (
-                <div key={item.label} className="text-center">
+                <div key={item.label} className="rounded-lg bg-[var(--bg)] px-2 py-2 text-center sm:bg-transparent sm:p-0">
                   <p
                     className="text-lg font-bold"
                     style={{ color: item.color }}

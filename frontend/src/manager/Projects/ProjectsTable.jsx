@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  Pencil,
   Trash2,
   FolderKanban,
   Search,
@@ -68,7 +67,7 @@ const getStatusConfig = (status) => {
   };
 };
 
-export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
+export default function ProjectsTable({ projects = [], onDelete }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
@@ -175,13 +174,13 @@ export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-9 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] pl-9 pr-3 text-sm text-[var(--text)] placeholder-[var(--muted)] outline-none transition-all focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20"
+            className="h-12 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] pl-9 pr-3 text-base text-[var(--text)] placeholder-[var(--muted)] outline-none transition-all focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 sm:h-9 sm:text-sm"
           />
         </div>
       </div>
 
       {/* ── Table ───────────────────────────────────── */}
-      <div className="overflow-x-auto">
+      <div className="hidden overflow-x-auto md:block mobile-scrollbar">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-[var(--border)]">
@@ -326,6 +325,100 @@ export default function ProjectsTable({ projects = [], onEdit, onDelete }) {
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="divide-y divide-[var(--border)] md:hidden">
+        {paginated.length > 0 ? (
+          paginated.map((project, idx) => {
+            const status = getStatusConfig(project.status);
+            return (
+              <article key={project.id ?? idx} className="grid gap-4 p-4">
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-base font-bold text-[var(--primary)]">
+                      {project.name?.charAt(0)?.toUpperCase() ?? "P"}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="break-words text-base font-semibold leading-6 text-[var(--text)]">
+                        {project.name}
+                      </h3>
+                      <p className="mt-1 break-words text-sm text-[var(--muted)]">
+                        {project.property_type || "—"}
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${status.bg} ${status.text} ${status.border}`}
+                  >
+                    <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} />
+                    {project.status || "—"}
+                  </span>
+                </div>
+
+                <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("ProjectsTable.location")}
+                    </dt>
+                    <dd className="mt-1 break-words text-sm font-medium text-[var(--text)]">
+                      {project.location || "—"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      {t("ProjectsTable.startDate")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                      {formatDate(project.formatted_start_date || project.start_date)}
+                    </dd>
+                  </div>
+                </dl>
+
+                <div className="flex flex-wrap items-center justify-end gap-2 border-t border-[var(--border)] pt-3">
+                  <button
+                    onClick={() => navigate(`/manager/projects/${project.id}`)}
+                    className="inline-flex h-12 min-w-12 items-center justify-center rounded-xl border border-[var(--border)] px-3 text-[var(--primary)]"
+                    title={t("ProjectsTable.viewProject")}
+                    type="button"
+                  >
+                    <Eye size={18} strokeWidth={1.8} />
+                    <span className="ms-2 text-sm font-medium">View</span>
+                  </button>
+                  <PermissionWrapper permissions={["projects.delete"]}>
+                    <button
+                      onClick={() => setProjectToDelete(project)}
+                      className="inline-flex h-12 min-w-12 items-center justify-center rounded-xl border border-red-500/20 px-3 text-[var(--danger)]"
+                      title={t("ProjectsTable.deleteProject")}
+                      type="button"
+                    >
+                      <Trash2 size={18} strokeWidth={1.8} />
+                      <span className="ms-2 text-sm font-medium">Delete</span>
+                    </button>
+                  </PermissionWrapper>
+                </div>
+              </article>
+            );
+          })
+        ) : (
+          <div className="px-4 py-16 text-center">
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--hover)]">
+                <FolderKanban
+                  className="h-6 w-6 text-[var(--muted)]"
+                  strokeWidth={1.5}
+                />
+              </div>
+              <p className="text-sm font-medium text-[var(--text)]">
+                {t("ProjectsTable.noProjectsFound")}
+              </p>
+              <p className="text-xs text-[var(--muted)]">
+                {searchQuery
+                  ? t("ProjectsTable.adjustSearch")
+                  : t("ProjectsTable.createFirstProject")}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Pagination Footer ───────────────────────── */}

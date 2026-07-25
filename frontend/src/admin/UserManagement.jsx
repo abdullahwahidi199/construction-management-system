@@ -1,13 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import instance from "../api/axiosInstance";
 import { useLanguage } from "../hooks/useLanguage";
 import usePost from "../hooks/usePost";
 import { getFriendlyErrorMessage } from "../utils/apiErrors";
-
-function cn(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
 
 // --- Icons ---
 const EditIcon = () => (
@@ -38,6 +34,21 @@ const LockIcon = () => (
       strokeLinejoin="round"
       strokeWidth={2}
       d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+    />
+  </svg>
+);
+const CloseIcon = () => (
+  <svg
+    className="h-5 w-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M6 18L18 6M6 6l12 12"
     />
   </svg>
 );
@@ -146,7 +157,7 @@ export default function UserManagement() {
           backgroundColor: "var(--card)",
         }}
       >
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto md:block mobile-scrollbar">
           <table className="w-full text-left text-sm rtl:text-right">
             <thead
               className="text-xs uppercase tracking-wider"
@@ -308,6 +319,87 @@ export default function UserManagement() {
             </tbody>
           </table>
         </div>
+        <div className="divide-y divide-[var(--border)] md:hidden">
+          {users.length === 0 ? (
+            <div className="px-6 py-12 text-center text-sm" style={{ color: "var(--muted)" }}>
+              {t("admin.users.empty")}
+            </div>
+          ) : (
+            users.map((user) => (
+              <article key={user.id} className="grid gap-4 p-4">
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="break-words text-base font-semibold text-[var(--text)]">
+                      {user.username}
+                    </h3>
+                    <p className="mt-1 break-words text-sm text-[var(--muted)]">
+                      {user.email || "-"}
+                    </p>
+                  </div>
+                  <span
+                    className="inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold"
+                    style={{
+                      backgroundColor: user.is_active
+                        ? "color-mix(in srgb, var(--success) 15%, transparent)"
+                        : "color-mix(in srgb, var(--danger) 15%, transparent)",
+                      color: user.is_active
+                        ? "var(--success)"
+                        : "var(--danger)",
+                    }}
+                  >
+                    {user.is_active
+                      ? t("common.active")
+                      : t("common.inactive")}
+                  </span>
+                </div>
+
+                <label className="block">
+                  <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+                    {t("admin.users.role")}
+                  </span>
+                  <select
+                    className="h-12 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 text-base text-[var(--text)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20"
+                    value={user.role}
+                    onChange={(e) => updateRole(user.id, e.target.value)}
+                  >
+                    {roles.map((role) => (
+                      <option key={role.value} value={role.value}>
+                        {role.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="flex flex-col gap-2 border-t border-[var(--border)] pt-3 min-[380px]:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => setEditingUser(user)}
+                    className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-3 text-sm font-medium text-[var(--text)]"
+                  >
+                    <EditIcon /> {t("admin.users.edit")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleActive(user)}
+                    className="h-12 flex-1 rounded-xl px-3 text-sm font-semibold"
+                    style={{
+                      backgroundColor: user.is_active
+                        ? "color-mix(in srgb, var(--danger) 12%, transparent)"
+                        : "color-mix(in srgb, var(--success) 12%, transparent)",
+                      color: user.is_active
+                        ? "var(--danger)"
+                        : "var(--success)",
+                    }}
+                  >
+                    {user.is_active
+                      ? t("admin.users.disable")
+                      : t("admin.users.enable")}
+                  </button>
+                </div>
+              </article>
+            ))
+          )}
+        </div>
       </div>
 
       {/* Modals */}
@@ -407,8 +499,9 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
     backgroundColor: "var(--hover)",
     color: "var(--text)",
     borderRadius: "0.5rem",
-    padding: "0.5rem 0.75rem",
-    fontSize: "0.875rem",
+    minHeight: "48px",
+    padding: "0.75rem",
+    fontSize: "1rem",
     outline: "none",
     transition: "border-color 0.15s, box-shadow 0.15s",
   };
@@ -427,7 +520,7 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="mobile-modal-surface fixed inset-0 z-50 flex"
       style={{
         backgroundColor: "rgba(0,0,0,0.6)",
         backdropFilter: "blur(4px)",
@@ -435,18 +528,34 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg rounded-xl p-6 shadow-2xl"
+        className="mobile-modal-panel flex w-full max-w-lg flex-col overflow-hidden rounded-xl shadow-2xl"
         style={{
           border: "1px solid var(--border)",
           backgroundColor: "var(--card)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-6 text-xl font-bold" style={{ color: "var(--text)" }}>
-          {t("admin.users.edit")}
-        </h2>
+        <div
+          className="mobile-modal-header flex items-center justify-between border-b px-6 py-4"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <h2 className="text-xl font-bold" style={{ color: "var(--text)" }}>
+            {t("admin.users.edit")}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={saving}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg transition hover:bg-[var(--hover)]"
+            style={{ color: "var(--text)" }}
+            aria-label="Close"
+          >
+            <CloseIcon />
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="mobile-modal-content space-y-5 p-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label
@@ -582,14 +691,15 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
               {error}
             </div>
           )}
+          </div>
 
           <div
-            className="flex justify-end gap-3 pt-5"
+            className="mobile-modal-footer flex justify-end gap-3 px-6 py-4"
             style={{ borderTop: "1px solid var(--border)" }}
           >
             <button
               type="button"
-              className="rounded-lg px-4 py-2 text-sm font-medium transition"
+              className="min-h-12 rounded-lg px-4 py-2 text-sm font-medium transition"
               style={{
                 border: "1px solid var(--border)",
                 backgroundColor: "var(--card)",
@@ -608,7 +718,7 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
             </button>
             <button
               type="submit"
-              className="rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition disabled:opacity-50"
+              className="min-h-12 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition disabled:opacity-50"
               style={{ backgroundColor: "var(--primary)" }}
               onMouseEnter={(e) =>
                 (e.currentTarget.style.filter = "brightness(1.1)")
@@ -668,7 +778,9 @@ function CreateUserModal({
       });
       toast.success("User created.");
       onCreated();
-    } catch {}
+    } catch (err) {
+      setLocalError(getFriendlyErrorMessage(err, t("common.error")));
+    }
   };
 
   const renderApiError = () => {
@@ -683,8 +795,9 @@ function CreateUserModal({
     backgroundColor: "var(--hover)",
     color: "var(--text)",
     borderRadius: "0.5rem",
-    padding: "0.5rem 0.75rem",
-    fontSize: "0.875rem",
+    minHeight: "48px",
+    padding: "0.75rem",
+    fontSize: "1rem",
     outline: "none",
     transition: "border-color 0.15s, box-shadow 0.15s",
   };
@@ -703,7 +816,7 @@ function CreateUserModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="mobile-modal-surface fixed inset-0 z-50 flex"
       style={{
         backgroundColor: "rgba(0,0,0,0.6)",
         backdropFilter: "blur(4px)",
@@ -711,17 +824,33 @@ function CreateUserModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-xl p-6 shadow-2xl"
+        className="mobile-modal-panel flex w-full max-w-md flex-col overflow-hidden rounded-xl shadow-2xl"
         style={{
           border: "1px solid var(--border)",
           backgroundColor: "var(--card)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-6 text-xl font-bold" style={{ color: "var(--text)" }}>
-          {t("admin.users.create")}
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div
+          className="mobile-modal-header flex items-center justify-between border-b px-6 py-4"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <h2 className="text-xl font-bold" style={{ color: "var(--text)" }}>
+            {t("admin.users.create")}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={creating}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg transition hover:bg-[var(--hover)]"
+            style={{ color: "var(--text)" }}
+            aria-label="Close"
+          >
+            <CloseIcon />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="mobile-modal-content space-y-4 p-6">
           <div>
             <label
               htmlFor="create-user-username"
@@ -829,14 +958,15 @@ function CreateUserModal({
               {localError || renderApiError()}
             </div>
           )}
+          </div>
 
           <div
-            className="flex justify-end gap-3 pt-5"
+            className="mobile-modal-footer flex justify-end gap-3 px-6 py-4"
             style={{ borderTop: "1px solid var(--border)" }}
           >
             <button
               type="button"
-              className="rounded-lg px-4 py-2 text-sm font-medium transition"
+              className="min-h-12 rounded-lg px-4 py-2 text-sm font-medium transition"
               style={{
                 border: "1px solid var(--border)",
                 backgroundColor: "var(--card)",
@@ -855,7 +985,7 @@ function CreateUserModal({
             </button>
             <button
               type="submit"
-              className="rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition disabled:opacity-50"
+              className="min-h-12 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition disabled:opacity-50"
               style={{ backgroundColor: "var(--primary)" }}
               onMouseEnter={(e) =>
                 (e.currentTarget.style.filter = "brightness(1.1)")

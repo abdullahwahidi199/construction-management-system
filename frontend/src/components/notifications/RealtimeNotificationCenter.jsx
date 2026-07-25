@@ -229,7 +229,7 @@ export default function RealtimeNotificationCenter({ children }) {
   return (
     <RealtimeNotificationContext.Provider value={contextValue}>
       {children}
-      <div className="fixed right-4 top-4 z-[200] flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-3">
+      <div className="fixed inset-x-3 bottom-[calc(5rem+var(--safe-bottom))] z-[200] flex flex-col gap-3 sm:inset-x-auto sm:right-4 sm:top-4 sm:bottom-auto sm:w-[min(24rem,calc(100vw-2rem))]">
         {toasts.map((toast) => (
           <div
             key={toast.id}
@@ -261,7 +261,7 @@ export default function RealtimeNotificationCenter({ children }) {
               <button
                 type="button"
                 onClick={() => removeToast(toast.id)}
-                className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--text)]"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--text)]"
               >
                 <X className="h-3.5 w-3.5" />
                 Close
@@ -269,7 +269,7 @@ export default function RealtimeNotificationCenter({ children }) {
               <button
                 type="button"
                 onClick={() => openToastAction(toast)}
-                className="inline-flex h-8 items-center rounded-lg bg-[var(--primary)] px-3 text-xs font-semibold text-white hover:opacity-90"
+                className="inline-flex min-h-10 items-center rounded-lg bg-[var(--primary)] px-3 text-xs font-semibold text-white hover:opacity-90"
               >
                 {toast.actionLabel || "Open"}
               </button>

@@ -613,6 +613,15 @@ export default function ManagerNavbar() {
     (group) => group.type === "group" || !primaryDesktopPaths.has(group.path),
   );
   const recentPages = allPages.slice(0, 5);
+  const mobilePrimaryPaths = new Set([
+    "/manager/dashboard",
+    "/manager/projects",
+    "/manager/expenses",
+    "/manager/employees",
+  ]);
+  const mobilePrimaryPages = allPages
+    .filter((item) => mobilePrimaryPaths.has(item.path))
+    .slice(0, 4);
   const searchResults = allPages.filter((item) => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return true;
@@ -907,6 +916,39 @@ export default function ManagerNavbar() {
           </button>
         </div>
       </aside>
+
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-(--border) bg-(--bg)/95 px-[max(0.5rem,var(--safe-left))] pb-[var(--safe-bottom)] shadow-[0_-12px_30px_var(--shadow)] backdrop-blur-xl lg:hidden">
+        <div className="mx-auto grid h-16 max-w-md grid-cols-5 items-center gap-1">
+          {mobilePrimaryPages.map((item) => {
+            const Icon = item.icon;
+            const active = isRouteActive(location.pathname, item.path);
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1 text-[11px] font-medium transition ${
+                  active
+                    ? "text-(--primary)"
+                    : "text-(--muted) active:bg-(--hover)"
+                }`}
+              >
+                <Icon className="h-5 w-5 shrink-0" />
+                <span className="max-w-full truncate">{item.name}</span>
+                <PendingBadge value={item.badge} />
+              </NavLink>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1 text-[11px] font-medium text-(--muted) transition active:bg-(--hover)"
+            aria-label={t("managerNavbar.more")}
+          >
+            <MoreHorizontal className="h-5 w-5" />
+            <span>{t("managerNavbar.more")}</span>
+          </button>
+        </div>
+      </div>
     </nav>
   );
 }

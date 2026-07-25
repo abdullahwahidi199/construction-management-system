@@ -389,28 +389,29 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
       <div className="fixed inset-0 bg-black/50 z-[60]" onClick={onClose} />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+      <div className="mobile-modal-surface fixed inset-0 z-[70] flex">
         <div
-          className="w-full max-w-3xl max-h-[90vh] bg-[var(--card)] rounded-2xl shadow-2xl border border-[var(--border)] overflow-hidden flex flex-col"
+          className="mobile-modal-panel mobile-modal-full w-full max-w-3xl bg-[var(--card)] rounded-2xl shadow-2xl border border-[var(--border)] overflow-hidden flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
+          <div className="mobile-modal-header flex flex-col gap-3 px-6 py-4 border-b border-[var(--border)] shrink-0 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-semibold text-[var(--text)]">
               Expense Receipt Preview
             </h2>
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center gap-2 sm:w-auto">
               <button
                 onClick={handlePrint}
                 disabled={!canPrint}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity"
+                className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 sm:flex-none"
               >
                 <Printer className="h-4 w-4" />
                 Print
               </button>
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--text)] transition-colors"
+                className="inline-flex h-12 w-12 items-center justify-center rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--text)] transition-colors"
+                aria-label="Close"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -418,15 +419,15 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
           </div>
 
           {/* Scrollable Receipt Preview */}
-          <div className="overflow-y-auto flex-1 bg-[var(--bg)]">
+          <div className="flex-1 overflow-auto bg-[var(--bg)] mobile-scrollbar">
             {!canPrint && (
               <div className="border-b border-amber-500/20 bg-amber-500/10 px-6 py-3 text-sm text-amber-700 dark:text-amber-300">
                 Expense must be approved before printing.
               </div>
             )}
-            <div ref={printRef} className="p-8 md:p-10 max-w-3xl mx-auto">
+            <div ref={printRef} className="mx-auto max-w-3xl p-4 sm:p-8 md:p-10">
               {/* Document Header */}
-              <div className="flex items-start justify-between pb-5 border-b-[3px] border-[var(--text)] mb-7">
+              <div className="mb-7 flex flex-col gap-4 border-b-[3px] border-[var(--text)] pb-5 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <h1 className="text-2xl font-extrabold tracking-tight text-[var(--text)]">
                     Expense Receipt
@@ -452,7 +453,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
               </div>
 
               {/* Info Grid */}
-              <div className="grid grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] rounded-lg overflow-hidden mb-7">
+              <div className="mb-7 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--border)] sm:grid-cols-3">
                 <div className="bg-[var(--card)] px-4 py-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)] mb-1">
                     Project
@@ -479,7 +480,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] rounded-lg overflow-hidden mb-7">
+              <div className="mb-7 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--border)] sm:grid-cols-3">
                 <div className="bg-[var(--card)] px-4 py-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)] mb-1">
                     Prepared By
@@ -572,7 +573,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
               )}
 
               {/* Signatures */}
-              <div className="mt-14 grid grid-cols-4 gap-6">
+              <div className="mt-14 grid grid-cols-2 gap-6 sm:grid-cols-4">
                 {[
                   { role: "Prepared By", name: preparedBy },
                   { role: "Checked By", name: "Name & Signature" },
