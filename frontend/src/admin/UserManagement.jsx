@@ -450,12 +450,14 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label
+                htmlFor="edit-user-username"
                 className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
                 style={{ color: "var(--muted)" }}
               >
                 {t("admin.users.username")}
               </label>
               <input
+                id="edit-user-username"
                 type="text"
                 style={inputStyle}
                 {...inputFocusHandlers}
@@ -466,12 +468,14 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
             </div>
             <div>
               <label
+                htmlFor="edit-user-email"
                 className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
                 style={{ color: "var(--muted)" }}
               >
                 {t("admin.users.email")}
               </label>
               <input
+                id="edit-user-email"
                 type="email"
                 style={inputStyle}
                 {...inputFocusHandlers}
@@ -483,12 +487,14 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
 
           <div>
             <label
+              htmlFor="edit-user-role"
               className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
               style={{ color: "var(--muted)" }}
             >
               {t("admin.users.role")}
             </label>
             <select
+              id="edit-user-role"
               style={inputStyle}
               {...inputFocusHandlers}
               value={form.role}
@@ -523,12 +529,14 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label
+                  htmlFor="edit-user-new-password"
                   className="mb-1.5 block text-xs font-medium"
                   style={{ color: "var(--muted)" }}
                 >
                   {t("admin.users.newPassword")}
                 </label>
                 <input
+                  id="edit-user-new-password"
                   type="password"
                   style={{
                     ...inputStyle,
@@ -541,12 +549,14 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
               </div>
               <div>
                 <label
+                  htmlFor="edit-user-confirm-password"
                   className="mb-1.5 block text-xs font-medium"
                   style={{ color: "var(--muted)" }}
                 >
                   {t("admin.users.confirmNewPassword")}
                 </label>
                 <input
+                  id="edit-user-confirm-password"
                   type="password"
                   style={{
                     ...inputStyle,
@@ -714,12 +724,14 @@ function CreateUserModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
+              htmlFor="create-user-username"
               className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
               style={{ color: "var(--muted)" }}
             >
               {t("admin.users.username")}
             </label>
             <input
+              id="create-user-username"
               type="text"
               style={inputStyle}
               {...inputFocusHandlers}
@@ -731,12 +743,14 @@ function CreateUserModal({
           </div>
           <div>
             <label
+              htmlFor="create-user-email"
               className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
               style={{ color: "var(--muted)" }}
             >
               {t("admin.users.email")}
             </label>
             <input
+              id="create-user-email"
               type="email"
               style={inputStyle}
               {...inputFocusHandlers}
@@ -746,12 +760,14 @@ function CreateUserModal({
           </div>
           <div>
             <label
+              htmlFor="create-user-role"
               className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
               style={{ color: "var(--muted)" }}
             >
               {t("admin.users.role")}
             </label>
             <select
+              id="create-user-role"
               style={inputStyle}
               {...inputFocusHandlers}
               value={form.role}
@@ -766,12 +782,14 @@ function CreateUserModal({
           </div>
           <div>
             <label
+              htmlFor="create-user-password"
               className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
               style={{ color: "var(--muted)" }}
             >
               {t("admin.users.password")}
             </label>
             <input
+              id="create-user-password"
               type="password"
               style={inputStyle}
               {...inputFocusHandlers}
@@ -782,12 +800,14 @@ function CreateUserModal({
           </div>
           <div>
             <label
+              htmlFor="create-user-confirm-password"
               className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
               style={{ color: "var(--muted)" }}
             >
               {t("admin.users.confirmPassword")}
             </label>
             <input
+              id="create-user-confirm-password"
               type="password"
               style={inputStyle}
               {...inputFocusHandlers}

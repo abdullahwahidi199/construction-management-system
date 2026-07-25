@@ -11,7 +11,7 @@ import PayrollForm from "../../components/payroll/PayrollForm";
 import instance from "../../api/axiosInstance";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
-import PayrollPrintModal from "./payrollPrintModal";
+import PayrollPrintModal from "./PayrollPrintModal";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 
 export default function PayrollPage() {

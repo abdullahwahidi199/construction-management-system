@@ -136,3 +136,12 @@ class AuditAPITests(APITestCase):
         self.assertEqual(log.extra_metadata["currency"], "USD")
         self.assertEqual(log.extra_metadata["reason"], "Vendor invoice correction")
         self.assertTrue(log.extra_metadata["is_financial"])
+
+    def test_audit_filters_search_and_unauthorized_access(self):
+        response = self.client.get("/api/audit/logs/?action=project.budget_change&search=API")
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertIn("results", response.data)
+
+        self.client.force_authenticate(None)
+        unauthenticated = self.client.get("/api/audit/logs/")
+        self.assertEqual(unauthenticated.status_code, 401)

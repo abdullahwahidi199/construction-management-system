@@ -87,21 +87,22 @@ class ExpenseReport(BaseReport):
         # =====================================================
         # 4. OPTIONAL: LIGHTWEIGHT PREVIEW ROWS (NOT FULL DATA)
         # =====================================================
-        preview_rows = list(
-            qs.order_by("-expense_date")[:20].values(
-                "id",
-                "serial_number",
-                "expense_date",
-                "expense_type",
-                "amount_afn",
-                "amount_usd",
-                "total_usd",
-                "total_afn",
-                "project_id",
-                "project__name",
-                "approval_status",
-            )
+        preview_rows = []
+        preview_values = qs.order_by("-expense_date")[:20].values(
+            "id",
+            "serial_number",
+            "expense_date",
+            "expense_type",
+            "amount_afn",
+            "amount_usd",
+            "project_id",
+            "project__name",
+            "approval_status",
         )
+        for row in preview_values:
+            row["total_usd"] = row["amount_usd"]
+            row["total_afn"] = row["amount_afn"]
+            preview_rows.append(row)
 
         # =====================================================
         # 5. FINAL RESPONSE

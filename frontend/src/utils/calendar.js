@@ -141,7 +141,8 @@ function positiveMod(value, divisor) {
 }
 
 export function isShamsiLeapYear(year) {
-  return jalaliToJdn(Number(year) + 1, 1, 1) - jalaliToJdn(Number(year), 1, 1) === 366;
+  const lastDay = toShamsi(`${Number(year) + 622}-03-20`);
+  return lastDay?.year === Number(year) && lastDay.month === 12 && lastDay.day === 30;
 }
 
 export function shamsiMonthLength(year, month) {
@@ -154,7 +155,21 @@ export function shamsiMonthLength(year, month) {
 export function toShamsi(value) {
   const parsed = parseYmd(value);
   if (!parsed) return null;
-  return jdnToJalali(gregorianToJdn(parsed.year, parsed.month, parsed.day));
+  const date = new Date(Date.UTC(parsed.year, parsed.month - 1, parsed.day));
+  if (Number.isNaN(date.getTime())) return null;
+
+  const parts = new Intl.DateTimeFormat("en-US-u-ca-persian", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "UTC",
+  }).formatToParts(date);
+
+  const getPart = (type) => Number(parts.find((part) => part.type === type)?.value);
+  const year = getPart("year");
+  const month = getPart("month");
+  const day = getPart("day");
+  return year && month && day ? { year, month, day } : null;
 }
 
 export function toGregorian(value) {

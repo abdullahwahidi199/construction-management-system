@@ -265,7 +265,7 @@ class ContractDocumentViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
-            return ContractDocumentCreateSerializer
+            return ContractDocumentSerializer
         return ContractDocumentSerializer
 
 
@@ -281,7 +281,7 @@ class ContractPaymentViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
-            return ContractPaymentCreateSerializer
+            return ContractPaymentSerializer
         return ContractPaymentSerializer
 
     def destroy(self, request, *args, **kwargs):
@@ -304,7 +304,7 @@ class ContractVariationViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
-            return ContractVariationCreateSerializer
+            return ContractVariationSerializer
         return ContractVariationSerializer
 
     @action(detail=True, methods=['post'])

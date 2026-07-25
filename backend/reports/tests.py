@@ -254,3 +254,100 @@ class FinancialAPISecurityTests(APITestCase):
             Decimal(response.data["results"]["totals"]["afn"]),
             Decimal("7000"),
         )
+
+
+class ReportEndpointTests(APITestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_superuser(
+            username="report-admin",
+            password="pass",
+            email="report-admin@example.com",
+        )
+        self.client.force_authenticate(self.user)
+        self.project = Project.objects.create(
+            name="Report Project",
+            property_type="commercial",
+            location="Kabul",
+            total_floors=5,
+            start_date=date(2026, 1, 1),
+            estimated_budget=Decimal("1000.00"),
+            budget_currency="USD",
+            status="ongoing",
+        )
+        self.employee = Employee.objects.create(
+            first_name="Report",
+            last_name="Employee",
+            email="report.employee@example.com",
+            phone="0700000000",
+            address="Kabul",
+            department="finance",
+            position="Accountant",
+            employment_type="full_time",
+            hire_date=date(2026, 1, 1),
+            salary=Decimal("1000.00"),
+        )
+        Payroll.objects.create(
+            employee=self.employee,
+            payroll_period_start=date(2026, 2, 1),
+            payroll_period_end=date(2026, 2, 28),
+            basic_salary=Decimal("1000.00"),
+            gross_pay=Decimal("1000.00"),
+            net_pay=Decimal("900.00"),
+            tax_deducted=Decimal("100.00"),
+            currency="USD",
+        )
+        Expense.objects.create(
+            project=self.project,
+            expense_date=date(2026, 2, 1),
+            description="Report expense",
+            amount_usd=Decimal("50.00"),
+            approval_status=Expense.ApprovalStatus.APPROVED,
+        )
+        subcontractor = Subcontractor.objects.create(
+            name="Report Sub",
+            specialization=SpecializationChoices.CONCRETE,
+        )
+        self.contract = Contract.objects.create(
+            project=self.project,
+            subcontractor=subcontractor,
+            title="Report Contract",
+            currency="USD",
+            contract_value=Decimal("500.00"),
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 6, 1),
+            status="active",
+        )
+
+    def test_all_json_reports_return_summary_rows_and_totals(self):
+        endpoints = [
+            "/api/reports/projects/",
+            "/api/reports/expenses/",
+            "/api/reports/payroll/",
+            "/api/reports/attendance/",
+            "/api/reports/employees/",
+            "/api/reports/contracts/",
+            "/api/reports/financial/",
+        ]
+
+        for endpoint in endpoints:
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 200, endpoint)
+            self.assertIn("summary", response.data, endpoint)
+
+    def test_report_date_range_validation(self):
+        response = self.client.get("/api/reports/expenses/?start_date=2026-03-01&end_date=2026-02-01")
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_report_filters_and_pdf_export(self):
+        filtered = self.client.get(f"/api/reports/contracts/?project_id={self.project.id}&currency=USD")
+        exported = self.client.get("/api/reports/projects/?export=pdf")
+
+        self.assertEqual(filtered.status_code, 200, filtered.data)
+        self.assertEqual(exported.status_code, 200)
+        self.assertEqual(exported["Content-Type"], "application/pdf")
+
+    def test_expense_pdf_export_rejects_pending_status(self):
+        response = self.client.get("/api/reports/expenses/?export=pdf&status=pending")
+
+        self.assertEqual(response.status_code, 403)

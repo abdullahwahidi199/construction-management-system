@@ -222,12 +222,14 @@ function WorkerPayrollManager() {
         >
           <div>
             <label
+              htmlFor="worker-payroll-period-start"
               className="block text-sm mb-1"
               style={{ color: "var(--muted)" }}
             >
               {t("WorkerPayrollManager.periodStart")}
             </label>
             <input
+              id="worker-payroll-period-start"
               type="date"
               required
               value={periodStart}
@@ -242,12 +244,14 @@ function WorkerPayrollManager() {
           </div>
           <div>
             <label
+              htmlFor="worker-payroll-period-end"
               className="block text-sm mb-1"
               style={{ color: "var(--muted)" }}
             >
               {t("WorkerPayrollManager.periodEnd")}
             </label>
             <input
+              id="worker-payroll-period-end"
               type="date"
               required
               value={periodEnd}
@@ -262,12 +266,14 @@ function WorkerPayrollManager() {
           </div>
           <div>
             <label
+              htmlFor="worker-payroll-payment-method"
               className="block text-sm mb-1"
               style={{ color: "var(--muted)" }}
             >
               {t("WorkerPayrollManager.defaultMethod")}
             </label>
             <select
+              id="worker-payroll-payment-method"
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
               className="rounded border px-3 py-2"
@@ -290,12 +296,14 @@ function WorkerPayrollManager() {
           </div>
           <div>
             <label
+              htmlFor="worker-payroll-project"
               className="block text-sm mb-1"
               style={{ color: "var(--muted)" }}
             >
               Project
             </label>
             <select
+              id="worker-payroll-project"
               value={generationProject}
               onChange={(e) => setGenerationProject(e.target.value)}
               className="rounded border px-3 py-2"

@@ -219,8 +219,12 @@ export default function PermissionManagement() {
           ]);
         }
       } catch (e) {
-        setError(getFriendlyErrorMessage(e, "Unable to save changes. Please try again."));
+        const message = getFriendlyErrorMessage(
+          e,
+          "Unable to save changes. Please try again.",
+        );
         await load();
+        setError(message);
       } finally {
         setSavingKey(null);
       }
