@@ -216,22 +216,22 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
       >
         {/* ── Header ─────────────────────────────── */}
         <div className="mobile-modal-header px-7 py-5 border-b border-[var(--border)] bg-[var(--card)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center">
+          <div className="flex min-w-0 items-start justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10">
                 <Pencil
                   className="w-5 h-5 text-[var(--primary)]"
                   strokeWidth={2}
                 />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h2
                   id="edit-project-title"
-                  className="text-lg font-semibold text-[var(--text)]"
+                  className="break-words text-lg font-semibold leading-6 text-[var(--text)]"
                 >
                   {t("ProjectEditView.title")}
                 </h2>
-                <p className="text-xs text-[var(--muted)] mt-0.5">
+                <p className="mt-0.5 break-words text-xs text-[var(--muted)]">
                   {fetching
                     ? t("ProjectEditView.loading")
                     : hasChanges
@@ -241,9 +241,9 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               {hasChanges && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--warning)]/10 border border-[var(--warning)]/30 px-2.5 py-1 text-xs font-medium text-[var(--warning)]">
+                <span className="hidden items-center gap-1.5 rounded-full border border-[var(--warning)]/30 bg-[var(--warning)]/10 px-2.5 py-1 text-xs font-medium text-[var(--warning)] min-[380px]:inline-flex">
                   <span className="h-1.5 w-1.5 rounded-full bg-[var(--warning)] animate-pulse" />
                   {t("ProjectEditView.modified")}
                 </span>
@@ -482,8 +482,8 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
         {/* ── Footer ─────────────────────────────── */}
         {!fetching && (
           <div className="mobile-modal-footer px-7 py-4 border-t border-[var(--border)] bg-[var(--card)] flex items-center justify-between gap-3">
-            <div className="flex items-center gap-4 min-w-0">
-              <p className="text-xs text-[var(--muted)] whitespace-nowrap">
+            <div className="flex min-w-0 flex-wrap items-center gap-3 max-sm:justify-center">
+              <p className="break-words text-xs text-[var(--muted)]">
                 <span className="text-[var(--danger)]">*</span>
                 {t("ProjectEditView.requiredFields")}
               </p>
@@ -501,7 +501,7 @@ export default function ProjectEditView({ projectId, open, onClose, onSaved }) {
               )}
             </div>
 
-            <div className="flex items-center gap-2.5 shrink-0 max-sm:w-full max-sm:flex-col-reverse">
+            <div className="flex shrink-0 items-center gap-2.5 max-sm:w-full max-sm:flex-col-reverse">
               <button
                 type="button"
                 onClick={handleClose}

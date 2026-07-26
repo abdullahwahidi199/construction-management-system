@@ -31,6 +31,7 @@ import NotificationBell from "../components/notifications/NotificationBell";
 import { useRealtimeNotifications } from "../components/notifications/RealtimeNotificationCenter";
 import { useAuth } from "../auth/AuthContext";
 import { hasAnyPermission } from "../../utils/permissions";
+import useBodyScrollLock from "../hooks/useBodyScrollLock";
 
 const isRouteActive = (pathname, itemPath) =>
   pathname === itemPath || pathname.startsWith(`${itemPath}/`);
@@ -657,6 +658,8 @@ export default function ManagerNavbar() {
       .includes(query);
   });
 
+  useBodyScrollLock(mobileOpen);
+
   useEffect(() => {
     const handleShortcut = (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
@@ -788,7 +791,7 @@ export default function ManagerNavbar() {
             className="fixed inset-0 z-[60] cursor-default bg-black/10 backdrop-blur-[1px]"
             onClick={() => setSearchOpen(false)}
           />
-          <div className="fixed left-3 right-3 top-16 z-[70] rounded-xl border border-(--border) bg-(--card) p-2 shadow-2xl sm:left-auto sm:w-[28rem]">
+          <div className="fixed left-3 right-3 top-16 z-[70] max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-xl border border-(--border) bg-(--card) p-2 shadow-2xl mobile-scrollbar sm:left-auto sm:w-[min(28rem,calc(100vw-1.5rem))]">
             <div className="relative mb-2">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--muted)" />
               <input
@@ -821,10 +824,10 @@ export default function ManagerNavbar() {
 
       <aside
         id="manager-mobile-drawer"
-        className={`fixed inset-0 z-[100] flex h-dvh flex-col bg-(--bg) transition duration-[250ms] lg:hidden ${
+        className={`fixed inset-0 z-[100] h-dvh flex-col overflow-x-hidden bg-(--bg) transition duration-[250ms] lg:hidden ${
           mobileOpen
-            ? "pointer-events-auto translate-x-0 opacity-100"
-            : "pointer-events-none translate-x-full opacity-0 rtl:-translate-x-full"
+            ? "flex pointer-events-auto translate-x-0 opacity-100"
+            : "hidden pointer-events-none translate-x-full opacity-0 rtl:-translate-x-full"
         }`}
         style={{ backgroundColor: "var(--bg)" }}
         aria-hidden={!mobileOpen}
@@ -867,7 +870,7 @@ export default function ManagerNavbar() {
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 mobile-scrollbar">
           <div className="space-y-4">
             {navGroups.map((group) => {
               if (group.type !== "group") {

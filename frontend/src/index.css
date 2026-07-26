@@ -6,10 +6,12 @@
 }
 
 html {
+  width: 100%;
   min-width: 0;
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  touch-action: manipulation;
 }
 
 body {
@@ -17,14 +19,18 @@ body {
   color: var(--text);
   transition: all 0.2s ease;
   margin: 0;
+  width: 100%;
+  min-height: 100dvh;
   min-width: 0;
   overflow-x: hidden;
+  overscroll-behavior-y: none;
   font-synthesis-weight: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
 
 #root {
+  width: 100%;
   min-width: 0;
   isolation: isolate;
 }
@@ -49,6 +55,22 @@ textarea {
 
 button {
   touch-action: manipulation;
+}
+
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+table {
+  max-width: 100%;
+}
+
+[role="dialog"],
+.mobile-modal-content,
+.mobile-scrollbar {
+  -webkit-overflow-scrolling: touch;
 }
 
 :focus-visible {
@@ -95,13 +117,16 @@ button {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  overflow: hidden;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .mobile-modal-panel {
   display: flex;
+  width: min(100%, calc(100vw - 2rem));
   max-height: min(92dvh, 900px);
   flex-direction: column;
+  min-width: 0;
 }
 
 .mobile-modal-header,
@@ -136,16 +161,10 @@ button {
     min-height: 48px;
   }
 
-  button,
-  [role="button"],
-  a[role="button"] {
-    min-width: 48px;
-  }
-
   input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
   select,
   textarea {
-    font-size: 16px;
+    font-size: 16px !important;
   }
 
   button,
@@ -193,7 +212,9 @@ button {
   .mobile-modal-surface {
     align-items: flex-start;
     overflow-y: auto;
-    padding: calc(var(--safe-top) + 0.75rem) 0 0;
+    overflow-x: hidden;
+    padding: calc(var(--safe-top) + 0.75rem) max(0.5rem, var(--safe-right)) 0
+      max(0.5rem, var(--safe-left));
   }
 
   .mobile-modal-panel {
@@ -239,5 +260,12 @@ button {
   .mobile-modal-footer > * {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-modal-panel {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
   }
 }

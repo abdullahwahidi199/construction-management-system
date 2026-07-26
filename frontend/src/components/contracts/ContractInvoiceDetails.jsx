@@ -6,6 +6,7 @@ import { useLanguage } from "../../hooks/useLanguage";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 import { useCalendar } from "../../hooks/useCalendar";
 import { resolveFileUrl } from "../../utils/fileUrls";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 const ACCEPTED_EXTENSIONS = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png"];
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
@@ -18,6 +19,7 @@ function isAcceptedFile(file) {
 export default function ContractInvoiceDetails({ id, onClose, currency }) {
   const { t } = useLanguage();
   const { formatDate } = useCalendar("invoices");
+  useBodyScrollLock(true);
   // Force refetch after successful upload
   const [refreshKey, setRefreshKey] = useState(0);
   const {
@@ -135,10 +137,11 @@ export default function ContractInvoiceDetails({ id, onClose, currency }) {
         bottom: 0,
         background: "rgba(0,0,0,0.5)",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "center",
         zIndex: 1000,
         padding: "1rem",
+        overflowY: "auto",
         backdropFilter: "blur(2px)",
       }}
       onClick={onClose}
@@ -150,7 +153,7 @@ export default function ContractInvoiceDetails({ id, onClose, currency }) {
           borderRadius: "12px",
           width: "100%",
           maxWidth: "720px",
-          maxHeight: "90vh",
+          maxHeight: "calc(100dvh - 2rem)",
           overflowY: "auto",
           padding: "1.5rem",
           boxShadow: "0 8px 24px var(--shadow, rgba(0,0,0,0.15))",
@@ -162,7 +165,8 @@ export default function ContractInvoiceDetails({ id, onClose, currency }) {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "flex-start",
+            gap: "1rem",
             marginBottom: "1.2rem",
           }}
         >
@@ -197,7 +201,7 @@ export default function ContractInvoiceDetails({ id, onClose, currency }) {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))",
             gap: "1rem",
             marginBottom: "1.5rem",
           }}
@@ -349,8 +353,10 @@ export default function ContractInvoiceDetails({ id, onClose, currency }) {
                 key={doc.id}
                 style={{
                   display: "flex",
-                  alignItems: "center",
+                  alignItems: "flex-start",
                   justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "0.5rem",
                   padding: "0.6rem 0.8rem",
                   background: "var(--bg)",
                   border: "1px solid var(--border)",
@@ -366,6 +372,7 @@ export default function ContractInvoiceDetails({ id, onClose, currency }) {
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
                     flex: 1,
+                    minWidth: 0,
                   }}
                 >
                   📄{" "}
@@ -385,6 +392,9 @@ export default function ContractInvoiceDetails({ id, onClose, currency }) {
                     padding: "0.2rem 0.5rem",
                     borderRadius: "4px",
                     border: "1px solid var(--border)",
+                    minHeight: "36px",
+                    display: "inline-flex",
+                    alignItems: "center",
                   }}
                 >
                   {t("ContractInvoiceDetails.viewDownload")}

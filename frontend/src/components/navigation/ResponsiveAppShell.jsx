@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { LogOut, Menu, MoreHorizontal, X } from "lucide-react";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 function cx(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -35,6 +36,8 @@ export default function ResponsiveAppShell({
       4: "grid-cols-4",
       5: "grid-cols-5",
     }[Math.min(bottomItemCount, 5)] || "grid-cols-5";
+
+  useBodyScrollLock(drawerOpen);
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -122,8 +125,10 @@ export default function ResponsiveAppShell({
       <aside
         id="mobile-app-drawer"
         className={cx(
-          "fixed inset-y-0 start-0 z-[110] flex w-[min(21rem,86vw)] flex-col border-e border-(--border) bg-(--bg) pt-[var(--safe-top)] shadow-2xl transition-transform duration-[250ms] md:hidden",
-          drawerOpen ? "translate-x-0" : "-translate-x-full rtl:translate-x-full",
+          "fixed inset-y-0 start-0 z-[110] w-[min(21rem,86vw)] flex-col overflow-x-hidden border-e border-(--border) bg-(--bg) pt-[var(--safe-top)] shadow-2xl transition-transform duration-[250ms] md:hidden",
+          drawerOpen
+            ? "flex translate-x-0"
+            : "hidden -translate-x-full rtl:translate-x-full",
         )}
         aria-hidden={!drawerOpen}
       >

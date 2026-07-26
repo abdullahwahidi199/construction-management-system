@@ -58,21 +58,31 @@ class BaseAuthenticationThrottle(BaseThrottle):
         identity = hashlib.sha256(f"{tenant}:{client_ip}".encode("utf-8")).hexdigest()
         return f"auth_throttle:{self.scope}:{identity}"
 
+    def get_cache_prefixes(self, request):
+        return [self.get_cache_prefix(request)]
+
     def get_block_key(self, request):
-        return f"{self.get_cache_prefix(request)}:blocked"
+        return f"{self.get_cache_prefixes(request)[0]}:blocked"
+
+    def get_retry_after(self, block_key):
+        retry_after = self.cache.ttl(block_key) if hasattr(self.cache, "ttl") else None
+        if retry_after is not None and retry_after <= 0:
+            retry_after = None
+        if retry_after is None:
+            retry_after = self.cache.get(block_key)
+        return retry_after
 
     def allow_request(self, request, view):
         self.request = request
         self.view = view
-        self.block_key = self.get_block_key(request)
-        retry_after = self.cache.ttl(self.block_key) if hasattr(self.cache, "ttl") else None
-        if retry_after is not None and retry_after <= 0:
-            retry_after = None
+        self.block_keys = [f"{prefix}:blocked" for prefix in self.get_cache_prefixes(request)]
 
-        if retry_after is None:
-            retry_after = self.cache.get(self.block_key)
-        if retry_after:
+        for block_key in self.block_keys:
+            retry_after = self.get_retry_after(block_key)
+            if not retry_after:
+                continue
             self.wait_duration = int(retry_after)
+            self.block_key = block_key
             self.log_rate_limited_attempt(request)
             return False
 
@@ -82,20 +92,24 @@ class BaseAuthenticationThrottle(BaseThrottle):
     def wait(self):
         return int(getattr(self, "wait_duration", getattr(settings, "LOGIN_BLOCK_TIME", 900)))
 
-    def block(self):
+    def block(self, prefix=None):
         block_time = int(getattr(settings, "LOGIN_BLOCK_TIME", 900))
-        self.cache.set(self.block_key, block_time, timeout=block_time)
+        block_key = f"{prefix}:blocked" if prefix else self.block_key
+        self.cache.set(block_key, block_time, timeout=block_time)
+        self.block_key = block_key
         self.wait_duration = block_time
 
     def clear(self, request):
-        prefix = self.get_cache_prefix(request)
-        self.cache.delete_many(
-            [
-                f"{prefix}:minute",
-                f"{prefix}:hour",
-                f"{prefix}:blocked",
-            ]
-        )
+        keys = []
+        for prefix in self.get_cache_prefixes(request):
+            keys.extend(
+                [
+                    f"{prefix}:minute",
+                    f"{prefix}:hour",
+                    f"{prefix}:blocked",
+                ]
+            )
+        self.cache.delete_many(keys)
 
     def _increment(self, key, timeout):
         if self.cache.add(key, 1, timeout=timeout):
@@ -123,17 +137,34 @@ class BaseAuthenticationThrottle(BaseThrottle):
 class LoginFailedRateThrottle(BaseAuthenticationThrottle):
     scope = "login_failed"
 
-    def record_failure(self, request):
-        self.block_key = self.get_block_key(request)
-        prefix = self.get_cache_prefix(request)
-        minute_count = self._increment(f"{prefix}:minute", timeout=60)
-        hour_count = self._increment(f"{prefix}:hour", timeout=3600)
+    def get_login_identifier(self, request):
+        data = getattr(request, "data", {}) if request.method in {"POST", "PUT", "PATCH"} else {}
+        if not isinstance(data, dict):
+            return ""
+        raw_identifier = data.get("username") or data.get("email") or ""
+        return str(raw_identifier).strip().casefold()
 
-        if (
-            minute_count >= int(getattr(settings, "LOGIN_RATE_LIMIT_PER_MINUTE", 5))
-            or hour_count >= int(getattr(settings, "LOGIN_RATE_LIMIT_PER_HOUR", 20))
-        ):
-            self.block()
+    def get_cache_prefixes(self, request):
+        prefixes = [self.get_cache_prefix(request)]
+        login_identifier = self.get_login_identifier(request)
+        if login_identifier:
+            tenant = get_tenant_identifier(request)
+            identity = hashlib.sha256(
+                f"{tenant}:login:{login_identifier}".encode("utf-8"),
+            ).hexdigest()
+            prefixes.append(f"auth_throttle:{self.scope}:account:{identity}")
+        return prefixes
+
+    def record_failure(self, request):
+        for prefix in self.get_cache_prefixes(request):
+            minute_count = self._increment(f"{prefix}:minute", timeout=60)
+            hour_count = self._increment(f"{prefix}:hour", timeout=3600)
+
+            if (
+                minute_count >= int(getattr(settings, "LOGIN_RATE_LIMIT_PER_MINUTE", 5))
+                or hour_count >= int(getattr(settings, "LOGIN_RATE_LIMIT_PER_HOUR", 20))
+            ):
+                self.block(prefix=prefix)
 
     def reset(self, request):
         self.clear(request)

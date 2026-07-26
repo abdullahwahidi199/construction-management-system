@@ -2,6 +2,7 @@ import React from "react";
 import { Loader2 } from "lucide-react";
 import Button from "./Button";
 import { useLanguage } from "../../hooks/useLanguage";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 export default function DeleteConfirmModal({
   open,
@@ -15,6 +16,8 @@ export default function DeleteConfirmModal({
 }) {
   const { t } = useLanguage();
   const visible = open ?? isOpen;
+  useBodyScrollLock(Boolean(visible));
+
   if (!visible) return null;
 
   return (

@@ -1,5 +1,6 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Printer, X } from "lucide-react";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 const EMPTY_VALUE = "-";
 
@@ -99,14 +100,7 @@ export default function PrintableReceiptModal({
   signatures = [],
   footer = "This is a system-generated receipt. Keep it with the payment records.",
 }) {
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, [isOpen]);
+  useBodyScrollLock(isOpen);
 
   const amountText = useMemo(
     () => formatMoney(amount, currency),

@@ -79,11 +79,11 @@ function DailyWorkersLayout() {
         className="border-b"
         style={{ borderColor: "var(--border)", backgroundColor: "var(--card)" }}
       >
-        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-2xl font-bold">
+        <div className="max-w-9xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+          <h1 className="break-words text-xl font-bold sm:text-2xl">
             {t("dailyWorkers.title", "Daily Workers Management")}
           </h1>
-          <p className="text-sm" style={{ color: "var(--muted)" }}>
+          <p className="break-words text-sm" style={{ color: "var(--muted)" }}>
             {t(
               "dailyWorkers.subtitle",
               "Manage site laborers, track daily attendance, and auto-generate payrolls",
@@ -97,14 +97,14 @@ function DailyWorkersLayout() {
         style={{ borderColor: "var(--border)", backgroundColor: "var(--card)" }}
       >
         <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-1 py-2">
+          <div className="grid grid-cols-1 gap-2 py-2 min-[360px]:grid-cols-2 md:flex md:flex-wrap md:gap-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all"
+                  className="inline-flex min-h-11 min-w-0 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all md:px-4"
                   style={{
                     backgroundColor:
                       activeTab === tab.id ? "var(--primary)" : "transparent",
@@ -120,7 +120,7 @@ function DailyWorkersLayout() {
         </div>
       </nav>
 
-      <main className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-9xl mx-auto px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
         {tabs.length === 0 && (
           <div
             className="rounded-lg border p-6 text-sm"

@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { X, Printer } from "lucide-react";
 import useFetch from "../../hooks/useFetch";
 import { useCalendar } from "../../hooks/useCalendar";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
   const printRef = useRef();
@@ -13,16 +14,7 @@ export default function PayrollPrintModal({ isOpen, onClose, payrollID }) {
     payrollID ? `/payrolls/${payrollID}/` : null,
   );
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
+  useBodyScrollLock(isOpen);
 
   if (!isOpen) return null;
 

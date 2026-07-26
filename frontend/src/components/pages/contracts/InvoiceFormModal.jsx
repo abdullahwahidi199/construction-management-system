@@ -6,6 +6,7 @@ import PermissionWrapper from "../../../auth/PermissionWrapper";
 import Button from "../../ui/Button";
 import { useLanguage } from "../../../hooks/useLanguage";
 import CalendarDatePicker from "../../common/CalendarDatePicker";
+import useBodyScrollLock from "../../../hooks/useBodyScrollLock";
 
 const INITIAL_STATE = {
   invoice_date: "",
@@ -23,6 +24,7 @@ export default function InvoiceFormModal({
   contractID,
 }) {
   const { t } = useLanguage();
+  useBodyScrollLock(true);
   const [formData, setFormData] = useState(INITIAL_STATE);
   const [formError, setFormError] = useState("");
   const { postData, loading: submitting, error: postError } = usePost();
@@ -87,7 +89,8 @@ export default function InvoiceFormModal({
     borderRadius: "6px",
     background: "var(--bg)",
     color: "var(--text)",
-    fontSize: "0.9rem",
+    fontSize: "1rem",
+    minHeight: "44px",
     outline: "none",
     transition: "border-color 0.2s",
   };
@@ -110,10 +113,11 @@ export default function InvoiceFormModal({
         bottom: 0,
         background: "rgba(0,0,0,0.5)",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "center",
         zIndex: 1000,
         padding: "1rem",
+        overflowY: "auto",
       }}
       onClick={onClose}
     >
@@ -124,7 +128,7 @@ export default function InvoiceFormModal({
           borderRadius: "10px",
           width: "100%",
           maxWidth: "650px",
-          maxHeight: "90vh",
+          maxHeight: "calc(100dvh - 2rem)",
           overflowY: "auto",
           padding: "1.5rem",
           boxShadow: "0 8px 24px var(--shadow, rgba(0,0,0,0.15))",
@@ -135,7 +139,8 @@ export default function InvoiceFormModal({
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "flex-start",
+            gap: "1rem",
             marginBottom: "1.2rem",
           }}
         >
@@ -188,7 +193,7 @@ export default function InvoiceFormModal({
           onSubmit={handleSubmit}
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))",
             gap: "1rem",
           }}
         >
@@ -275,6 +280,7 @@ export default function InvoiceFormModal({
               gridColumn: "1 / -1",
               display: "flex",
               justifyContent: "flex-end",
+              flexWrap: "wrap",
               gap: "0.75rem",
               marginTop: "0.5rem",
             }}
@@ -290,6 +296,8 @@ export default function InvoiceFormModal({
                 color: "var(--text)",
                 cursor: "pointer",
                 fontSize: "0.9rem",
+                minHeight: "44px",
+                flex: "0 1 10rem",
               }}
             >
               {t("InvoiceFormModal.cancel")}
@@ -326,6 +334,8 @@ export default function InvoiceFormModal({
                   opacity: submitting ? 0.7 : 1,
                   fontSize: "0.9rem",
                   fontWeight: "500",
+                  minHeight: "44px",
+                  flex: "0 1 10rem",
                 }}
               >
                 {submitting

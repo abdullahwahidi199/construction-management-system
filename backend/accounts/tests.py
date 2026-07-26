@@ -282,6 +282,34 @@ class LoginRateLimitingTests(APITestCase):
 
         self.assertEqual(self.post_login(self.admin.username, "wrong-password").status_code, 429)
 
+    def test_username_limit_blocks_even_when_production_proxy_ip_rotates(self):
+        for index in range(settings.LOGIN_RATE_LIMIT_PER_MINUTE):
+            response = self.post_login(
+                self.admin.username,
+                "wrong-password",
+                ip=f"198.51.100.{index + 1}",
+            )
+            self.assertEqual(response.status_code, 400, response.data)
+
+        limited = self.post_login(
+            self.admin.username,
+            "wrong-password",
+            ip="198.51.100.250",
+        )
+
+        self.assertEqual(limited.status_code, 429)
+        self.assertEqual(limited.data["code"], "rate_limited")
+
+    def test_ip_limit_still_blocks_distributed_usernames_from_one_client(self):
+        for index in range(settings.LOGIN_RATE_LIMIT_PER_MINUTE):
+            response = self.post_login(f"missing-{index}", "wrong-password")
+            self.assertEqual(response.status_code, 400, response.data)
+
+        limited = self.post_login("another-missing-user", "wrong-password")
+
+        self.assertEqual(limited.status_code, 429)
+        self.assertEqual(limited.data["code"], "rate_limited")
+
     def test_rate_limited_login_attempt_is_logged(self):
         for _ in range(settings.LOGIN_RATE_LIMIT_PER_MINUTE):
             self.post_login(self.admin.username, "wrong-password")

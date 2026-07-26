@@ -19,7 +19,7 @@ export default function ReportFilters({
   };
 
   const inputClass =
-    "h-9 rounded-md bg-bg px-3 text-sm text-text shadow-inner outline-none transition-colors focus:ring-2 focus:ring-[var(--primary)]/20";
+    "min-h-12 rounded-md bg-bg px-3 py-3 text-base text-text shadow-inner outline-none transition-colors focus:ring-2 focus:ring-[var(--primary)]/20 sm:min-h-0 sm:py-2 sm:text-sm";
 
   return (
     <form
@@ -36,7 +36,7 @@ export default function ReportFilters({
         </h2>
       </div>
 
-      <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(180px,1fr))]">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,180px),1fr))] gap-4">
         {filters.map((field) => (
           <div className="flex flex-col gap-1.5" key={field.name}>
             <label className="text-xs font-medium text-muted">
@@ -79,10 +79,10 @@ export default function ReportFilters({
         ))}
       </div>
 
-      <div className="mt-4 flex gap-2 pt-1">
+      <div className="mt-4 flex flex-col gap-2 pt-1 sm:flex-row">
         <button
           type="submit"
-          className="inline-flex h-9 items-center gap-2 rounded-md bg-[var(--primary)] px-4 text-sm font-medium text-white shadow-sm shadow-black/10 transition-colors hover:opacity-90"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[var(--primary)] px-4 text-sm font-medium text-white shadow-sm shadow-black/10 transition-colors hover:opacity-90 sm:min-h-0 sm:h-9"
         >
           <Search size={15} />
           {translateOrFallback(t, "reports.actions.apply", "Apply")}
@@ -90,7 +90,7 @@ export default function ReportFilters({
         <button
           type="button"
           onClick={onReset}
-          className="inline-flex h-9 items-center gap-2 rounded-md bg-bg px-4 text-sm font-medium text-text transition-colors hover:bg-hover"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-bg px-4 text-sm font-medium text-text transition-colors hover:bg-hover sm:min-h-0 sm:h-9"
         >
           <RotateCcw size={15} />
           {translateOrFallback(t, "reports.actions.reset", "Reset")}

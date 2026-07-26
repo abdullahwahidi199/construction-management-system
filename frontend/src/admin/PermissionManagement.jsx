@@ -312,7 +312,7 @@ export default function PermissionManagement() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-2">
               <SkeletonLine className="w-56" />
-              <SkeletonLine className="w-80 h-3" />
+              <SkeletonLine className="h-3 w-full max-w-[20rem]" />
             </div>
             <SkeletonLine className="h-9 w-28" />
           </div>
@@ -356,12 +356,12 @@ export default function PermissionManagement() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 max-sm:w-full">
           <button
             type="button"
             onClick={() => setAllModulesCollapsed(true)}
             className={cn(
-              "inline-flex items-center justify-center rounded-lg border border-(--border) bg-(--card) px-3 py-2 text-sm",
+              "inline-flex min-h-11 items-center justify-center rounded-lg border border-(--border) bg-(--card) px-3 py-2 text-sm max-sm:flex-1",
               "hover:bg-black/5 active:bg-black/10",
               "focus:outline-none focus:ring-2 focus:ring-black/15",
             )}
@@ -372,7 +372,7 @@ export default function PermissionManagement() {
             type="button"
             onClick={() => setAllModulesCollapsed(false)}
             className={cn(
-              "inline-flex items-center justify-center rounded-lg border border-(--border) bg-(--card) px-3 py-2 text-sm",
+              "inline-flex min-h-11 items-center justify-center rounded-lg border border-(--border) bg-(--card) px-3 py-2 text-sm max-sm:flex-1",
               "hover:bg-black/5 active:bg-black/10",
               "focus:outline-none focus:ring-2 focus:ring-black/15",
             )}
@@ -383,7 +383,7 @@ export default function PermissionManagement() {
             type="button"
             onClick={load}
             className={cn(
-              "inline-flex items-center justify-center rounded-lg border border-(--border) bg-(--card) px-3 py-2 text-sm",
+              "inline-flex min-h-11 items-center justify-center rounded-lg border border-(--border) bg-(--card) px-3 py-2 text-sm max-sm:flex-1",
               "hover:bg-black/5 active:bg-black/10",
               "focus:outline-none focus:ring-2 focus:ring-black/15",
             )}

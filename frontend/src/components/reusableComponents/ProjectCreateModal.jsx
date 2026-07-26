@@ -138,22 +138,22 @@ export default function ProjectCreateModal({
       >
         {/* Header */}
         <div className="mobile-modal-header px-7 py-5 border-b border-[var(--border)] bg-[var(--card)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center">
+          <div className="flex min-w-0 items-start justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10">
                 <Building2
                   className="w-5 h-5 text-[var(--primary)]"
                   strokeWidth={2}
                 />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h2
                   id="create-project-title"
-                  className="text-lg font-semibold text-[var(--text)]"
+                  className="break-words text-lg font-semibold leading-6 text-[var(--text)]"
                 >
                   {t("ProjectCreateModal.title")}
                 </h2>
-                <p className="text-xs text-[var(--muted)] mt-0.5">
+                <p className="mt-0.5 break-words text-xs text-[var(--muted)]">
                   {t("ProjectCreateModal.subtitle")}
                 </p>
               </div>
@@ -366,10 +366,10 @@ export default function ProjectCreateModal({
 
         {/* Footer */}
         <div className="mobile-modal-footer px-7 py-4 border-t border-[var(--border)] bg-[var(--card)] flex items-center justify-between gap-3">
-          <p className="text-xs text-[var(--muted)]">
+          <p className="min-w-0 break-words text-xs text-[var(--muted)] max-sm:text-center">
             <span className="text-[var(--danger)]">*</span> Required fields
           </p>
-          <div className="flex items-center gap-2.5 max-sm:w-full max-sm:flex-col-reverse">
+          <div className="flex shrink-0 items-center gap-2.5 max-sm:w-full max-sm:flex-col-reverse">
             <button
               type="button"
               onClick={handleClose}

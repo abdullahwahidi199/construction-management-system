@@ -142,7 +142,7 @@ export default function PayrollForm({
   };
 
   const inputClass =
-    "w-full px-3 py-2 rounded-lg border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+    "min-h-12 w-full rounded-lg border px-3 py-3 text-base transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)] sm:min-h-0 sm:py-2 sm:text-sm";
   const labelClass = "block text-sm font-medium mb-1";
 
   return (
@@ -156,7 +156,7 @@ export default function PayrollForm({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
             {t("PayrollForm.employee")} *
@@ -202,7 +202,7 @@ export default function PayrollForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
             {t("PayrollForm.periodStart")} *
@@ -241,7 +241,7 @@ export default function PayrollForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
             {t("PayrollForm.overtimeHours")}
@@ -298,7 +298,7 @@ export default function PayrollForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
             {t("PayrollForm.allowances")}
@@ -355,7 +355,7 @@ export default function PayrollForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>
             {t("PayrollForm.currency")}
@@ -375,7 +375,7 @@ export default function PayrollForm({
             <option value="USD">USD</option>
           </select>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className={labelClass} style={{ color: "var(--text)" }}>
               {t("PayrollForm.paymentMethod")}
@@ -442,13 +442,13 @@ export default function PayrollForm({
       </div>
 
       <div
-        className="flex gap-3 justify-end pt-4 border-t"
+        className="flex flex-col-reverse gap-3 border-t pt-4 sm:flex-row sm:justify-end"
         style={{ borderColor: "var(--border)" }}
       >
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="min-h-12 rounded-lg px-4 py-2 text-sm font-medium transition-colors sm:min-h-0"
           style={{ backgroundColor: "var(--hover)", color: "var(--text)" }}
         >
           {t("PayrollForm.buttons.cancel")}
@@ -471,7 +471,7 @@ export default function PayrollForm({
           <button
             type="submit"
             disabled={loading || saving}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors disabled:opacity-50"
+            className="min-h-12 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:min-h-0"
             style={{ backgroundColor: "var(--primary)" }}
           >
             {loading || saving

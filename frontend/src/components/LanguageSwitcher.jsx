@@ -12,10 +12,10 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-(--border) bg-(--card) px-2 py-1">
+    <div className="flex max-w-full flex-wrap items-center gap-1 rounded-lg border border-(--border) bg-(--card) px-1.5 py-1 sm:gap-2 sm:px-2">
       <button
         onClick={() => changeLang("en")}
-        className={`px-2 py-1 text-sm rounded-md transition ${
+        className={`rounded-md px-2 py-1 text-sm transition ${
           lang === "en"
             ? "bg-(--primary) text-white"
             : "text-(--text) hover:bg-(--hover)"
@@ -26,7 +26,7 @@ export default function LanguageSwitcher() {
 
       <button
         onClick={() => changeLang("dr")}
-        className={`px-2 py-1 text-sm rounded-md transition ${
+        className={`rounded-md px-2 py-1 text-sm transition ${
           lang === "dr"
             ? "bg-(--primary) text-white"
             : "text-(--text) hover:bg-(--hover)"
@@ -37,7 +37,7 @@ export default function LanguageSwitcher() {
 
       <button
         onClick={() => changeLang("ps")}
-        className={`px-2 py-1 text-sm rounded-md transition ${
+        className={`rounded-md px-2 py-1 text-sm transition ${
           lang === "ps"
             ? "bg-(--primary) text-white"
             : "text-(--text) hover:bg-(--hover)"

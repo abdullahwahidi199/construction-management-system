@@ -71,7 +71,7 @@ export default function CalendarDatePicker({
           required={required}
           onChange={(event) => onChange?.(event.target.value)}
           {...props}
-          className={`w-full px-4 py-2.5 rounded-lg border bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 ${error ? "border-red-500" : "border-[var(--border)]"} ${className}`}
+          className={`min-h-12 w-full rounded-lg border bg-[var(--bg)] px-4 py-3 text-base text-[var(--text)] focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 sm:min-h-0 sm:py-2.5 sm:text-sm ${error ? "border-red-500" : "border-[var(--border)]"} ${className}`}
         />
         {error && <p className="mt-1 text-xs text-[var(--danger)]">{error}</p>}
       </div>
@@ -122,24 +122,24 @@ export default function CalendarDatePicker({
           onChange={(event) => commitManual(event.target.value)}
           placeholder={placeholder}
           {...props}
-          className={`w-full px-4 py-2.5 rounded-lg border bg-[var(--bg)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 ${error ? "border-red-500" : "border-[var(--border)]"} ${className}`}
+          className={`min-h-12 w-full rounded-lg border bg-[var(--bg)] px-4 py-3 text-base text-[var(--text)] placeholder:text-[var(--muted)] focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 sm:min-h-0 sm:py-2.5 sm:text-sm ${error ? "border-red-500" : "border-[var(--border)]"} ${className}`}
         />
         {value && (
-          <button type="button" title="Clear" onClick={() => { setText(""); onChange?.(""); }} className="h-10 w-10 rounded-lg border border-[var(--border)] text-[var(--muted)] hover:bg-[var(--hover)]">
+          <button type="button" title="Clear" onClick={() => { setText(""); onChange?.(""); }} className="h-12 w-12 shrink-0 rounded-lg border border-[var(--border)] text-[var(--muted)] hover:bg-[var(--hover)] sm:h-10 sm:w-10">
             <X className="mx-auto h-4 w-4" />
           </button>
         )}
       </div>
       {open && (
-        <div className="absolute z-50 mt-2 w-80 rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3 shadow-xl">
+        <div className="absolute left-0 right-0 z-50 mt-2 max-w-[calc(100vw-2rem)] rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3 shadow-xl sm:right-auto sm:w-80">
           <div className="mb-3 flex items-center justify-between">
-            <button type="button" title="Previous month" onClick={() => changeMonth(-1)} className="h-8 w-8 rounded-lg hover:bg-[var(--hover)]">
+            <button type="button" title="Previous month" onClick={() => changeMonth(-1)} className="h-10 w-10 rounded-lg hover:bg-[var(--hover)] sm:h-8 sm:w-8">
               <ChevronLeft className="mx-auto h-4 w-4" />
             </button>
             <div className="text-sm font-semibold text-[var(--text)]">
               {AFGHAN_MONTH_NAMES.en[visibleMonth.month - 1]} {visibleMonth.year}
             </div>
-            <button type="button" title="Next month" onClick={() => changeMonth(1)} className="h-8 w-8 rounded-lg hover:bg-[var(--hover)]">
+            <button type="button" title="Next month" onClick={() => changeMonth(1)} className="h-10 w-10 rounded-lg hover:bg-[var(--hover)] sm:h-8 sm:w-8">
               <ChevronRight className="mx-auto h-4 w-4" />
             </button>
           </div>
@@ -147,7 +147,7 @@ export default function CalendarDatePicker({
             {WEEK_DAYS.map((day) => <div key={day} className="py-1">{day}</div>)}
             {blanks.map((_, index) => <div key={`blank-${index}`} />)}
             {days.map((day) => (
-              <button key={day} type="button" onClick={() => selectDay(day)} className="h-8 rounded-md text-sm text-[var(--text)] hover:bg-[var(--primary)] hover:text-white">
+              <button key={day} type="button" onClick={() => selectDay(day)} className="min-h-10 rounded-md text-sm text-[var(--text)] hover:bg-[var(--primary)] hover:text-white sm:min-h-8">
                 {day}
               </button>
             ))}

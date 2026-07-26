@@ -1,22 +1,13 @@
 import { X, Printer } from "lucide-react";
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { useCalendar } from "../../hooks/useCalendar";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
   const printRef = useRef();
   const { formatDate, formatDateTime } = useCalendar("expenses");
 
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
+  useBodyScrollLock(isOpen);
 
   if (!isOpen || !expense) return null;
 
