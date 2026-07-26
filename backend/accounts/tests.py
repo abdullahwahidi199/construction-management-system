@@ -228,6 +228,7 @@ class LoginRateLimitingTests(APITestCase):
         cache.clear()
         self.password = "StrongPass123!"
         self.admin = create_admin(username="rate-admin", password=self.password)
+        self.other_user = create_user(username="rate-other", password=self.password)
         self.login_url = "/api/auth/login/"
         self.ip = "203.0.113.10"
 
@@ -263,7 +264,7 @@ class LoginRateLimitingTests(APITestCase):
         self.assertEqual(limited.data["retry_after"], settings.LOGIN_BLOCK_TIME)
         self.assertEqual(limited["Retry-After"], str(settings.LOGIN_BLOCK_TIME))
 
-    def test_successful_login_resets_failed_attempt_counter_for_ip(self):
+    def test_successful_login_resets_failed_attempt_counter_for_account(self):
         for _ in range(settings.LOGIN_RATE_LIMIT_PER_MINUTE - 1):
             self.assertEqual(self.post_login(self.admin.username, "wrong-password").status_code, 400)
 
@@ -273,6 +274,18 @@ class LoginRateLimitingTests(APITestCase):
             self.assertEqual(self.post_login(self.admin.username, "wrong-password").status_code, 400)
 
         self.assertEqual(self.post_login(self.admin.username, "wrong-password").status_code, 429)
+
+    def test_username_limit_does_not_block_other_users_on_same_ip(self):
+        for _ in range(settings.LOGIN_RATE_LIMIT_PER_MINUTE):
+            response = self.post_login(self.admin.username, "wrong-password")
+            self.assertEqual(response.status_code, 400, response.data)
+
+        blocked_account = self.post_login(self.admin.username, "wrong-password")
+        other_user_login = self.post_login(self.other_user.username, self.password)
+
+        self.assertEqual(blocked_account.status_code, 429)
+        self.assertEqual(other_user_login.status_code, 200, other_user_login.data)
+        self.assertIn("token", other_user_login.data)
 
     @override_settings(LOGIN_RATE_LIMIT_PER_MINUTE=100, LOGIN_RATE_LIMIT_PER_HOUR=20)
     def test_exceeding_hourly_limit_blocks_login_attempts(self):
@@ -300,12 +313,12 @@ class LoginRateLimitingTests(APITestCase):
         self.assertEqual(limited.status_code, 429)
         self.assertEqual(limited.data["code"], "rate_limited")
 
-    def test_ip_limit_still_blocks_distributed_usernames_from_one_client(self):
+    def test_missing_username_limit_still_blocks_malformed_attempts_from_one_client(self):
         for index in range(settings.LOGIN_RATE_LIMIT_PER_MINUTE):
-            response = self.post_login(f"missing-{index}", "wrong-password")
+            response = self.post_login("", "wrong-password")
             self.assertEqual(response.status_code, 400, response.data)
 
-        limited = self.post_login("another-missing-user", "wrong-password")
+        limited = self.post_login("", "wrong-password")
 
         self.assertEqual(limited.status_code, 429)
         self.assertEqual(limited.data["code"], "rate_limited")

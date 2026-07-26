@@ -145,15 +145,15 @@ class LoginFailedRateThrottle(BaseAuthenticationThrottle):
         return str(raw_identifier).strip().casefold()
 
     def get_cache_prefixes(self, request):
-        prefixes = [self.get_cache_prefix(request)]
         login_identifier = self.get_login_identifier(request)
         if login_identifier:
             tenant = get_tenant_identifier(request)
             identity = hashlib.sha256(
                 f"{tenant}:login:{login_identifier}".encode("utf-8"),
             ).hexdigest()
-            prefixes.append(f"auth_throttle:{self.scope}:account:{identity}")
-        return prefixes
+            return [f"auth_throttle:{self.scope}:account:{identity}"]
+
+        return [self.get_cache_prefix(request)]
 
     def record_failure(self, request):
         for prefix in self.get_cache_prefixes(request):
