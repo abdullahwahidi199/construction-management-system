@@ -83,6 +83,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     filterset_fields = {
         "project": ["exact"],
+        "expense_scope": ["exact"],
         "expense_type": ["exact"],
         "expense_date": ["gte", "lte", "exact"],
         "serial_number": ["exact"],
@@ -93,6 +94,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         "description",
         "remarks",
         "paid_to",
+        "project__name",
     ]
 
     ordering_fields = [
@@ -112,6 +114,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         calendar_type = get_module_calendar("expenses", request=self.request)
         project = self.request.query_params.get("project")
+        expense_scope = self.request.query_params.get("expense_scope")
         expense_type = self.request.query_params.get("expense_type")
         expense_exact = self.request.query_params.get("expense_date")
         expense_gte = self.request.query_params.get("expense_date__gte")
@@ -120,6 +123,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
         if project:
             queryset = queryset.filter(project=project)
+        if expense_scope:
+            queryset = queryset.filter(expense_scope=expense_scope)
         if expense_type:
             queryset = queryset.filter(expense_type=expense_type)
         if serial_number:
@@ -221,6 +226,18 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         afn_total = financial_qs.aggregate(
             total=Sum("amount_afn")
         )["total"] or 0
+        project_totals = financial_qs.filter(
+            expense_scope=Expense.ExpenseScope.PROJECT,
+        ).aggregate(
+            usd=Sum("amount_usd"),
+            afn=Sum("amount_afn"),
+        )
+        office_totals = financial_qs.filter(
+            expense_scope=Expense.ExpenseScope.OFFICE,
+        ).aggregate(
+            usd=Sum("amount_usd"),
+            afn=Sum("amount_afn"),
+        )
 
         # -------- PAGINATION --------
         page = self.paginate_queryset(base_qs)
@@ -232,6 +249,14 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 "totals": {
                     "usd": usd_total,
                     "afn": afn_total,
+                    "project": {
+                        "usd": project_totals["usd"] or 0,
+                        "afn": project_totals["afn"] or 0,
+                    },
+                    "office": {
+                        "usd": office_totals["usd"] or 0,
+                        "afn": office_totals["afn"] or 0,
+                    },
                 },
                 "approval": approval_summary(base_qs),
             })
@@ -242,6 +267,14 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             "totals": {
                 "usd": usd_total,
                 "afn": afn_total,
+                "project": {
+                    "usd": project_totals["usd"] or 0,
+                    "afn": project_totals["afn"] or 0,
+                },
+                "office": {
+                    "usd": office_totals["usd"] or 0,
+                    "afn": office_totals["afn"] or 0,
+                },
             },
             "approval": approval_summary(base_qs),
         })
@@ -313,6 +346,7 @@ class ExpensePDFExportView(APIView):
 
         search = self.request.GET.get("search")
         project = self.request.GET.get("project")
+        expense_scope = self.request.GET.get("expense_scope")
         expense_type = self.request.GET.get("expense_type")
         date_from = self.request.GET.get("expense_date__gte")
         date_to = self.request.GET.get("expense_date__lte")
@@ -330,6 +364,9 @@ class ExpensePDFExportView(APIView):
 
         if project:
             qs = qs.filter(project_id=project)
+
+        if expense_scope:
+            qs = qs.filter(expense_scope=expense_scope)
 
         if expense_type:
             qs = qs.filter(
@@ -412,6 +449,7 @@ class ExpensePDFExportView(APIView):
 
         search = request.GET.get("search")
         project_id = request.GET.get("project")
+        expense_scope = request.GET.get("expense_scope")
         expense_type = request.GET.get("expense_type")
         date_from = request.GET.get("expense_date__gte")
         date_to = request.GET.get("expense_date__lte")
@@ -479,6 +517,7 @@ class ExpensePDFExportView(APIView):
 
         filter_data = [
             ["Project", project_name],
+            ["Expense Scope", expense_scope or "All"],
             ["Expense Type", expense_type or "All"],
             ["Search", search or "None"],
             ["Date From", date_from or "Any"],
@@ -558,13 +597,7 @@ class ExpensePDFExportView(APIView):
                     normal_style,
                 ),
                 Paragraph(
-                    rtl(
-                        getattr(
-                            expense.project,
-                            "name",
-                            "",
-                        )
-                    ),
+                    rtl(expense.project_label),
                     normal_style,
                 ),
                 Paragraph(

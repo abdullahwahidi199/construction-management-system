@@ -35,7 +35,9 @@ class ProjectSummaryReport(BaseReport):
         qs = Project.objects.prefetch_related(
             Prefetch(
                 "expenses",
-                queryset=Expense.objects.approved(),
+                queryset=Expense.objects.approved().filter(
+                    expense_scope=Expense.ExpenseScope.PROJECT,
+                ),
                 to_attr="approved_expenses",
             ),
             "subcontractor_contracts__payments",

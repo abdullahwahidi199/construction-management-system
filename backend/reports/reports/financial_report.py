@@ -54,10 +54,13 @@ class FinancialOverviewReport(BaseReport):
     def _expense_queryset(self):
         qs = Expense.objects.approved().select_related("project")
         project_id = self.filters.get("project_id")
+        expense_scope = self.filters.get("expense_scope")
         start, end = self.get_date_range()
 
         if project_id:
             qs = qs.filter(project_id=project_id)
+        if expense_scope:
+            qs = qs.filter(expense_scope=expense_scope)
         if start:
             qs = qs.filter(expense_date__gte=start)
         if end:
@@ -270,6 +273,8 @@ class FinancialOverviewReport(BaseReport):
         }
 
         for expense in expenses:
+            if expense.expense_scope != Expense.ExpenseScope.PROJECT:
+                continue
             row = by_project.get(expense.project_id)
             if not row:
                 continue
@@ -322,6 +327,20 @@ class FinancialOverviewReport(BaseReport):
         contracts = list(self._contract_queryset())
 
         expense_totals = self._expense_totals(expenses)
+        project_expenses = self._expense_totals(
+            [
+                expense
+                for expense in expenses
+                if expense.expense_scope == Expense.ExpenseScope.PROJECT
+            ]
+        )
+        office_expenses = self._expense_totals(
+            [
+                expense
+                for expense in expenses
+                if expense.expense_scope == Expense.ExpenseScope.OFFICE
+            ]
+        )
         employee_payroll = self._payroll_totals(
             employee_payrolls,
             gross_field="gross_pay",
@@ -393,6 +412,10 @@ class FinancialOverviewReport(BaseReport):
             "expense_records": expense_totals["count"],
             "expenses_usd": expense_totals["total_usd"],
             "expenses_afn": expense_totals["total_afn"],
+            "project_expenses_usd": project_expenses["total_usd"],
+            "project_expenses_afn": project_expenses["total_afn"],
+            "office_expenses_usd": office_expenses["total_usd"],
+            "office_expenses_afn": office_expenses["total_afn"],
             "employee_payroll_records": employee_payroll["count"],
             "daily_worker_payroll_records": worker_payroll["count"],
             "payroll_net_usd": employee_payroll["net"]["USD"] + worker_payroll["net"]["USD"],
@@ -421,6 +444,8 @@ class FinancialOverviewReport(BaseReport):
                 **expense_totals,
                 "total_afn": expense_totals["total_afn"],
                 "total_usd": expense_totals["total_usd"],
+                "project": project_expenses,
+                "office": office_expenses,
             },
             "payroll": {
                 "count": employee_payroll["count"] + worker_payroll["count"],

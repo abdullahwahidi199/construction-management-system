@@ -303,6 +303,15 @@ class ReportEndpointTests(APITestCase):
             amount_usd=Decimal("50.00"),
             approval_status=Expense.ApprovalStatus.APPROVED,
         )
+        Expense.objects.create(
+            expense_scope=Expense.ExpenseScope.OFFICE,
+            project=None,
+            expense_date=date(2026, 2, 1),
+            description="Office rent",
+            expense_type="office_rent",
+            amount_usd=Decimal("30.00"),
+            approval_status=Expense.ApprovalStatus.APPROVED,
+        )
         subcontractor = Subcontractor.objects.create(
             name="Report Sub",
             specialization=SpecializationChoices.CONCRETE,
@@ -351,3 +360,34 @@ class ReportEndpointTests(APITestCase):
         response = self.client.get("/api/reports/expenses/?export=pdf&status=pending")
 
         self.assertEqual(response.status_code, 403)
+
+    def test_expense_report_splits_project_and_office_totals_and_filters_scope(self):
+        all_expenses = self.client.get("/api/reports/expenses/")
+        office_expenses = self.client.get("/api/reports/expenses/?expense_scope=office")
+        project_report = self.client.get("/api/reports/projects/")
+        financial = self.client.get("/api/reports/financial/")
+
+        self.assertEqual(all_expenses.status_code, 200, all_expenses.data)
+        self.assertEqual(
+            all_expenses.data["summary"]["total_project_expenses_usd"],
+            Decimal("50"),
+        )
+        self.assertEqual(
+            all_expenses.data["summary"]["total_office_expenses_usd"],
+            Decimal("30"),
+        )
+        self.assertEqual(
+            all_expenses.data["summary"]["overall_total_expenses_usd"],
+            Decimal("80"),
+        )
+        self.assertEqual(office_expenses.data["summary"]["total_records"], 1)
+        self.assertEqual(office_expenses.data["preview"][0]["project__name"], "Office")
+        self.assertEqual(office_expenses.data["rows"][0]["project"], "Office")
+        self.assertEqual(
+            project_report.data["summary"]["total_expenses_usd"],
+            Decimal("50.00"),
+        )
+        self.assertEqual(
+            financial.data["summary"]["office_expenses_usd"],
+            Decimal("30.00"),
+        )

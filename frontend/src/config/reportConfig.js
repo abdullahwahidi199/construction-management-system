@@ -59,11 +59,21 @@ export const REPORTS = {
     filters: [
       { name: "project_id", label: "Project ID", type: "number" },
       {
-        name: "expense_type",
+        name: "expense_scope",
         label: "Expense Type",
         type: "select",
         options: [
-          { value: "", label: "All Types" },
+          { value: "", label: "All Expenses" },
+          { value: "project", label: "Project Expenses" },
+          { value: "office", label: "Office Expenses" },
+        ],
+      },
+      {
+        name: "expense_type",
+        label: "Category",
+        type: "select",
+        options: [
+          { value: "", label: "All Categories" },
           { value: "general", label: "General" },
           { value: "material", label: "Material" },
           { value: "construction", label: "Construction" },
@@ -72,6 +82,18 @@ export const REPORTS = {
           { value: "contract_payment", label: "Contract Payment" },
           { value: "equipment", label: "Equipment" },
           { value: "utility", label: "Utility" },
+          { value: "office_rent", label: "Office Rent" },
+          { value: "utilities", label: "Utilities" },
+          { value: "internet", label: "Internet" },
+          { value: "office_supplies", label: "Office Supplies" },
+          { value: "staff_meals", label: "Staff Meals" },
+          { value: "transportation", label: "Transportation" },
+          { value: "fuel", label: "Fuel" },
+          { value: "cleaning", label: "Cleaning" },
+          { value: "maintenance", label: "Maintenance" },
+          { value: "software_subscriptions", label: "Software & Subscriptions" },
+          { value: "salaries", label: "Salaries" },
+          { value: "miscellaneous", label: "Miscellaneous" },
           { value: "other", label: "Other" },
         ],
       },
@@ -92,6 +114,7 @@ export const REPORTS = {
     columns: [
       { key: "serial_number", label: "S/N" },
       { key: "project_id", label: "Project ID", type: "number" },
+      { key: "expense_scope", label: "Scope", type: "badge" },
       { key: "expense_date", label: "Date", type: "date" },
       { key: "expense_type", label: "Type", type: "badge" },
       { key: "approval_status", label: "Approval", type: "badge" },
@@ -325,6 +348,16 @@ export const REPORTS = {
     description: "Executive view of budgets, costs, payroll, contracts, and project exposure",
     filters: [
       { name: "project_id", label: "Project ID", type: "number" },
+      {
+        name: "expense_scope",
+        label: "Expenses",
+        type: "select",
+        options: [
+          { value: "", label: "All Expenses" },
+          { value: "project", label: "Project Expenses" },
+          { value: "office", label: "Office Expenses" },
+        ],
+      },
       { name: "start_date", label: "Start Date", type: "date" },
       { name: "end_date", label: "End Date", type: "date" },
     ],

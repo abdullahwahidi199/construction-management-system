@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Save, DollarSign, User, Calendar } from "lucide-react";
+import { X, Save, DollarSign, User, Calendar, Building2 } from "lucide-react";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import Button from "../../components/ui/Button";
 import { useLanguage } from "../../hooks/useLanguage";
@@ -8,7 +8,41 @@ import CalendarDatePicker from "../../components/common/CalendarDatePicker";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
-export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
+const PROJECT_EXPENSE_CATEGORIES = [
+  ["general", "general"],
+  ["construction", "construction"],
+  ["material", "material"],
+  ["staff_salary", "staffSalary"],
+  ["daily_wage", "dailyWage"],
+  ["equipment", "equipment"],
+  ["utility", "utility"],
+  ["contract_payment", "contractPayment"],
+  ["other", "other"],
+];
+
+const OFFICE_EXPENSE_CATEGORIES = [
+  ["office_rent", "officeRent"],
+  ["utilities", "utilities"],
+  ["internet", "internet"],
+  ["office_supplies", "officeSupplies"],
+  ["staff_meals", "staffMeals"],
+  ["transportation", "transportation"],
+  ["fuel", "fuel"],
+  ["cleaning", "cleaning"],
+  ["maintenance", "maintenance"],
+  ["equipment", "equipment"],
+  ["software_subscriptions", "softwareSubscriptions"],
+  ["salaries", "salaries"],
+  ["miscellaneous", "miscellaneous"],
+];
+
+export default function ExpenseEdit({
+  expense,
+  isOpen,
+  onClose,
+  onSave,
+  projects = [],
+}) {
   const { t, lang } = useLanguage();
   const isRTL = RTL_LANGS.includes(lang);
 
@@ -19,7 +53,9 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
     amount_afn: "",
     exchange_rate: "",
     paid_to: "",
+    expense_scope: "project",
     expense_type: "general",
+    project: "",
     remarks: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,7 +71,9 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
         amount_afn: expense.amount_afn || "0.00",
         exchange_rate: expense.exchange_rate || "68.20",
         paid_to: expense.paid_to || "",
+        expense_scope: expense.expense_scope || "project",
         expense_type: expense.expense_type || "general",
+        project: expense.project || "",
         remarks: expense.remarks || "",
       });
       setErrors({});
@@ -43,17 +81,26 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
   }, [expense]);
 
   if (!isOpen || !expense) return null;
+  const projectLabel =
+    formData.expense_scope === "office" ? "Office" : expense.project_name || "-";
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
+      ...(field === "expense_scope" && value === "office"
+        ? { project: "", expense_type: "office_rent" }
+        : {}),
+      ...(field === "expense_scope" && value === "project"
+        ? { expense_type: "general" }
+        : {}),
     }));
     // Clear error for this field
     if (errors[field]) {
       setErrors((prev) => ({
         ...prev,
         [field]: null,
+        ...(field === "expense_scope" ? { project: null } : {}),
       }));
     }
   };
@@ -69,6 +116,9 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
     }
     if (!formData.amount_usd && !formData.amount_afn) {
       newErrors.amount = t("ExpenseEdit.amountRequired");
+    }
+    if (formData.expense_scope === "project" && !formData.project) {
+      newErrors.project = t("ExpenseEdit.projectRequired");
     }
 
     setErrors(newErrors);
@@ -94,6 +144,7 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
       const updatedExpense = {
         ...expense,
         ...formData,
+        project: formData.expense_scope === "office" ? null : formData.project,
         amount_usd: usd.toFixed(2),
         amount_afn: afn.toFixed(2),
         exchange_rate: rate.toFixed(4),
@@ -133,7 +184,7 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
                 {t("ExpenseEdit.title")}
               </h2>
               <p className="text-sm text-[var(--muted)] mt-0.5">
-                #{expense.serial_number} • {expense.project_name}
+                #{expense.serial_number} • {projectLabel}
               </p>
             </div>
             <button
@@ -276,27 +327,72 @@ export default function ExpenseEdit({ expense, isOpen, onClose, onSave }) {
               </div>
             </div>
 
-            {/* Expense Type */}
+            {/* Expense Scope */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
                 {t("ExpenseEdit.expenseType")}
+              </label>
+              <div className="relative">
+                <Building2 className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
+                <select
+                  value={formData.expense_scope}
+                  onChange={(e) => handleChange("expense_scope", e.target.value)}
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] ps-10 pe-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors"
+                >
+                  <option value="project">{t("ExpenseEdit.projectExpense")}</option>
+                  <option value="office">{t("ExpenseEdit.officeExpense")}</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                {t("ExpenseEdit.category")}
               </label>
               <select
                 value={formData.expense_type}
                 onChange={(e) => handleChange("expense_type", e.target.value)}
                 className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors"
               >
-                <option value="general">{t("ExpenseEdit.general")}</option>
-                <option value="material">{t("ExpenseEdit.material")}</option>
-                <option value="daily_wage">{t("ExpenseEdit.dailyWage")}</option>
-                <option value="equipment">{t("ExpenseEdit.equipment")}</option>
-                <option value="utility">{t("ExpenseEdit.utility")}</option>
-                <option value="contract_payment">
-                  {t("ExpenseEdit.contractPayment")}
-                </option>
-                <option value="other">{t("ExpenseEdit.other")}</option>
+                {(formData.expense_scope === "office"
+                  ? OFFICE_EXPENSE_CATEGORIES
+                  : PROJECT_EXPENSE_CATEGORIES
+                ).map(([value, labelKey]) => (
+                  <option key={value} value={value}>
+                    {t(`ExpenseEdit.${labelKey}`)}
+                  </option>
+                ))}
               </select>
             </div>
+
+            {formData.expense_scope === "project" && (
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                  {t("ExpenseEdit.project")}{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.project}
+                  onChange={(e) => handleChange("project", e.target.value)}
+                  className={`w-full rounded-xl border ${
+                    errors.project ? "border-red-500" : "border-[var(--border)]"
+                  } bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
+                >
+                  <option value="">{t("ExpenseEdit.selectProject")}</option>
+                  {projects.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.project && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.project}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Remarks */}
             <div>

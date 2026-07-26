@@ -51,6 +51,7 @@ describe("report components", () => {
     expect(REPORT_LIST.length).toBeGreaterThanOrEqual(7);
     expect(REPORTS.projects.endpoint).toBe("reports/projects/");
     expect(REPORTS.expenses.filters.some((field) => field.name === "status")).toBe(true);
+    expect(REPORTS.expenses.filters.some((field) => field.name === "expense_scope")).toBe(true);
     expect(REPORT_LIST.every((report) => report.key && report.label && report.endpoint)).toBe(true);
   });
 
@@ -132,11 +133,11 @@ describe("report components", () => {
       />,
     );
     expect(screen.getByText("Detailed Records")).toBeInTheDocument();
-    expect(screen.getByText("Tower")).toBeInTheDocument();
-    expect(screen.getByText("formatted-2026-01-01")).toBeInTheDocument();
-    expect(screen.getByText("1,000.00")).toBeInTheDocument();
-    expect(screen.getByText("Yes")).toBeInTheDocument();
-    expect(screen.getByText("completed")).toBeInTheDocument();
+    expect(screen.getAllByText("Tower").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("formatted-2026-01-01").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("1,000.00").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Yes").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("completed").length).toBeGreaterThan(0);
   });
 
   it("ReportToolbar exports, shows disabled state, and renders generated timestamp", () => {

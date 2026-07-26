@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from project.models import Project  # Assuming projects app with Project model
 from django.db import transaction
-from django.db.models import Max
+from django.db.models import Max, Q
 from django.utils import timezone
 
 
@@ -28,14 +28,17 @@ class ApprovedExpenseManager(models.Manager):
         return ExpenseQuerySet(self.model, using=self._db).approved()
 
 class Expense(models.Model):
+    class ExpenseScope(models.TextChoices):
+        PROJECT = "project", "Project Expense"
+        OFFICE = "office", "Office Expense"
+
     class ApprovalStatus(models.TextChoices):
         PENDING = "pending", "Pending"
         APPROVED = "approved", "Approved"
         REJECTED = "rejected", "Rejected"
 
-    # Expense categories for future use, all historical imports default to general
-    EXPENSE_TYPE_CHOICES = [
-        ("general", "General Expense"),  # All your current Excel sheet entries
+    PROJECT_EXPENSE_TYPE_CHOICES = [
+        ("general", "General Expense"),
         ("material", "Construction Material"),
         ("construction", "Construction"),
         ("staff_salary", "Staff Salary"),
@@ -46,9 +49,50 @@ class Expense(models.Model):
         ("other", "Other"),
     ]
 
+    OFFICE_EXPENSE_TYPE_CHOICES = [
+        ("office_rent", "Office Rent"),
+        ("utilities", "Utilities"),
+        ("internet", "Internet"),
+        ("office_supplies", "Office Supplies"),
+        ("staff_meals", "Staff Meals"),
+        ("transportation", "Transportation"),
+        ("fuel", "Fuel"),
+        ("cleaning", "Cleaning"),
+        ("maintenance", "Maintenance"),
+        ("equipment", "Equipment"),
+        ("software_subscriptions", "Software & Subscriptions"),
+        ("miscellaneous", "Miscellaneous"),
+    ]
+
+    # Expense categories for future use, all historical imports default to general
+    EXPENSE_TYPE_CHOICES = [
+        *PROJECT_EXPENSE_TYPE_CHOICES,
+        ("office_rent", "Office Rent"),
+        ("utilities", "Utilities"),
+        ("internet", "Internet"),
+        ("office_supplies", "Office Supplies"),
+        ("staff_meals", "Staff Meals"),
+        ("transportation", "Transportation"),
+        ("fuel", "Fuel"),
+        ("cleaning", "Cleaning"),
+        ("maintenance", "Maintenance"),
+        ("software_subscriptions", "Software & Subscriptions"),
+        ("salaries", "Salaries"),
+        ("miscellaneous", "Miscellaneous"),
+    ]
+
+    expense_scope = models.CharField(
+        max_length=20,
+        choices=ExpenseScope.choices,
+        default=ExpenseScope.PROJECT,
+        db_index=True,
+    )
+
     # Link expense to its parent project (each Excel sheet is 1 project)
     project = models.ForeignKey(
         Project,
+        null=True,
+        blank=True,
         on_delete=models.PROTECT, # Prevents accidental deletion of projects with expenses
         related_name="expenses"
     )
@@ -57,7 +101,7 @@ class Expense(models.Model):
     # serial_number = models.PositiveIntegerField(help_text="Serial number as shown on project expense sheet")
     serial_number = models.PositiveIntegerField(
         editable=False,  # 👈 user cannot set it
-        help_text="Auto-generated per project"
+        help_text="Auto-generated per project or office ledger"
     )
 
     # Matches your DATE / تاریخ column
@@ -135,14 +179,43 @@ class Expense(models.Model):
     approved_objects = ApprovedExpenseManager()
 
     class Meta:
-        ordering = ["project", "expense_date", "serial_number"]
-        # Prevent duplicate serial numbers per project (matches how your Excel works)
+        ordering = ["expense_scope", "project", "expense_date", "serial_number"]
         constraints = [
-            models.UniqueConstraint(fields=["project", "serial_number"], name="unique_serial_per_project")
+            models.UniqueConstraint(
+                fields=["project", "serial_number"],
+                condition=Q(project__isnull=False),
+                name="unique_serial_per_project",
+            ),
+            models.UniqueConstraint(
+                fields=["expense_scope", "serial_number"],
+                condition=Q(expense_scope="office"),
+                name="unique_serial_for_office_expenses",
+            ),
+            models.CheckConstraint(
+                check=(
+                    Q(expense_scope="project", project__isnull=False)
+                    | Q(expense_scope="office", project__isnull=True)
+                ),
+                name="expense_scope_matches_project",
+            ),
         ]
 
     def __str__(self):
-        return f"{self.project.name} - Expense #{self.serial_number} ({self.expense_date})"
+        return f"{self.project_label} - Expense #{self.serial_number} ({self.expense_date})"
+
+    @property
+    def is_office_expense(self):
+        return self.expense_scope == self.ExpenseScope.OFFICE
+
+    @property
+    def is_project_expense(self):
+        return self.expense_scope == self.ExpenseScope.PROJECT
+
+    @property
+    def project_label(self):
+        if self.is_office_expense:
+            return "Office"
+        return self.project.name if self.project_id and self.project else ""
 
     @property
     def is_approved(self):
@@ -185,21 +258,58 @@ class Expense(models.Model):
 
     def clean(self):
         # Add database level validation matching your business rules
+        if self.expense_scope == self.ExpenseScope.OFFICE and self.project_id:
+            raise ValidationError("Office expenses cannot be linked to a project")
+        if self.expense_scope == self.ExpenseScope.PROJECT and not self.project_id:
+            raise ValidationError("Project expenses must be linked to a project")
         if self.amount_afn <=0 and self.amount_usd <=0:
             raise ValidationError("Expense must have at least one amount (AFN or USD) greater than 0")
         if self.amount_afn > 0 and self.amount_usd > 0:
             raise ValidationError("Expense cannot contain both AFN and USD amounts")
-    
+
+    def _serial_scope_filter(self):
+        if self.is_office_expense:
+            return {"expense_scope": self.ExpenseScope.OFFICE}
+        return {"project_id": self.project_id}
+
+    def _serial_ledger_changed(self):
+        if not self.pk:
+            return False
+
+        previous = (
+            Expense.objects
+            .filter(pk=self.pk)
+            .values("expense_scope", "project_id")
+            .first()
+        )
+        if not previous:
+            return False
+
+        return (
+            previous["expense_scope"] != self.expense_scope
+            or previous["project_id"] != self.project_id
+        )
+
     def save(self, *args, **kwargs):
-        if not self.serial_number:
+        should_generate_serial = (
+            not self.serial_number
+            or self._serial_ledger_changed()
+        )
+
+        if should_generate_serial:
             with transaction.atomic():
                 last_serial = (
                     Expense.objects
-                    .filter(project=self.project)
+                    .filter(**self._serial_scope_filter())
+                    .exclude(pk=self.pk)
                     .aggregate(max_serial=Max("serial_number"))
                     .get("max_serial")
                 )
 
                 self.serial_number = (last_serial or 0) + 1
+
+                update_fields = kwargs.get("update_fields")
+                if update_fields is not None:
+                    kwargs["update_fields"] = set(update_fields) | {"serial_number"}
 
         super().save(*args, **kwargs)

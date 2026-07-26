@@ -9,6 +9,7 @@ import {
   Calendar,
   FileQuestion,
   Printer,
+  Building2,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import ExpenseDetail from "./ExpenseDetail";
@@ -68,6 +69,7 @@ export default function ExpenseList({
   selectedCategory = "all",
   onRefresh,
   canDelete = true,
+  projects = [],
 }) {
   const [sortField, setSortField] = useState("expense_date");
   const [sortDirection, setSortDirection] = useState("desc");
@@ -97,6 +99,11 @@ export default function ExpenseList({
     return parseFloat(expense.total_usd) || parseFloat(expense.total_afn) || 0;
   };
 
+  const isOfficeExpense = (expense) => expense.expense_scope === "office";
+
+  const getProjectLabel = (expense) =>
+    isOfficeExpense(expense) ? "Office" : expense.project_name || "-";
+
   const filteredExpenses = useMemo(() => {
     let result = [...expenses];
 
@@ -106,6 +113,8 @@ export default function ExpenseList({
         (exp) =>
           exp.description?.toLowerCase().includes(term) ||
           exp.expense_type?.toLowerCase().includes(term) ||
+          exp.expense_scope?.toLowerCase().includes(term) ||
+          getProjectLabel(exp).toLowerCase().includes(term) ||
           exp.paid_to?.toLowerCase().includes(term),
       );
     }
@@ -320,7 +329,7 @@ export default function ExpenseList({
                           </p>
                           <p className="text-xs text-[var(--muted)] mt-0.5">
                             {expense.paid_to ||
-                              expense.project_name ||
+                              getProjectLabel(expense) ||
                               t("ExpenseList.noVendor")}{" "}
                             • {expense.expense_type || t("ExpenseList.general")}
                           </p>
@@ -334,7 +343,9 @@ export default function ExpenseList({
                     </td>
                     <td className="px-4 py-3.5">
                       <span className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium bg-gray-500/10 text-gray-600 dark:text-gray-400">
+                        {isOfficeExpense(expense) && <Building2 className="h-3.5 w-3.5" />}
                         <span>
+                          {isOfficeExpense(expense) ? "Office" : "Project"} ·{" "}
                           {expense.expense_type || t("ExpenseList.general")}
                         </span>
                       </span>
@@ -516,7 +527,7 @@ export default function ExpenseList({
                     </h3>
                     <p className="mt-1 break-words text-sm text-[var(--muted)]">
                       {expense.paid_to ||
-                        expense.project_name ||
+                        getProjectLabel(expense) ||
                         t("ExpenseList.noVendor")}
                     </p>
                   </div>
@@ -541,7 +552,11 @@ export default function ExpenseList({
                     </dt>
                     <dd className="mt-1">
                       <span className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${category.color}`}>
-                        <span>{expense.expense_type || t("ExpenseList.general")}</span>
+                        {isOfficeExpense(expense) && <Building2 className="h-3.5 w-3.5" />}
+                        <span>
+                          {isOfficeExpense(expense) ? "Office" : "Project"} ·{" "}
+                          {expense.expense_type || t("ExpenseList.general")}
+                        </span>
                       </span>
                     </dd>
                   </div>
@@ -643,6 +658,7 @@ export default function ExpenseList({
       <ExpenseEdit
         expense={selectedExpense}
         isOpen={showEdit}
+        projects={projects}
         onClose={() => {
           setShowEdit(false);
           setSelectedExpense(null);

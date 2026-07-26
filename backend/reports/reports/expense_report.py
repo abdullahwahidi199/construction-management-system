@@ -21,11 +21,14 @@ class ExpenseReport(BaseReport):
             qs = qs.approved()
 
         project_id = self.filters.get("project_id")
+        expense_scope = self.filters.get("expense_scope")
         expense_type = self.filters.get("expense_type")
         start, end = self.get_date_range()
 
         if project_id:
             qs = qs.filter(project_id=project_id)
+        if expense_scope:
+            qs = qs.filter(expense_scope=expense_scope)
         if expense_type:
             qs = qs.filter(expense_type=expense_type)
         if start:
@@ -55,6 +58,20 @@ class ExpenseReport(BaseReport):
                 Value(Decimal("0")),
                 output_field=DecimalField(max_digits=18, decimal_places=2),
             ),
+        )
+        project_totals = qs.filter(
+            expense_scope=Expense.ExpenseScope.PROJECT,
+        ).aggregate(
+            total_afn=Coalesce(Sum("amount_afn"), Value(Decimal("0"))),
+            total_usd=Coalesce(Sum("amount_usd"), Value(Decimal("0"))),
+            count=Count("id"),
+        )
+        office_totals = qs.filter(
+            expense_scope=Expense.ExpenseScope.OFFICE,
+        ).aggregate(
+            total_afn=Coalesce(Sum("amount_afn"), Value(Decimal("0"))),
+            total_usd=Coalesce(Sum("amount_usd"), Value(Decimal("0"))),
+            count=Count("id"),
         )
 
         # =====================================================
@@ -92,6 +109,7 @@ class ExpenseReport(BaseReport):
             "id",
             "serial_number",
             "expense_date",
+            "expense_scope",
             "expense_type",
             "amount_afn",
             "amount_usd",
@@ -102,6 +120,9 @@ class ExpenseReport(BaseReport):
         for row in preview_values:
             row["total_usd"] = row["amount_usd"]
             row["total_afn"] = row["amount_afn"]
+            if row["expense_scope"] == Expense.ExpenseScope.OFFICE:
+                row["project__name"] = "Office"
+            row["project"] = row["project__name"] or ""
             preview_rows.append(row)
 
         # =====================================================
@@ -111,9 +132,18 @@ class ExpenseReport(BaseReport):
             **self.get_metadata(),
             "summary": {
                 "total_records": qs.count(),
+                "total_project_expenses_afn": project_totals["total_afn"],
+                "total_project_expenses_usd": project_totals["total_usd"],
+                "total_project_expense_count": project_totals["count"],
+                "total_office_expenses_afn": office_totals["total_afn"],
+                "total_office_expenses_usd": office_totals["total_usd"],
+                "total_office_expense_count": office_totals["count"],
+                "overall_total_expenses_afn": totals["total_afn"],
+                "overall_total_expenses_usd": totals["total_usd"],
                 **totals,
             },
             "type_breakdown": type_breakdown,
             "monthly_trend": monthly_trend,
+            "rows": preview_rows,
             "preview": preview_rows,
         }

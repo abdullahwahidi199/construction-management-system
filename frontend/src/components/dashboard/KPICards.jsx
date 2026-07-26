@@ -1,5 +1,6 @@
 // components/dashboard/KPICards.jsx
 
+import { Building2, ReceiptText, WalletCards } from "lucide-react";
 import { useLanguage } from "../../hooks/useLanguage";
 
 const formatCurrency = (val, currency = "USD") => {
@@ -37,9 +38,13 @@ function KPICard({
         className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl sm:h-12 sm:w-12"
         style={{ backgroundColor: `${bgColor}15` }}
       >
-        <span className="text-3xl leading-none sm:text-2xl" style={{ color: bgColor }}>
-          {icon}
-        </span>
+        {typeof icon === "string" ? (
+          <span className="text-3xl leading-none sm:text-2xl" style={{ color: bgColor }}>
+            {icon}
+          </span>
+        ) : (
+          <span style={{ color: bgColor }}>{icon}</span>
+        )}
       </div>
       <div className="min-w-0 flex-1">
         <p className="break-words text-sm text-[var(--muted)]">{label}</p>
@@ -114,6 +119,30 @@ AFN: ${formatCurrency(financial?.contracts?.total_contract_value_afn)}`,
       color: "success",
     },
     {
+      icon: <Building2 className="h-6 w-6" />,
+      label: t("kpi.officeExpensesThisMonth"),
+      value: `$${formatCurrency(expenseMonth?.current_month?.office?.total_usd)}`,
+      sub: `USD: ${formatCurrency(expenseMonth?.current_month?.office?.total_usd)}
+AFN: ${formatCurrency(expenseMonth?.current_month?.office?.total_afn)}`,
+      color: "warning",
+    },
+    {
+      icon: <ReceiptText className="h-6 w-6" />,
+      label: t("kpi.projectExpensesThisMonth"),
+      value: `$${formatCurrency(expenseMonth?.current_month?.project?.total_usd)}`,
+      sub: `USD: ${formatCurrency(expenseMonth?.current_month?.project?.total_usd)}
+AFN: ${formatCurrency(expenseMonth?.current_month?.project?.total_afn)}`,
+      color: "primary",
+    },
+    {
+      icon: <WalletCards className="h-6 w-6" />,
+      label: t("kpi.totalExpenses"),
+      value: `$${formatCurrency(financial?.expenses?.total_usd)}`,
+      sub: `USD: ${formatCurrency(financial?.expenses?.total_usd)}
+AFN: ${formatCurrency(financial?.expenses?.total_afn)}`,
+      color: "success",
+    },
+    {
       icon: "📊",
       label: t("kpi.thisMonthExpenses"),
       value: `$${formatCurrency(expenseMonth?.current_month?.total_usd)}`,
@@ -141,7 +170,7 @@ AFN: ${formatCurrency(expenseMonth?.current_month?.total_afn)}`,
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {cards.map((card, i) => (
         <KPICard key={i} {...card} />
       ))}

@@ -67,6 +67,10 @@ vi.mock("../../hooks/useLanguage", () => ({
         "ExpensesMain.filters.button": "Filters",
         "ExpensesMain.filters.project.label": "Project",
         "ExpensesMain.filters.project.all": "All Projects",
+        "ExpensesMain.filters.scope.label": "Expense Type",
+        "ExpensesMain.filters.scope.all": "All Expenses",
+        "ExpensesMain.filters.scope.project": "Project Expenses",
+        "ExpensesMain.filters.scope.office": "Office Expenses",
         "ExpensesMain.filters.type.label": "Type",
         "ExpensesMain.filters.type.all": "All Types",
         "ExpensesMain.filters.date.from": "From",
@@ -75,6 +79,7 @@ vi.mock("../../hooks/useLanguage", () => ({
         "ExpensesMain.activeFilters.label": "Active filters:",
         "ExpensesMain.activeFilters.search": "Search",
         "ExpensesMain.activeFilters.project": "Project",
+        "ExpensesMain.activeFilters.scope": "Expense Type",
         "ExpensesMain.activeFilters.type": "Type",
         "ExpensesMain.activeFilters.date": "Date",
         "ExpensesMain.activeFilters.sort": "Sort",
@@ -107,6 +112,18 @@ vi.mock("../../hooks/useLanguage", () => ({
         "ExpensesMain.types.contractPayment": "Contract Payment",
         "ExpensesMain.types.equipment": "Equipment",
         "ExpensesMain.types.utility": "Utility",
+        "ExpensesMain.types.officeRent": "Office Rent",
+        "ExpensesMain.types.utilities": "Utilities",
+        "ExpensesMain.types.internet": "Internet",
+        "ExpensesMain.types.officeSupplies": "Office Supplies",
+        "ExpensesMain.types.staffMeals": "Staff Meals",
+        "ExpensesMain.types.transportation": "Transportation",
+        "ExpensesMain.types.fuel": "Fuel",
+        "ExpensesMain.types.cleaning": "Cleaning",
+        "ExpensesMain.types.maintenance": "Maintenance",
+        "ExpensesMain.types.softwareSubscriptions": "Software & Subscriptions",
+        "ExpensesMain.types.salaries": "Salaries",
+        "ExpensesMain.types.miscellaneous": "Miscellaneous",
         "ExpensesMain.types.other": "Other",
         "ProjectDetails.downloadPdf": "Download PDF",
       })[key] || key,
@@ -252,6 +269,7 @@ describe("ExpensesMain", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /filters/i }));
     fireEvent.change(screen.getByDisplayValue("All Projects"), { target: { value: "1" } });
+    fireEvent.change(screen.getByDisplayValue("All Expenses"), { target: { value: "project" } });
     fireEvent.change(screen.getByDisplayValue("All Types"), { target: { value: "material" } });
     fireEvent.change(screen.getByDisplayValue("All statuses"), { target: { value: "approved" } });
     fireEvent.change(screen.getAllByDisplayValue("")[0], { target: { value: "2026-01-01" } });
@@ -260,6 +278,7 @@ describe("ExpensesMain", () => {
 
     const latestEndpoint = state.endpoints.at(-2);
     expect(latestEndpoint).toContain("project=1");
+    expect(latestEndpoint).toContain("expense_scope=project");
     expect(latestEndpoint).toContain("expense_type=material");
     expect(latestEndpoint).toContain("status=approved");
     expect(latestEndpoint).toContain("ordering=expense_date");

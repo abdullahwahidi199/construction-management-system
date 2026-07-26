@@ -46,6 +46,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterProject, setFilterProject] = useState("");
+  const [filterScope, setFilterScope] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDateFrom, setFilterDateFrom] = useState("");
@@ -72,6 +73,9 @@ export default function ExpensesMain({ dataEntryMode = false }) {
     }
     if (filterProject) {
       params.append("project", filterProject);
+    }
+    if (filterScope) {
+      params.append("expense_scope", filterScope);
     }
     if (filterType) {
       params.append("expense_type", filterType);
@@ -178,6 +182,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
     setSearchQuery("");
     setDebouncedSearch("");
     setFilterProject("");
+    setFilterScope("");
     setFilterType("");
     setFilterStatus("");
     setFilterDateFrom("");
@@ -189,6 +194,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
   const activeFilterCount = [
     debouncedSearch,
     filterProject,
+    filterScope,
     filterType,
     filterStatus,
     filterDateFrom,
@@ -282,6 +288,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
 
   const expenseTypes = [
     { value: "general", label: t("ExpensesMain.types.general") },
+    { value: "construction", label: t("ExpensesMain.types.construction") },
     { value: "material", label: t("ExpensesMain.types.material") },
     { value: "staff_salary", label: t("ExpensesMain.types.staffSalary") },
     { value: "daily_wage", label: t("ExpensesMain.types.dailyWage") },
@@ -293,6 +300,28 @@ export default function ExpensesMain({ dataEntryMode = false }) {
     { value: "utility", label: t("ExpensesMain.types.utility") },
     { value: "other", label: t("ExpensesMain.types.other") },
   ];
+
+  const officeExpenseTypes = [
+    { value: "office_rent", label: t("ExpensesMain.types.officeRent") },
+    { value: "utilities", label: t("ExpensesMain.types.utilities") },
+    { value: "internet", label: t("ExpensesMain.types.internet") },
+    { value: "office_supplies", label: t("ExpensesMain.types.officeSupplies") },
+    { value: "staff_meals", label: t("ExpensesMain.types.staffMeals") },
+    { value: "transportation", label: t("ExpensesMain.types.transportation") },
+    { value: "fuel", label: t("ExpensesMain.types.fuel") },
+    { value: "cleaning", label: t("ExpensesMain.types.cleaning") },
+    { value: "maintenance", label: t("ExpensesMain.types.maintenance") },
+    { value: "equipment", label: t("ExpensesMain.types.equipment") },
+    {
+      value: "software_subscriptions",
+      label: t("ExpensesMain.types.softwareSubscriptions"),
+    },
+    { value: "salaries", label: t("ExpensesMain.types.salaries") },
+    { value: "miscellaneous", label: t("ExpensesMain.types.miscellaneous") },
+  ];
+
+  const visibleExpenseTypes =
+    filterScope === "office" ? officeExpenseTypes : expenseTypes;
 
   const averageUSD = count > 0 ? totals.usd / count : 0;
   const exportBlocked = filterStatus && filterStatus !== "approved";
@@ -578,7 +607,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
 
         {/* Expanded Filters */}
         {showFilters && (
-          <div className="mt-4 grid grid-cols-1 gap-3 border-t border-[var(--border)] pt-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-4 grid grid-cols-1 gap-3 border-t border-[var(--border)] pt-4 sm:grid-cols-2 lg:grid-cols-6">
             {/* Project Filter */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-[var(--muted)]">
@@ -603,6 +632,30 @@ export default function ExpensesMain({ dataEntryMode = false }) {
               </select>
             </div>
 
+            {/* Expense Scope Filter */}
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--muted)]">
+                {t("ExpensesMain.filters.scope.label")}
+              </label>
+              <select
+                value={filterScope}
+                onChange={(e) => {
+                  setFilterScope(e.target.value);
+                  setFilterType("");
+                  setPage(1);
+                }}
+                className="h-10 w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 text-sm text-[var(--text)] transition-all focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 cursor-pointer"
+              >
+                <option value="">{t("ExpensesMain.filters.scope.all")}</option>
+                <option value="project">
+                  {t("ExpensesMain.filters.scope.project")}
+                </option>
+                <option value="office">
+                  {t("ExpensesMain.filters.scope.office")}
+                </option>
+              </select>
+            </div>
+
             {/* Expense Type Filter */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-[var(--muted)]">
@@ -617,7 +670,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
                 className="h-10 w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 text-sm text-[var(--text)] transition-all focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 cursor-pointer"
               >
                 <option value="">{t("ExpensesMain.filters.type.all")}</option>
-                {expenseTypes.map((type) => (
+                {visibleExpenseTypes.map((type) => (
                   <option key={type.value} value={type.value}>
                     {type.label}
                   </option>
@@ -691,7 +744,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
 
             {/* Clear Filters Button */}
             {activeFilterCount > 0 && (
-              <div className="flex items-end sm:col-span-2 lg:col-span-5">
+              <div className="flex items-end sm:col-span-2 lg:col-span-6">
                 <button
                   onClick={clearAllFilters}
                   className="inline-flex h-10 items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 text-sm font-medium text-red-600 transition-all hover:bg-red-100 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
@@ -734,10 +787,25 @@ export default function ExpensesMain({ dataEntryMode = false }) {
                 </button>
               </span>
             )}
+            {filterScope && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-[var(--primary)]/10 px-2.5 py-1 text-xs font-medium text-[var(--primary)]">
+                {t("ExpensesMain.activeFilters.scope")}{" "}
+                {filterScope === "office" ? "Office" : "Project"}
+                <button
+                  onClick={() => {
+                    setFilterScope("");
+                    setFilterType("");
+                  }}
+                  className="ms-1 hover:text-[var(--primary)]/70"
+                >
+                  <X className="h-3 w-3" strokeWidth={2.5} />
+                </button>
+              </span>
+            )}
             {filterType && (
               <span className="inline-flex items-center gap-1 rounded-lg bg-[var(--primary)]/10 px-2.5 py-1 text-xs font-medium text-[var(--primary)]">
                 {t("ExpensesMain.activeFilters.type")}{" "}
-                {expenseTypes.find((t) => t.value === filterType)?.label ||
+                {visibleExpenseTypes.find((t) => t.value === filterType)?.label ||
                   filterType}
                 <button
                   onClick={() => setFilterType("")}
@@ -892,6 +960,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
           onUpdate={handleExpenseUpdate}
           onRefresh={handleRefresh}
           canDelete={!dataEntryMode}
+          projects={projects || []}
         />
       )}
 

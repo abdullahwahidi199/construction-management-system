@@ -116,7 +116,9 @@ class DashboardService:
         ).prefetch_related(
             Prefetch(
                 "expenses",
-                queryset=Expense.objects.approved(),
+                queryset=Expense.objects.approved().filter(
+                    expense_scope=Expense.ExpenseScope.PROJECT,
+                ),
                 to_attr="approved_expenses",
             )
         )
@@ -183,6 +185,20 @@ class DashboardService:
             total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
             total_count=Count("id"),
         )
+        project_totals = expenses.filter(
+            expense_scope=Expense.ExpenseScope.PROJECT,
+        ).aggregate(
+            total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
+            total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
+            count=Count("id"),
+        )
+        office_totals = expenses.filter(
+            expense_scope=Expense.ExpenseScope.OFFICE,
+        ).aggregate(
+            total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
+            total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
+            count=Count("id"),
+        )
 
         # --- By expense type ---
         by_type = list(
@@ -221,13 +237,17 @@ class DashboardService:
             .values(
                 "id", "serial_number", "description",
                 "amount_afn", "amount_usd", "expense_date",
-                "expense_type", "project__name"
+                "expense_scope", "expense_type", "project__name"
             )
         )
+        for expense in recent_expenses:
+            if expense["expense_scope"] == Expense.ExpenseScope.OFFICE:
+                expense["project__name"] = "Office"
 
         # --- By project ---
         by_project = list(
-            expenses.values("project__id", "project__name")
+            expenses.filter(expense_scope=Expense.ExpenseScope.PROJECT)
+            .values("project__id", "project__name")
             .annotate(
                 total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
                 total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
@@ -240,6 +260,13 @@ class DashboardService:
             "total_expenses_afn": totals["total_afn"],
             "total_expenses_usd": totals["total_usd"],
             "total_expense_count": totals["total_count"],
+            "project_expenses": project_totals,
+            "office_expenses": office_totals,
+            "overall_expenses": {
+                "total_afn": totals["total_afn"],
+                "total_usd": totals["total_usd"],
+                "count": totals["total_count"],
+            },
             "by_expense_type": by_type,
             "monthly_trend": monthly_trend,
             "recent_expenses": recent_expenses,
@@ -251,11 +278,13 @@ class DashboardService:
         """Current month expense snapshot."""
         today = date.today()
         first_of_month = today.replace(day=1)
+        approved_expenses = Expense.objects.approved()
 
-        current_month = Expense.objects.approved().filter(
+        current_month_qs = approved_expenses.filter(
             expense_date__gte=first_of_month,
             expense_date__lte=today,
-        ).aggregate(
+        )
+        current_month = current_month_qs.aggregate(
             total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
             total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
             count=Count("id"),
@@ -265,14 +294,22 @@ class DashboardService:
         prev_month_start = (first_of_month - timedelta(days=1)).replace(day=1)
         prev_month_end = first_of_month - timedelta(days=1)
 
-        previous_month = Expense.objects.approved().filter(
+        previous_month_qs = approved_expenses.filter(
             expense_date__gte=prev_month_start,
             expense_date__lte=prev_month_end,
-        ).aggregate(
+        )
+        previous_month = previous_month_qs.aggregate(
             total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
             total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
             count=Count("id"),
         )
+
+        def scope_totals(queryset, scope):
+            return queryset.filter(expense_scope=scope).aggregate(
+                total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
+                total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
+                count=Count("id"),
+            )
 
         # Calculate change percentage
         prev_usd = float(previous_month["total_usd"])
@@ -287,11 +324,15 @@ class DashboardService:
                 "total_afn": current_month["total_afn"],
                 "total_usd": current_month["total_usd"],
                 "count": current_month["count"],
+                "project": scope_totals(current_month_qs, Expense.ExpenseScope.PROJECT),
+                "office": scope_totals(current_month_qs, Expense.ExpenseScope.OFFICE),
             },
             "previous_month": {
                 "total_afn": previous_month["total_afn"],
                 "total_usd": previous_month["total_usd"],
                 "count": previous_month["count"],
+                "project": scope_totals(previous_month_qs, Expense.ExpenseScope.PROJECT),
+                "office": scope_totals(previous_month_qs, Expense.ExpenseScope.OFFICE),
             },
             "change_percentage": change_pct,
             "trend": (
@@ -798,7 +839,9 @@ class DashboardService:
         ).prefetch_related(
             Prefetch(
                 "expenses",
-                queryset=Expense.objects.approved(),
+                queryset=Expense.objects.approved().filter(
+                    expense_scope=Expense.ExpenseScope.PROJECT,
+                ),
                 to_attr="approved_expenses",
             )
         )
@@ -959,7 +1002,7 @@ class DashboardService:
                     if len(expense.description) > 80
                     else expense.description
                 ),
-                "project": expense.project.name,
+                "project": expense.project_label,
                 "amount_display": (
                     f"AFN {expense.amount_afn:,.2f}"
                     if expense.amount_afn > 0
@@ -1068,6 +1111,18 @@ class DashboardService:
         total_expenses_afn = Expense.objects.approved().aggregate(
             total=Coalesce(Sum("amount_afn"), Decimal("0.00"))
         )["total"]
+        project_expenses = Expense.objects.approved().filter(
+            expense_scope=Expense.ExpenseScope.PROJECT,
+        ).aggregate(
+            total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
+            total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
+        )
+        office_expenses = Expense.objects.approved().filter(
+            expense_scope=Expense.ExpenseScope.OFFICE,
+        ).aggregate(
+            total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
+            total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
+        )
 
         # ── Payroll ────────────────────────────────
         payroll = Payroll.objects.aggregate(
@@ -1158,6 +1213,10 @@ class DashboardService:
             "expenses": {
                 "total_usd": total_expenses_usd,
                 "total_afn": total_expenses_afn,
+                "project_usd": project_expenses["total_usd"],
+                "project_afn": project_expenses["total_afn"],
+                "office_usd": office_expenses["total_usd"],
+                "office_afn": office_expenses["total_afn"],
             },
 
             "payroll": {

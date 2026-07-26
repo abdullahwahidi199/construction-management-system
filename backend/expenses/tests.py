@@ -31,6 +31,28 @@ class ExpenseWorkflowAPITests(APITestCase):
         self.assertEqual(response.data["serial_number"], 1)
         self.assertEqual(response.data["approval_status"], "approved")
         self.assertEqual(Decimal(response.data["total_usd"]), Decimal("250.00"))
+        self.assertEqual(response.data["expense_scope"], "project")
+        self.assertEqual(response.data["project_name"], self.project.name)
+
+    def test_create_office_expense_without_project(self):
+        response = self.client.post(
+            "/api/expenses/",
+            expense_payload(
+                None,
+                expense_scope=Expense.ExpenseScope.OFFICE,
+                project=None,
+                expense_type="office_rent",
+                description="Office rent",
+                amount_usd="900.00",
+            ),
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertIsNone(response.data["project"])
+        self.assertEqual(response.data["project_name"], "Office")
+        self.assertEqual(response.data["expense_scope"], "office")
+        self.assertEqual(response.data["expense_type"], "office_rent")
 
     def test_expense_validation_rejects_empty_and_mixed_amounts(self):
         empty = self.client.post(
@@ -48,8 +70,36 @@ class ExpenseWorkflowAPITests(APITestCase):
         self.assertEqual(mixed.status_code, 400)
         self.assertIn("Expense cannot contain both", str(mixed.data))
 
+    def test_expense_scope_validation_requires_exactly_one_context(self):
+        office_with_project = self.client.post(
+            "/api/expenses/",
+            expense_payload(self.project, expense_scope=Expense.ExpenseScope.OFFICE),
+            format="json",
+        )
+        project_without_project = self.client.post(
+            "/api/expenses/",
+            expense_payload(
+                None,
+                expense_scope=Expense.ExpenseScope.PROJECT,
+                project=None,
+            ),
+            format="json",
+        )
+
+        self.assertEqual(office_with_project.status_code, 400)
+        self.assertEqual(project_without_project.status_code, 400)
+        self.assertIn("Office expenses cannot be linked", str(office_with_project.data))
+        self.assertIn("Project expenses must be linked", str(project_without_project.data))
+
     def test_expense_list_filters_searches_orders_and_totals_only_approved(self):
         create_expense(self.project, description="Steel beams", amount_usd=Decimal("100.00"))
+        create_expense(
+            None,
+            expense_scope=Expense.ExpenseScope.OFFICE,
+            description="Office rent",
+            expense_type="office_rent",
+            amount_usd=Decimal("50.00"),
+        )
         create_expense(
             self.project,
             description="Pending concrete",
@@ -64,6 +114,11 @@ class ExpenseWorkflowAPITests(APITestCase):
         self.assertEqual(response.data["results"]["totals"]["usd"], Decimal("100"))
         self.assertEqual(response.data["results"]["totals"]["afn"], 0)
         self.assertEqual(len(response.data["results"]["results"]), 1)
+
+        office = self.client.get("/api/expenses/?expense_scope=office")
+        self.assertEqual(office.status_code, 200, office.data)
+        self.assertEqual(office.data["results"]["totals"]["office"]["usd"], Decimal("50"))
+        self.assertEqual(office.data["results"]["results"][0]["project_name"], "Office")
 
     def test_approval_workflow_pending_approve_reject_and_notifications(self):
         approver = create_user(
@@ -145,6 +200,44 @@ class ExpenseWorkflowAPITests(APITestCase):
         second = create_expense(self.project)
 
         self.assertEqual((first.serial_number, second.serial_number), (1, 2))
+
+    def test_office_expense_serial_generation_uses_office_ledger(self):
+        first = create_expense(
+            None,
+            expense_scope=Expense.ExpenseScope.OFFICE,
+            expense_type="office_rent",
+        )
+        second = create_expense(
+            None,
+            expense_scope=Expense.ExpenseScope.OFFICE,
+            expense_type="utilities",
+        )
+        project_expense = create_expense(self.project)
+
+        self.assertEqual((first.serial_number, second.serial_number), (1, 2))
+        self.assertEqual(project_expense.serial_number, 1)
+
+    def test_changing_expense_scope_moves_to_next_ledger_serial(self):
+        create_expense(
+            None,
+            expense_scope=Expense.ExpenseScope.OFFICE,
+            expense_type="office_rent",
+        )
+        project_expense = create_expense(self.project)
+
+        response = self.client.patch(
+            f"/api/expenses/{project_expense.id}/",
+            {
+                "expense_scope": Expense.ExpenseScope.OFFICE,
+                "project": None,
+                "expense_type": "utilities",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data["serial_number"], 2)
+        self.assertEqual(response.data["project_name"], "Office")
 
     def test_network_broadcast_failures_do_not_break_expense_approval(self):
         expense = create_expense(self.project, approval_status=Expense.ApprovalStatus.PENDING)

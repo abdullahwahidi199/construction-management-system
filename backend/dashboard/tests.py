@@ -19,6 +19,7 @@ from common.test_helpers import (
     create_user,
 )
 from dashboard.services import DashboardService
+from expenses.models import Expense
 
 
 class DashboardAPITests(APITestCase):
@@ -90,6 +91,32 @@ class DashboardAPITests(APITestCase):
         response = self.client.get("/api/dashboard/")
 
         self.assertEqual(response.status_code, 403)
+
+    def test_dashboard_expense_widgets_split_current_month_project_and_office(self):
+        create_expense(
+            self.project,
+            expense_date=date.today(),
+            amount_usd=Decimal("40.00"),
+        )
+        create_expense(
+            None,
+            expense_scope=Expense.ExpenseScope.OFFICE,
+            expense_date=date.today(),
+            amount_usd=Decimal("60.00"),
+            expense_type="office_rent",
+        )
+
+        response = self.client.get("/api/dashboard/expenses/this-month/")
+
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(
+            response.data["current_month"]["project"]["total_usd"],
+            Decimal("40.00"),
+        )
+        self.assertEqual(
+            response.data["current_month"]["office"]["total_usd"],
+            Decimal("60.00"),
+        )
 
 
 class DashboardPerformanceTests(TestCase):

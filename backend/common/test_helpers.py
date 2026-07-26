@@ -151,9 +151,12 @@ def create_attendance(employee=None, **overrides):
 
 
 def expense_payload(project=None, **overrides):
-    project = project or create_project()
+    expense_scope = overrides.get("expense_scope", Expense.ExpenseScope.PROJECT)
+    if project is None and expense_scope == Expense.ExpenseScope.PROJECT:
+        project = create_project()
     data = {
-        "project": project.id,
+        "expense_scope": expense_scope,
+        "project": project.id if project else None,
         "expense_date": "2026-02-01",
         "description": "Concrete purchase",
         "remarks": "Batch A",
@@ -168,8 +171,11 @@ def expense_payload(project=None, **overrides):
 
 
 def create_expense(project=None, **overrides):
-    project = project or create_project()
+    expense_scope = overrides.get("expense_scope", Expense.ExpenseScope.PROJECT)
+    if project is None and expense_scope == Expense.ExpenseScope.PROJECT:
+        project = create_project()
     data = {
+        "expense_scope": expense_scope,
         "project": project,
         "expense_date": date(2026, 2, 1),
         "description": "Concrete purchase",

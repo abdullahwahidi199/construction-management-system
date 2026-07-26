@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Save, DollarSign, User, Calendar } from "lucide-react";
+import { X, Save, DollarSign, User, Calendar, Building2 } from "lucide-react";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import Button from "../../components/ui/Button";
 import { useLanguage } from "../../hooks/useLanguage";
@@ -17,6 +17,32 @@ import { todayIso } from "../../utils/calendar";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
+const PROJECT_EXPENSE_CATEGORIES = [
+  ["general", "general"],
+  ["construction", "construction"],
+  ["material", "material"],
+  ["staff_salary", "staffSalary"],
+  ["daily_wage", "dailyWage"],
+  ["equipment", "equipment"],
+  ["utility", "utility"],
+  ["contract_payment", "contractPayment"],
+  ["other", "other"],
+];
+
+const OFFICE_EXPENSE_CATEGORIES = [
+  ["office_rent", "officeRent"],
+  ["utilities", "utilities"],
+  ["internet", "internet"],
+  ["office_supplies", "officeSupplies"],
+  ["staff_meals", "staffMeals"],
+  ["transportation", "transportation"],
+  ["fuel", "fuel"],
+  ["cleaning", "cleaning"],
+  ["maintenance", "maintenance"],
+  ["equipment", "equipment"],
+  ["miscellaneous", "miscellaneous"],
+];
+
 export default function ExpenseCreateModal({
   isOpen,
   onClose,
@@ -33,6 +59,7 @@ export default function ExpenseCreateModal({
     amount_afn: "",
     exchange_rate: "",
     paid_to: "",
+    expense_scope: "project",
     expense_type: "general",
     remarks: "",
   });
@@ -48,6 +75,7 @@ export default function ExpenseCreateModal({
         amount_afn: "",
         exchange_rate: "68.2",
         paid_to: "",
+        expense_scope: "project",
         expense_type: "general",
         remarks: "",
         project: "",
@@ -66,12 +94,19 @@ export default function ExpenseCreateModal({
     setFormData((prev) => ({
       ...prev,
       [field]: value,
+      ...(field === "expense_scope" && value === "office"
+        ? { project: "", expense_type: "office_rent" }
+        : {}),
+      ...(field === "expense_scope" && value === "project"
+        ? { expense_type: "general" }
+        : {}),
     }));
     // Clear error for this field
     if (errors[field]) {
       setErrors((prev) => ({
         ...prev,
         [field]: null,
+        ...(field === "expense_scope" ? { project: null } : {}),
       }));
     }
   };
@@ -88,7 +123,7 @@ export default function ExpenseCreateModal({
     if (!formData.amount_usd && !formData.amount_afn) {
       newErrors.amount = t("ExpenseCreateModal.amountRequired");
     }
-    if (!formData.project) {
+    if (formData.expense_scope === "project" && !formData.project) {
       newErrors.project = t("ExpenseCreateModal.projectRequired");
     }
 
@@ -110,6 +145,7 @@ export default function ExpenseCreateModal({
 
       const payload = {
         ...formData,
+        project: formData.expense_scope === "office" ? null : formData.project,
         amount_usd: usd,
         amount_afn: afn,
         exchange_rate: rate,
@@ -164,202 +200,225 @@ export default function ExpenseCreateModal({
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <form
+            onSubmit={handleSubmit}
+            className="flex min-h-0 flex-1 flex-col"
+          >
             <div className="mobile-modal-content p-6 space-y-6">
-            {/* Description */}
-            <div>
-              <label className={fieldLabelClass}>
-                {t("ExpenseCreateModal.description")} <RequiredMark />
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => handleChange("description", e.target.value)}
-                rows={3}
-                className={`${textareaControlClass} ${
-                  errors.description ? fieldControlErrorClass : ""
-                }`}
-                placeholder={t("ExpenseCreateModal.enterDescription")}
-              />
-              {errors.description && (
-                <p className={fieldErrorClass}>{errors.description}</p>
-              )}
-            </div>
-
-            {/* Date */}
-            <div>
-              <label className={fieldLabelClass}>
-                {t("ExpenseCreateModal.expenseDate")} <RequiredMark />
-              </label>
-              <div className="relative">
-                <Calendar className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
-                <CalendarDatePicker
-                  value={formData.expense_date}
-                  onChange={(value) => handleChange("expense_date", value)}
-                  module="expenses"
-                  className="ps-10"
+              {/* Description */}
+              <div>
+                <label className={fieldLabelClass}>
+                  {t("ExpenseCreateModal.description")} <RequiredMark />
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => handleChange("description", e.target.value)}
+                  rows={3}
+                  className={`${textareaControlClass} ${
+                    errors.description ? fieldControlErrorClass : ""
+                  }`}
+                  placeholder={t("ExpenseCreateModal.enterDescription")}
                 />
+                {errors.description && (
+                  <p className={fieldErrorClass}>{errors.description}</p>
+                )}
               </div>
-              {errors.expense_date && (
-                <p className={fieldErrorClass}>{errors.expense_date}</p>
+
+              {/* Date */}
+              <div>
+                <label className={fieldLabelClass}>
+                  {t("ExpenseCreateModal.expenseDate")} <RequiredMark />
+                </label>
+                <div className="relative">
+                  <Calendar className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
+                  <CalendarDatePicker
+                    value={formData.expense_date}
+                    onChange={(value) => handleChange("expense_date", value)}
+                    module="expenses"
+                    className="ps-10"
+                  />
+                </div>
+                {errors.expense_date && (
+                  <p className={fieldErrorClass}>{errors.expense_date}</p>
+                )}
+              </div>
+
+              {/* Amounts */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className={fieldLabelClass}>
+                    {t("ExpenseCreateModal.amountUsd")} <RequiredMark />
+                  </label>
+                  <div className="relative">
+                    <DollarSign className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.amount_usd}
+                      onChange={(e) =>
+                        handleChange("amount_usd", e.target.value)
+                      }
+                      className={controlClass(errors.amount, "ps-10")}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={fieldLabelClass}>
+                    {t("ExpenseCreateModal.amountAfn")} <RequiredMark />
+                  </label>
+                  <div className="relative">
+                    <span className="absolute start-3 top-1/2 -translate-y-1/2 text-[var(--muted)] font-medium">
+                      ؋
+                    </span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.amount_afn}
+                      onChange={(e) =>
+                        handleChange("amount_afn", e.target.value)
+                      }
+                      className={controlClass(errors.amount, "ps-10")}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+              </div>
+              {errors.amount && (
+                <p className={fieldErrorClass}>{errors.amount}</p>
               )}
-            </div>
 
-            {/* Amounts */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Exchange Rate */}
               <div>
                 <label className={fieldLabelClass}>
-                  {t("ExpenseCreateModal.amountUsd")} <RequiredMark />
+                  {t("ExpenseCreateModal.exchangeRate")}
                 </label>
-                <div className="relative">
-                  <DollarSign className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.amount_usd}
-                    onChange={(e) => handleChange("amount_usd", e.target.value)}
-                    className={controlClass(errors.amount, "ps-10")}
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className={fieldLabelClass}>
-                  {t("ExpenseCreateModal.amountAfn")} <RequiredMark />
-                </label>
-                <div className="relative">
-                  <span className="absolute start-3 top-1/2 -translate-y-1/2 text-[var(--muted)] font-medium">
-                    ؋
-                  </span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.amount_afn}
-                    onChange={(e) => handleChange("amount_afn", e.target.value)}
-                    className={controlClass(errors.amount, "ps-10")}
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
-            </div>
-            {errors.amount && (
-              <p className={fieldErrorClass}>{errors.amount}</p>
-            )}
-
-            {/* Exchange Rate */}
-            <div>
-              <label className={fieldLabelClass}>
-                {t("ExpenseCreateModal.exchangeRate")}
-              </label>
-              <input
-                type="number"
-                step="0.0001"
-                value={formData.exchange_rate}
-                onChange={(e) => handleChange("exchange_rate", e.target.value)}
-                className={fieldControlClass}
-                placeholder="68.2000"
-              />
-            </div>
-
-            {/* Paid To */}
-            <div>
-              <label className={fieldLabelClass}>
-                {t("ExpenseCreateModal.paidTo")}
-              </label>
-              <div className="relative">
-                <User className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
                 <input
-                  type="text"
-                  value={formData.paid_to}
-                  onChange={(e) => handleChange("paid_to", e.target.value)}
-                  className={`${fieldControlClass} ps-10`}
-                  placeholder={t("ExpenseCreateModal.paidToPlaceholder")}
+                  type="number"
+                  step="0.0001"
+                  value={formData.exchange_rate}
+                  onChange={(e) =>
+                    handleChange("exchange_rate", e.target.value)
+                  }
+                  className={fieldControlClass}
+                  placeholder="68.2000"
                 />
               </div>
-            </div>
 
-            {/* Expense Type */}
-            <div>
-              <label className={fieldLabelClass}>
-                {t("ExpenseCreateModal.expenseType")}
-              </label>
-              <select
-                value={formData.expense_type}
-                onChange={(e) => handleChange("expense_type", e.target.value)}
-                className={fieldControlClass}
-              >
-                <option value="general">
-                  {t("ExpenseCreateModal.general")}
-                </option>
-                <option value="construction">
-                  {t("ExpenseCreateModal.construction")}
-                </option>
-                <option value="material">
-                  {t("ExpenseCreateModal.material")}
-                </option>
-                <option value="daily_wage">
-                  {t("ExpenseCreateModal.dailyWage")}
-                </option>
-                <option value="equipment">
-                  {t("ExpenseCreateModal.equipment")}
-                </option>
-                <option value="utility">
-                  {t("ExpenseCreateModal.utility")}
-                </option>
-                <option value="contract_payment">
-                  {t("ExpenseCreateModal.contractPayment")}
-                </option>
-                <option value="other">{t("ExpenseCreateModal.other")}</option>
-              </select>
-            </div>
-
-            {/* Project */}
-            <div>
-              <label className={fieldLabelClass}>
-                {t("ExpenseCreateModal.project")} <RequiredMark />
-              </label>
-
-              <select
-                value={formData.project}
-                onChange={(e) => handleChange("project", e.target.value)}
-                className={controlClass(errors.project)}
-              >
-                <option value="">
-                  {t("ExpenseCreateModal.selectProject")}
-                </option>
-
-                {projects.map((project) => (
-                  <option key={project.id} value={project.id}>
-                    {project.name}
-                  </option>
-                ))}
-              </select>
-
-              {errors.project && (
-                <p className={fieldErrorClass}>{errors.project}</p>
-              )}
-            </div>
-
-            {/* Remarks */}
-            <div>
-              <label className={fieldLabelClass}>
-                {t("ExpenseCreateModal.remarks")}
-              </label>
-              <textarea
-                value={formData.remarks}
-                onChange={(e) => handleChange("remarks", e.target.value)}
-                rows={2}
-                className={textareaControlClass}
-                placeholder={t("ExpenseCreateModal.remarksPlaceholder")}
-              />
-            </div>
-
-            {/* Error Message */}
-            {errors.submit && (
-              <div className="rounded-lg border border-[var(--danger)]/20 bg-[var(--danger)]/10 p-4">
-                <p className="text-sm text-[var(--danger)]">{errors.submit}</p>
+              {/* Paid To */}
+              <div>
+                <label className={fieldLabelClass}>
+                  {t("ExpenseCreateModal.paidTo")}
+                </label>
+                <div className="relative">
+                  <User className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
+                  <input
+                    type="text"
+                    value={formData.paid_to}
+                    onChange={(e) => handleChange("paid_to", e.target.value)}
+                    className={`${fieldControlClass} ps-10`}
+                    placeholder={t("ExpenseCreateModal.paidToPlaceholder")}
+                  />
+                </div>
               </div>
-            )}
+
+              {/* Expense Scope */}
+              <div>
+                <label className={fieldLabelClass}>
+                  {t("ExpenseCreateModal.expenseType")}
+                </label>
+                <div className="relative">
+                  <Building2 className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
+                  <select
+                    value={formData.expense_scope}
+                    onChange={(e) =>
+                      handleChange("expense_scope", e.target.value)
+                    }
+                    className={`${fieldControlClass} ps-10`}
+                  >
+                    <option value="project">
+                      {t("ExpenseCreateModal.projectExpense")}
+                    </option>
+                    <option value="office">
+                      {t("ExpenseCreateModal.officeExpense")}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className={fieldLabelClass}>
+                  {t("ExpenseCreateModal.category")}
+                </label>
+                <select
+                  value={formData.expense_type}
+                  onChange={(e) => handleChange("expense_type", e.target.value)}
+                  className={fieldControlClass}
+                >
+                  {(formData.expense_scope === "office"
+                    ? OFFICE_EXPENSE_CATEGORIES
+                    : PROJECT_EXPENSE_CATEGORIES
+                  ).map(([value, labelKey]) => (
+                    <option key={value} value={value}>
+                      {t(`ExpenseCreateModal.${labelKey}`)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Project */}
+              {formData.expense_scope === "project" && (
+                <div>
+                  <label className={fieldLabelClass}>
+                    {t("ExpenseCreateModal.project")} <RequiredMark />
+                  </label>
+
+                  <select
+                    value={formData.project}
+                    onChange={(e) => handleChange("project", e.target.value)}
+                    className={controlClass(errors.project)}
+                  >
+                    <option value="">
+                      {t("ExpenseCreateModal.selectProject")}
+                    </option>
+
+                    {projects.map((project) => (
+                      <option key={project.id} value={project.id}>
+                        {project.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  {errors.project && (
+                    <p className={fieldErrorClass}>{errors.project}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Remarks */}
+              <div>
+                <label className={fieldLabelClass}>
+                  {t("ExpenseCreateModal.remarks")}
+                </label>
+                <textarea
+                  value={formData.remarks}
+                  onChange={(e) => handleChange("remarks", e.target.value)}
+                  rows={2}
+                  className={textareaControlClass}
+                  placeholder={t("ExpenseCreateModal.remarksPlaceholder")}
+                />
+              </div>
+
+              {/* Error Message */}
+              {errors.submit && (
+                <div className="rounded-lg border border-[var(--danger)]/20 bg-[var(--danger)]/10 p-4">
+                  <p className="text-sm text-[var(--danger)]">
+                    {errors.submit}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Actions */}

@@ -79,6 +79,34 @@ export default function FinancialOverview({ data }) {
           prefix="AFN "
         />
 
+        <FinancialRow
+          label="Project Expenses USD"
+          value={data.expenses?.project_usd}
+          prefix="$"
+          color="var(--muted)"
+        />
+
+        <FinancialRow
+          label="Project Expenses AFN"
+          value={data.expenses?.project_afn}
+          prefix="AFN "
+          color="var(--muted)"
+        />
+
+        <FinancialRow
+          label="Office Expenses USD"
+          value={data.expenses?.office_usd}
+          prefix="$"
+          color="var(--muted)"
+        />
+
+        <FinancialRow
+          label="Office Expenses AFN"
+          value={data.expenses?.office_afn}
+          prefix="AFN "
+          color="var(--muted)"
+        />
+
         <div className="mt-4 mb-1">
           <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
             {t("financialOverview.payroll")}

@@ -53,6 +53,10 @@ function DetailItem({ label, value }) {
   );
 }
 
+function projectLabel(expense) {
+  return expense?.expense_scope === "office" ? "Office" : expense?.project_name || "-";
+}
+
 function expenseFromRealtimePayload(payload = {}) {
   return {
     id: payload.expense_id,
@@ -63,6 +67,7 @@ function expenseFromRealtimePayload(payload = {}) {
     description: payload.description || "",
     remarks: payload.remarks || "",
     paid_to: payload.paid_to || "",
+    expense_scope: payload.expense_scope || "project",
     expense_type: payload.expense_type || "",
     amount_afn: payload.amount_afn || "0.00",
     amount_usd: payload.amount_usd || "0.00",
@@ -89,6 +94,7 @@ function rowMatchesFilters(expense, filters) {
   if (!expense?.id) return false;
   if (filters.status && expense.approval_status !== filters.status) return false;
   if (filters.project && String(expense.project) !== String(filters.project)) return false;
+  if (filters.expense_scope && expense.expense_scope !== filters.expense_scope) return false;
   if (filters.creator && String(expense.created_by) !== String(filters.creator)) return false;
   if (filters.date_from && expense.expense_date && expense.expense_date < filters.date_from) {
     return false;
@@ -104,6 +110,7 @@ function rowMatchesFilters(expense, filters) {
       expense.remarks,
       expense.paid_to,
       expense.project_name,
+      expense.expense_scope,
       expense.created_by_name,
     ]
       .filter(Boolean)
@@ -138,6 +145,7 @@ export default function ExpenseApprovalsPage() {
     status: "pending",
     search: "",
     project: "",
+    expense_scope: "",
     creator: "",
     date_from: "",
     date_to: "",
@@ -154,6 +162,7 @@ export default function ExpenseApprovalsPage() {
     if (filters.status) params.status = filters.status;
     if (filters.search) params.search = filters.search;
     if (filters.project) params.project = filters.project;
+    if (filters.expense_scope) params.expense_scope = filters.expense_scope;
     if (filters.creator) params.creator = filters.creator;
     if (filters.date_from) params.expense_date__gte = filters.date_from;
     if (filters.date_to) params.expense_date__lte = filters.date_to;
@@ -303,6 +312,7 @@ export default function ExpenseApprovalsPage() {
       status: "pending",
       search: "",
       project: "",
+      expense_scope: "",
       creator: "",
       date_from: "",
       date_to: "",
@@ -404,7 +414,7 @@ export default function ExpenseApprovalsPage() {
         </div>
 
         <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-6">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-7">
             <div className="relative md:col-span-2">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
               <input
@@ -425,6 +435,15 @@ export default function ExpenseApprovalsPage() {
                   {project.name}
                 </option>
               ))}
+            </select>
+            <select
+              value={filters.expense_scope}
+              onChange={(event) => updateFilter("expense_scope", event.target.value)}
+              className="h-10 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)]"
+            >
+              <option value="">All expenses</option>
+              <option value="project">Project expenses</option>
+              <option value="office">Office expenses</option>
             </select>
             <div className="relative">
               <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
@@ -538,7 +557,7 @@ export default function ExpenseApprovalsPage() {
                             </p>
                           </td>
                           <td className="px-4 py-3 text-sm text-[var(--text)]">
-                            {expense.project_name || "-"}
+                            {projectLabel(expense)}
                           </td>
                           <td className="px-4 py-3 text-sm text-[var(--text)]">
                             {expense.created_by_name || "-"}
@@ -628,7 +647,7 @@ export default function ExpenseApprovalsPage() {
                       </div>
 
                       <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
-                        <DetailItem label="Project" value={expense.project_name} />
+                        <DetailItem label="Project" value={projectLabel(expense)} />
                         <DetailItem label="Creator" value={expense.created_by_name} />
                         <DetailItem
                           label="Amount USD"
@@ -691,7 +710,7 @@ export default function ExpenseApprovalsPage() {
                         #{selectedExpense.serial_number}
                       </p>
                       <p className="mt-1 text-sm text-[var(--muted)]">
-                        {selectedExpense.project_name || "-"}
+                        {projectLabel(selectedExpense)}
                       </p>
                     </div>
                     <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${statusClass[selectedExpense.approval_status]}`}>

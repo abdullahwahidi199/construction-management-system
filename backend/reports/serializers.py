@@ -37,6 +37,10 @@ class ProjectReportFilterSerializer(BaseReportFilterSerializer):
 
 class ExpenseReportFilterSerializer(BaseReportFilterSerializer):
     project_id = serializers.IntegerField(required=False)
+    expense_scope = serializers.ChoiceField(
+        choices=["project", "office"],
+        required=False,
+    )
     expense_type = serializers.CharField(required=False)
     status = serializers.ChoiceField(
         choices=["pending", "approved", "rejected"],
@@ -85,3 +89,7 @@ class ContractReportFilterSerializer(BaseReportFilterSerializer):
 
 class FinancialReportFilterSerializer(BaseReportFilterSerializer):
     project_id = serializers.IntegerField(required=False)
+    expense_scope = serializers.ChoiceField(
+        choices=["project", "office"],
+        required=False,
+    )

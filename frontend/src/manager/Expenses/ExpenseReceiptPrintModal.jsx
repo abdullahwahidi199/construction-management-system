@@ -12,6 +12,8 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
   if (!isOpen || !expense) return null;
 
   const canPrint = expense.approval_status === "approved";
+  const projectLabel =
+    expense.expense_scope === "office" ? "Office" : expense.project_name || "—";
 
   const displayDate = (dateString, fallback) => {
     return formatDate(dateString) || fallback || "—";
@@ -261,7 +263,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
           <div class="info-grid">
             <div class="cell">
               <div class="label">Project</div>
-              <div class="value">${expense.project_name || "—"}</div>
+              <div class="value">${projectLabel}</div>
             </div>
             <div class="cell">
               <div class="label">Type</div>
@@ -450,7 +452,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
                     Project
                   </p>
                   <p className="text-sm font-semibold text-[var(--text)]">
-                    {expense.project_name || "—"}
+                    {projectLabel}
                   </p>
                 </div>
                 <div className="bg-[var(--card)] px-4 py-3">

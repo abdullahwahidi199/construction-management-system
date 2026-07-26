@@ -5,6 +5,7 @@ import {
   User,
   FileText,
   RefreshCw,
+  Building2,
 } from "lucide-react";
 import { useLanguage } from "../../hooks/useLanguage";
 import { useCalendar } from "../../hooks/useCalendar";
@@ -23,6 +24,8 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
   const isRTL = RTL_LANGS.includes(lang);
 
   if (!isOpen || !expense) return null;
+  const isOfficeExpense = expense.expense_scope === "office";
+  const projectLabel = isOfficeExpense ? "Office" : expense.project_name || "-";
 
   const displayDate = (dateString, fallback) => {
     return formatDate(dateString) || fallback || "-";
@@ -53,7 +56,7 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                 {t("ExpenseDetail.title")}
               </h2>
               <p className="mt-0.5 break-words text-sm text-[var(--muted)]">
-                #{expense.serial_number} • {expense.project_name}
+                #{expense.serial_number} • {projectLabel}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -79,6 +82,8 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
             {/* Status & Type Badge */}
             <div className="flex items-center gap-3">
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-3 py-1.5 text-sm font-medium text-blue-600">
+                {isOfficeExpense && <Building2 className="h-4 w-4" />}
+                {isOfficeExpense ? "Office" : "Project"} ·{" "}
                 {expense.expense_type || t("ExpenseDetail.general")}
               </span>
               <span

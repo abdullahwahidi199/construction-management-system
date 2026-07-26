@@ -88,6 +88,7 @@ class ExpenseReportView(BaseReportView):
     pdf_columns = [
         ("serial_number", "S/N"),
         ("project", "Project"),
+        ("expense_scope", "Scope"),
         ("expense_date", "Date"),
         ("description", "Description"),
         ("amount_afn", "AFN"),
