@@ -10,7 +10,7 @@ from rest_framework.authtoken.models import Token
 
 from accounts.constants import Role
 from accounts.models import CustomRole, Permission, RolePermission
-from Employees.models import Attendance, Employee, Payroll
+from Employees.models import Attendance, Employee, Payroll, PayrollPayment, SalaryAdvance
 from expenses.models import Expense
 from labour.models import DailyWorker, WorkerAdvance, WorkerAttendance, WorkerPayroll
 from notifications.models import Notification
@@ -133,7 +133,38 @@ def create_payroll(employee=None, **overrides):
     payroll = Payroll(**data)
     payroll.calculate_totals()
     payroll.save()
+    payroll.refresh_payment_totals(save=True)
     return payroll
+
+
+def create_salary_advance(employee=None, **overrides):
+    employee = employee or create_employee()
+    data = {
+        "employee": employee,
+        "amount": Decimal("100.00"),
+        "remaining_balance": Decimal("100.00"),
+        "date": date(2026, 1, 15),
+        "reason": "Personal advance",
+        "notes": "",
+        "status": "active",
+    }
+    data.update(overrides)
+    return SalaryAdvance.objects.create(**data)
+
+
+def create_payroll_payment(payroll=None, **overrides):
+    payroll = payroll or create_payroll()
+    data = {
+        "payroll": payroll,
+        "amount": payroll.balance_due or payroll.net_pay,
+        "payment_date": date(2026, 3, 5),
+        "payment_method": "cash",
+        "reference_number": "PAY-001",
+    }
+    data.update(overrides)
+    payment = PayrollPayment.objects.create(**data)
+    payroll.refresh_payment_totals(save=True)
+    return payment
 
 
 def create_attendance(employee=None, **overrides):

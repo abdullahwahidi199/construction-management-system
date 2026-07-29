@@ -76,9 +76,9 @@ export default function ReportTable({ columns, rows }) {
         </div>
       </div>
 
-      <div className="hidden max-h-[640px] overflow-x-auto md:block mobile-scrollbar">
+      <div className="hidden overflow-x-auto overflow-y-visible md:block mobile-scrollbar">
         <table className="w-full text-sm">
-          <thead className="sticky top-0 z-10 bg-[color:color-mix(in_srgb,var(--hover)_70%,var(--card))]">
+          <thead className="bg-[color:color-mix(in_srgb,var(--hover)_70%,var(--card))]">
             <tr>
               {columns.map((col) => (
                 <th

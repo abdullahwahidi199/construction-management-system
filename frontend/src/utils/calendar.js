@@ -140,6 +140,19 @@ function pad(value) {
   return String(value).padStart(2, "0");
 }
 
+function parseMonthKey(value) {
+  if (!value) return null;
+  const match = normalizeDigits(value)
+    .trim()
+    .replace(/\//g, "-")
+    .match(/^(-?\d{1,4})-(\d{1,2})$/);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  if (!year || month < 1 || month > 12) return null;
+  return { year, month };
+}
+
 function gregorianToJdn(year, month, day) {
   return (
     Math.floor((1461 * (year + 4800 + Math.floor((month - 14) / 12))) / 4) +
@@ -312,4 +325,79 @@ export function formatByModule(value, module, settings, locale = "en") {
 export function todayIso() {
   const today = new Date();
   return `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+}
+
+export function currentMonthKey(calendar = CALENDAR_TYPES.GREGORIAN) {
+  const today = todayIso();
+  if (calendar === CALENDAR_TYPES.SHAMSI) {
+    const shamsi = toShamsi(today);
+    return shamsi ? `${shamsi.year}-${pad(shamsi.month)}` : "";
+  }
+  const parsed = parseYmd(today);
+  return parsed ? `${parsed.year}-${pad(parsed.month)}` : "";
+}
+
+export function monthKeyFromDate(value, calendar = CALENDAR_TYPES.GREGORIAN) {
+  const parsed = parseYmd(value);
+  if (!parsed) return "";
+
+  if (calendar === CALENDAR_TYPES.SHAMSI) {
+    if (parsed.year < 1700) return `${parsed.year}-${pad(parsed.month)}`;
+    const shamsi = toShamsi(value);
+    return shamsi ? `${shamsi.year}-${pad(shamsi.month)}` : "";
+  }
+
+  if (parsed.year < 1700) {
+    const gregorian = toGregorian(
+      `${parsed.year}-${pad(parsed.month)}-${pad(parsed.day)}`,
+    );
+    const gregorianParsed = parseYmd(gregorian);
+    return gregorianParsed
+      ? `${gregorianParsed.year}-${pad(gregorianParsed.month)}`
+      : "";
+  }
+
+  const gregorian = parseDate(value, CALENDAR_TYPES.GREGORIAN);
+  const gregorianParsed = parseYmd(gregorian);
+  return gregorianParsed
+    ? `${gregorianParsed.year}-${pad(gregorianParsed.month)}`
+    : "";
+}
+
+export function monthBoundsFromKey(monthKey, calendar = CALENDAR_TYPES.GREGORIAN) {
+  const parsed = parseMonthKey(monthKey);
+  if (!parsed) return { start: "", end: "" };
+
+  if (calendar === CALENDAR_TYPES.SHAMSI) {
+    const start = toGregorian(`${parsed.year}-${pad(parsed.month)}-01`);
+    const endDay = shamsiMonthLength(parsed.year, parsed.month);
+    const end = toGregorian(`${parsed.year}-${pad(parsed.month)}-${pad(endDay)}`);
+    return { start, end };
+  }
+
+  const endDay = new Date(Date.UTC(parsed.year, parsed.month, 0)).getUTCDate();
+  return {
+    start: `${parsed.year}-${pad(parsed.month)}-01`,
+    end: `${parsed.year}-${pad(parsed.month)}-${pad(endDay)}`,
+  };
+}
+
+export function formatMonthKey(
+  monthKey,
+  calendar = CALENDAR_TYPES.GREGORIAN,
+  locale = "en",
+) {
+  const parsed = parseMonthKey(monthKey);
+  if (!parsed) return "";
+
+  if (calendar === CALENDAR_TYPES.SHAMSI) {
+    const names = AFGHAN_MONTH_NAMES[locale] || AFGHAN_MONTH_NAMES.en;
+    return `${names[parsed.month - 1]} ${parsed.year}`;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(parsed.year, parsed.month - 1, 1)));
 }

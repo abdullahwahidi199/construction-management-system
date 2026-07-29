@@ -17,6 +17,8 @@ const STATUS_COLORS = {
 
 // Shared input style for consistency
 const inputStyle = {
+  boxSizing: "border-box",
+  maxWidth: "100%",
   padding: "0.5rem 0.75rem",
   border: "1px solid var(--border)",
   borderRadius: "6px",
@@ -156,7 +158,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
         padding: "2rem",
         background: "var(--bg)",
         color: "var(--text)",
-        minHeight: "100vh",
+        minHeight: 0,
       }}
     >
       {/* Header */}
@@ -215,7 +217,12 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          style={{ ...inputStyle, minWidth: "130px", cursor: "pointer" }}
+          style={{
+            ...inputStyle,
+            flex: "1 1 130px",
+            minWidth: "min(100%, 130px)",
+            cursor: "pointer",
+          }}
         >
           {STATUS_FILTERS.map((s) => (
             <option key={s.value} value={s.value}>
@@ -225,7 +232,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
         </select>
 
         {/* Start Date */}
-        <div style={{ width: "150px" }}>
+        <div style={{ flex: "1 1 150px", minWidth: 0 }}>
           <CalendarDatePicker
             value={dateRange.start}
             onChange={(value) =>
@@ -237,7 +244,7 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
         </div>
 
         {/* End Date */}
-        <div style={{ width: "150px" }}>
+        <div style={{ flex: "1 1 150px", minWidth: 0 }}>
           <CalendarDatePicker
             value={dateRange.end}
             onChange={(value) =>

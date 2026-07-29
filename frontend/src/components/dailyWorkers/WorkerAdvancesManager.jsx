@@ -291,10 +291,11 @@ export default function WorkerAdvancesManager() {
       </div>
 
       <div
-        className="rounded-lg border md:overflow-x-auto"
+        className="overflow-hidden rounded-lg border"
         style={{ borderColor: "var(--border)", backgroundColor: "var(--bg)" }}
       >
-        <table className="hidden w-full text-sm md:table">
+        <div className="hidden overflow-x-auto md:block mobile-scrollbar">
+        <table className="w-full min-w-[820px] text-sm">
           <thead
             className="uppercase text-xs"
             style={{ backgroundColor: "var(--hover)", color: "var(--muted)" }}
@@ -387,6 +388,7 @@ export default function WorkerAdvancesManager() {
             )}
           </tbody>
         </table>
+        </div>
         <div className="divide-y divide-[var(--border)] md:hidden">
           {loading ? (
             <div className="px-4 py-6 text-center text-sm">Loading...</div>

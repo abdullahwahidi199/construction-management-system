@@ -29,7 +29,7 @@ export default class ErrorBoundary extends React.Component {
     if (!this.state.hasError) return this.props.children;
 
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-4 text-[var(--text)]">
+      <main className="flex min-h-[100svh] items-center justify-center bg-[var(--bg)] px-4 text-[var(--text)]">
         <section className="w-full max-w-xl rounded-lg border border-[var(--border)] bg-[var(--card)] p-8 text-center shadow-sm">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-lg bg-red-500/10 text-red-600">
             <AlertTriangle className="h-9 w-9" />

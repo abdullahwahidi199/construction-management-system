@@ -72,7 +72,7 @@ function DailyWorkersLayout() {
 
   return (
     <div
-      className="min-h-screen"
+      className="min-h-0"
       style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}
     >
       <header
@@ -138,7 +138,9 @@ function DailyWorkersLayout() {
         {activeTab === "workers" && <WorkersList />}
         {activeTab === "attendance" && <WorkerBulkAttendance />}
         {activeTab === "advances" && <WorkerAdvancesManager />}
-        {activeTab === "payroll" && <WorkerPayrollManager />}
+        {activeTab === "payroll" && (
+          <WorkerPayrollManager onOpenAttendance={() => setActiveTab("attendance")} />
+        )}
       </main>
     </div>
   );

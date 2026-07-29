@@ -5,19 +5,22 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Sum
-from datetime import datetime
+from django.db.models import Count, Q, Sum
+from datetime import datetime, date
+from decimal import Decimal
 
 from accounts.permissions import RBACPermission
 from accounts.services import has_permission
 from common.calendar_utils import calendar_month_bounds, calendar_year_bounds, get_module_calendar, parse_calendar_date, to_shamsi
-from .models import Employee, Payroll
+from .models import Employee, Payroll, PayrollPayment, SalaryAdvance
 from .serializers import (
     EmployeeSerializer,
     EmployeeListSerializer,
+    PayrollPaymentSerializer,
     PayrollSerializer,
     PayrollListSerializer,
     PayrollBulkCreateSerializer,
+    SalaryAdvanceSerializer,
 )
 
 
@@ -75,7 +78,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     def payroll_history(self, request, pk=None):
         """Get payroll history for a specific employee"""
         employee = self.get_object()
-        payrolls = employee.payrolls.all()
+        payrolls = employee.payrolls.prefetch_related("payments", "advance_deduction_records__advance").all()
         
         # Optional year filtering
         year = request.query_params.get('year', None)
@@ -85,10 +88,10 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         
         page = self.paginate_queryset(payrolls)
         if page is not None:
-            serializer = PayrollListSerializer(page, many=True)
+            serializer = PayrollSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         
-        serializer = PayrollListSerializer(payrolls, many=True)
+        serializer = PayrollSerializer(payrolls, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=['get'])
@@ -99,25 +102,61 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         
         start, end = calendar_year_bounds(year, get_module_calendar("payroll", request=request))
         payrolls = employee.payrolls.filter(payroll_period_start__gte=start, payroll_period_start__lte=end)
+        all_payrolls = employee.payrolls.all()
+        advances = employee.salary_advances.all()
         summary = payrolls.aggregate(
             total_gross=Sum('gross_pay'),
             total_net=Sum('net_pay'),
             total_overtime=Sum('overtime_amount'),
             total_bonus=Sum('bonus'),
             total_deductions=Sum('deductions'),
+            total_advance_deductions=Sum('advance_deductions'),
             total_tax=Sum('tax_deducted'),
             payroll_count=Count('id')
         )
+        advance_summary = advances.aggregate(
+            outstanding=Sum("remaining_balance"),
+            total_given=Sum("amount"),
+        )
+        last_payroll = all_payrolls.order_by("-payroll_period_end").first()
         
         return Response({
             'employee': {
                 'id': employee.id,
                 'name': employee.full_name,
                 'employee_id': employee.employee_id,
+                'current_salary': employee.salary,
             },
             'year': year,
-            'summary': summary
+            'summary': {
+                **summary,
+                'outstanding_advances': advance_summary["outstanding"] or Decimal("0.00"),
+                'total_advances_given': advance_summary["total_given"] or Decimal("0.00"),
+                'total_advances_deducted': all_payrolls.aggregate(total=Sum("advance_deductions"))["total"] or Decimal("0.00"),
+                'total_payrolls_processed': all_payrolls.count(),
+                'total_amount_paid_this_year': payrolls.aggregate(total=Sum("amount_paid"))["total"] or Decimal("0.00"),
+                'last_payroll_date': last_payroll.payroll_period_end if last_payroll else None,
+            }
         })
+
+    @action(detail=True, methods=['get'])
+    def advance_history(self, request, pk=None):
+        employee = self.get_object()
+        advances = employee.salary_advances.prefetch_related("payroll_deductions__payroll").all()
+        data = SalaryAdvanceSerializer(advances, many=True, context={"request": request}).data
+        deductions_by_advance = {}
+        for advance in advances:
+            deductions_by_advance[advance.id] = [
+                {
+                    "payroll": deduction.payroll_id,
+                    "payroll_period": f"{deduction.payroll.payroll_period_start} to {deduction.payroll.payroll_period_end}",
+                    "amount": deduction.amount,
+                }
+                for deduction in advance.payroll_deductions.select_related("payroll").all()
+            ]
+        for row in data:
+            row["deductions"] = deductions_by_advance.get(row["id"], [])
+        return Response(data)
 
     @action(detail=False, methods=['get'])
     def by_department(self, request):
@@ -148,6 +187,56 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         return Response(departments)
 
 
+class SalaryAdvanceViewSet(viewsets.ModelViewSet):
+    queryset = SalaryAdvance.objects.select_related("employee")
+    serializer_class = SalaryAdvanceSerializer
+    permission_classes = [RBACPermission]
+    rbac_resource = "payrolls"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        employee_id = self.request.query_params.get("employee")
+        status_filter = self.request.query_params.get("status")
+        if employee_id:
+            queryset = queryset.filter(employee_id=employee_id)
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        instance.save()
+
+    @action(detail=False, methods=["get"])
+    def outstanding(self, request):
+        employee_id = request.query_params.get("employee")
+        if not employee_id:
+            return Response({"employee": "employee query parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
+        period_end = request.query_params.get("period_end") or request.query_params.get("payroll_period_end")
+        advances = self.get_queryset().filter(
+            employee_id=employee_id,
+            status="active",
+            remaining_balance__gt=0,
+        )
+        if period_end:
+            try:
+                advances = advances.filter(
+                    date__lte=parse_calendar_date(
+                        period_end,
+                        get_module_calendar("payroll", request=request),
+                    )
+                )
+            except ValueError as exc:
+                return Response({"period_end": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            "advances": SalaryAdvanceSerializer(advances, many=True, context={"request": request}).data,
+            "total_outstanding": advances.aggregate(total=Sum("remaining_balance"))["total"] or Decimal("0.00"),
+        })
+
+
 class PayrollViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing Payroll CRUD operations.
@@ -155,7 +244,10 @@ class PayrollViewSet(viewsets.ModelViewSet):
     Provides standard CRUD operations plus additional actions for
     bulk creation, payment status updates, and reporting.
     """
-    queryset = Payroll.objects.all()
+    queryset = Payroll.objects.select_related("employee").prefetch_related(
+        "payments",
+        "advance_deduction_records__advance",
+    )
     permission_classes = [RBACPermission]
     rbac_resource = "payrolls"
 
@@ -194,10 +286,51 @@ class PayrollViewSet(viewsets.ModelViewSet):
             end_date = parse_calendar_date(end_date, calendar_type)
             queryset = queryset.filter(payment_date__lte=end_date)
         
-        return queryset.select_related('employee')
+        return queryset.select_related('employee').prefetch_related("payments", "advance_deduction_records__advance")
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
+
+    @action(detail=False, methods=['get'])
+    def outstanding_advances(self, request):
+        employee_id = request.query_params.get("employee")
+        if not employee_id:
+            return Response({"employee": "employee query parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
+        period_end = request.query_params.get("period_end") or request.query_params.get("payroll_period_end")
+
+        advances = SalaryAdvance.objects.select_related("employee").filter(
+            employee_id=employee_id,
+            status="active",
+            remaining_balance__gt=0,
+        )
+        if period_end:
+            try:
+                advances = advances.filter(
+                    date__lte=parse_calendar_date(
+                        period_end,
+                        get_module_calendar("payroll", request=request),
+                    )
+                )
+            except ValueError as exc:
+                return Response({"period_end": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        advances = advances.order_by("date", "id")
+        return Response({
+            "advances": SalaryAdvanceSerializer(advances, many=True, context={"request": request}).data,
+            "total_outstanding": advances.aggregate(total=Sum("remaining_balance"))["total"] or Decimal("0.00"),
+        })
+
+    @action(detail=True, methods=['post'])
+    @transaction.atomic
+    def record_payment(self, request, pk=None):
+        payroll = self.get_object()
+        payroll.refresh_payment_totals(save=True)
+        serializer = PayrollPaymentSerializer(
+            data=request.data,
+            context={"request": request, "payroll": payroll},
+        )
+        serializer.is_valid(raise_exception=True)
+        payment = serializer.save()
+        return Response(PayrollPaymentSerializer(payment).data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'])
     @transaction.atomic
@@ -245,6 +378,7 @@ class PayrollViewSet(viewsets.ModelViewSet):
                 
                 payroll.calculate_totals()
                 payroll.save()
+                payroll.refresh_payment_totals(save=True)
                 created_payrolls.append(PayrollListSerializer(payroll).data)
                 
             except Employee.DoesNotExist:
@@ -266,12 +400,24 @@ class PayrollViewSet(viewsets.ModelViewSet):
 
         payment_date = request.data.get('payment_date')
         payment_method = request.data.get('payment_method')
+        payment_status = request.data.get('payment_status')
 
         if payment_date:
-            payroll.payment_date = payment_date
+            payroll.payment_date = parse_calendar_date(payment_date, get_module_calendar("payroll", request=request))
         
         if payment_method:
             payroll.payment_method = payment_method
+
+        payroll.refresh_payment_totals()
+        if payment_status in ["paid", "fully_paid"] and payroll.balance_due > 0:
+            PayrollPayment.objects.create(
+                payroll=payroll,
+                amount=payroll.balance_due,
+                payment_date=payroll.payment_date or date.today(),
+                payment_method=payroll.payment_method,
+                created_by=request.user,
+            )
+            payroll.refresh_payment_totals()
         
         payroll.save()
         serializer = PayrollSerializer(payroll)

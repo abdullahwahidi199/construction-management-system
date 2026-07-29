@@ -21,7 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .schema_views import redoc_ui, schema_view, swagger_ui
 
-from Employees.views import EmployeeViewSet,PayrollViewSet,AttendanceViewSet
+from Employees.views import EmployeeViewSet,PayrollViewSet,AttendanceViewSet,SalaryAdvanceViewSet
 from subcontractor.views import (
     SubcontractorViewSet,
     ContractViewSet,
@@ -40,6 +40,7 @@ from labour.views import (
 router = DefaultRouter()
 router.register(r'employees', EmployeeViewSet)
 router.register(r'payrolls', PayrollViewSet)
+router.register(r'salary-advances', SalaryAdvanceViewSet, basename='salary-advance')
 router.register(r'attendance', AttendanceViewSet)
 
 router.register(r'daily-workers', DailyWorkerViewSet, basename='daily-worker')

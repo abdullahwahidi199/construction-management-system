@@ -105,7 +105,7 @@ export default function AlertsPanel({ alerts, compact = false }) {
         </div>
       }
     >
-      <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+      <div className="space-y-3">
         {displayAlerts.map((alert, i) => {
           const config = SEVERITY_CONFIG[alert.severity] || SEVERITY_CONFIG.low;
           return (

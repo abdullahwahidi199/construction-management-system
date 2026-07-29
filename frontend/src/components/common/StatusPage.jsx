@@ -45,7 +45,7 @@ function StatusPage({
   onSecondary,
 }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-4 py-10 text-[var(--text)]">
+    <main className="flex min-h-[100svh] items-center justify-center bg-[var(--bg)] px-4 py-10 text-[var(--text)]">
       <section className="w-full max-w-2xl text-center">
         <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--card)] text-[var(--primary)] shadow-sm">
           {icon}

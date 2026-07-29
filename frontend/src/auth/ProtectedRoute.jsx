@@ -11,7 +11,7 @@ export function ProtectedRoute({ roles, permissions }) {
 
   if (initializing) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-(--bg) text-(--text)">
+      <div className="flex min-h-[100svh] items-center justify-center bg-(--bg) text-(--text)">
         <div className="flex flex-col items-center gap-3">
           <span className="h-10 w-10 animate-spin rounded-full border-4 border-[var(--border)] border-t-[var(--primary)]" />
           <span className="text-sm text-(--muted)">{t("common.loading")}</span>

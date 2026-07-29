@@ -52,7 +52,7 @@ export default function ResponsiveAppShell({
   }, []);
 
   return (
-    <div className="min-h-screen bg-(--bg) text-(--text)">
+    <div className="min-h-[100svh] bg-(--bg) text-(--text)">
       <nav className="sticky top-0 z-50 border-b border-(--border) bg-(--bg)/92 pt-[var(--safe-top)] backdrop-blur-xl">
         <div className={cx("mx-auto flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8", maxWidth)}>
           <div className="flex min-w-0 items-center gap-2 font-bold">

@@ -34,6 +34,11 @@ function startWeekOffset(year, month) {
   return (new Date(gy, gm - 1, gd).getDay() + 1) % 7;
 }
 
+function keepCalendarClickInside(event) {
+  event.preventDefault();
+  event.stopPropagation();
+}
+
 export default function CalendarDatePicker({
   label,
   value,
@@ -88,7 +93,8 @@ export default function CalendarDatePicker({
     if (gregorian) onChange?.(gregorian);
   };
 
-  const changeMonth = (delta) => {
+  const changeMonth = (delta, event) => {
+    keepCalendarClickInside(event);
     let year = visibleMonth.year;
     let month = visibleMonth.month + delta;
     if (month < 1) {
@@ -102,10 +108,23 @@ export default function CalendarDatePicker({
     setText(`${year}-${pad(month)}-01`);
   };
 
-  const selectDay = (day) => {
+  const selectDay = (day, event) => {
+    keepCalendarClickInside(event);
     const shamsi = `${visibleMonth.year}-${pad(visibleMonth.month)}-${pad(day)}`;
     setText("");
     onChange?.(toGregorian(shamsi));
+    setOpen(false);
+  };
+
+  const selectToday = (event) => {
+    keepCalendarClickInside(event);
+    setText("");
+    onChange?.(todayIso());
+    setOpen(false);
+  };
+
+  const closeCalendar = (event) => {
+    keepCalendarClickInside(event);
     setOpen(false);
   };
 
@@ -131,15 +150,18 @@ export default function CalendarDatePicker({
         )}
       </div>
       {open && (
-        <div className="absolute left-0 right-0 z-50 mt-2 max-w-[calc(100vw-2rem)] rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3 shadow-xl sm:right-auto sm:w-80">
+        <div
+          className="absolute left-0 right-0 z-50 mt-2 max-w-[calc(100vw-2rem)] rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3 shadow-xl sm:right-auto sm:w-80"
+          onClick={(event) => event.stopPropagation()}
+        >
           <div className="mb-3 flex items-center justify-between">
-            <button type="button" title="Previous month" onClick={() => changeMonth(-1)} className="h-10 w-10 rounded-lg hover:bg-[var(--hover)] sm:h-8 sm:w-8">
+            <button type="button" title="Previous month" onClick={(event) => changeMonth(-1, event)} className="h-10 w-10 rounded-lg hover:bg-[var(--hover)] sm:h-8 sm:w-8">
               <ChevronLeft className="mx-auto h-4 w-4" />
             </button>
             <div className="text-sm font-semibold text-[var(--text)]">
               {AFGHAN_MONTH_NAMES.en[visibleMonth.month - 1]} {visibleMonth.year}
             </div>
-            <button type="button" title="Next month" onClick={() => changeMonth(1)} className="h-10 w-10 rounded-lg hover:bg-[var(--hover)] sm:h-8 sm:w-8">
+            <button type="button" title="Next month" onClick={(event) => changeMonth(1, event)} className="h-10 w-10 rounded-lg hover:bg-[var(--hover)] sm:h-8 sm:w-8">
               <ChevronRight className="mx-auto h-4 w-4" />
             </button>
           </div>
@@ -147,14 +169,14 @@ export default function CalendarDatePicker({
             {WEEK_DAYS.map((day) => <div key={day} className="py-1">{day}</div>)}
             {blanks.map((_, index) => <div key={`blank-${index}`} />)}
             {days.map((day) => (
-              <button key={day} type="button" onClick={() => selectDay(day)} className="min-h-10 rounded-md text-sm text-[var(--text)] hover:bg-[var(--primary)] hover:text-white sm:min-h-8">
+              <button key={day} type="button" onClick={(event) => selectDay(day, event)} className="min-h-10 rounded-md text-sm text-[var(--text)] hover:bg-[var(--primary)] hover:text-white sm:min-h-8">
                 {day}
               </button>
             ))}
           </div>
           <div className="mt-3 flex justify-between gap-2 border-t border-[var(--border)] pt-3">
-            <button type="button" onClick={() => { setText(""); onChange?.(todayIso()); setOpen(false); }} className="rounded-lg px-3 py-1.5 text-sm hover:bg-[var(--hover)]">Today</button>
-            <button type="button" onClick={() => setOpen(false)} className="rounded-lg px-3 py-1.5 text-sm hover:bg-[var(--hover)]">Close</button>
+            <button type="button" onClick={selectToday} className="rounded-lg px-3 py-1.5 text-sm hover:bg-[var(--hover)]">Today</button>
+            <button type="button" onClick={closeCalendar} className="rounded-lg px-3 py-1.5 text-sm hover:bg-[var(--hover)]">Close</button>
           </div>
         </div>
       )}

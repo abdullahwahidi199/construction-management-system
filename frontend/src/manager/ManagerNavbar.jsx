@@ -157,7 +157,7 @@ function MoreNavMenu({ groups, pathname, open, onToggle, onClose, t }) {
           />
           <div
             role="menu"
-            className="fixed left-1/2 top-16 z-[90] max-h-[calc(100vh-5rem)] w-[calc(100vw-1.5rem)] max-w-2xl -translate-x-1/2 overflow-y-auto rounded-xl border border-(--border) bg-(--card) p-3 shadow-2xl shadow-black/15 ring-1 ring-black/5 transition duration-200 dark:shadow-black/35"
+            className="fixed left-1/2 top-16 z-[90] max-h-[calc(100dvh-5rem)] w-[calc(100vw-1.5rem)] max-w-2xl -translate-x-1/2 overflow-y-auto rounded-xl border border-(--border) bg-(--card) p-3 shadow-2xl shadow-black/15 ring-1 ring-black/5 transition duration-200 dark:shadow-black/35"
           >
             {groups.map((group) => {
               if (group.type !== "group") {
@@ -661,6 +661,13 @@ export default function ManagerNavbar() {
   useBodyScrollLock(mobileOpen);
 
   useEffect(() => {
+    setMobileOpen(false);
+    setOpenDropdown(null);
+    setProfileOpen(false);
+    setSearchOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
     const handleShortcut = (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
@@ -824,7 +831,7 @@ export default function ManagerNavbar() {
 
       <aside
         id="manager-mobile-drawer"
-        className={`fixed inset-0 z-[100] h-dvh flex-col overflow-x-hidden bg-(--bg) transition duration-[250ms] lg:hidden ${
+        className={`fixed inset-0 z-[100] flex-col overflow-hidden bg-(--bg) transition duration-[250ms] lg:hidden ${
           mobileOpen
             ? "flex pointer-events-auto translate-x-0 opacity-100"
             : "hidden pointer-events-none translate-x-full opacity-0 rtl:-translate-x-full"

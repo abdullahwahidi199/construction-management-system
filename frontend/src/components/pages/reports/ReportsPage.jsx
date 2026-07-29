@@ -50,7 +50,7 @@ export default function ReportsPage() {
   const rows = getReportRows(data);
 
   return (
-    <div className="min-h-screen bg-bg text-text">
+    <div className="min-h-0 bg-bg text-text">
       <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:py-10">
         <ReportToolbar
           report={report}

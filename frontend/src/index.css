@@ -11,7 +11,6 @@ html {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  touch-action: manipulation;
 }
 
 body {
@@ -23,7 +22,6 @@ body {
   min-height: 100dvh;
   min-width: 0;
   overflow-x: hidden;
-  overscroll-behavior-y: none;
   font-synthesis-weight: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -51,10 +49,6 @@ input,
 select,
 textarea {
   font: inherit;
-}
-
-button {
-  touch-action: manipulation;
 }
 
 input,
@@ -117,8 +111,7 @@ table {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  overflow: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
 }
 
 .mobile-modal-panel {
@@ -126,6 +119,7 @@ table {
   width: min(100%, calc(100vw - 2rem));
   max-height: min(92dvh, 900px);
   flex-direction: column;
+  min-height: 0;
   min-width: 0;
 }
 
@@ -138,7 +132,6 @@ table {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  overscroll-behavior: contain;
 }
 
 @media (min-width: 768px) {
@@ -148,10 +141,6 @@ table {
 }
 
 @media (max-width: 767px) {
-  body {
-    overscroll-behavior-y: contain;
-  }
-
   button,
   [role="button"],
   input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
@@ -210,9 +199,9 @@ table {
   }
 
   .mobile-modal-surface {
-    align-items: flex-start;
-    overflow-y: auto;
-    overflow-x: hidden;
+    align-items: stretch;
+    justify-content: center;
+    overflow: hidden;
     padding: calc(var(--safe-top) + 0.75rem) max(0.5rem, var(--safe-right)) 0
       max(0.5rem, var(--safe-left));
   }
@@ -221,7 +210,7 @@ table {
     display: flex;
     width: 100%;
     max-width: none;
-    min-height: calc(100dvh - var(--safe-top) - 0.75rem);
+    min-height: 0;
     max-height: calc(100dvh - var(--safe-top) - 0.75rem);
     flex-direction: column;
     border-bottom-left-radius: 0 !important;
@@ -230,7 +219,8 @@ table {
   }
 
   .mobile-modal-panel.mobile-modal-full {
-    min-height: calc(100dvh - var(--safe-top) - 0.75rem);
+    height: calc(100dvh - var(--safe-top) - 0.75rem);
+    max-height: calc(100dvh - var(--safe-top) - 0.75rem);
     border-radius: 0 !important;
   }
 

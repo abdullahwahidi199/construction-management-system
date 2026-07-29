@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Edit2, Plus, Printer, Trash2 } from "lucide-react";
+import { AlertTriangle, CalendarCheck, Edit2, Plus, Printer, Trash2 } from "lucide-react";
 import { useDailyWorkers } from "../../hooks/useDailyWorkers";
 import { useLanguage } from "../../hooks/useLanguage";
 import { useAuth } from "../../auth/AuthContext";
@@ -11,6 +11,7 @@ import CalendarDatePicker from "../common/CalendarDatePicker";
 import { useCalendar } from "../../hooks/useCalendar";
 import { todayIso } from "../../utils/calendar";
 import PrintableReceiptModal from "../common/PrintableReceiptModal";
+import Modal from "../common/Modal";
 
 function money(value, currency) {
   return `${currency ? `${currency} ` : ""}${Number(value || 0).toLocaleString("en-US", {
@@ -23,11 +24,43 @@ function labelize(value) {
   return String(value || "-").replace(/_/g, " ");
 }
 
-function WorkerPayrollManager() {
+function parseIsoDate(value) {
+  const [year, month, day] = String(value || "").split("-").map(Number);
+  if (!year || !month || !day) return null;
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function toIsoDate(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function getDatesInRange(start, end) {
+  const startDate = parseIsoDate(start);
+  const endDate = parseIsoDate(end);
+  if (!startDate || !endDate || startDate > endDate) return [];
+
+  const dates = [];
+  const cursor = new Date(startDate);
+  while (cursor <= endDate) {
+    dates.push(toIsoDate(cursor));
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+  return dates;
+}
+
+function getMarkedAttendanceCount(dayStatus) {
+  if (Array.isArray(dayStatus?.marked_records)) return dayStatus.marked_records.length;
+  if (dayStatus?.total_marked != null) return Number(dayStatus.total_marked);
+  return Number(dayStatus?.marked_count || 0);
+}
+
+function WorkerPayrollManager({ onOpenAttendance }) {
   const {
     fetchPayrolls,
     fetchWorkers,
     fetchProjects,
+    fetchDailyStatus,
     createPayroll,
     updatePayroll,
     deletePayroll,
@@ -59,6 +92,8 @@ function WorkerPayrollManager() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [markPaidTarget, setMarkPaidTarget] = useState(null);
   const [receiptPayroll, setReceiptPayroll] = useState(null);
+  const [validatingAttendance, setValidatingAttendance] = useState(false);
+  const [missingAttendanceDates, setMissingAttendanceDates] = useState([]);
 
   useEffect(() => {
     loadPayrolls();
@@ -136,7 +171,30 @@ function WorkerPayrollManager() {
     if (!periodStart || !periodEnd)
       return toast.error(t("WorkerPayrollManager.selectDateRange"));
 
+    const dates = getDatesInRange(periodStart, periodEnd);
+    if (dates.length === 0) {
+      toast.error(t("WorkerPayrollManager.invalidDateRange"));
+      return;
+    }
+
     try {
+      setValidatingAttendance(true);
+      const statuses = await Promise.all(
+        dates.map((date) =>
+          fetchDailyStatus(
+            date,
+            generationProject ? { project: generationProject } : {},
+          ),
+        ),
+      );
+      const missingDates = dates.filter(
+        (_date, index) => getMarkedAttendanceCount(statuses[index]) === 0,
+      );
+      if (missingDates.length > 0) {
+        setMissingAttendanceDates(missingDates);
+        return;
+      }
+
       const res = await generatePayrolls({
         period_start: periodStart,
         period_end: periodEnd,
@@ -147,6 +205,8 @@ function WorkerPayrollManager() {
       loadPayrolls();
     } catch (err) {
       // Central axios handling shows the user-facing error.
+    } finally {
+      setValidatingAttendance(false);
     }
   };
 
@@ -167,6 +227,15 @@ function WorkerPayrollManager() {
   };
 
   const displayDate = (value) => formatDate(value) || value || "-";
+
+  const displayMissingAttendanceDate = (value) => {
+    return displayDate(value);
+  };
+
+  const openAttendanceFromValidation = () => {
+    setMissingAttendanceDates([]);
+    onOpenAttendance?.();
+  };
 
   const buildPayrollReceipt = (payroll) => {
     const currency = payroll.currency || "";
@@ -266,6 +335,13 @@ function WorkerPayrollManager() {
         loading={loading}
         confirmLabel="Mark paid"
         destructive={false}
+      />
+      <MissingAttendanceModal
+        isOpen={missingAttendanceDates.length > 0}
+        onClose={() => setMissingAttendanceDates([])}
+        onOpenAttendance={onOpenAttendance ? openAttendanceFromValidation : null}
+        missingDates={missingAttendanceDates.map(displayMissingAttendanceDate)}
+        t={t}
       />
 
       <div
@@ -406,11 +482,13 @@ function WorkerPayrollManager() {
           {canCreate && (
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || validatingAttendance}
               className="rounded px-6 py-2 font-medium text-white transition disabled:opacity-50"
               style={{ backgroundColor: "var(--primary)" }}
             >
-              {loading
+              {validatingAttendance
+                ? t("WorkerPayrollManager.validatingAttendance")
+                : loading
                 ? t("WorkerPayrollManager.generating")
                 : t("WorkerPayrollManager.generatePayroll")}
             </button>
@@ -434,8 +512,8 @@ function WorkerPayrollManager() {
             {t("WorkerPayrollManager.generatedPayrollHistory")}
           </h3>
         </div>
-        <div className="md:overflow-x-auto">
-          <table className="hidden w-full text-sm md:table">
+        <div className="hidden overflow-x-auto md:block mobile-scrollbar">
+          <table className="w-full min-w-[820px] text-sm">
             <thead
               className="uppercase text-xs"
               style={{ backgroundColor: "var(--hover)", color: "var(--muted)" }}
@@ -588,6 +666,7 @@ function WorkerPayrollManager() {
               ))}
             </tbody>
           </table>
+        </div>
           <div className="divide-y divide-[var(--border)] md:hidden">
             {payrolls.length === 0 ? (
               <div className="px-4 py-6 text-center text-sm" style={{ color: "var(--muted)" }}>
@@ -710,7 +789,79 @@ function WorkerPayrollManager() {
           </div>
         </div>
       </div>
-    </div>
+  );
+}
+
+function MissingAttendanceModal({
+  isOpen,
+  onClose,
+  onOpenAttendance,
+  missingDates,
+  t,
+}) {
+  const hasSingleMissingDate = missingDates.length === 1;
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t("WorkerPayrollManager.attendanceValidationTitle")}
+      size="md"
+    >
+      <div className="space-y-5">
+        <div className="flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+          <div className="space-y-2">
+            <p className="text-sm font-medium">
+              {hasSingleMissingDate
+                ? t("WorkerPayrollManager.attendanceMissingSingle")
+                : t("WorkerPayrollManager.attendanceMissingMultiple")}
+            </p>
+            <p className="text-sm leading-6">
+              {t("WorkerPayrollManager.attendanceMissingInstruction")}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm font-semibold">
+            {t("WorkerPayrollManager.missingAttendanceDates")}
+          </p>
+          <ul className="max-h-56 space-y-2 overflow-y-auto rounded-lg border p-3 text-sm" style={{ borderColor: "var(--border)" }}>
+            {missingDates.map((date) => (
+              <li
+                key={date}
+                className="rounded bg-[var(--hover)] px-3 py-2 font-medium"
+              >
+                {date}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="flex flex-col-reverse gap-3 border-t border-[var(--border)] pt-4 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="min-h-12 rounded-lg px-4 py-2 text-sm font-medium"
+            style={{ backgroundColor: "var(--hover)", color: "var(--text)" }}
+          >
+            {t("WorkerPayrollManager.modal.close")}
+          </button>
+          {onOpenAttendance && (
+            <button
+              type="button"
+              onClick={onOpenAttendance}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
+              style={{ backgroundColor: "var(--primary)" }}
+            >
+              <CalendarCheck className="h-4 w-4" />
+              {t("WorkerPayrollManager.goToAttendance")}
+            </button>
+          )}
+        </div>
+      </div>
+    </Modal>
   );
 }
 

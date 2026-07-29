@@ -2,12 +2,16 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   CALENDAR_TYPES,
+  currentMonthKey,
   defaultCalendarSettings,
   formatByModule,
   formatDate,
   formatDateTime,
+  formatMonthKey,
   getModuleCalendar,
   isShamsiLeapYear,
+  monthBoundsFromKey,
+  monthKeyFromDate,
   normalizeCalendarSettings,
   normalizeDateInput,
   normalizeDigits,
@@ -78,6 +82,37 @@ describe("calendar utilities", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-07-25T08:00:00Z"));
     expect(todayIso()).toBe("2026-07-25");
+    vi.useRealTimers();
+  });
+
+  it("derives month keys and bounds for Gregorian payroll months", () => {
+    expect(monthKeyFromDate("2026-07-15", CALENDAR_TYPES.GREGORIAN)).toBe("2026-07");
+    expect(formatMonthKey("2026-07", CALENDAR_TYPES.GREGORIAN)).toBe("July 2026");
+    expect(monthBoundsFromKey("2026-07", CALENDAR_TYPES.GREGORIAN)).toEqual({
+      start: "2026-07-01",
+      end: "2026-07-31",
+    });
+    expect(monthBoundsFromKey("2026-02", CALENDAR_TYPES.GREGORIAN)).toEqual({
+      start: "2026-02-01",
+      end: "2026-02-28",
+    });
+  });
+
+  it("derives month keys and bounds for Shamsi payroll months", () => {
+    expect(monthKeyFromDate("2026-03-21", CALENDAR_TYPES.SHAMSI)).toBe("1405-01");
+    expect(monthKeyFromDate("1405-01-01", CALENDAR_TYPES.SHAMSI)).toBe("1405-01");
+    expect(formatMonthKey("1405-01", CALENDAR_TYPES.SHAMSI)).toBe("Hamal 1405");
+    expect(monthBoundsFromKey("1405-01", CALENDAR_TYPES.SHAMSI)).toEqual({
+      start: "2026-03-21",
+      end: "2026-04-20",
+    });
+  });
+
+  it("defaults the current month using the requested calendar", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-25T08:00:00Z"));
+    expect(currentMonthKey(CALENDAR_TYPES.GREGORIAN)).toBe("2026-07");
+    expect(currentMonthKey(CALENDAR_TYPES.SHAMSI)).toBe("1405-05");
     vi.useRealTimers();
   });
 });

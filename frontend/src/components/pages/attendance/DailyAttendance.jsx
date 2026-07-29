@@ -218,7 +218,8 @@ function DailyAttendance() {
                 style={{ borderColor: "var(--border)" }}
                 dir={isRTL ? "rtl" : "ltr"}
               >
-                <table className="hidden w-full md:table">
+                <div className="hidden overflow-x-auto md:block mobile-scrollbar">
+                <table className="w-full min-w-[760px]">
                   <thead>
                     <tr style={{ backgroundColor: "var(--card)" }}>
                       <th
@@ -299,6 +300,7 @@ function DailyAttendance() {
                     ))}
                   </tbody>
                 </table>
+                </div>
                 <div className="divide-y divide-[var(--border)] md:hidden">
                   {(data.records || []).length === 0 ? (
                     <div className="px-4 py-8 text-center text-sm" style={{ color: "var(--muted)" }}>
@@ -372,7 +374,8 @@ function DailyAttendance() {
                   style={{ borderColor: "var(--border)" }}
                   dir={isRTL ? "rtl" : "ltr"}
                 >
-                  <table className="hidden w-full md:table">
+                  <div className="hidden overflow-x-auto md:block mobile-scrollbar">
+                  <table className="w-full min-w-[640px]">
                     <thead>
                       <tr style={{ backgroundColor: "var(--card)" }}>
                         <th
@@ -420,6 +423,7 @@ function DailyAttendance() {
                       ))}
                     </tbody>
                   </table>
+                  </div>
                   <div className="divide-y divide-[var(--border)] md:hidden">
                     {(data.unmarked_employees || []).map((emp) => (
                       <article key={emp.id} className="grid gap-3 p-4">

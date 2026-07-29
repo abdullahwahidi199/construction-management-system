@@ -55,7 +55,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-(--bg) px-4 text-(--text)">
+    <main className="flex min-h-[100svh] items-center justify-center bg-(--bg) px-4 text-(--text)">
       <section className="w-full max-w-md rounded-lg border border-(--border) bg-(--card) p-6 shadow-sm">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">

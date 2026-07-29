@@ -141,7 +141,7 @@ export default function ContractInvoiceDetails({ id, onClose, currency }) {
         justifyContent: "center",
         zIndex: 1000,
         padding: "1rem",
-        overflowY: "auto",
+        overflow: "hidden",
         backdropFilter: "blur(2px)",
       }}
       onClick={onClose}
@@ -155,6 +155,7 @@ export default function ContractInvoiceDetails({ id, onClose, currency }) {
           maxWidth: "720px",
           maxHeight: "calc(100dvh - 2rem)",
           overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
           padding: "1.5rem",
           boxShadow: "0 8px 24px var(--shadow, rgba(0,0,0,0.15))",
         }}

@@ -17,7 +17,7 @@ function AttendanceLayout() {
 
   return (
     <div
-      className="min-h-screen"
+      className="min-h-0"
       style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}
     >
       {/* Header */}
