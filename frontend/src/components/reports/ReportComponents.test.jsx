@@ -106,6 +106,23 @@ describe("report components", () => {
     expect(screen.getByText("approved")).toBeInTheDocument();
   });
 
+  it("ReportSummary does not present contract or payroll amounts as income", () => {
+    render(
+      <ReportSummary
+        summary={{
+          contract_value_usd: 1000,
+          total_gross: 750,
+          overall_total_expenses_usd: 500,
+        }}
+      />,
+    );
+
+    expect(screen.queryByText("Income")).not.toBeInTheDocument();
+    expect(screen.getByText("Contract")).toBeInTheDocument();
+    expect(screen.getByText("Payroll")).toBeInTheDocument();
+    expect(screen.getByText("Outflow")).toBeInTheDocument();
+  });
+
   it("ReportTable renders empty, numeric, date, boolean, and badge states", () => {
     const columns = [
       { key: "name", label: "Name" },

@@ -23,6 +23,22 @@ const baseReportTranslations = {
     detailedRecords: "Detailed Records",
     recordCount: "{{count}} records in this report view",
   },
+  metricTones: {
+    contract: "Contract",
+    outflow: "Outflow",
+    payroll: "Payroll",
+    balance: "Balance",
+    warning: "Watch",
+    neutral: "Metric",
+  },
+  metricDescriptions: {
+    contract: "Contract value or payment metric",
+    outflow: "Expense or cash outflow metric",
+    payroll: "Employee and daily worker payroll metric",
+    balance: "Remaining balance or net position",
+    warning: "Needs management attention",
+    neutral: "Current report view",
+  },
   reportTypes: {
     projects: {
       label: "Projects",

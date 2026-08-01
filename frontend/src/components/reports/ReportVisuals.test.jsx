@@ -35,9 +35,9 @@ vi.mock("../../hooks/useLanguage", () => ({
     t: (key, params) => {
       const translations = {
         "reports.states.noChartData": "No chart data available",
-        "reports.summary.income": "Income",
-        "reports.summary.expenses": "Expenses",
-        "reports.summary.payroll": "Payroll",
+        "reports.metricTones.contract": "Contract",
+        "reports.metricTones.outflow": "Outflow",
+        "reports.metricTones.payroll": "Payroll",
         "reports.summary.contractPayments": "Contract Payments",
       };
       if (params?.count) return `${params.count} records`;

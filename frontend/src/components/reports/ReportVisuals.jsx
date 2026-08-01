@@ -27,11 +27,11 @@ import {
 } from "./reportUtils";
 
 const CHART_COLORS = {
-  revenue: "#16a34a",
-  revenueDark: "#15803d",
+  contract: "#16a34a",
+  contractDark: "#15803d",
   expense: "#ea580c",
   expenseDark: "#dc2626",
-  profit: "#0f766e",
+  balance: "#0f766e",
   primary: "#2563eb",
   warning: "#d97706",
   neutral: "#64748b",
@@ -40,9 +40,9 @@ const CHART_COLORS = {
 
 const COLORS = [
   CHART_COLORS.primary,
-  CHART_COLORS.revenue,
+  CHART_COLORS.contract,
   CHART_COLORS.expense,
-  CHART_COLORS.profit,
+  CHART_COLORS.balance,
   CHART_COLORS.warning,
   CHART_COLORS.expenseDark,
   CHART_COLORS.neutral,
@@ -517,7 +517,7 @@ function PayrollVisuals({ data, rows, t }) {
               />
               <Legend wrapperStyle={legendStyle} />
               <Bar dataKey="gross" name={legendText(t, "gross", "Gross")} fill={CHART_COLORS.primary} radius={3} barSize={10} maxBarSize={20} />
-              <Bar dataKey="net" name={legendText(t, "net", "Net")} fill={CHART_COLORS.profit} radius={3} barSize={10} maxBarSize={20} />
+              <Bar dataKey="net" name={legendText(t, "net", "Net")} fill={CHART_COLORS.balance} radius={3} barSize={10} maxBarSize={20} />
               <Bar dataKey="advances" name={legendText(t, "advances", "Advances Paid")} fill={CHART_COLORS.warning} radius={3} barSize={10} maxBarSize={20} />
               <Bar dataKey="advanceDeductions" name={legendText(t, "advanceDeductions", "Advance Deductions")} fill={CHART_COLORS.expense} radius={3} barSize={10} maxBarSize={20} />
               <Bar dataKey="cashOutflow" name={legendText(t, "cashOutflow", "Cash Outflow")} fill={CHART_COLORS.expenseDark} radius={3} barSize={10} maxBarSize={20} />
@@ -546,7 +546,7 @@ function PayrollVisuals({ data, rows, t }) {
               />
               <Legend wrapperStyle={legendStyle} />
               <Bar dataKey="gross" name={legendText(t, "gross", "Gross")} fill={CHART_COLORS.primary} radius={3} barSize={12} maxBarSize={22} />
-              <Bar dataKey="net" name={legendText(t, "net", "Net")} fill={CHART_COLORS.profit} radius={3} barSize={12} maxBarSize={22} />
+              <Bar dataKey="net" name={legendText(t, "net", "Net")} fill={CHART_COLORS.balance} radius={3} barSize={12} maxBarSize={22} />
               <Bar dataKey="deductions" name={legendText(t, "deductions", "Deductions")} fill={CHART_COLORS.expense} radius={3} barSize={12} maxBarSize={22} />
               <Bar dataKey="tax" name={legendText(t, "tax", "Tax")} fill={CHART_COLORS.expenseDark} radius={3} barSize={12} maxBarSize={22} />
             </BarChart>
@@ -579,7 +579,7 @@ function PayrollVisuals({ data, rows, t }) {
                   formatLabel(name),
                 ]}
               />
-              <Bar dataKey="net" name={legendText(t, "net", "Net")} fill={CHART_COLORS.profit} radius={3} barSize={12} maxBarSize={24} />
+              <Bar dataKey="net" name={legendText(t, "net", "Net")} fill={CHART_COLORS.balance} radius={3} barSize={12} maxBarSize={24} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
@@ -649,7 +649,7 @@ function AttendanceVisuals({ data, t }) {
                 ]}
               />
               <Legend wrapperStyle={legendStyle} />
-              <Bar dataKey="present" name={legendText(t, "present", "Present")} fill={CHART_COLORS.revenue} radius={3} barSize={10} maxBarSize={20} />
+              <Bar dataKey="present" name={legendText(t, "present", "Present")} fill={CHART_COLORS.contract} radius={3} barSize={10} maxBarSize={20} />
               <Bar dataKey="absent" name={legendText(t, "absent", "Absent")} fill={CHART_COLORS.expenseDark} radius={3} barSize={10} maxBarSize={20} />
               <Bar dataKey="halfDay" name={legendText(t, "halfDay", "Half Day")} fill={CHART_COLORS.warning} radius={3} barSize={10} maxBarSize={20} />
               <Bar dataKey="leave" name={legendText(t, "leave", "Leave")} fill={CHART_COLORS.expense} radius={3} barSize={10} maxBarSize={20} />
@@ -685,7 +685,7 @@ function AttendanceVisuals({ data, t }) {
                 ]}
               />
               <Legend wrapperStyle={legendStyle} />
-              <Bar dataKey="present" name={legendText(t, "present", "Present")} fill={CHART_COLORS.revenue} radius={3} barSize={10} maxBarSize={20} />
+              <Bar dataKey="present" name={legendText(t, "present", "Present")} fill={CHART_COLORS.contract} radius={3} barSize={10} maxBarSize={20} />
               <Bar dataKey="absent" name={legendText(t, "absent", "Absent")} fill={CHART_COLORS.expenseDark} radius={3} barSize={10} maxBarSize={20} />
               <Bar dataKey="leave" name={legendText(t, "leave", "Leave")} fill={CHART_COLORS.warning} radius={3} barSize={10} maxBarSize={20} />
               <Bar dataKey="overtime" name={legendText(t, "overtime", "Overtime")} fill={CHART_COLORS.primary} radius={3} barSize={10} maxBarSize={20} />
@@ -738,7 +738,7 @@ function EmployeeVisuals({ data, t }) {
               />
               <Legend wrapperStyle={legendStyle} />
               <Bar dataKey="employees" name={legendText(t, "employees", "Employees")} fill={CHART_COLORS.primary} radius={3} barSize={12} maxBarSize={22} />
-              <Bar dataKey="salary" name={legendText(t, "salary", "Salary")} fill={CHART_COLORS.revenue} radius={3} barSize={12} maxBarSize={22} />
+              <Bar dataKey="salary" name={legendText(t, "salary", "Salary")} fill={CHART_COLORS.contract} radius={3} barSize={12} maxBarSize={22} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
@@ -789,7 +789,7 @@ function ContractVisuals({ data, rows, t }) {
                 ]}
               />
               <Legend wrapperStyle={legendStyle} />
-              <Bar dataKey="value" name={legendText(t, "value", "Value")} fill={CHART_COLORS.revenue} radius={3} barSize={12} maxBarSize={24} />
+              <Bar dataKey="value" name={legendText(t, "value", "Value")} fill={CHART_COLORS.contract} radius={3} barSize={12} maxBarSize={24} />
               <Bar dataKey="paid" name={legendText(t, "paid", "Paid")} fill={CHART_COLORS.primary} radius={3} barSize={12} maxBarSize={24} />
             </BarChart>
           </ResponsiveContainer>
@@ -809,7 +809,7 @@ function ContractVisuals({ data, rows, t }) {
         title={chartText(t, "contractProgress", "Contract Completion Progress")}
         subtitle={chartText(t, "contractProgressSubtitle", "Completion percentage with paid and remaining balance")}
       >
-        <ProgressComparison items={progress} t={t} accent={CHART_COLORS.profit} />
+        <ProgressComparison items={progress} t={t} accent={CHART_COLORS.balance} />
       </ChartFrame>
 
       <ChartFrame
@@ -829,7 +829,7 @@ function ContractVisuals({ data, rows, t }) {
                 ]}
               />
               <Legend wrapperStyle={legendStyle} />
-              <Bar dataKey="value" name={legendText(t, "value", "Value")} fill={CHART_COLORS.revenue} radius={3} barSize={12} maxBarSize={24} />
+              <Bar dataKey="value" name={legendText(t, "value", "Value")} fill={CHART_COLORS.contract} radius={3} barSize={12} maxBarSize={24} />
               <Bar dataKey="paid" name={legendText(t, "paid", "Paid")} fill={CHART_COLORS.primary} radius={3} barSize={12} maxBarSize={24} />
               <Bar dataKey="remaining" name={legendText(t, "remaining", "Remaining")} fill={CHART_COLORS.warning} radius={3} barSize={12} maxBarSize={24} />
             </BarChart>
@@ -891,8 +891,8 @@ function FinancialVisuals({ data, t }) {
   const cards = [
     { label: translateReportKey(t, "metrics", "operating_cost_usd", "Operating Cost USD"), value: formatMoney(summary.operating_cost_usd, "USD"), tone: "outflow" },
     { label: translateReportKey(t, "metrics", "operating_cost_afn", "Operating Cost AFN"), value: formatMoney(summary.operating_cost_afn, "AFN"), tone: "outflow" },
-    { label: translateReportKey(t, "metrics", "contract_value_usd", "Contract Value USD"), value: formatMoney(summary.contract_value_usd, "USD"), tone: "income" },
-    { label: translateReportKey(t, "metrics", "contract_value_afn", "Contract Value AFN"), value: formatMoney(summary.contract_value_afn, "AFN"), tone: "income" },
+    { label: translateReportKey(t, "metrics", "contract_value_usd", "Contract Value USD"), value: formatMoney(summary.contract_value_usd, "USD"), tone: "contract" },
+    { label: translateReportKey(t, "metrics", "contract_value_afn", "Contract Value AFN"), value: formatMoney(summary.contract_value_afn, "AFN"), tone: "contract" },
     { label: translateReportKey(t, "metrics", "expenses_usd", "Expenses USD Eq."), value: formatMoney(summary.expenses_usd, "USD"), tone: "outflow" },
     { label: translateReportKey(t, "metrics", "expenses_afn", "Expenses AFN Eq."), value: formatMoney(summary.expenses_afn, "AFN"), tone: "outflow" },
     { label: translateReportKey(t, "metrics", "payroll_net_usd", "Payroll Net USD"), value: formatMoney(summary.payroll_net_usd, "USD"), tone: "payroll" },
@@ -901,13 +901,13 @@ function FinancialVisuals({ data, t }) {
     { label: translateReportKey(t, "metrics", "payroll_cash_outflow_afn", "Payroll Cash Outflow AFN"), value: formatMoney(summary.payroll_cash_outflow_afn, "AFN"), tone: "outflow" },
   ];
   const toneClasses = {
-    income: "bg-success/10 text-success",
+    contract: "bg-success/10 text-success",
     outflow: "bg-danger/10 text-danger",
     payroll: "bg-[color:color-mix(in_srgb,var(--primary)_12%,transparent)] text-[var(--primary)]",
     warning: "bg-warning/10 text-warning",
   };
   const toneLabels = {
-    income: translateOrFallback(t, "reports.metricTones.income", "Income"),
+    contract: translateOrFallback(t, "reports.metricTones.contract", "Contract"),
     outflow: translateOrFallback(t, "reports.metricTones.outflow", "Outflow"),
     payroll: translateOrFallback(t, "reports.metricTones.payroll", "Payroll"),
     warning: translateOrFallback(t, "reports.metricTones.warning", "Watch"),
@@ -959,7 +959,7 @@ function FinancialVisuals({ data, t }) {
                 <Bar dataKey="expenses" name={legendText(t, "expenses", "Expenses")} fill={CHART_COLORS.expense} radius={3} barSize={10} maxBarSize={20} />
                 <Bar dataKey="employee_payroll" name={legendText(t, "employeePayroll", "Employee Payroll")} fill={CHART_COLORS.primary} radius={3} barSize={10} maxBarSize={20} />
                 <Bar dataKey="employee_advances" name={legendText(t, "employeeAdvances", "Employee Advances")} fill={CHART_COLORS.warning} radius={3} barSize={10} maxBarSize={20} />
-                <Bar dataKey="worker_payroll" name={legendText(t, "workerPayroll", "Worker Payroll")} fill={CHART_COLORS.profit} radius={3} barSize={10} maxBarSize={20} />
+                <Bar dataKey="worker_payroll" name={legendText(t, "workerPayroll", "Worker Payroll")} fill={CHART_COLORS.balance} radius={3} barSize={10} maxBarSize={20} />
                 <Bar dataKey="contract_paid" name={legendText(t, "contractPaid", "Contract Paid")} fill={CHART_COLORS.neutral} radius={3} barSize={10} maxBarSize={20} />
               </BarChart>
           </ResponsiveContainer>
@@ -1055,10 +1055,10 @@ function FinancialVisuals({ data, t }) {
                   type="monotone"
                   dataKey="contractPayments"
                   name={legendText(t, "contractPayments", "Contract Payments")}
-                  stroke={CHART_COLORS.profit}
+                  stroke={CHART_COLORS.balance}
                   strokeWidth={2}
-                  dot={{ ...lineDot, stroke: CHART_COLORS.profit }}
-                  activeDot={{ ...activeLineDot, fill: CHART_COLORS.profit }}
+                  dot={{ ...lineDot, stroke: CHART_COLORS.balance }}
+                  activeDot={{ ...activeLineDot, fill: CHART_COLORS.balance }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -1085,7 +1085,7 @@ function FinancialVisuals({ data, t }) {
                 />
                 <Legend wrapperStyle={legendStyle} />
                 <Bar dataKey="netUsd" name={translateReportKey(t, "metrics", "payroll_net_usd", "Net USD")} fill={CHART_COLORS.primary} radius={3} barSize={12} maxBarSize={22} />
-                <Bar dataKey="netAfn" name={translateReportKey(t, "metrics", "payroll_net_afn", "Net AFN")} fill={CHART_COLORS.profit} radius={3} barSize={12} maxBarSize={22} />
+                <Bar dataKey="netAfn" name={translateReportKey(t, "metrics", "payroll_net_afn", "Net AFN")} fill={CHART_COLORS.balance} radius={3} barSize={12} maxBarSize={22} />
                 <Bar dataKey="grossUsd" name={legendText(t, "gross", "Gross USD")} fill={CHART_COLORS.neutral} radius={3} barSize={12} maxBarSize={22} />
                 <Bar dataKey="grossAfn" name={legendText(t, "gross", "Gross AFN")} fill={CHART_COLORS.warning} radius={3} barSize={12} maxBarSize={22} />
               </BarChart>
@@ -1114,7 +1114,7 @@ function FinancialVisuals({ data, t }) {
                   ]}
                 />
                 <Legend wrapperStyle={legendStyle} />
-                <Bar dataKey="value" name={legendText(t, "value", "Value")} fill={CHART_COLORS.revenue} radius={3} barSize={12} maxBarSize={24} />
+                <Bar dataKey="value" name={legendText(t, "value", "Value")} fill={CHART_COLORS.contract} radius={3} barSize={12} maxBarSize={24} />
                 <Bar dataKey="paid" name={legendText(t, "paid", "Paid")} fill={CHART_COLORS.primary} radius={3} barSize={12} maxBarSize={24} />
                 <Bar dataKey="remaining" name={legendText(t, "remaining", "Remaining")} fill={CHART_COLORS.warning} radius={3} barSize={12} maxBarSize={24} />
                 <Bar dataKey="variation" name={legendText(t, "variation", "Variation")} fill={CHART_COLORS.neutral} radius={3} barSize={12} maxBarSize={24} />

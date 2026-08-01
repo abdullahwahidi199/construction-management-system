@@ -7,13 +7,21 @@ import {
 } from "./reportUtils";
 
 const TONE_STYLES = {
-  income: {
-    key: "income",
+  contract: {
+    key: "contract",
     accent: "var(--success)",
     bg: "bg-success/10",
     text: "text-success",
-    chip: "Income",
-    description: "Revenue or inflow metric",
+    chip: "Contract",
+    description: "Contract value or payment metric",
+  },
+  payroll: {
+    key: "payroll",
+    accent: "var(--primary)",
+    bg: "bg-[color:color-mix(in_srgb,var(--primary)_12%,transparent)]",
+    text: "text-[var(--primary)]",
+    chip: "Payroll",
+    description: "Employee and daily worker payroll metric",
   },
   outflow: {
     key: "outflow",
@@ -23,13 +31,13 @@ const TONE_STYLES = {
     chip: "Outflow",
     description: "Expense or cash outflow metric",
   },
-  profit: {
-    key: "profit",
+  balance: {
+    key: "balance",
     accent: "var(--primary)",
     bg: "bg-[color:color-mix(in_srgb,var(--primary)_12%,transparent)]",
     text: "text-[var(--primary)]",
-    chip: "Margin",
-    description: "Net financial position",
+    chip: "Balance",
+    description: "Remaining balance or net position",
   },
   warning: {
     key: "warning",
@@ -74,35 +82,60 @@ const getMetricTone = (key) => {
       "expense",
       "expenses",
       "cost",
+      "spent",
+      "outflow",
       "payroll",
       "salary",
+      "wage",
+      "gross_pay",
+      "net_pay",
+      "total_gross",
+      "total_net",
+      "amount_paid",
+      "balance_due",
       "deduction",
       "tax",
       "cash_outflow",
       "advance",
-      "remaining_amount",
     ])
   ) {
-    return TONE_STYLES.outflow;
-  }
-
-  if (includesAny(normalized, ["profit", "margin", "net_income", "balance"])) {
-    return TONE_STYLES.profit;
+    return includesAny(normalized, [
+      "payroll",
+      "salary",
+      "wage",
+      "gross_pay",
+      "net_pay",
+      "total_gross",
+      "total_net",
+      "amount_paid",
+      "balance_due",
+    ])
+      ? TONE_STYLES.payroll
+      : TONE_STYLES.outflow;
   }
 
   if (
     includesAny(normalized, [
-      "revenue",
-      "income",
+      "remaining",
+      "balance",
+      "net_position",
+      "budget_remaining",
+    ])
+  ) {
+    return TONE_STYLES.balance;
+  }
+
+  if (
+    includesAny(normalized, [
+      "contract",
       "contract_value",
       "invoice",
       "received",
-      "gross",
       "paid",
-      "earned",
+      "payment",
     ])
   ) {
-    return TONE_STYLES.income;
+    return TONE_STYLES.contract;
   }
 
   return TONE_STYLES.neutral;
