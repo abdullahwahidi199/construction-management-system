@@ -306,9 +306,11 @@ class EmployeeAndPayrollAPITests(APITestCase):
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(Decimal(response.data["summary"]["outstanding_advances"]), Decimal("40.00"))
         self.assertEqual(Decimal(response.data["summary"]["total_advances_given"]), Decimal("100.00"))
+        self.assertEqual(Decimal(response.data["summary"]["total_advances_paid_this_year"]), Decimal("100.00"))
         self.assertEqual(Decimal(response.data["summary"]["total_advances_deducted"]), Decimal("60.00"))
         self.assertEqual(response.data["summary"]["total_payrolls_processed"], 1)
         self.assertEqual(Decimal(response.data["summary"]["total_amount_paid_this_year"]), Decimal("500.00"))
+        self.assertEqual(Decimal(response.data["summary"]["total_outstanding_salary_this_year"]), payroll.balance_due)
 
     def test_bulk_payroll_duplicate_period_reports_error(self):
         employee = create_employee()

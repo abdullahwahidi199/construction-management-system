@@ -103,10 +103,6 @@ table {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
 }
 
-.mobile-page-shell {
-  padding-bottom: calc(5.25rem + var(--safe-bottom));
-}
-
 .mobile-modal-surface {
   align-items: center;
   justify-content: center;
@@ -132,12 +128,6 @@ table {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-}
-
-@media (min-width: 768px) {
-  .mobile-page-shell {
-    padding-bottom: 0;
-  }
 }
 
 @media (max-width: 767px) {
@@ -177,7 +167,7 @@ table {
   .mobile-fab {
     position: fixed;
     right: max(1rem, var(--safe-right));
-    bottom: calc(5.25rem + var(--safe-bottom));
+    bottom: calc(1rem + var(--safe-bottom));
     z-index: 45;
     min-width: 3.5rem;
     min-height: 3.5rem;

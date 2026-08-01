@@ -49,7 +49,9 @@ export default function ContractsPage() {
   const [projectFilter, setProjectFilter] = useState("");
   const [subcontractorFilter, setSubcontractorFilter] = useState("");
   const { data: projectsData } = useFetch("projects/");
-  const { data: subcontractorsData } = useFetch("subcontractors/");
+  const { data: subcontractorsData } = useFetch("subcontractors/", {
+    skipGlobalErrorToast: true,
+  });
 
   const projects = projectsData?.results || projectsData || [];
   const subcontractors =

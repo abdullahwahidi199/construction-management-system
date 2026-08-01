@@ -5,6 +5,22 @@ import { getFriendlyErrorMessage } from "../../../utils/apiErrors";
 import CalendarDatePicker from "../../common/CalendarDatePicker";
 import { todayIso } from "../../../utils/calendar";
 
+function CalendarDayBadge({ info }) {
+  if (!info || info.is_working_day) return null;
+  const isHoliday = info.is_holiday;
+  return (
+    <span
+      className={
+        isHoliday
+          ? "inline-flex rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700 dark:bg-rose-950/40 dark:text-rose-200"
+          : "inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
+      }
+    >
+      {isHoliday ? "Official Holiday" : "Weekly Off Day"}
+    </span>
+  );
+}
+
 function DailyAttendance() {
   const { fetchDailyAttendance, loading, error } = useAttendance();
 
@@ -87,10 +103,15 @@ function DailyAttendance() {
         className="rounded-lg border p-6"
         style={{ backgroundColor: "var(--card)", borderColor: "var(--border)" }}
       >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">
-            {t("DailyAttendance.title")}
-          </h2>
+        <div className="flex items-center justify-between gap-4 mb-6">
+          <div className="min-w-0">
+            <h2 className="text-xl font-semibold">
+              {t("DailyAttendance.title")}
+            </h2>
+            <div className="mt-2">
+              <CalendarDayBadge info={data?.work_calendar} />
+            </div>
+          </div>
           <div>
             <label
               className="block text-sm font-medium mb-2"

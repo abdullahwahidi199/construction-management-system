@@ -1,15 +1,16 @@
-import { LayoutDashboard, ScrollText, Settings, ShieldCheck, Users } from "lucide-react";
+import { LayoutDashboard, ScrollText, ShieldCheck, Users } from "lucide-react";
 import { useLanguage } from "../hooks/useLanguage";
-import LanguageSwitcher from "../components/LanguageSwitcher";
-import ThemeToggle from "../components/ui/ToggleButton";
 import { useAuth } from "../auth/AuthContext";
 import { hasAnyPermission } from "../auth/roles";
 import ResponsiveAppShell from "../components/navigation/ResponsiveAppShell";
+import { useCompany } from "../context/CompanyContext";
 
 export default function AdminRootLayout() {
   const { t } = useLanguage();
   const { logout, user } = useAuth();
+  const { company } = useCompany();
   const permissions = user?.permissions || [];
+  const canOpenSettings = hasAnyPermission(permissions, ["settings.view", "settings.manage"]);
   const links = [
     { label: t("admin.nav.dashboard"), to: "/admin/dashboard", icon: LayoutDashboard },
     {
@@ -37,28 +38,21 @@ export default function AdminRootLayout() {
       icon: ScrollText,
       permissions: ["audit_logs.view"],
     },
-    {
-      label: "Settings",
-      to: "/admin/settings",
-      icon: Settings,
-      permissions: ["settings.view", "settings.manage"],
-    },
   ].filter((link) => !link.permissions || hasAnyPermission(permissions, link.permissions));
 
   return (
     <ResponsiveAppShell
       title={t("admin.title")}
       brandIcon={ShieldCheck}
+      brandName={company.company_name}
+      brandLogo={company.company_logo_url}
+      brandSubtitle={t("admin.title")}
       links={links}
+      settingsTo={canOpenSettings ? "/admin/settings" : undefined}
+      settingsLabel="Settings"
       user={user}
       logout={logout}
       logoutLabel={t("auth.logout")}
-      tools={
-        <>
-          <LanguageSwitcher />
-          <ThemeToggle />
-        </>
-      }
     />
   );
 }

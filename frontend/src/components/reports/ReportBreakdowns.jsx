@@ -87,6 +87,15 @@ const getItemTitle = (item, t) => {
   return translateOrFallback(t, "reports.record", "Record");
 };
 
+const getBreakdownAccent = (name) => {
+  const normalized = name.toLowerCase();
+  if (normalized.includes("expense") || normalized.includes("cost")) return "var(--danger)";
+  if (normalized.includes("payroll") || normalized.includes("advance")) return "var(--warning)";
+  if (normalized.includes("currency") || normalized.includes("contract")) return "var(--success)";
+  if (normalized.includes("status") || normalized.includes("attendance")) return "var(--primary)";
+  return "var(--muted)";
+};
+
 export default function ReportBreakdowns({ data }) {
   const { t } = useLanguage();
   const lists = getBreakdownLists(data);
@@ -98,24 +107,32 @@ export default function ReportBreakdowns({ data }) {
       {lists.map(([name, arr]) => {
         const values = arr.map(getPrimaryNumber);
         const max = Math.max(...values, 1);
+        const accent = getBreakdownAccent(name);
 
         return (
           <div
             key={name}
-            className="overflow-hidden rounded-lg bg-card shadow-sm shadow-black/5"
+            className="overflow-hidden rounded-md border border-[color:color-mix(in_srgb,var(--border)_72%,transparent)] bg-card"
           >
-            <div className="px-5 py-4">
-              <h3 className="text-sm font-semibold text-text">
-                {translateReportKey(t, "breakdowns", name, formatLabel(name))}
-              </h3>
-              <p className="mt-1 text-xs text-muted">
-                {translateOrFallback(
-                  t,
-                  "reports.groupedRecords",
-                  "{{count}} grouped records",
-                  { count: formatValue(arr.length) },
-                )}
-              </p>
+            <div className="flex items-start justify-between gap-4 px-5 py-4">
+              <div className="min-w-0">
+                <h3 className="truncate text-sm font-semibold text-text">
+                  {translateReportKey(t, "breakdowns", name, formatLabel(name))}
+                </h3>
+                <p className="mt-1 text-xs text-muted">
+                  {translateOrFallback(
+                    t,
+                    "reports.groupedRecords",
+                    "{{count}} grouped records",
+                    { count: formatValue(arr.length) },
+                  )}
+                </p>
+              </div>
+              <span
+                className="mt-1 h-2 w-2 shrink-0 rounded-full"
+                style={{ background: accent }}
+                aria-hidden="true"
+              />
             </div>
 
             <div className="divide-y divide-[color:color-mix(in_srgb,var(--border)_55%,transparent)]">
@@ -126,7 +143,7 @@ export default function ReportBreakdowns({ data }) {
                   .slice(0, 4);
 
                 return (
-                  <div key={index} className="px-5 py-4">
+                  <div key={index} className="px-5 py-3.5">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-text truncate">
@@ -146,11 +163,12 @@ export default function ReportBreakdowns({ data }) {
                       </p>
                     </div>
 
-                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-hover">
+                    <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-hover">
                       <div
                         className="h-full rounded-full bg-[var(--primary)]"
                         style={{
                           width: `${Math.max((numericValue / max) * 100, 5)}%`,
+                          background: accent,
                         }}
                       />
                     </div>

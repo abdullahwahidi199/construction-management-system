@@ -9,7 +9,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from accounts.constants import Role
-from accounts.models import CustomRole, Permission, ProjectAssignment, RolePermission
+from accounts.models import CompanyInformation, CustomRole, Permission, ProjectAssignment, RolePermission
+from audit.models import AuditLog
+from common.calendar_utils import to_gregorian
 from common.test_helpers import create_admin, create_project, create_user
 
 
@@ -212,7 +214,81 @@ class AuthenticationAndRBACAPITests(APITestCase):
         self.client.force_authenticate(manager)
         put_allowed = self.client.put(
             "/api/auth/settings/calendar/",
-            {"default_calendar": "gregorian", "modules": {"expenses": "gregorian"}},
+            {
+                "default_calendar": "gregorian",
+                "modules": {"expenses": "gregorian"},
+                "work_calendar": {
+                    "weekly_off_days": [4, 5],
+                    "holidays": [
+                        {
+                            "name": "Eid al-Fitr",
+                            "start_date": "2026-03-20",
+                            "end_date": "2026-03-22",
+                            "paid_holiday": True,
+                            "active": True,
+                        }
+                    ],
+                },
+            },
+            format="json",
+        )
+        invalid_overlap = self.client.put(
+            "/api/auth/settings/calendar/",
+            {
+                "default_calendar": "gregorian",
+                "modules": {},
+                "work_calendar": {
+                    "weekly_off_days": [4],
+                    "holidays": [
+                        {
+                            "name": "Holiday One",
+                            "start_date": "2026-03-20",
+                            "end_date": "2026-03-22",
+                            "paid_holiday": True,
+                            "active": True,
+                        },
+                        {
+                            "name": "Holiday Two",
+                            "start_date": "2026-03-21",
+                            "end_date": "2026-03-23",
+                            "paid_holiday": True,
+                            "active": True,
+                        },
+                    ],
+                },
+            },
+            format="json",
+        )
+        invalid_duplicate_weekly_off = self.client.put(
+            "/api/auth/settings/calendar/",
+            {
+                "default_calendar": "gregorian",
+                "modules": {},
+                "work_calendar": {
+                    "weekly_off_days": [4, 4],
+                    "holidays": [],
+                },
+            },
+            format="json",
+        )
+        shamsi_holiday = self.client.put(
+            "/api/auth/settings/calendar/",
+            {
+                "default_calendar": "shamsi",
+                "modules": {},
+                "work_calendar": {
+                    "weekly_off_days": [4],
+                    "holidays": [
+                        {
+                            "name": "Nowruz",
+                            "start_date": "1405-01-01",
+                            "end_date": "1405-01-01",
+                            "paid_holiday": True,
+                            "active": True,
+                        }
+                    ],
+                },
+            },
             format="json",
         )
 
@@ -220,6 +296,103 @@ class AuthenticationAndRBACAPITests(APITestCase):
         self.assertEqual(get_response.status_code, 200)
         self.assertEqual(put_forbidden.status_code, 403)
         self.assertEqual(put_allowed.status_code, 200, put_allowed.data)
+        self.assertEqual(put_allowed.data["work_calendar"]["weekly_off_days"], [4, 5])
+        self.assertEqual(put_allowed.data["work_calendar"]["holidays"][0]["name"], "Eid al-Fitr")
+        self.assertEqual(invalid_overlap.status_code, 400)
+        self.assertEqual(invalid_duplicate_weekly_off.status_code, 400)
+        self.assertEqual(shamsi_holiday.status_code, 200, shamsi_holiday.data)
+        self.assertEqual(
+            shamsi_holiday.data["work_calendar"]["holidays"][0]["start_date"],
+            to_gregorian("1405-01-01").isoformat(),
+        )
+
+    def test_company_information_singleton_update_and_audit(self):
+        ordinary = create_user(username="company-reader", role="data_entry", permissions=["expenses.view"])
+        viewer = create_user(username="company-viewer", role="hr", permissions=["settings.view"])
+        manager = create_user(username="company-manager", role="admin_ops", permissions=["settings.manage"])
+
+        self.client.force_authenticate(ordinary)
+        ordinary_get = self.client.get("/api/auth/settings/company/")
+
+        self.client.force_authenticate(viewer)
+        forbidden_update = self.client.patch(
+            "/api/auth/settings/company/",
+            {"company_name": "Forbidden Builders"},
+            format="json",
+        )
+
+        self.client.force_authenticate(manager)
+        allowed_update = self.client.patch(
+            "/api/auth/settings/company/",
+            {
+                "company_name": "Kabul Builders",
+                "legal_company_name": "Kabul Builders Ltd",
+                "email": "info@example.com",
+                "phone_number": "+93 700 000 000",
+                "website": "https://example.com",
+                "print_footer_text": "Official company footer",
+            },
+            format="json",
+        )
+
+        self.assertEqual(ordinary_get.status_code, 200, ordinary_get.data)
+        self.assertEqual(forbidden_update.status_code, 403)
+        self.assertEqual(allowed_update.status_code, 200, allowed_update.data)
+        self.assertEqual(allowed_update.data["company_name"], "Kabul Builders")
+        self.assertEqual(CompanyInformation.objects.count(), 1)
+        self.assertTrue(
+            AuditLog.objects.filter(
+                action="settings.company_information.update",
+                model_name="CompanyInformation",
+            ).exists()
+        )
+
+    def test_settings_preferences_validation_permissions_and_audit(self):
+        viewer = create_user(username="preferences-viewer", role="hr", permissions=["settings.view"])
+        manager = create_user(username="preferences-manager", role="admin_ops", permissions=["settings.manage"])
+
+        self.client.force_authenticate(viewer)
+        get_response = self.client.get("/api/auth/settings/preferences/")
+        forbidden_update = self.client.put(
+            "/api/auth/settings/preferences/",
+            {"appearance": {"theme": "dark"}},
+            format="json",
+        )
+
+        self.client.force_authenticate(manager)
+        invalid_update = self.client.put(
+            "/api/auth/settings/preferences/",
+            {"appearance": {"theme": "purple"}},
+            format="json",
+        )
+        allowed_update = self.client.put(
+            "/api/auth/settings/preferences/",
+            {
+                "appearance": {"theme": "construction"},
+                "language": {"language": "dr"},
+                "notifications": {"in_app": True, "email": True, "real_time": False},
+                "security": {
+                    "session_timeout_minutes": 90,
+                    "password_min_length": 10,
+                    "require_uppercase": True,
+                    "require_number": True,
+                    "login_lockout_enabled": True,
+                },
+            },
+            format="json",
+        )
+        audit_response = self.client.get("/api/auth/settings/audit-logs/")
+
+        self.assertEqual(get_response.status_code, 200, get_response.data)
+        self.assertEqual(forbidden_update.status_code, 403)
+        self.assertEqual(invalid_update.status_code, 400)
+        self.assertEqual(allowed_update.status_code, 200, allowed_update.data)
+        self.assertEqual(allowed_update.data["language"]["language"], "dr")
+        self.assertEqual(allowed_update.data["security"]["session_timeout_minutes"], 90)
+        self.assertEqual(audit_response.status_code, 200, audit_response.data)
+        self.assertTrue(
+            AuditLog.objects.filter(action="settings.preferences.update").exists()
+        )
 
 
 @override_settings(CACHES=TEST_CACHES)

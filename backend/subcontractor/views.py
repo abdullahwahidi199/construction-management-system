@@ -50,6 +50,7 @@ from .permissions import IsAdminOrReadOnly
 from .pagination import StandardPagination
 from .services import ContractService
 from accounts.permissions import RBACPermission
+from reports.branding import build_pdf_branding_elements, draw_pdf_branding_footer
 
 
 # ──────────────────────────────────────────────
@@ -127,6 +128,21 @@ class ContractViewSet(viewsets.ModelViewSet):
     queryset = Contract.objects.all()
     permission_classes  = [RBACPermission]
     rbac_resource       = "contracts"
+    rbac_action_permissions = {
+        "financial_summary": ("contracts.view", "contracts.view_assigned"),
+        "payments": {
+            "GET": ("contract_payments.view",),
+            "POST": ("contract_payments.create",),
+        },
+        "variations": {
+            "GET": ("contract_variations.view",),
+            "POST": ("contract_variations.create",),
+        },
+        "documents": {
+            "GET": ("contract_documents.view",),
+            "POST": ("contract_documents.create",),
+        },
+    }
     pagination_class    = StandardPagination
     filter_backends     = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class     = ContractFilter
@@ -488,7 +504,7 @@ class ContractPDFExportView(APIView):
             leftMargin=15,
             rightMargin=15,
             topMargin=15,
-            bottomMargin=15,
+            bottomMargin=30,
         )
 
         styles = getSampleStyleSheet()
@@ -512,17 +528,13 @@ class ContractPDFExportView(APIView):
 
         elements = []
 
-        # ---------------------------------------------------
-        # HEADER
-        # ---------------------------------------------------
-        elements.append(Paragraph(rtl("Contracts Report"), title_style))
-        elements.append(
-            Paragraph(
-                rtl(f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}"),
-                normal,
-            )
+        company, branding = build_pdf_branding_elements(
+            title="Contracts Report",
+            subtitle=f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}",
+            request=request,
+            styles=styles,
         )
-        elements.append(Spacer(1, 10))
+        elements.extend(branding)
 
         # ---------------------------------------------------
         # RESOLVE FILTER VALUES
@@ -670,7 +682,21 @@ class ContractPDFExportView(APIView):
 
         elements.append(table)
 
-        doc.build(elements)
+        doc.build(
+            elements,
+            onFirstPage=lambda canvas, document: draw_pdf_branding_footer(
+                canvas,
+                document,
+                company=company,
+                font_name="NotoArabic",
+            ),
+            onLaterPages=lambda canvas, document: draw_pdf_branding_footer(
+                canvas,
+                document,
+                company=company,
+                font_name="NotoArabic",
+            ),
+        )
         return response
     
 
@@ -742,7 +768,7 @@ class ContractDetailPDFView(APIView):
             leftMargin=20,
             rightMargin=20,
             topMargin=20,
-            bottomMargin=20,
+            bottomMargin=32,
         )
 
         styles = getSampleStyleSheet()
@@ -766,19 +792,13 @@ class ContractDetailPDFView(APIView):
 
         currency_symbol = self.get_currency(contract.currency)
 
-        # ---------------------------------------------------
-        # HEADER
-        # ---------------------------------------------------
-        elements.append(
-            Paragraph(rtl("CONTRACT DETAIL REPORT"), title_style)
+        company, branding = build_pdf_branding_elements(
+            title="Contract Detail Report",
+            subtitle=f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}",
+            request=request,
+            styles=styles,
         )
-        elements.append(
-            Paragraph(
-                rtl(f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}"),
-                normal,
-            )
-        )
-        elements.append(Spacer(1, 10))
+        elements.extend(branding)
 
         # ---------------------------------------------------
         # BASIC INFO
@@ -881,5 +901,19 @@ class ContractDetailPDFView(APIView):
         # ---------------------------------------------------
         # BUILD PDF
         # ---------------------------------------------------
-        doc.build(elements)
+        doc.build(
+            elements,
+            onFirstPage=lambda canvas, document: draw_pdf_branding_footer(
+                canvas,
+                document,
+                company=company,
+                font_name="NotoArabic",
+            ),
+            onLaterPages=lambda canvas, document: draw_pdf_branding_footer(
+                canvas,
+                document,
+                company=company,
+                font_name="NotoArabic",
+            ),
+        )
         return response

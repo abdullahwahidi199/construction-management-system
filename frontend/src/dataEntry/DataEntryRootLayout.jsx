@@ -12,16 +12,16 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../auth/AuthContext";
-import LanguageSwitcher from "../components/LanguageSwitcher";
-import ThemeToggle from "../components/ui/ToggleButton";
 import NotificationBell from "../components/notifications/NotificationBell";
 import { useLanguage } from "../hooks/useLanguage";
 import { hasAnyPermission } from "../../utils/permissions";
 import ResponsiveAppShell from "../components/navigation/ResponsiveAppShell";
+import { useCompany } from "../context/CompanyContext";
 
 export default function DataEntryRootLayout() {
   const { logout, user } = useAuth();
   const { t } = useLanguage();
+  const { company } = useCompany();
 
   const permissions = user?.permissions || [];
 
@@ -151,16 +151,15 @@ export default function DataEntryRootLayout() {
     <ResponsiveAppShell
       title={t("dataEntry.title")}
       brandIcon={ClipboardPenLine}
+      brandName={company.company_name}
+      brandLogo={company.company_logo_url}
+      brandSubtitle={t("dataEntry.title")}
       links={links}
       user={user}
       logout={logout}
       logoutLabel={t("auth.logout")}
       tools={
-        <>
-          <LanguageSwitcher />
-          <ThemeToggle />
-          <NotificationBell />
-        </>
+        <NotificationBell />
       }
     />
   );

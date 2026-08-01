@@ -1,36 +1,47 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
 const ThemeContext = createContext();
+const THEME_KEY = "theme";
+const THEMES = ["light", "dark", "construction"];
+
+export const THEME_OPTIONS = [
+  { value: "light", label: "Light Theme" },
+  { value: "dark", label: "Dark Theme" },
+  { value: "construction", label: "Construction Theme" },
+];
+
+function normalizeTheme(value) {
+  if (value === "system") return "construction";
+  return THEMES.includes(value) ? value : "dark";
+}
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState("construction");
+  const [theme, setThemeState] = useState(() =>
+    normalizeTheme(localStorage.getItem(THEME_KEY)),
+  );
+  const [resolvedTheme, setResolvedTheme] = useState(theme);
+
+  const setTheme = (value) => {
+    setThemeState(normalizeTheme(value));
+  };
 
   useEffect(() => {
     const root = document.documentElement;
 
-    // Remove all theme classes
     root.classList.remove("dark", "construction");
-
-    // Apply selected theme
     if (theme !== "light") {
       root.classList.add(theme);
     }
 
-    localStorage.setItem("theme", theme);
+    setResolvedTheme(theme);
+    localStorage.setItem(THEME_KEY, theme);
   }, [theme]);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-  }, []);
 
   return (
     <ThemeContext.Provider
       value={{
         theme,
+        resolvedTheme,
         setTheme,
       }}
     >

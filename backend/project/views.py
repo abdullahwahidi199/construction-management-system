@@ -78,6 +78,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 from project.models import Project
 from expenses.models import Expense
+from reports.branding import build_pdf_branding_elements, draw_pdf_branding_footer
 
 
 # Optional but strongly recommended for correct Dari/Pashto/Arabic shaping.
@@ -332,15 +333,12 @@ class ProjectPDFExportView(APIView):
         return table
 
     def _page_footer(self, canvas, doc):
-        canvas.saveState()
-        canvas.setFont(PDF_FONT_NAME, 8)
-        canvas.setFillColor(colors.HexColor("#6B7280"))
-        canvas.drawCentredString(
-            doc.pagesize[0] / 2,
-            12,
-            f"Page {doc.page}",
+        draw_pdf_branding_footer(
+            canvas,
+            doc,
+            company=getattr(self, "_company", None),
+            font_name=PDF_FONT_NAME,
         )
-        canvas.restoreState()
 
     def _contract_calculations(self, contract):
         """
@@ -399,19 +397,13 @@ class ProjectPDFExportView(APIView):
 
         elements = []
 
-        # --------------------------------------------------
-        # HEADER
-        # --------------------------------------------------
-
-        elements.append(self._p("Project Report", styles["title"]))
-        elements.append(self._p(project.name, styles["subtitle"]))
-        elements.append(
-            self._p(
-                f"Generated: {self._format_datetime(timezone.now())}",
-                styles["normal_center"],
-            )
+        self._company, branding = build_pdf_branding_elements(
+            title="Project Report",
+            subtitle=f"{project.name} | Generated: {self._format_datetime(timezone.now())}",
+            request=request,
+            styles=getSampleStyleSheet(),
         )
-        elements.append(Spacer(1, 14))
+        elements.extend(branding)
 
         # --------------------------------------------------
         # PROJECT INFORMATION

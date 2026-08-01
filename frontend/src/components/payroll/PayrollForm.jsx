@@ -30,7 +30,7 @@ const initialFormData = {
   deductions: "0",
   tax_deducted: "0",
   social_security: "0",
-  payment_method: "bank_transfer",
+  payment_method: "cash",
   payment_date: "", // ADD THIS
   notes: "",
 };
@@ -68,7 +68,9 @@ export default function PayrollForm({
   const [localError, setLocalError] = useState("");
   const [outstandingAdvances, setOutstandingAdvances] = useState([]);
   const [loadingAdvances, setLoadingAdvances] = useState(false);
-  const [advanceMode, setAdvanceMode] = useState(payrollId ? "keep" : "selected");
+  const [advanceMode, setAdvanceMode] = useState(
+    payrollId ? "keep" : "selected",
+  );
   const [selectedAdvanceAmounts, setSelectedAdvanceAmounts] = useState({});
   const [partialAdvanceAmount, setPartialAdvanceAmount] = useState("");
   const [monthTouched, setMonthTouched] = useState(false);
@@ -84,7 +86,10 @@ export default function PayrollForm({
         setPayroll(res.data);
       } catch (err) {
         setLocalError(
-          getFriendlyErrorMessage(err, "The requested item could not be found."),
+          getFriendlyErrorMessage(
+            err,
+            "The requested item could not be found.",
+          ),
         );
       }
     };
@@ -112,7 +117,7 @@ export default function PayrollForm({
       deductions: payroll.deductions || "0",
       tax_deducted: payroll.tax_deducted || "0",
       social_security: payroll.social_security || "0",
-      payment_method: payroll.payment_method || "bank_transfer",
+      payment_method: payroll.payment_method || "cash",
       payment_date: payroll.payment_date || "", // ADD THIS
       notes: payroll.notes || "",
     });
@@ -212,12 +217,16 @@ export default function PayrollForm({
     }
 
     if (breakdown.net < 0) {
-      setLocalError("Payroll cannot be saved because net pay would be negative.");
+      setLocalError(
+        "Payroll cannot be saved because net pay would be negative.",
+      );
       return;
     }
 
     if (breakdown.advanceDeduction > breakdown.payableBeforeAdvances) {
-      setLocalError("Advance deductions cannot exceed the remaining payable salary.");
+      setLocalError(
+        "Advance deductions cannot exceed the remaining payable salary.",
+      );
       return;
     }
 
@@ -245,7 +254,9 @@ export default function PayrollForm({
 
     payload.advance_deduction_mode = advanceMode;
     if (advanceMode === "selected") {
-      payload.advance_deductions_payload = Object.entries(selectedAdvanceAmounts)
+      payload.advance_deductions_payload = Object.entries(
+        selectedAdvanceAmounts,
+      )
         .filter(([advanceId]) => selectedAdvanceIds.has(Number(advanceId)))
         .map(([advanceId, amount]) => ({
           advance: Number(advanceId),
@@ -293,14 +304,18 @@ export default function PayrollForm({
   }, 0);
   const breakdown = {
     basic: numeric(formData.basic_salary),
-    overtime: numeric(formData.overtime_hours) * numeric(formData.overtime_rate),
+    overtime:
+      numeric(formData.overtime_hours) * numeric(formData.overtime_rate),
     bonus: numeric(formData.bonus),
     allowances: numeric(formData.allowances),
     deductions: numeric(formData.deductions),
     tax: numeric(formData.tax_deducted),
   };
   breakdown.gross =
-    breakdown.basic + breakdown.overtime + breakdown.bonus + breakdown.allowances;
+    breakdown.basic +
+    breakdown.overtime +
+    breakdown.bonus +
+    breakdown.allowances;
   breakdown.payableBeforeAdvances =
     breakdown.gross - breakdown.deductions - breakdown.tax;
   breakdown.advanceDeduction =
@@ -632,14 +647,18 @@ export default function PayrollForm({
       </div>
 
       {formData.employee && (
-        <section className="rounded-lg border p-4" style={{ borderColor: "var(--border)" }}>
+        <section
+          className="rounded-lg border p-4"
+          style={{ borderColor: "var(--border)" }}
+        >
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 className="text-sm font-semibold text-[var(--text)]">
                 Salary Advances
               </h3>
               <p className="text-xs text-[var(--muted)]">
-                Includes outstanding advances through the selected payroll month.
+                Includes outstanding advances through the selected payroll
+                month.
               </p>
             </div>
             <span className="rounded-full bg-[var(--hover)] px-3 py-1 text-xs font-semibold">
@@ -693,7 +712,10 @@ export default function PayrollForm({
               </div>
 
               {advanceMode === "selected" && (
-                <div className="overflow-hidden rounded-lg border" style={{ borderColor: "var(--border)" }}>
+                <div
+                  className="overflow-hidden rounded-lg border"
+                  style={{ borderColor: "var(--border)" }}
+                >
                   {outstandingAdvances.map((advance) => (
                     <div
                       key={advance.id}
@@ -706,7 +728,10 @@ export default function PayrollForm({
                           className="mt-1"
                           checked={selectedAdvanceIds.has(advance.id)}
                           onChange={(event) =>
-                            updateSelectedAdvance(advance.id, event.target.checked)
+                            updateSelectedAdvance(
+                              advance.id,
+                              event.target.checked,
+                            )
                           }
                         />
                         <span>
@@ -731,7 +756,10 @@ export default function PayrollForm({
                           Deducted
                         </span>
                         <span className="font-medium">
-                          {money(advance.amount_deducted, formData.currency || "AFN")}
+                          {money(
+                            advance.amount_deducted,
+                            formData.currency || "AFN",
+                          )}
                         </span>
                       </div>
                       <div className="text-sm">
@@ -739,7 +767,10 @@ export default function PayrollForm({
                           Remaining
                         </span>
                         <span className="font-medium">
-                          {money(advance.remaining_balance, formData.currency || "AFN")}
+                          {money(
+                            advance.remaining_balance,
+                            formData.currency || "AFN",
+                          )}
                         </span>
                         <span className="mt-1 block text-xs text-[var(--muted)]">
                           {advanceStatusLabel(advance)}
@@ -771,7 +802,10 @@ export default function PayrollForm({
 
               {advanceMode === "partial" && (
                 <div className="max-w-sm">
-                  <label className={labelClass} style={{ color: "var(--text)" }}>
+                  <label
+                    className={labelClass}
+                    style={{ color: "var(--text)" }}
+                  >
                     Partial advance deduction
                   </label>
                   <input
@@ -780,7 +814,9 @@ export default function PayrollForm({
                     max={outstandingTotal}
                     step="0.01"
                     value={partialAdvanceAmount}
-                    onChange={(event) => setPartialAdvanceAmount(event.target.value)}
+                    onChange={(event) =>
+                      setPartialAdvanceAmount(event.target.value)
+                    }
                     className={inputClass}
                     style={{
                       backgroundColor: "var(--bg)",
@@ -795,7 +831,10 @@ export default function PayrollForm({
         </section>
       )}
 
-      <section className="rounded-lg border p-4" style={{ borderColor: "var(--border)" }}>
+      <section
+        className="rounded-lg border p-4"
+        style={{ borderColor: "var(--border)" }}
+      >
         <h3 className="mb-3 text-sm font-semibold text-[var(--text)]">
           Payroll Breakdown
         </h3>
@@ -814,18 +853,30 @@ export default function PayrollForm({
                 {type === "minus" ? "- " : "+ "}
                 {label}
               </span>
-              <span className="font-medium">{money(amount, formData.currency || "AFN")}</span>
+              <span className="font-medium">
+                {money(amount, formData.currency || "AFN")}
+              </span>
             </div>
           ))}
-          <div className="flex justify-between border-t pt-3 text-base font-bold" style={{ borderColor: "var(--border)" }}>
+          <div
+            className="flex justify-between border-t pt-3 text-base font-bold"
+            style={{ borderColor: "var(--border)" }}
+          >
             <span>= Net Pay</span>
-            <span className={breakdown.net < 0 ? "text-[var(--danger)]" : "text-[var(--success)]"}>
+            <span
+              className={
+                breakdown.net < 0
+                  ? "text-[var(--danger)]"
+                  : "text-[var(--success)]"
+              }
+            >
               {money(breakdown.net, formData.currency || "AFN")}
             </span>
           </div>
           {breakdown.advanceDeduction > breakdown.payableBeforeAdvances && (
             <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-[var(--danger)]">
-              Advance deductions exceed the payable salary. Choose a partial amount or leave advances for a future payroll.
+              Advance deductions exceed the payable salary. Choose a partial
+              amount or leave advances for a future payroll.
             </p>
           )}
         </div>

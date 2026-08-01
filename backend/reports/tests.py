@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APITestCase
 
-from Employees.models import Employee, Payroll
+from Employees.models import Employee, Payroll, SalaryAdvance
 from dashboard.services import DashboardService
 from expenses.models import Expense
 from expenses.serializers import ExpenseSerializer
@@ -390,4 +390,70 @@ class ReportEndpointTests(APITestCase):
         self.assertEqual(
             financial.data["summary"]["office_expenses_usd"],
             Decimal("30.00"),
+        )
+
+    def test_reports_include_salary_advances_without_double_counting_payroll_settlement(self):
+        scenario_employee = Employee.objects.create(
+            first_name="Advance",
+            last_name="Worker",
+            email="advance.worker@example.com",
+            phone="0799999999",
+            address="Kabul",
+            department="finance",
+            position="Accountant",
+            employment_type="full_time",
+            hire_date=date(2026, 1, 1),
+            salary=Decimal("30000.00"),
+        )
+        advance = SalaryAdvance.objects.create(
+            employee=scenario_employee,
+            amount=Decimal("5000.00"),
+            remaining_balance=Decimal("5000.00"),
+            date=date(2026, 2, 10),
+            reason="Emergency advance",
+        )
+        SalaryAdvance.objects.filter(pk=advance.pk).update(
+            remaining_balance=Decimal("0.00"),
+            status="deducted",
+        )
+        Payroll.objects.create(
+            employee=scenario_employee,
+            payroll_period_start=date(2026, 2, 1),
+            payroll_period_end=date(2026, 2, 28),
+            basic_salary=Decimal("30000.00"),
+            gross_pay=Decimal("30000.00"),
+            advance_deductions=Decimal("5000.00"),
+            net_pay=Decimal("25000.00"),
+            currency="AFN",
+            payment_method="cash",
+        )
+
+        payroll = self.client.get("/api/reports/payroll/?currency=AFN")
+        financial = self.client.get("/api/reports/financial/")
+        expenses = self.client.get("/api/reports/expenses/")
+
+        self.assertEqual(payroll.status_code, 200, payroll.data)
+        self.assertEqual(payroll.data["summary"]["total_advances"], Decimal("5000.00"))
+        self.assertEqual(payroll.data["summary"]["total_advance_deductions"], Decimal("5000.00"))
+        self.assertEqual(payroll.data["summary"]["total_cash_outflow"], Decimal("30000.00"))
+        self.assertIn(
+            "Salary Advance",
+            {row["source_type"] for row in payroll.data["rows"]},
+        )
+
+        self.assertEqual(
+            financial.data["summary"]["employee_advances_paid_afn"],
+            Decimal("5000.00"),
+        )
+        self.assertEqual(
+            financial.data["summary"]["payroll_cash_outflow_afn"],
+            Decimal("30000.00"),
+        )
+        self.assertEqual(
+            expenses.data["summary"]["employee_advances_paid_afn"],
+            Decimal("5000.00"),
+        )
+        self.assertEqual(
+            expenses.data["summary"]["overall_total_outflow_afn"],
+            Decimal("5000.00"),
         )

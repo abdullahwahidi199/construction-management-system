@@ -2,6 +2,7 @@ from collections import defaultdict
 from decimal import Decimal
 
 from Employees.models import Attendance
+from common.work_calendar import get_work_calendar_service
 from labour.models import WorkerAttendance
 from .base import BaseReport
 
@@ -41,6 +42,18 @@ def empty_source_summary(source_type):
 
 class AttendanceReport(BaseReport):
     report_name = "Attendance Report"
+
+    def _calendar_summary(self):
+        start, end = self.get_date_range()
+        if not start or not end:
+            return {
+                "total_calendar_days": 0,
+                "total_working_days": 0,
+                "weekly_off_days": 0,
+                "official_holidays": 0,
+                "days": [],
+            }
+        return get_work_calendar_service().get_range_summary(start, end)
 
     def _employee_queryset(self):
         if self.filters.get("source_type") == "daily_worker":
@@ -203,17 +216,44 @@ class AttendanceReport(BaseReport):
             ZERO,
         )
 
+        per_employee = self._person_summary(rows)
+        calendar_summary = self._calendar_summary()
+        effective_attendance_days = sum(
+            Decimal("1.00")
+            if row["status_key"] in {"present", "overtime"}
+            else Decimal("0.50")
+            if row["status_key"] == "half_day"
+            else ZERO
+            for row in rows
+        )
+        expected_attendance_days = (
+            Decimal(calendar_summary["total_working_days"] * len(per_employee))
+            if calendar_summary["total_working_days"] and per_employee
+            else ZERO
+        )
+        attendance_percentage = (
+            (effective_attendance_days / expected_attendance_days * Decimal("100")).quantize(Decimal("0.01"))
+            if expected_attendance_days
+            else ZERO
+        )
+
         return {
             **self.get_metadata(),
             "summary": {
                 "total_records": len(rows),
+                "total_calendar_days": calendar_summary["total_calendar_days"],
+                "total_working_days": calendar_summary["total_working_days"],
+                "weekly_off_days": calendar_summary["weekly_off_days"],
+                "official_holidays": calendar_summary["official_holidays"],
+                "attendance_percentage": attendance_percentage,
                 "employee_attendance_records": len(employee_rows),
                 "daily_worker_attendance_records": len(worker_rows),
                 "total_overtime_hours": total_overtime,
                 "status_breakdown": list(by_status.values()),
                 "by_source": list(by_source.values()),
+                "calendar_summary": calendar_summary,
             },
             "status_by_source": list(by_source_status.values()),
-            "per_employee": self._person_summary(rows),
+            "per_employee": per_employee,
             "rows": rows,
         }

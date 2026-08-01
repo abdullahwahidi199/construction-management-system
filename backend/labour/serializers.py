@@ -127,21 +127,46 @@ class WorkerAdvanceSerializer(CalendarModelSerializer):
     worker_name = serializers.CharField(source="worker.full_name", read_only=True)
     worker_code = serializers.CharField(source="worker.worker_id", read_only=True)
     status = serializers.SerializerMethodField()
+    amount_deducted = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkerAdvance
         fields = "__all__"
-        read_only_fields = ["created_at", "updated_at", "created_by", "status"]
+        read_only_fields = [
+            "remaining_balance",
+            "created_at",
+            "updated_at",
+            "created_by",
+            "status",
+            "amount_deducted",
+        ]
 
     def get_status(self, obj):
         return "paid" if obj.is_paid else "open"
 
+    def get_amount_deducted(self, obj):
+        return max((obj.amount or Decimal("0.00")) - (obj.remaining_balance or Decimal("0.00")), Decimal("0.00"))
+
     def validate(self, data):
-        if self.instance is None and "remaining_balance" not in data:
-            data["remaining_balance"] = data.get("amount")
-        if data.get("remaining_balance") and data.get("amount") and data["remaining_balance"] > data["amount"]:
-            raise serializers.ValidationError({"remaining_balance": "Remaining balance cannot exceed amount."})
+        amount = data.get("amount")
+        if self.instance and amount is not None:
+            already_deducted = (self.instance.amount or Decimal("0.00")) - (self.instance.remaining_balance or Decimal("0.00"))
+            if amount < already_deducted:
+                raise serializers.ValidationError({
+                    "amount": "Amount cannot be less than the amount already deducted through payroll."
+                })
         return data
+
+    def create(self, validated_data):
+        validated_data["remaining_balance"] = validated_data.get("amount", Decimal("0.00"))
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        amount = validated_data.get("amount")
+        if amount is not None:
+            already_deducted = (instance.amount or Decimal("0.00")) - (instance.remaining_balance or Decimal("0.00"))
+            instance.remaining_balance = amount - already_deducted
+        return super().update(instance, validated_data)
 
 
 class WorkerPayrollSerializer(CalendarModelSerializer):

@@ -52,14 +52,14 @@ export default function ReportTable({ columns, rows }) {
 
   if (!rows || rows.length === 0) {
     return (
-      <div className="rounded-lg bg-card p-12 text-center text-sm text-muted shadow-sm shadow-black/5">
+      <div className="rounded-md border border-dashed border-[color:color-mix(in_srgb,var(--border)_75%,transparent)] bg-card px-5 py-12 text-center text-sm text-muted">
         {translateOrFallback(t, "reports.states.noRecords", "No records found.")}
       </div>
     );
   }
 
   return (
-    <section className="overflow-hidden rounded-lg bg-card shadow-sm shadow-black/5">
+    <section className="overflow-hidden rounded-md border border-[color:color-mix(in_srgb,var(--border)_72%,transparent)] bg-card">
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
         <div>
           <h3 className="text-sm font-semibold text-text">
@@ -78,12 +78,12 @@ export default function ReportTable({ columns, rows }) {
 
       <div className="hidden overflow-x-auto overflow-y-visible md:block mobile-scrollbar">
         <table className="w-full text-sm">
-          <thead className="bg-[color:color-mix(in_srgb,var(--hover)_70%,var(--card))]">
+          <thead className="bg-bg">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider whitespace-nowrap"
+                  className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted"
                 >
                   {translateReportKey(t, "columns", col.key, col.label)}
                 </th>
@@ -94,16 +94,16 @@ export default function ReportTable({ columns, rows }) {
             {rows.map((row, idx) => (
               <tr
                 key={row.id ?? idx}
-                className="border-b border-[color:color-mix(in_srgb,var(--border)_55%,transparent)] last:border-0 odd:bg-bg/35 transition-colors hover:bg-hover"
+                className="border-b border-[color:color-mix(in_srgb,var(--border)_55%,transparent)] last:border-0 transition-colors hover:bg-hover/70"
               >
                 {columns.map((col) => (
                   <td
                     key={col.key}
-                    className="px-4 py-3 text-text whitespace-nowrap"
+                    className="max-w-64 break-words px-4 py-3 align-top text-text"
                   >
                     {col.type === "badge" ? (
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${badgeClass(
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize ${badgeClass(
                           row[col.key],
                         )}`}
                       >
@@ -151,7 +151,7 @@ export default function ReportTable({ columns, rows }) {
                     <dd className="mt-1 break-words text-sm font-medium text-text">
                       {col.type === "badge" ? (
                         <span
-                          className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium capitalize ${badgeClass(
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize ${badgeClass(
                             row[col.key],
                           )}`}
                         >

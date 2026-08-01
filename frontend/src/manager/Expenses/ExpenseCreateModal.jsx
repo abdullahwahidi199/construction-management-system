@@ -14,6 +14,7 @@ import {
 } from "../../components/ui/formStyles.jsx";
 import CalendarDatePicker from "../../components/common/CalendarDatePicker";
 import { todayIso } from "../../utils/calendar";
+import InlineAlert from "../../components/common/InlineAlert";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -120,8 +121,13 @@ export default function ExpenseCreateModal({
     if (!formData.expense_date) {
       newErrors.expense_date = t("ExpenseCreateModal.dateRequired");
     }
-    if (!formData.amount_usd && !formData.amount_afn) {
+    const usd = Number(formData.amount_usd || 0);
+    const afn = Number(formData.amount_afn || 0);
+    if (usd <= 0 && afn <= 0) {
       newErrors.amount = t("ExpenseCreateModal.amountRequired");
+    }
+    if (usd > 0 && afn > 0) {
+      newErrors.amount = "Enter the amount in either USD or AFN, not both.";
     }
     if (formData.expense_scope === "project" && !formData.project) {
       newErrors.project = t("ExpenseCreateModal.projectRequired");
@@ -156,6 +162,7 @@ export default function ExpenseCreateModal({
       onClose();
     } catch (error) {
       setErrors({
+        ...(error?.validationErrors || {}),
         submit: getFriendlyErrorMessage(
           error,
           t("ExpenseCreateModal.createFailed"),
@@ -413,11 +420,7 @@ export default function ExpenseCreateModal({
 
               {/* Error Message */}
               {errors.submit && (
-                <div className="rounded-lg border border-[var(--danger)]/20 bg-[var(--danger)]/10 p-4">
-                  <p className="text-sm text-[var(--danger)]">
-                    {errors.submit}
-                  </p>
-                </div>
+                <InlineAlert type="error">{errors.submit}</InlineAlert>
               )}
             </div>
 

@@ -133,9 +133,13 @@ export default function ExpensesMain({ dataEntryMode = false }) {
 
   const handleExpenseUpdate = async (id, updatedData) => {
     try {
-      await instance.put(`expenses/${id}/`, updatedData);
+      const response = await instance.put(`expenses/${id}/`, updatedData);
       refetch();
-      toast.success("Expense updated.");
+      if (response.status === 202 || response.data?.edit_request) {
+        toast.success("Expense edit submitted for approval.");
+      } else {
+        toast.success("Expense updated.");
+      }
     } catch (err) {
       // Central axios handling shows the user-facing error.
     }
@@ -209,8 +213,8 @@ export default function ExpensesMain({ dataEntryMode = false }) {
 
   const backendTotals = expenses?.results?.totals || { usd: 0, afn: 0 };
   const totals = {
-    usd: Number(backendTotals.usd) || 0,
-    afn: Number(backendTotals.afn) || 0,
+    usd: Number(backendTotals.usd_equivalent ?? backendTotals.usd) || 0,
+    afn: Number(backendTotals.afn_equivalent ?? backendTotals.afn) || 0,
   };
 
   const ITEMS_PER_PAGE = 25;
@@ -359,11 +363,11 @@ export default function ExpensesMain({ dataEntryMode = false }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex w-full flex-wrap items-center justify-end gap-2.5 sm:w-auto">
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--card)] text-[var(--muted)] shadow-sm transition-all hover:bg-[var(--hover)] hover:text-[var(--text)] disabled:opacity-50"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--muted)] shadow-sm transition-all hover:bg-[var(--hover)] hover:text-[var(--text)] disabled:opacity-50"
             title={t("ExpensesMain.refresh")}
           >
             <RefreshCw
@@ -374,7 +378,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
 
           <button
             onClick={() => setOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[var(--primary)]/25 transition-all hover:opacity-90 active:scale-[0.98]"
+            className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90 active:scale-[0.98] sm:flex-none"
           >
             <Plus className="h-4 w-4" strokeWidth={2.5} />
             {t("ExpensesMain.newExpense")}
@@ -414,7 +418,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
           </div>
           <div className="mt-4">
             <p className="text-sm font-medium text-[var(--muted)]">
-              {t("ExpensesMain.cards.totalSpendingUsd")}
+              {t("ExpensesMain.cards.totalSpendingUsd")} EQ
             </p>
             <p className="text-2xl font-bold text-[var(--text)]">
               {formatCurrency(totals.usd, "USD")}
@@ -448,7 +452,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
           </div>
           <div className="mt-4">
             <p className="text-sm font-medium text-[var(--muted)]">
-              {t("ExpensesMain.cards.totalSpendingAfn")}
+              {t("ExpensesMain.cards.totalSpendingAfn")} EQ
             </p>
             <p className="text-2xl font-bold text-[var(--text)]">
               {formatCurrency(totals.afn, "AFN").replace("$", "")}{" "}
@@ -515,7 +519,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
           </div>
           <div className="mt-4">
             <p className="text-sm font-medium text-[var(--muted)]">
-              {t("ExpensesMain.cards.avgPerEntry")}
+              {t("ExpensesMain.cards.avgPerEntry")} EQ
             </p>
             <p className="text-2xl font-bold text-[var(--text)]">
               {formatCurrency(averageUSD, "USD")}

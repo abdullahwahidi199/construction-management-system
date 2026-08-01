@@ -99,7 +99,7 @@ describe("calendar and report hooks", () => {
     await act(async () => {
       await result.current.fetchReport({ status: "approved" });
     });
-    expect(result.current.error).toBe("Something went wrong. Please try again later.");
+    expect(result.current.error).toBe("Something went wrong. Please try again in a moment.");
     expect(result.current.data).toBeNull();
 
     await act(async () => {

@@ -1,6 +1,7 @@
 from collections import defaultdict
 from decimal import Decimal
 
+from Employees.finance import salary_advance_queryset, salary_advance_totals
 from Employees.models import Payroll
 from expenses.models import Expense
 from labour.models import WorkerPayroll
@@ -41,6 +42,7 @@ def empty_month(name):
         "month": name,
         "expenses_usd": ZERO,
         "expenses_afn": ZERO,
+        "employee_advances": ZERO,
         "employee_payroll": ZERO,
         "worker_payroll": ZERO,
         "contract_payments": ZERO,
@@ -83,6 +85,12 @@ class FinancialOverviewReport(BaseReport):
             qs = qs.filter(payroll_period_end__lte=end)
 
         return qs
+
+    def _salary_advance_queryset(self):
+        start, end = self.get_date_range()
+        if self.filters.get("project_id"):
+            return salary_advance_queryset().none()
+        return salary_advance_queryset(start=start, end=end)
 
     def _worker_payroll_queryset(self):
         qs = WorkerPayroll.objects.select_related("worker", "project")
@@ -167,7 +175,12 @@ class FinancialOverviewReport(BaseReport):
             add_currency(totals["gross"], currency, getattr(payroll, gross_field))
             add_currency(totals["net"], currency, getattr(payroll, net_field))
             add_currency(totals["deductions"], currency, getattr(payroll, "deductions", ZERO))
-            add_currency(totals["advances"], currency, getattr(payroll, "advances", ZERO))
+            advance_amount = getattr(
+                payroll,
+                "advances",
+                getattr(payroll, "advance_deductions", ZERO),
+            )
+            add_currency(totals["advances"], currency, advance_amount)
             add_currency(totals["tax"], currency, getattr(payroll, "tax_deducted", ZERO))
 
         return totals
@@ -214,7 +227,7 @@ class FinancialOverviewReport(BaseReport):
             add_currency(totals, project.budget_currency, project.estimated_budget)
         return totals
 
-    def _monthly_trend(self, expenses, employee_payrolls, worker_payrolls, contracts):
+    def _monthly_trend(self, expenses, employee_payrolls, salary_advances, worker_payrolls, contracts):
         months = defaultdict(lambda: None)
 
         def get_month(name):
@@ -231,6 +244,11 @@ class FinancialOverviewReport(BaseReport):
         for payroll in employee_payrolls:
             item = get_month(month_key(payroll.payroll_period_start))
             item["employee_payroll"] += money(payroll.net_pay)
+            item["records"] += 1
+
+        for advance in salary_advances:
+            item = get_month(month_key(advance.date))
+            item["employee_advances"] += money(advance.amount)
             item["records"] += 1
 
         for payroll in worker_payrolls:
@@ -323,6 +341,7 @@ class FinancialOverviewReport(BaseReport):
         projects = list(self._project_queryset())
         expenses = list(self._expense_queryset())
         employee_payrolls = list(self._employee_payroll_queryset())
+        salary_advances = list(self._salary_advance_queryset())
         worker_payrolls = list(self._worker_payroll_queryset())
         contracts = list(self._contract_queryset())
 
@@ -351,6 +370,9 @@ class FinancialOverviewReport(BaseReport):
             gross_field="gross_amount",
             net_field="net_amount",
         )
+        employee_advances = salary_advance_totals(
+            self._salary_advance_queryset()
+        )
         contract_totals, contract_rows = self._contract_totals(contracts)
         budget_totals = self._budget_totals(projects)
 
@@ -358,15 +380,19 @@ class FinancialOverviewReport(BaseReport):
         for currency in CURRENCIES:
             expenses_value = expense_totals[f"total_{currency.lower()}"]
             employee_net = employee_payroll["net"][currency]
+            employee_advance_paid = employee_advances[f"total_{currency.lower()}"]
+            employee_cash_outflow = employee_net + employee_advance_paid
             worker_net = worker_payroll["net"][currency]
             contract_paid = contract_totals["paid"][currency]
-            operating_cost = expenses_value + employee_net + worker_net + contract_paid
+            operating_cost = expenses_value + employee_cash_outflow + worker_net + contract_paid
 
             cost_mix_by_currency.append({
                 "currency": currency,
                 "budget": budget_totals[currency],
                 "expenses": expenses_value,
                 "employee_payroll": employee_net,
+                "employee_advances": employee_advance_paid,
+                "employee_payroll_cash_outflow": employee_cash_outflow,
                 "worker_payroll": worker_net,
                 "contract_paid": contract_paid,
                 "operating_cost": operating_cost,
@@ -382,6 +408,10 @@ class FinancialOverviewReport(BaseReport):
                 "net_afn": employee_payroll["net"]["AFN"],
                 "gross_usd": employee_payroll["gross"]["USD"],
                 "gross_afn": employee_payroll["gross"]["AFN"],
+                "advances_usd": employee_advances["total_usd"],
+                "advances_afn": employee_advances["total_afn"],
+                "cash_outflow_usd": employee_payroll["net"]["USD"] + employee_advances["total_usd"],
+                "cash_outflow_afn": employee_payroll["net"]["AFN"] + employee_advances["total_afn"],
             },
             {
                 "source_type": "Daily Workers",
@@ -420,6 +450,10 @@ class FinancialOverviewReport(BaseReport):
             "daily_worker_payroll_records": worker_payroll["count"],
             "payroll_net_usd": employee_payroll["net"]["USD"] + worker_payroll["net"]["USD"],
             "payroll_net_afn": employee_payroll["net"]["AFN"] + worker_payroll["net"]["AFN"],
+            "employee_advances_paid_usd": employee_advances["total_usd"],
+            "employee_advances_paid_afn": employee_advances["total_afn"],
+            "payroll_cash_outflow_usd": employee_payroll["net"]["USD"] + worker_payroll["net"]["USD"] + employee_advances["total_usd"],
+            "payroll_cash_outflow_afn": employee_payroll["net"]["AFN"] + worker_payroll["net"]["AFN"] + employee_advances["total_afn"],
             "contract_count": contract_totals["count"],
             "contract_value_usd": contract_totals["value"]["USD"],
             "contract_value_afn": contract_totals["value"]["AFN"],
@@ -453,6 +487,9 @@ class FinancialOverviewReport(BaseReport):
                 "daily_worker": worker_payroll,
                 "net_usd": summary["payroll_net_usd"],
                 "net_afn": summary["payroll_net_afn"],
+                "cash_outflow_usd": summary["payroll_cash_outflow_usd"],
+                "cash_outflow_afn": summary["payroll_cash_outflow_afn"],
+                "employee_advances": employee_advances,
                 "gross_usd": employee_payroll["gross"]["USD"] + worker_payroll["gross"]["USD"],
                 "gross_afn": employee_payroll["gross"]["AFN"] + worker_payroll["gross"]["AFN"],
             },
@@ -463,6 +500,7 @@ class FinancialOverviewReport(BaseReport):
             "monthly_trend": self._monthly_trend(
                 expenses,
                 employee_payrolls,
+                salary_advances,
                 worker_payrolls,
                 contracts,
             ),

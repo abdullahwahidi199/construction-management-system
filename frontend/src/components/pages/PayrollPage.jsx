@@ -250,6 +250,11 @@ export default function PayrollPage() {
           acc[currency] = {
             gross: 0,
             net: 0,
+            advancesPaid: 0,
+            advanceDeductions: 0,
+            cashOutflow: 0,
+            amountPaid: 0,
+            balanceDue: 0,
             count: 0,
             paid: 0,
           };
@@ -257,6 +262,10 @@ export default function PayrollPage() {
 
         acc[currency].gross += gross;
         acc[currency].net += net;
+        acc[currency].advanceDeductions += numeric(p.advance_deductions);
+        acc[currency].cashOutflow += net;
+        acc[currency].amountPaid += numeric(p.amount_paid);
+        acc[currency].balanceDue += numeric(p.balance_due);
         acc[currency].count += 1;
 
         if (p.payment_status === "fully_paid" || p.payment_status === "paid") {
@@ -266,6 +275,30 @@ export default function PayrollPage() {
         return acc;
       }, {})
     : {};
+  if (Array.isArray(advances)) {
+    advances
+      .filter((advance) => advance.status !== "cancelled")
+      .forEach((advance) => {
+        const currency = "AFN";
+        if (!summaryByCurrency[currency]) {
+          summaryByCurrency[currency] = {
+            gross: 0,
+            net: 0,
+            advancesPaid: 0,
+            advanceDeductions: 0,
+            cashOutflow: 0,
+            amountPaid: 0,
+            balanceDue: 0,
+            count: 0,
+            paid: 0,
+          };
+        }
+        const amount = numeric(advance.amount);
+        summaryByCurrency[currency].advancesPaid += amount;
+        summaryByCurrency[currency].cashOutflow += amount;
+        summaryByCurrency[currency].amountPaid += amount;
+      });
+  }
 
   return (
     <div>
@@ -442,6 +475,42 @@ export default function PayrollPage() {
                   </span>
                   <span style={{ color: "var(--success)" }}>
                     {currency} {data.net.toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex justify-between text-sm">
+                  <span style={{ color: "var(--muted)" }}>
+                    Advances paid
+                  </span>
+                  <span style={{ color: "var(--danger)" }}>
+                    {currency} {data.advancesPaid.toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex justify-between text-sm">
+                  <span style={{ color: "var(--muted)" }}>
+                    Advance deductions
+                  </span>
+                  <span style={{ color: "var(--warning)" }}>
+                    {currency} {data.advanceDeductions.toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex justify-between text-sm">
+                  <span style={{ color: "var(--muted)" }}>
+                    Cash outflow
+                  </span>
+                  <span style={{ color: "var(--primary)" }}>
+                    {currency} {data.cashOutflow.toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex justify-between text-sm">
+                  <span style={{ color: "var(--muted)" }}>
+                    Paid / balance
+                  </span>
+                  <span style={{ color: "var(--text)" }}>
+                    {currency} {data.amountPaid.toLocaleString()} / {data.balanceDue.toLocaleString()}
                   </span>
                 </div>
 
@@ -864,26 +933,16 @@ export default function PayrollPage() {
           employee: deleteConfirm?.employee_name,
         })}
       />
-      <Modal
-        isOpen={showPrintModal}
-        onClose={() => {
-          setShowPrintModal(false);
-          setSelectedPayrollId(null);
-        }}
-        title="Payroll Details"
-        size="xl"
-      >
-        {selectedPayrollId && (
-          <PayrollPrintModal
-            isOpen={showPrintModal}
-            onClose={() => {
-              setShowPrintModal(false);
-              setSelectedPayrollId(null);
-            }}
-            payrollID={selectedPayrollId}
-          />
-        )}
-      </Modal>
+      {selectedPayrollId && (
+        <PayrollPrintModal
+          isOpen={showPrintModal}
+          onClose={() => {
+            setShowPrintModal(false);
+            setSelectedPayrollId(null);
+          }}
+          payrollID={selectedPayrollId}
+        />
+      )}
     </div>
   );
 }
@@ -899,14 +958,17 @@ function SalaryAdvancesPanel({
 }) {
   const totals = advances.reduce(
     (acc, advance) => {
-      acc.given += numeric(advance.amount);
-      acc.outstanding += numeric(advance.remaining_balance);
+      if (advance.status !== "cancelled") {
+        acc.given += numeric(advance.amount);
+        acc.deducted += getAdvanceAmountDeducted(advance);
+        acc.outstanding += numeric(advance.remaining_balance);
+      }
       if (advance.status !== "cancelled" && numeric(advance.remaining_balance) > 0) {
         acc.active += 1;
       }
       return acc;
     },
-    { given: 0, outstanding: 0, active: 0 },
+    { given: 0, deducted: 0, outstanding: 0, active: 0 },
   );
   const groupedAdvances = groupAdvancesByMonth(advances, calendar);
 
@@ -931,8 +993,9 @@ function SalaryAdvancesPanel({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
         <SummaryTile label="Total Given" value={money(totals.given)} />
+        <SummaryTile label="Deducted Through Payroll" value={money(totals.deducted)} />
         <SummaryTile label="Outstanding" value={money(totals.outstanding)} tone="danger" />
         <SummaryTile label="Outstanding Advances" value={totals.active} />
       </div>

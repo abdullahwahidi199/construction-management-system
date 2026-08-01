@@ -1,6 +1,15 @@
 import { useMemo } from "react";
 import { Printer, X } from "lucide-react";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
+import { useCompany } from "../../context/CompanyContext";
+import {
+  PrintBrandFooter,
+  PrintBrandHeader,
+  escapePrintHtml,
+  renderPrintBrandFooter,
+  renderPrintBrandHeader,
+  renderPrintBrandingStyles,
+} from "./PrintBranding";
 
 const EMPTY_VALUE = "-";
 
@@ -10,12 +19,7 @@ function text(value) {
 }
 
 function escapeHtml(value) {
-  return text(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return escapePrintHtml(text(value));
 }
 
 function formatMoney(amount, currency) {
@@ -101,6 +105,7 @@ export default function PrintableReceiptModal({
   footer = "This is a system-generated receipt. Keep it with the payment records.",
 }) {
   useBodyScrollLock(isOpen);
+  const { company } = useCompany();
 
   const amountText = useMemo(
     () => formatMoney(amount, currency),
@@ -130,6 +135,7 @@ export default function PrintableReceiptModal({
             line-height: 1.45;
           }
           .receipt { max-width: 820px; margin: 0 auto; }
+          ${renderPrintBrandingStyles()}
           .header {
             display: grid;
             grid-template-columns: 1fr auto;
@@ -291,18 +297,16 @@ export default function PrintableReceiptModal({
       </head>
       <body>
         <main class="receipt">
-          <header class="header">
-            <div class="brand">
-              <h1>${escapeHtml(title)}</h1>
-              <p>${escapeHtml(subtitle)}</p>
-            </div>
-            <div class="meta">
+          ${renderPrintBrandHeader(company, {
+            title,
+            subtitle,
+            metaHtml: `
               <div class="small">Receipt No.</div>
               <div class="number">${escapeHtml(receiptNumber)}</div>
               <div class="small">${escapeHtml(receiptDate)}</div>
               <div class="status">${escapeHtml(status)}</div>
-            </div>
-          </header>
+            `,
+          })}
           <section class="amount-box">
             <div>
               <div class="label">${escapeHtml(amountLabel)}</div>
@@ -314,7 +318,7 @@ export default function PrintableReceiptModal({
           ${renderPrintSections(sections)}
           ${notes ? `<section class="notes">${escapeHtml(notes)}</section>` : ""}
           <section class="signatures">${renderPrintSignatures(signatures)}</section>
-          <footer class="footer">${escapeHtml(footer)}</footer>
+          ${renderPrintBrandFooter(company, footer)}
         </main>
       </body>
       </html>
@@ -373,16 +377,11 @@ export default function PrintableReceiptModal({
 
           <div className="flex-1 overflow-auto bg-[var(--bg)] p-4 mobile-scrollbar sm:p-5">
             <div className="mx-auto max-w-3xl rounded-lg bg-white p-4 text-slate-900 shadow-sm sm:p-7">
-              <div className="mb-5 flex flex-col gap-4 border-b-[3px] border-slate-900 pb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-                <div>
-                  <h1 className="text-2xl font-extrabold tracking-normal">
-                    {title}
-                  </h1>
-                  <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    {subtitle}
-                  </p>
-                </div>
-                <div className="text-right">
+              <PrintBrandHeader
+                title={title}
+                subtitle={subtitle}
+                meta={
+                  <div className="text-right">
                   <p className="text-xs text-slate-500">Receipt No.</p>
                   <p className="text-lg font-extrabold">{receiptNumber}</p>
                   <p className="text-xs text-slate-500">{receiptDate}</p>
@@ -390,7 +389,8 @@ export default function PrintableReceiptModal({
                     {status}
                   </p>
                 </div>
-              </div>
+                }
+              />
 
               <div className="mb-5 flex flex-col gap-3 rounded-lg bg-slate-900 px-5 py-4 text-white sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -457,9 +457,7 @@ export default function PrintableReceiptModal({
                   </div>
                 ))}
               </div>
-              <p className="mt-8 border-t border-slate-200 pt-3 text-center text-[10px] text-slate-500">
-                {footer}
-              </p>
+              <PrintBrandFooter fallback={footer} />
             </div>
           </div>
         </div>

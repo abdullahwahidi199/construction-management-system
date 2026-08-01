@@ -6,6 +6,23 @@ import { hasAnyPermission } from "../../../utils/permissions";
 import toast from "react-hot-toast";
 import CalendarDatePicker from "../common/CalendarDatePicker";
 import { todayIso } from "../../utils/calendar";
+
+function CalendarDayBadge({ info }) {
+  if (!info || info.is_working_day) return null;
+  const isHoliday = info.is_holiday;
+  return (
+    <span
+      className={
+        isHoliday
+          ? "inline-flex rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700 dark:bg-rose-950/40 dark:text-rose-200"
+          : "inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
+      }
+    >
+      {isHoliday ? "Official Holiday" : "Weekly Off Day"}
+    </span>
+  );
+}
+
 function WorkerBulkAttendance() {
   const { fetchDailyStatus, fetchProjects, bulkMarkAttendance, loading } =
     useDailyWorkers();
@@ -114,7 +131,7 @@ function WorkerBulkAttendance() {
         className="rounded-lg border p-4 flex flex-wrap gap-4 items-center justify-between"
         style={{ backgroundColor: "var(--card)", borderColor: "var(--border)" }}
       >
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-wrap gap-4 items-center">
           <div>
             <label className="text-xs" style={{ color: "var(--muted)" }}>
               {t("WorkerBulkAttendance.date")}
@@ -154,6 +171,7 @@ function WorkerBulkAttendance() {
               ))}
             </select>
           </div>
+          <CalendarDayBadge info={stats?.work_calendar} />
         </div>
 
         {canSaveAttendance && (

@@ -222,6 +222,7 @@
     "search": "لټون",
     "tryDifferentSearch": "بل لټون وکړئ یا فلټرونه پاک کړئ.",
     "cancel": "لغوه",
+    "close": "بندول",
     "create": "جوړول",
     "active": "فعال",
     "inactive": "غیرفعال",
@@ -850,6 +851,12 @@
     "documents": "اسناد",
     "backToContracts": "بېرته قراردادونو ته",
     "progress": "پرمختګ",
+    "updateProgress": "پرمختګ تازه کړئ",
+    "progressPercentage": "د پرمختګ سلنه",
+    "progressHelp": "له 0 تر 100 پورې ارزښت ولیکئ. که پرمختګ 100٪ شي، قرارداد به بشپړ وښودل شي.",
+    "progressRange": "مهرباني وکړئ د پرمختګ ارزښت له 0 تر 100 پورې ولیکئ.",
+    "saveProgress": "پرمختګ خوندي کړئ",
+    "progressUpdated": "د قرارداد پرمختګ تازه شو.",
     "downloadPdf": "PDF ډاونلوډ",
     "failedToLoadContractDetails": "د قرارداد جزئیات پورته نه شول.",
     "contractDetails": "د قرارداد جزئیات",
@@ -941,6 +948,7 @@
     "supportedFiles": "PDF، DOCX، XLSX، JPG، PNG ملاتړ کېږي",
     "documentUploaded": "سند په بریالیتوب سره پورته شو!",
     "uploadFailed": "پورته کول ناکام شول",
+    "fileTooLargeAfterCompression": "دا فایل له فشرده کولو وروسته هم ډېر لوی دی. مهرباني وکړئ له {{size}} کم فایل پورته کړئ.",
     "viewDownload": "لیدل / ډاونلوډ",
     "noDocuments": "تر اوسه هېڅ سند نه دی پورته شوی.",
     "document": "سند"
@@ -1077,7 +1085,9 @@
     "uploading": "پورته کېږي...",
     "browse": "غوره کړئ",
     "dragAndDrop": "فایل راکش او خوشې کړئ یا",
-    "supportedFiles": "PDF، انځورونه، Word، Excel — اعظمي 50MB",
+    "supportedFiles": "PDF، انځورونه، Word، Excel، DWG، ZIP — اعظمي 50MB. انځورونه له پورته کولو مخکې فشرده کېږي.",
+    "preparingFile": "فایل چمتو کېږي...",
+    "compressedFileNote": "له {{original}} څخه {{current}} ته فشرده شو",
     "removeFile": "فایل لرې کړئ",
     "close": "بندول",
     "signedContract": "لاسلیک شوی قرارداد",
@@ -1090,7 +1100,7 @@
     "titlePlaceholder": "لکه: لاسلیک شوی قرارداد V1",
     "titleRequired": "عنوان اړین دی",
     "fileRequired": "فایل اړین دی",
-    "fileTooLarge": "د فایل اندازه باید له 50MB څخه کمه وي"
+    "fileTooLarge": "دا فایل له فشرده کولو وروسته هم ډېر لوی دی. مهرباني وکړئ له 50MB څخه کم فایل پورته کړئ."
   },
 
   "ExpensesMain": {

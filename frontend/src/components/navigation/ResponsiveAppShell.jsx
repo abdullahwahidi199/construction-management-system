@@ -1,21 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { LogOut, Menu, MoreHorizontal, X } from "lucide-react";
+import { LogOut, Menu, Settings, X } from "lucide-react";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 function cx(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-function isActivePath(pathname, to) {
-  return pathname === to || pathname.startsWith(`${to}/`);
-}
-
 export default function ResponsiveAppShell({
   title,
   brandIcon: BrandIcon,
+  brandLogo,
+  brandName,
+  brandSubtitle,
   links = [],
   tools,
+  settingsTo,
+  settingsLabel = "Settings",
   user,
   logout,
   logoutLabel = "Logout",
@@ -24,18 +25,8 @@ export default function ResponsiveAppShell({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const location = useLocation();
   const visibleLinks = useMemo(() => links.filter(Boolean), [links]);
-  const drawerLinks = visibleLinks;
-  const hasOverflow = visibleLinks.length > 5;
-  const primaryLinks = visibleLinks.slice(0, hasOverflow ? 4 : 5);
-  const bottomItemCount = hasOverflow ? 5 : Math.max(primaryLinks.length, 1);
-  const bottomGridClass =
-    {
-      1: "grid-cols-1",
-      2: "grid-cols-2",
-      3: "grid-cols-3",
-      4: "grid-cols-4",
-      5: "grid-cols-5",
-    }[Math.min(bottomItemCount, 5)] || "grid-cols-5";
+  const displayTitle = brandName || title;
+  const displaySubtitle = brandSubtitle || (brandName ? title : "");
 
   useBodyScrollLock(drawerOpen);
 
@@ -56,10 +47,25 @@ export default function ResponsiveAppShell({
       <nav className="sticky top-0 z-50 border-b border-(--border) bg-(--bg)/92 pt-[var(--safe-top)] backdrop-blur-xl">
         <div className={cx("mx-auto flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8", maxWidth)}>
           <div className="flex min-w-0 items-center gap-2 font-bold">
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-(--primary)/10 text-(--primary)">
-              {BrandIcon && <BrandIcon className="h-5 w-5" />}
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-(--primary)/10 text-(--primary)">
+              {brandLogo ? (
+                <img
+                  src={brandLogo}
+                  alt=""
+                  className="h-full w-full object-contain p-1"
+                />
+              ) : (
+                BrandIcon && <BrandIcon className="h-5 w-5" />
+              )}
             </span>
-            <span className="truncate">{title}</span>
+            <span className="min-w-0">
+              <span className="block truncate leading-5">{displayTitle}</span>
+              {displaySubtitle && (
+                <span className="block truncate text-xs font-medium text-(--muted)">
+                  {displaySubtitle}
+                </span>
+              )}
+            </span>
           </div>
 
           <div className="hidden min-w-0 items-center gap-1 md:flex">
@@ -87,6 +93,21 @@ export default function ResponsiveAppShell({
               {user?.username}
             </span>
             <div className="hidden items-center gap-2 sm:flex">{tools}</div>
+            {settingsTo && (
+              <NavLink
+                to={settingsTo}
+                className={({ isActive }) =>
+                  cx(
+                    "inline-flex h-10 w-10 items-center justify-center rounded-lg transition hover:bg-(--hover) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35",
+                    isActive ? "text-(--primary)" : "text-(--muted) hover:text-(--text)",
+                  )
+                }
+                title={settingsLabel}
+                aria-label={settingsLabel}
+              >
+                <Settings className="h-4 w-4" />
+              </NavLink>
+            )}
             <button
               onClick={logout}
               className="hidden h-10 w-10 items-center justify-center rounded-lg text-(--muted) transition hover:bg-(--hover) hover:text-(--text) sm:inline-flex"
@@ -124,8 +145,11 @@ export default function ResponsiveAppShell({
       />
       <aside
         id="mobile-app-drawer"
+        role="dialog"
+        aria-label={displayTitle}
+        aria-modal="true"
         className={cx(
-          "fixed inset-y-0 start-0 z-[110] w-[min(21rem,86vw)] flex-col overflow-x-hidden border-e border-(--border) bg-(--bg) pt-[var(--safe-top)] shadow-2xl transition-transform duration-[250ms] md:hidden",
+          "fixed inset-y-0 start-0 z-[110] w-[min(21rem,86vw)] flex-col overflow-hidden border-e border-(--border) bg-(--bg) pt-[var(--safe-top)] shadow-2xl transition-transform duration-[250ms] md:hidden",
           drawerOpen
             ? "flex translate-x-0"
             : "hidden -translate-x-full rtl:translate-x-full",
@@ -135,6 +159,9 @@ export default function ResponsiveAppShell({
         <div className="flex items-center justify-between border-b border-(--border) px-4 py-3">
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">{title}</p>
+            {displaySubtitle && (
+              <p className="truncate text-xs text-(--muted)">{displaySubtitle}</p>
+            )}
             {user?.username && (
               <p className="truncate text-xs text-(--muted)">{user.username}</p>
             )}
@@ -149,9 +176,9 @@ export default function ResponsiveAppShell({
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4 mobile-scrollbar">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4 mobile-scrollbar">
           <div className="grid gap-1">
-            {drawerLinks.map(({ label, to, icon: Icon }) => (
+            {visibleLinks.map(({ label, to, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -183,39 +210,6 @@ export default function ResponsiveAppShell({
           </button>
         </div>
       </aside>
-
-      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-(--border) bg-(--bg)/95 px-[max(0.5rem,var(--safe-left))] pb-[var(--safe-bottom)] shadow-[0_-12px_30px_var(--shadow)] backdrop-blur-xl md:hidden">
-        <div className={cx("mx-auto grid h-16 max-w-md items-center gap-1", bottomGridClass)}>
-          {primaryLinks.map(({ label, to, icon: Icon }) => {
-            const active = isActivePath(location.pathname, to);
-            return (
-              <NavLink
-                key={to}
-                to={to}
-                className={cx(
-                  "flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1 text-[11px] font-medium transition",
-                  active ? "text-(--primary)" : "text-(--muted) active:bg-(--hover)",
-                )}
-              >
-                {Icon && <Icon className="h-5 w-5 shrink-0" />}
-                <span className="max-w-full truncate">{label}</span>
-              </NavLink>
-            );
-          })}
-          <button
-            type="button"
-            onClick={() => setDrawerOpen(true)}
-            className={cx(
-              "flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1 text-[11px] font-medium transition",
-              hasOverflow ? "text-(--muted) active:bg-(--hover)" : "hidden",
-            )}
-            aria-label="More navigation"
-          >
-            <MoreHorizontal className="h-5 w-5" />
-            <span>More</span>
-          </button>
-        </div>
-      </nav>
     </div>
   );
 }

@@ -17,7 +17,6 @@ const blankAdvance = {
   currency: "AFN",
   date: todayIso(),
   description: "",
-  remaining_balance: "",
 };
 
 function money(value, currency) {
@@ -25,6 +24,14 @@ function money(value, currency) {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   })}`;
+}
+
+function deductedAmount(advance) {
+  if (advance?.amount_deducted != null) return Number(advance.amount_deducted || 0);
+  return Math.max(
+    Number(advance?.amount || 0) - Number(advance?.remaining_balance || 0),
+    0,
+  );
 }
 
 export default function WorkerAdvancesManager() {
@@ -75,12 +82,13 @@ export default function WorkerAdvancesManager() {
           const currency = advance.currency || "AFN";
           acc[currency].total += Number(advance.amount || 0);
           acc[currency].remaining += Number(advance.remaining_balance || 0);
+          acc[currency].deducted += deductedAmount(advance);
           acc[currency].count += 1;
           return acc;
         },
         {
-          AFN: { total: 0, remaining: 0, count: 0 },
-          USD: { total: 0, remaining: 0, count: 0 },
+          AFN: { total: 0, deducted: 0, remaining: 0, count: 0 },
+          USD: { total: 0, deducted: 0, remaining: 0, count: 0 },
         },
       ),
     [advances],
@@ -119,8 +127,7 @@ export default function WorkerAdvancesManager() {
 
   const buildAdvanceReceipt = (advance) => {
     const currency = advance.currency || "AFN";
-    const recoveredAmount =
-      Number(advance.amount || 0) - Number(advance.remaining_balance || 0);
+    const recoveredAmount = deductedAmount(advance);
 
     return {
       title: "Daily Worker Advance Receipt",
@@ -136,8 +143,8 @@ export default function WorkerAdvancesManager() {
         { label: "Worker ID", value: advance.worker_code },
         { label: "Advance Date", value: displayDate(advance.date) },
         { label: "Status", value: advance.status || "open" },
-        { label: "Remaining Balance", value: money(advance.remaining_balance, currency) },
-        { label: "Recovered Amount", value: money(recoveredAmount, currency) },
+        { label: "Outstanding Balance", value: money(advance.remaining_balance, currency) },
+        { label: "Deducted Through Payroll", value: money(recoveredAmount, currency) },
         { label: "Recorded At", value: formatDateTime(advance.created_at) || "-" },
         { label: "Updated At", value: formatDateTime(advance.updated_at) || "-" },
         { label: "Advance ID", value: advance.id ? `#${advance.id}` : "-" },
@@ -147,7 +154,7 @@ export default function WorkerAdvancesManager() {
           title: "Advance Details",
           rows: [
             { label: "Original Advance", value: money(advance.amount, currency) },
-            { label: "Recovered / Deducted", value: money(recoveredAmount, currency) },
+            { label: "Deducted Through Payroll", value: money(recoveredAmount, currency) },
             { label: "Outstanding Balance", value: money(advance.remaining_balance, currency) },
             { label: "Currency", value: currency },
             { label: "Description", value: advance.description || "-" },
@@ -200,7 +207,7 @@ export default function WorkerAdvancesManager() {
         <div>
           <h2 className="text-xl font-bold">Worker Advances</h2>
           <p className="text-sm" style={{ color: "var(--muted)" }}>
-            Track advance payments and remaining balances for daily workers.
+            Track advance payments and payroll deductions for daily workers.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -276,13 +283,17 @@ export default function WorkerAdvancesManager() {
                 {summary[currency].count} records
               </span>
             </div>
-            <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+            <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
               <div>
                 <p style={{ color: "var(--muted)" }}>Total advanced</p>
                 <p className="font-semibold">{money(summary[currency].total, currency)}</p>
               </div>
               <div>
-                <p style={{ color: "var(--muted)" }}>Remaining</p>
+                <p style={{ color: "var(--muted)" }}>Deducted</p>
+                <p className="font-semibold">{money(summary[currency].deducted, currency)}</p>
+              </div>
+              <div>
+                <p style={{ color: "var(--muted)" }}>Outstanding</p>
                 <p className="font-semibold">{money(summary[currency].remaining, currency)}</p>
               </div>
             </div>
@@ -304,7 +315,8 @@ export default function WorkerAdvancesManager() {
               <th className="px-4 py-3 text-left font-medium">Worker</th>
               <th className="px-4 py-3 text-left font-medium">Date</th>
               <th className="px-4 py-3 text-left font-medium">Amount</th>
-              <th className="px-4 py-3 text-left font-medium">Remaining</th>
+              <th className="px-4 py-3 text-left font-medium">Deducted</th>
+              <th className="px-4 py-3 text-left font-medium">Outstanding</th>
               <th className="px-4 py-3 text-left font-medium">Status</th>
               <th className="px-4 py-3 text-left font-medium">Description</th>
               <th className="px-4 py-3 text-left font-medium">Actions</th>
@@ -313,14 +325,14 @@ export default function WorkerAdvancesManager() {
           <tbody className="divide-y" style={{ borderColor: "var(--border)" }}>
             {loading ? (
               <tr>
-                <td colSpan={7} className="py-6 text-center">
+                <td colSpan={8} className="py-6 text-center">
                   Loading...
                 </td>
               </tr>
             ) : advances.length === 0 ? (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   className="py-6 text-center"
                   style={{ color: "var(--muted)" }}
                 >
@@ -341,6 +353,9 @@ export default function WorkerAdvancesManager() {
                   </td>
                   <td className="px-4 py-3 font-medium">
                     {money(advance.amount, advance.currency)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {money(deductedAmount(advance), advance.currency)}
                   </td>
                   <td className="px-4 py-3">
                     {money(advance.remaining_balance, advance.currency)}
@@ -432,7 +447,15 @@ export default function WorkerAdvancesManager() {
                   </div>
                   <div>
                     <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
-                      Remaining
+                      Deducted
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium">
+                      {money(deductedAmount(advance), advance.currency)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                      Outstanding
                     </dt>
                     <dd className="mt-1 text-sm font-medium">
                       {money(advance.remaining_balance, advance.currency)}
@@ -522,14 +545,6 @@ function AdvanceModal({ open, onClose, onSubmit, advance, workers, loading }) {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    if (name === "amount" && !advance) {
-      setFormData((prev) => ({
-        ...prev,
-        amount: value,
-        remaining_balance: prev.remaining_balance || value,
-      }));
-      return;
-    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -541,8 +556,11 @@ function AdvanceModal({ open, onClose, onSubmit, advance, workers, loading }) {
     event.preventDefault();
     setError("");
     const payload = {
-      ...formData,
-      remaining_balance: formData.remaining_balance || formData.amount,
+      worker: formData.worker,
+      date: formData.date,
+      amount: formData.amount,
+      currency: formData.currency,
+      description: formData.description || "",
     };
     try {
       await onSubmit(payload);
@@ -622,18 +640,6 @@ function AdvanceModal({ open, onClose, onSubmit, advance, workers, loading }) {
                 step="0.01"
                 name="amount"
                 value={formData.amount}
-                onChange={handleChange}
-                className={inputClass}
-                style={inputStyle}
-              />
-            </Field>
-            <Field label="Remaining Balance">
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                name="remaining_balance"
-                value={formData.remaining_balance}
                 onChange={handleChange}
                 className={inputClass}
                 style={inputStyle}

@@ -19,6 +19,7 @@ import useRealtimeEvents from "../../hooks/useRealtimeEvents";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 import CalendarDatePicker from "../../components/common/CalendarDatePicker";
 import { useCalendar } from "../../hooks/useCalendar";
+import InlineAlert from "../../components/common/InlineAlert";
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pending" },
@@ -57,9 +58,32 @@ function projectLabel(expense) {
   return expense?.expense_scope === "office" ? "Office" : expense?.project_name || "-";
 }
 
+function isEditRequest(expense) {
+  return expense?.approval_item_type === "expense_edit";
+}
+
+function queueKey(expense) {
+  return expense?.queue_id || `${expense?.approval_item_type || "expense"}:${expense?.id}`;
+}
+
+function approvalActionEndpoint(expense, mode) {
+  if (isEditRequest(expense)) {
+    return `expenses/edit-requests/${expense.edit_request_id}/${mode}/`;
+  }
+  return `expenses/${expense.id}/${mode}/`;
+}
+
+function reviewItemLabel(expense) {
+  return isEditRequest(expense) ? "Expense edit" : "Expense";
+}
+
 function expenseFromRealtimePayload(payload = {}) {
   return {
     id: payload.expense_id,
+    queue_id: payload.queue_id || `expense:${payload.expense_id}`,
+    approval_item_type: payload.approval_item_type || "expense_creation",
+    edit_request_id: payload.edit_request_id,
+    expense_id: payload.expense_id,
     project: payload.project_id,
     project_name: payload.project_name || "",
     serial_number: payload.serial_number,
@@ -84,6 +108,10 @@ function expenseFromRealtimePayload(payload = {}) {
     rejected_by_name: payload.rejected_by_name || "",
     rejected_at: payload.rejected_at || "",
     approval_notes: payload.approval_notes || "",
+    original_values: payload.original_values || {},
+    proposed_values: payload.proposed_values || {},
+    changed_fields: payload.changed_fields || [],
+    field_changes: payload.field_changes || [],
     approval_history: payload.approval_history || [],
     created_at: payload.created_at || "",
     updated_at: payload.updated_at || "",
@@ -250,7 +278,7 @@ export default function ExpenseApprovalsPage() {
         approval_status: "pending",
       });
       const alreadyLoaded = rows.some(
-        (item) => Number(item.id) === Number(expense.id),
+        (item) => queueKey(item) === queueKey(expense),
       );
 
       if (!alreadyLoaded) {
@@ -261,7 +289,7 @@ export default function ExpenseApprovalsPage() {
       }
 
       setRows((current) => {
-        if (current.some((item) => Number(item.id) === Number(expense.id))) {
+        if (current.some((item) => queueKey(item) === queueKey(expense))) {
           return current;
         }
         if (!rowMatchesFilters(expense, filters)) return current;
@@ -291,14 +319,14 @@ export default function ExpenseApprovalsPage() {
 
       setRows((current) => {
         const withoutExpense = current.filter(
-          (item) => Number(item.id) !== Number(expense.id),
+          (item) => queueKey(item) !== queueKey(expense),
         );
         if (!rowMatchesFilters(expense, filters)) return withoutExpense;
         return [expense, ...withoutExpense];
       });
 
       setSelectedExpense((current) =>
-        Number(current?.id) === Number(expense.id) ? expense : current,
+        queueKey(current) === queueKey(expense) ? expense : current,
       );
     }
   });
@@ -331,6 +359,18 @@ export default function ExpenseApprovalsPage() {
     setNotes("");
   };
 
+  const formatReviewValue = (field, value) => {
+    if (value === null || value === undefined || value === "") return "-";
+    if (field === "expense_date") return formatDate(value) || value;
+    if (field === "project") return value ? `Project #${value}` : "Office";
+    if (field === "expense_scope") {
+      return value === "office" ? "Office expense" : "Project expense";
+    }
+    if (field === "amount_usd") return money(value, "USD");
+    if (field === "amount_afn") return money(value, "AFN");
+    return String(value);
+  };
+
   const submitAction = async () => {
     if (!actionTarget || !actionMode) return;
     if (actionMode === "reject" && !notes.trim()) {
@@ -341,11 +381,13 @@ export default function ExpenseApprovalsPage() {
     setSaving(true);
     setError("");
     try {
-      await instance.post(`expenses/${actionTarget.id}/${actionMode}/`, {
+      await instance.post(approvalActionEndpoint(actionTarget, actionMode), {
         approval_notes: notes,
       });
       toast.success(
-        actionMode === "approve" ? "Expense approved." : "Expense rejected.",
+        actionMode === "approve"
+          ? `${reviewItemLabel(actionTarget)} approved.`
+          : `${reviewItemLabel(actionTarget)} rejected.`,
       );
       closeAction();
       await fetchQueue();
@@ -362,9 +404,9 @@ export default function ExpenseApprovalsPage() {
     <PermissionWrapper
       permissions={["expenses.approve"]}
       fallback={
-        <div className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-6 text-sm text-[var(--muted)]">
-          You do not have permission to approve expenses.
-        </div>
+        <InlineAlert type="warning" title="Permission required">
+          You do not have permission to approve expenses. Please contact an administrator if you need access.
+        </InlineAlert>
       }
     >
       <div className="space-y-6">
@@ -496,9 +538,7 @@ export default function ExpenseApprovalsPage() {
         </div>
 
         {error && (
-          <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-600">
-            {error}
-          </div>
+          <InlineAlert type="error">{error}</InlineAlert>
         )}
 
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_28rem]">
@@ -544,14 +584,21 @@ export default function ExpenseApprovalsPage() {
                     ) : (
                       rows.map((expense) => (
                         <tr
-                          key={expense.id}
+                          key={queueKey(expense)}
                           onClick={() => setSelectedExpense(expense)}
                           className="cursor-pointer hover:bg-[var(--hover)]"
                         >
                           <td className="px-4 py-3">
-                            <p className="font-semibold text-[var(--text)]">
-                              #{expense.serial_number}
-                            </p>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="font-semibold text-[var(--text)]">
+                                #{expense.serial_number}
+                              </p>
+                              {isEditRequest(expense) && (
+                                <span className="inline-flex rounded-full bg-[var(--primary)]/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--primary)]">
+                                  Edit request
+                                </span>
+                              )}
+                            </div>
                             <p className="max-w-sm truncate text-xs text-[var(--muted)]">
                               {expense.description}
                             </p>
@@ -628,15 +675,22 @@ export default function ExpenseApprovalsPage() {
                 ) : (
                   rows.map((expense) => (
                     <article
-                      key={expense.id}
+                      key={queueKey(expense)}
                       onClick={() => setSelectedExpense(expense)}
                       className="grid gap-4 p-4 active:bg-[var(--hover)]"
                     >
                       <div className="flex min-w-0 items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <h3 className="font-semibold text-[var(--text)]">
-                            #{expense.serial_number}
-                          </h3>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-semibold text-[var(--text)]">
+                              #{expense.serial_number}
+                            </h3>
+                            {isEditRequest(expense) && (
+                              <span className="inline-flex rounded-full bg-[var(--primary)]/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--primary)]">
+                                Edit request
+                              </span>
+                            )}
+                          </div>
                           <p className="mt-1 break-words text-sm text-[var(--muted)]">
                             {expense.description || "-"}
                           </p>
@@ -706,9 +760,16 @@ export default function ExpenseApprovalsPage() {
                 <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <p className="text-lg font-semibold text-[var(--text)]">
-                        #{selectedExpense.serial_number}
-                      </p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-lg font-semibold text-[var(--text)]">
+                          #{selectedExpense.serial_number}
+                        </p>
+                        {isEditRequest(selectedExpense) && (
+                          <span className="inline-flex rounded-full bg-[var(--primary)]/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--primary)]">
+                            Edit request
+                          </span>
+                        )}
+                      </div>
                       <p className="mt-1 text-sm text-[var(--muted)]">
                         {projectLabel(selectedExpense)}
                       </p>
@@ -721,6 +782,47 @@ export default function ExpenseApprovalsPage() {
                     {selectedExpense.description || "-"}
                   </p>
                 </div>
+
+                {isEditRequest(selectedExpense) && (
+                  <div className="rounded-xl border border-[var(--primary)]/20 bg-[var(--primary)]/5 p-4">
+                    <p className="text-sm font-semibold text-[var(--text)]">
+                      Requested Changes
+                    </p>
+                    <p className="mt-1 text-sm text-[var(--muted)]">
+                      The approved expense remains unchanged until this request is approved.
+                    </p>
+                    <div className="mt-4 overflow-hidden rounded-lg border border-[var(--border)]">
+                      <div className="grid grid-cols-[1fr_1fr_1fr] border-b border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+                        <span>Field</span>
+                        <span>Before</span>
+                        <span>After</span>
+                      </div>
+                      <div className="divide-y divide-[var(--border)]">
+                        {(selectedExpense.field_changes || []).map((change) => (
+                          <div
+                            key={change.field}
+                            className="grid grid-cols-1 gap-2 px-3 py-3 text-sm sm:grid-cols-[1fr_1fr_1fr]"
+                          >
+                            <p className="font-semibold text-[var(--text)]">
+                              {change.label}
+                            </p>
+                            <p className="break-words text-[var(--muted)]">
+                              {change.before_display || formatReviewValue(change.field, change.before)}
+                            </p>
+                            <p className="break-words rounded-md bg-[var(--primary)]/10 px-2 py-1 font-medium text-[var(--text)]">
+                              {change.after_display || formatReviewValue(change.field, change.after)}
+                            </p>
+                          </div>
+                        ))}
+                        {(selectedExpense.field_changes || []).length === 0 && (
+                          <p className="px-3 py-4 text-sm text-[var(--muted)]">
+                            No changed fields were provided with this request.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <DetailItem label="Expense Date" value={formatDate(selectedExpense.expense_date)} />
@@ -835,7 +937,7 @@ export default function ExpenseApprovalsPage() {
               <div className="mobile-modal-header flex items-start justify-between gap-4 border-b border-[var(--border)] p-5">
                 <div>
                   <h2 className="text-lg font-semibold capitalize text-[var(--text)]">
-                    {actionMode} Expense #{actionTarget.serial_number}
+                    {actionMode} {reviewItemLabel(actionTarget)} #{actionTarget.serial_number}
                   </h2>
                   <p className="mt-1 text-sm text-[var(--muted)]">
                     {actionTarget.description}
@@ -851,6 +953,13 @@ export default function ExpenseApprovalsPage() {
                 </button>
               </div>
               <div className="mobile-modal-content p-5">
+                {isEditRequest(actionTarget) && (
+                  <InlineAlert type={actionMode === "approve" ? "info" : "warning"} className="mb-4">
+                    {actionMode === "approve"
+                      ? "Approving this request will apply the proposed values to the approved expense and update reports immediately."
+                      : "Rejecting this request keeps the approved expense unchanged. Add a reason so the requester knows what to fix."}
+                  </InlineAlert>
+                )}
                 <textarea
                   value={notes}
                   onChange={(event) => setNotes(event.target.value)}

@@ -36,8 +36,8 @@ export default function PayrollSummary({ data }) {
   const current = data.current_month || {};
   const previous = data.previous_month || {};
 
-  const currentNetUSD = parseFloat(current.net_usd || 0);
-  const previousNetUSD = parseFloat(previous.net_usd || 0);
+  const currentNetUSD = parseFloat(current.cash_outflow_usd ?? current.net_usd ?? 0);
+  const previousNetUSD = parseFloat(previous.cash_outflow_usd ?? previous.net_usd ?? 0);
 
   const changeNet =
     previousNetUSD > 0
@@ -71,10 +71,18 @@ export default function PayrollSummary({ data }) {
               {t("payrollSummary.gross")}:{" "}
               {renderDual(current.gross_usd, current.gross_afn)}
             </div>
+            <div className="text-xs text-[var(--muted)] mt-1">
+              Cash outflow:{" "}
+              {renderDual(current.cash_outflow_usd, current.cash_outflow_afn)}
+            </div>
             <div className="mt-2 space-y-1 text-xs text-[var(--muted)]">
               <div className="flex justify-between gap-3">
                 <span>Employees</span>
                 <div className="text-right">{renderDual(current.employee_net_usd, current.employee_net_afn)}</div>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>Advances paid</span>
+                <div className="text-right">{renderDual(current.total_advances_paid_usd, current.total_advances_paid_afn)}</div>
               </div>
               <div className="flex justify-between gap-3">
                 <span>Daily workers</span>
@@ -90,6 +98,10 @@ export default function PayrollSummary({ data }) {
 
             <div className="text-xl font-bold text-[var(--muted)]">
               {renderDual(previous.net_usd, previous.net_afn)}
+            </div>
+            <div className="text-xs text-[var(--muted)] mt-1">
+              Cash outflow:{" "}
+              {renderDual(previous.cash_outflow_usd, previous.cash_outflow_afn)}
             </div>
 
             {changeNet !== 0 && (
@@ -107,13 +119,25 @@ export default function PayrollSummary({ data }) {
         </div>
 
         {/* BREAKDOWN */}
-        <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-6">
           {[
             {
-              label: t("payrollSummary.tax"),
+              label: "Deductions",
               usd: current.total_deductions_usd,
               afn: current.total_deductions_afn,
               color: "var(--danger)",
+            },
+            {
+              label: "Advances Paid",
+              usd: current.total_advances_paid_usd,
+              afn: current.total_advances_paid_afn,
+              color: "var(--danger)",
+            },
+            {
+              label: "Advance Deductions",
+              usd: current.total_advance_deductions_usd,
+              afn: current.total_advance_deductions_afn,
+              color: "var(--warning)",
             },
             {
               label: t("payrollSummary.tax"),
@@ -132,6 +156,18 @@ export default function PayrollSummary({ data }) {
               usd: current.total_overtime_usd,
               afn: current.total_overtime_afn,
               color: "var(--primary)",
+            },
+            {
+              label: "Outstanding Salary",
+              usd: current.outstanding_salary_usd,
+              afn: current.outstanding_salary_afn,
+              color: "var(--warning)",
+            },
+            {
+              label: "Already Paid",
+              usd: current.amount_already_paid_usd,
+              afn: current.amount_already_paid_afn,
+              color: "var(--success)",
             },
           ].map((item) => (
             <div

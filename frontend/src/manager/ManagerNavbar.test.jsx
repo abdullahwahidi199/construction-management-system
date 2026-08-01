@@ -16,6 +16,15 @@ vi.mock("../auth/AuthContext", () => ({
   useAuth: () => authState,
 }));
 
+vi.mock("../context/CompanyContext", () => ({
+  useCompany: () => ({
+    company: {
+      company_name: "Lanader Manager",
+      company_logo_url: "",
+    },
+  }),
+}));
+
 vi.mock("../hooks/useLanguage", () => ({
   useLanguage: () => ({
     t: (key) =>
@@ -115,7 +124,11 @@ describe("ManagerNavbar", () => {
     expect(screen.getAllByText("Projects").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Contracts").length).toBeGreaterThan(0);
 
-    fireEvent.click(screen.getByRole("button", { name: /more/i }));
+    const desktopMoreButton = screen
+      .getAllByRole("button", { name: /more/i })
+      .find((button) => button.getAttribute("aria-haspopup") === "menu");
+
+    fireEvent.click(desktopMoreButton);
     const moreMenu = screen.getByRole("menu");
     expect(within(moreMenu).getByText("People")).toBeInTheDocument();
     expect(within(moreMenu).getByText("Finance")).toBeInTheDocument();
@@ -143,17 +156,19 @@ describe("ManagerNavbar", () => {
 
     expect(screen.getAllByText("Dashboard").length).toBeGreaterThan(0);
     expect(screen.queryByText("Projects")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /more/i })).not.toBeInTheDocument();
+    const moreButtons = screen.queryAllByRole("button", { name: /more/i });
+    expect(
+      moreButtons.some((button) => button.getAttribute("aria-haspopup") === "menu"),
+    ).toBe(false);
     expect(screen.queryByText("99+")).not.toBeInTheDocument();
   });
 
-  it("opens mobile drawer, renders grouped mobile links, closes on link selection, and logs out", () => {
+  it("opens burger drawer, renders grouped mobile links, closes on link selection, and logs out", () => {
     realtimeState.pendingExpenseApprovals = 7;
     renderNavbar();
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
-    const drawer = document.querySelector("#manager-mobile-drawer");
-    expect(drawer).toHaveAttribute("aria-hidden", "false");
+    const drawer = screen.getByRole("dialog", { name: "Lanader Manager" });
     expect(within(drawer).getByText("Amina Manager")).toBeInTheDocument();
     expect(within(drawer).getByText("People")).toBeInTheDocument();
     expect(within(drawer).getByText("Finance")).toBeInTheDocument();
@@ -161,10 +176,11 @@ describe("ManagerNavbar", () => {
 
     fireEvent.click(within(drawer).getByText("Employees"));
     expect(screen.getByTestId("location")).toHaveTextContent("/manager/employees");
-    expect(drawer).toHaveAttribute("aria-hidden", "true");
+    expect(screen.queryByRole("dialog", { name: "Lanader Manager" })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
-    fireEvent.click(within(drawer).getByRole("button", { name: /logout/i }));
+    const reopenedDrawer = screen.getByRole("dialog", { name: "Lanader Manager" });
+    fireEvent.click(within(reopenedDrawer).getByRole("button", { name: /logout/i }));
     expect(authState.logout).toHaveBeenCalledOnce();
   });
 
@@ -204,10 +220,10 @@ describe("ManagerNavbar", () => {
     expect(screen.getAllByText("Recent pages").length).toBeGreaterThan(0);
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
-    expect(document.querySelector("#manager-mobile-drawer")).toHaveAttribute("aria-hidden", "false");
+    expect(screen.getByRole("dialog", { name: "Lanader Manager" })).toBeInTheDocument();
 
     fireEvent.keyDown(window, { key: "Escape" });
-    expect(document.querySelector("#manager-mobile-drawer")).toHaveAttribute("aria-hidden", "true");
-    expect(screen.getAllByText("Recent pages").length).toBeGreaterThan(0);
+    expect(screen.queryByRole("dialog", { name: "Lanader Manager" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Recent pages")).not.toBeInTheDocument();
   });
 });

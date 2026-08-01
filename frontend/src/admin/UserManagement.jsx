@@ -321,7 +321,10 @@ export default function UserManagement() {
         </div>
         <div className="divide-y divide-[var(--border)] md:hidden">
           {users.length === 0 ? (
-            <div className="px-6 py-12 text-center text-sm" style={{ color: "var(--muted)" }}>
+            <div
+              className="px-6 py-12 text-center text-sm"
+              style={{ color: "var(--muted)" }}
+            >
               {t("admin.users.empty")}
             </div>
           ) : (
@@ -347,9 +350,7 @@ export default function UserManagement() {
                         : "var(--danger)",
                     }}
                   >
-                    {user.is_active
-                      ? t("common.active")
-                      : t("common.inactive")}
+                    {user.is_active ? t("common.active") : t("common.inactive")}
                   </span>
                 </div>
 
@@ -556,141 +557,141 @@ function EditUserModal({ user, roles, onClose, onUpdated, t }) {
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="mobile-modal-content space-y-5 p-6">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="edit-user-username"
-                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
-                style={{ color: "var(--muted)" }}
-              >
-                {t("admin.users.username")}
-              </label>
-              <input
-                id="edit-user-username"
-                type="text"
-                style={inputStyle}
-                {...inputFocusHandlers}
-                value={form.username}
-                onChange={handleChange("username")}
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="edit-user-email"
-                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
-                style={{ color: "var(--muted)" }}
-              >
-                {t("admin.users.email")}
-              </label>
-              <input
-                id="edit-user-email"
-                type="email"
-                style={inputStyle}
-                {...inputFocusHandlers}
-                value={form.email}
-                onChange={handleChange("email")}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label
-              htmlFor="edit-user-role"
-              className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
-              style={{ color: "var(--muted)" }}
-            >
-              {t("admin.users.role")}
-            </label>
-            <select
-              id="edit-user-role"
-              style={inputStyle}
-              {...inputFocusHandlers}
-              value={form.role}
-              onChange={handleChange("role")}
-            >
-              {roles.map((role) => (
-                <option key={role.value} value={role.value}>
-                  {role.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Password Section */}
-          <div
-            className="rounded-lg p-4"
-            style={{
-              border: "1px solid var(--border)",
-              backgroundColor: "var(--hover)",
-            }}
-          >
-            <div
-              className="mb-3 flex items-center gap-2 text-sm font-semibold"
-              style={{ color: "var(--text)" }}
-            >
-              <LockIcon /> {t("admin.users.changePassword")}
-            </div>
-            <p className="mb-4 text-xs" style={{ color: "var(--muted)" }}>
-              {t("admin.users.leaveBlankPassword")}
-            </p>
-
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label
-                  htmlFor="edit-user-new-password"
-                  className="mb-1.5 block text-xs font-medium"
+                  htmlFor="edit-user-username"
+                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
                   style={{ color: "var(--muted)" }}
                 >
-                  {t("admin.users.newPassword")}
+                  {t("admin.users.username")}
                 </label>
                 <input
-                  id="edit-user-new-password"
-                  type="password"
-                  style={{
-                    ...inputStyle,
-                    backgroundColor: "var(--card)",
-                  }}
+                  id="edit-user-username"
+                  type="text"
+                  style={inputStyle}
                   {...inputFocusHandlers}
-                  value={form.newPassword}
-                  onChange={handleChange("newPassword")}
+                  value={form.username}
+                  onChange={handleChange("username")}
+                  required
                 />
               </div>
               <div>
                 <label
-                  htmlFor="edit-user-confirm-password"
-                  className="mb-1.5 block text-xs font-medium"
+                  htmlFor="edit-user-email"
+                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
                   style={{ color: "var(--muted)" }}
                 >
-                  {t("admin.users.confirmNewPassword")}
+                  {t("admin.users.email")}
                 </label>
                 <input
-                  id="edit-user-confirm-password"
-                  type="password"
-                  style={{
-                    ...inputStyle,
-                    backgroundColor: "var(--card)",
-                  }}
+                  id="edit-user-email"
+                  type="email"
+                  style={inputStyle}
                   {...inputFocusHandlers}
-                  value={form.confirmPassword}
-                  onChange={handleChange("confirmPassword")}
+                  value={form.email}
+                  onChange={handleChange("email")}
                 />
               </div>
             </div>
-          </div>
 
-          {error && (
+            <div>
+              <label
+                htmlFor="edit-user-role"
+                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
+                style={{ color: "var(--muted)" }}
+              >
+                {t("admin.users.role")}
+              </label>
+              <select
+                id="edit-user-role"
+                style={inputStyle}
+                {...inputFocusHandlers}
+                value={form.role}
+                onChange={handleChange("role")}
+              >
+                {roles.map((role) => (
+                  <option key={role.value} value={role.value}>
+                    {role.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Password Section */}
             <div
-              className="rounded-lg p-3 text-sm"
+              className="rounded-lg p-4"
               style={{
-                backgroundColor:
-                  "color-mix(in srgb, var(--danger) 12%, transparent)",
-                color: "var(--danger)",
+                border: "1px solid var(--border)",
+                backgroundColor: "var(--hover)",
               }}
             >
-              {error}
+              <div
+                className="mb-3 flex items-center gap-2 text-sm font-semibold"
+                style={{ color: "var(--text)" }}
+              >
+                <LockIcon /> {t("admin.users.changePassword")}
+              </div>
+              <p className="mb-4 text-xs" style={{ color: "var(--muted)" }}>
+                {t("admin.users.leaveBlankPassword")}
+              </p>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="edit-user-new-password"
+                    className="mb-1.5 block text-xs font-medium"
+                    style={{ color: "var(--muted)" }}
+                  >
+                    {t("admin.users.newPassword")}
+                  </label>
+                  <input
+                    id="edit-user-new-password"
+                    type="password"
+                    style={{
+                      ...inputStyle,
+                      backgroundColor: "var(--card)",
+                    }}
+                    {...inputFocusHandlers}
+                    value={form.newPassword}
+                    onChange={handleChange("newPassword")}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="edit-user-confirm-password"
+                    className="mb-1.5 block text-xs font-medium"
+                    style={{ color: "var(--muted)" }}
+                  >
+                    {t("admin.users.confirmNewPassword")}
+                  </label>
+                  <input
+                    id="edit-user-confirm-password"
+                    type="password"
+                    style={{
+                      ...inputStyle,
+                      backgroundColor: "var(--card)",
+                    }}
+                    {...inputFocusHandlers}
+                    value={form.confirmPassword}
+                    onChange={handleChange("confirmPassword")}
+                  />
+                </div>
+              </div>
             </div>
-          )}
+
+            {error && (
+              <div
+                className="rounded-lg p-3 text-sm"
+                style={{
+                  backgroundColor:
+                    "color-mix(in srgb, var(--danger) 12%, transparent)",
+                  color: "var(--danger)",
+                }}
+              >
+                {error}
+              </div>
+            )}
           </div>
 
           <div
@@ -851,113 +852,113 @@ function CreateUserModal({
         </div>
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="mobile-modal-content space-y-4 p-6">
-          <div>
-            <label
-              htmlFor="create-user-username"
-              className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
-              style={{ color: "var(--muted)" }}
-            >
-              {t("admin.users.username")}
-            </label>
-            <input
-              id="create-user-username"
-              type="text"
-              style={inputStyle}
-              {...inputFocusHandlers}
-              value={form.username}
-              onChange={handleChange("username")}
-              autoFocus
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="create-user-email"
-              className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
-              style={{ color: "var(--muted)" }}
-            >
-              {t("admin.users.email")}
-            </label>
-            <input
-              id="create-user-email"
-              type="email"
-              style={inputStyle}
-              {...inputFocusHandlers}
-              value={form.email}
-              onChange={handleChange("email")}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="create-user-role"
-              className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
-              style={{ color: "var(--muted)" }}
-            >
-              {t("admin.users.role")}
-            </label>
-            <select
-              id="create-user-role"
-              style={inputStyle}
-              {...inputFocusHandlers}
-              value={form.role}
-              onChange={handleChange("role")}
-            >
-              {roles.map((role) => (
-                <option key={role.value} value={role.value}>
-                  {role.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label
-              htmlFor="create-user-password"
-              className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
-              style={{ color: "var(--muted)" }}
-            >
-              {t("admin.users.password")}
-            </label>
-            <input
-              id="create-user-password"
-              type="password"
-              style={inputStyle}
-              {...inputFocusHandlers}
-              value={form.password}
-              onChange={handleChange("password")}
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="create-user-confirm-password"
-              className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
-              style={{ color: "var(--muted)" }}
-            >
-              {t("admin.users.confirmPassword")}
-            </label>
-            <input
-              id="create-user-confirm-password"
-              type="password"
-              style={inputStyle}
-              {...inputFocusHandlers}
-              value={form.confirmPassword}
-              onChange={handleChange("confirmPassword")}
-              required
-            />
-          </div>
-
-          {(localError || createError) && (
-            <div
-              className="rounded-lg p-3 text-sm"
-              style={{
-                backgroundColor:
-                  "color-mix(in srgb, var(--danger) 12%, transparent)",
-                color: "var(--danger)",
-              }}
-            >
-              {localError || renderApiError()}
+            <div>
+              <label
+                htmlFor="create-user-username"
+                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
+                style={{ color: "var(--muted)" }}
+              >
+                {t("admin.users.username")}
+              </label>
+              <input
+                id="create-user-username"
+                type="text"
+                style={inputStyle}
+                {...inputFocusHandlers}
+                value={form.username}
+                onChange={handleChange("username")}
+                autoFocus
+                required
+              />
             </div>
-          )}
+            <div>
+              <label
+                htmlFor="create-user-email"
+                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
+                style={{ color: "var(--muted)" }}
+              >
+                {t("admin.users.email")}
+              </label>
+              <input
+                id="create-user-email"
+                type="email"
+                style={inputStyle}
+                {...inputFocusHandlers}
+                value={form.email}
+                onChange={handleChange("email")}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="create-user-role"
+                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
+                style={{ color: "var(--muted)" }}
+              >
+                {t("admin.users.role")}
+              </label>
+              <select
+                id="create-user-role"
+                style={inputStyle}
+                {...inputFocusHandlers}
+                value={form.role}
+                onChange={handleChange("role")}
+              >
+                {roles.map((role) => (
+                  <option key={role.value} value={role.value}>
+                    {role.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label
+                htmlFor="create-user-password"
+                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
+                style={{ color: "var(--muted)" }}
+              >
+                {t("admin.users.password")}
+              </label>
+              <input
+                id="create-user-password"
+                type="password"
+                style={inputStyle}
+                {...inputFocusHandlers}
+                value={form.password}
+                onChange={handleChange("password")}
+                required
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="create-user-confirm-password"
+                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider"
+                style={{ color: "var(--muted)" }}
+              >
+                {t("admin.users.confirmPassword")}
+              </label>
+              <input
+                id="create-user-confirm-password"
+                type="password"
+                style={inputStyle}
+                {...inputFocusHandlers}
+                value={form.confirmPassword}
+                onChange={handleChange("confirmPassword")}
+                required
+              />
+            </div>
+
+            {(localError || createError) && (
+              <div
+                className="rounded-lg p-3 text-sm"
+                style={{
+                  backgroundColor:
+                    "color-mix(in srgb, var(--danger) 12%, transparent)",
+                  color: "var(--danger)",
+                }}
+              >
+                {localError || renderApiError()}
+              </div>
+            )}
           </div>
 
           <div

@@ -210,6 +210,7 @@
   },
   "common": {
     "cancel": "لغو",
+    "close": "بستن",
     "create": "یجاد کردن",
     "active": "فعال",
     "inactive": "غیرفعال",
@@ -850,6 +851,12 @@
     "documents": "اسناد",
     "backToContracts": "بازگشت به قراردادها",
     "progress": "پیشرفت",
+    "updateProgress": "به‌روزرسانی پیشرفت",
+    "progressPercentage": "درصد پیشرفت",
+    "progressHelp": "یک مقدار از 0 تا 100 وارد کنید. اگر پیشرفت 100٪ شود، قرارداد تکمیل‌شده علامت‌گذاری می‌شود.",
+    "progressRange": "لطفاً مقدار پیشرفت را از 0 تا 100 وارد کنید.",
+    "saveProgress": "ذخیره پیشرفت",
+    "progressUpdated": "پیشرفت قرارداد به‌روزرسانی شد.",
     "downloadPdf": "دانلود PDF",
     "failedToLoadContractDetails": "بارگذاری جزئیات قرارداد ناموفق بود.",
     "contractDetails": "جزئیات قرارداد",
@@ -941,6 +948,7 @@
     "supportedFiles": "پشتیبانی از PDF، DOCX، XLSX، JPG، PNG",
     "documentUploaded": "سند با موفقیت بارگذاری شد!",
     "uploadFailed": "بارگذاری ناموفق بود",
+    "fileTooLargeAfterCompression": "این فایل پس از فشرده‌سازی هنوز بزرگ است. لطفاً فایلی کمتر از {{size}} بارگذاری کنید.",
     "viewDownload": "مشاهده / دانلود",
     "noDocuments": "هنوز هیچ سندی بارگذاری نشده است.",
     "document": "سند"
@@ -1077,7 +1085,9 @@
     "uploading": "در حال بارگذاری...",
     "browse": "انتخاب فایل",
     "dragAndDrop": "فایل را بکشید و رها کنید یا",
-    "supportedFiles": "PDF، تصاویر، Word، Excel — حداکثر 50 مگابایت",
+    "supportedFiles": "PDF، تصاویر، Word، Excel، DWG، ZIP — حداکثر 50MB. تصاویر پیش از بارگذاری فشرده می‌شوند.",
+    "preparingFile": "در حال آماده‌سازی فایل...",
+    "compressedFileNote": "از {{original}} به {{current}} فشرده شد",
     "removeFile": "حذف فایل",
     "close": "بستن",
     "signedContract": "قرارداد امضا شده",
@@ -1090,7 +1100,7 @@
     "titlePlaceholder": "مثلاً قرارداد امضا شده نسخه ۱",
     "titleRequired": "عنوان الزامی است",
     "fileRequired": "فایل الزامی است",
-    "fileTooLarge": "حجم فایل باید کمتر از 50 مگابایت باشد"
+    "fileTooLarge": "این فایل پس از فشرده‌سازی هنوز بزرگ است. لطفاً فایلی کمتر از 50MB بارگذاری کنید."
   },
 
   "ExpensesMain": {

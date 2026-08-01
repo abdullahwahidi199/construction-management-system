@@ -3,11 +3,11 @@ import json
 import math
 import re
 
-PROJECT_ID = 5
-START_PK = 782
-LATEST_SERIAL = 781
+PROJECT_ID = 2
+START_PK = 1015
+LATEST_SERIAL = 1014
 
-csv_file = "Lalander 5  general exponsis.csv"
+csv_file = "Genral Expnsess Sheet LALANDER 5.csv"
 output_file = "lalander5_expenses.json"
 
 # Read without assuming columns - read all

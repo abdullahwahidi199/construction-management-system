@@ -26,6 +26,10 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
   if (!isOpen || !expense) return null;
   const isOfficeExpense = expense.expense_scope === "office";
   const projectLabel = isOfficeExpense ? "Office" : expense.project_name || "-";
+  const totalUsd =
+    parseFloat(expense.total_usd_equivalent ?? expense.total_usd) || 0;
+  const totalAfn =
+    parseFloat(expense.total_afn_equivalent ?? expense.total_afn) || 0;
 
   const displayDate = (dateString, fallback) => {
     return formatDate(dateString) || fallback || "-";
@@ -144,19 +148,19 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="rounded-xl bg-[var(--primary)]/5 border border-[var(--primary)]/20 p-4">
                 <p className="text-sm font-medium text-[var(--primary)] mb-1">
-                  {t("ExpenseDetail.totalUsd")}
+                  {t("ExpenseDetail.totalUsd")} EQ
                 </p>
                 <p className="text-xl font-bold text-[var(--primary)]">
-                  ${parseFloat(expense.total_usd || 0).toLocaleString()}
+                  ${totalUsd.toLocaleString()}
                 </p>
               </div>
 
               <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 p-4">
                 <p className="text-sm font-medium text-emerald-600 mb-1">
-                  {t("ExpenseDetail.totalAfn")}
+                  {t("ExpenseDetail.totalAfn")} EQ
                 </p>
                 <p className="text-xl font-bold text-emerald-600">
-                  ؋{parseFloat(expense.total_afn || 0).toLocaleString()}
+                  ؋{totalAfn.toLocaleString()}
                 </p>
               </div>
             </div>

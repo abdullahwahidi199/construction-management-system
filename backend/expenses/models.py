@@ -4,6 +4,7 @@ from project.models import Project  # Assuming projects app with Project model
 from django.db import transaction
 from django.db.models import Max, Q
 from django.utils import timezone
+from decimal import Decimal, ROUND_HALF_UP
 
 
 from django.core.exceptions import ValidationError
@@ -256,6 +257,22 @@ class Expense(models.Model):
         """AFN amount only. USD is intentionally not converted into AFN."""
         return round(self.amount_afn, 2)
 
+    @property
+    def total_usd_equivalent(self):
+        """Expense total converted to USD using this row's exchange rate."""
+        total = self.amount_usd or Decimal("0.00")
+        if self.amount_afn and self.exchange_rate and self.exchange_rate > 0:
+            total += self.amount_afn / self.exchange_rate
+        return total.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    @property
+    def total_afn_equivalent(self):
+        """Expense total converted to AFN using this row's exchange rate."""
+        total = self.amount_afn or Decimal("0.00")
+        if self.amount_usd and self.exchange_rate and self.exchange_rate > 0:
+            total += self.amount_usd * self.exchange_rate
+        return total.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
     def clean(self):
         # Add database level validation matching your business rules
         if self.expense_scope == self.ExpenseScope.OFFICE and self.project_id:
@@ -313,3 +330,80 @@ class Expense(models.Model):
                     kwargs["update_fields"] = set(update_fields) | {"serial_number"}
 
         super().save(*args, **kwargs)
+
+
+class ExpenseEditRequest(models.Model):
+    class ApprovalStatus(models.TextChoices):
+        PENDING = "pending", "Pending"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+
+    expense = models.ForeignKey(
+        Expense,
+        on_delete=models.CASCADE,
+        related_name="edit_requests",
+    )
+    original_values = models.JSONField(default=dict)
+    proposed_values = models.JSONField(default=dict)
+    changed_fields = models.JSONField(default=list)
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="requested_expense_edits",
+    )
+    requested_at = models.DateTimeField(auto_now_add=True)
+    approval_status = models.CharField(
+        max_length=20,
+        choices=ApprovalStatus.choices,
+        default=ApprovalStatus.PENDING,
+        db_index=True,
+    )
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="reviewed_expense_edits",
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    approval_notes = models.TextField(blank=True, default="")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-requested_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["expense"],
+                condition=Q(approval_status="pending"),
+                name="unique_pending_edit_request_per_expense",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Edit request for {self.expense}"
+
+    @property
+    def is_pending(self):
+        return self.approval_status == self.ApprovalStatus.PENDING
+
+    @property
+    def is_approved(self):
+        return self.approval_status == self.ApprovalStatus.APPROVED
+
+    @property
+    def is_rejected(self):
+        return self.approval_status == self.ApprovalStatus.REJECTED
+
+    def mark_approved(self, user, notes=""):
+        self.approval_status = self.ApprovalStatus.APPROVED
+        self.reviewed_by = user
+        self.reviewed_at = timezone.now()
+        self.approval_notes = notes or ""
+
+    def mark_rejected(self, user, notes=""):
+        self.approval_status = self.ApprovalStatus.REJECTED
+        self.reviewed_by = user
+        self.reviewed_at = timezone.now()
+        self.approval_notes = notes or ""

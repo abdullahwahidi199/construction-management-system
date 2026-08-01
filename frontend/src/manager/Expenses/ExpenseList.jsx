@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import {
-  MoreHorizontal,
   Edit2,
   Trash2,
   Eye,
@@ -74,7 +73,6 @@ export default function ExpenseList({
   const [sortField, setSortField] = useState("expense_date");
   const [sortDirection, setSortDirection] = useState("desc");
   const [selectedExpenses, setSelectedExpenses] = useState([]);
-  const [openDropdownId, setOpenDropdownId] = useState(null);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -96,8 +94,17 @@ export default function ExpenseList({
   };
 
   const getTotalAmount = (expense) => {
-    return parseFloat(expense.total_usd) || parseFloat(expense.total_afn) || 0;
+    return (
+      parseFloat(expense.total_usd_equivalent ?? expense.total_usd) ||
+      parseFloat(expense.total_afn_equivalent ?? expense.total_afn) ||
+      0
+    );
   };
+
+  const getEquivalentTotals = (expense) => ({
+    usd: parseFloat(expense.total_usd_equivalent ?? expense.total_usd) || 0,
+    afn: parseFloat(expense.total_afn_equivalent ?? expense.total_afn) || 0,
+  });
 
   const isOfficeExpense = (expense) => expense.expense_scope === "office";
 
@@ -304,7 +311,7 @@ export default function ExpenseList({
             <tbody className="divide-y divide-[var(--border)]">
               {filteredExpenses.map((expense) => {
                 const displayAmount = getDisplayAmount(expense);
-                const isOpen = openDropdownId === expense.id;
+                const equivalentTotals = getEquivalentTotals(expense);
 
                 return (
                   <tr
@@ -388,9 +395,9 @@ export default function ExpenseList({
                         {displayAmount.value.toLocaleString()}
                       </p>
                       <p className="text-xs text-[var(--muted)] mt-0.5">
-                        {t("ExpenseList.total")}: $
-                        {parseFloat(expense.total_usd || 0).toLocaleString()} /
-                        ؋{parseFloat(expense.total_afn || 0).toLocaleString()}
+                        {t("ExpenseList.total")} EQ: $
+                        {equivalentTotals.usd.toLocaleString()} /
+                        ؋{equivalentTotals.afn.toLocaleString()}
                       </p>
                     </td>
                     <td className="px-4 py-3.5 pe-5">
@@ -410,87 +417,29 @@ export default function ExpenseList({
                           <Edit2 className="h-4 w-4" />
                         </button>
 
-                        {/* Custom Dropdown */}
-                        <div className="relative">
-                          <button
-                            onClick={() =>
-                              setOpenDropdownId(isOpen ? null : expense.id)
-                            }
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--text)]"
-                            title={t("ExpenseList.moreOptions")}
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </button>
-
-                          {isOpen && (
-                            <>
-                              <div
-                                className="fixed inset-0 z-40"
-                                onClick={() => setOpenDropdownId(null)}
-                              />
-                              <div className="absolute end-0 mt-2 w-48 rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-lg z-50 py-1">
-                                <button
-                                  onClick={() => {
-                                    handleViewDetails(expense);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-start hover:bg-[var(--hover)]"
-                                >
-                                  <Eye className="h-4 w-4 shrink-0" />{" "}
-                                  {t("ExpenseList.viewDetails")}
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    handleEdit(expense);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-start hover:bg-[var(--hover)]"
-                                >
-                                  <Edit2 className="h-4 w-4 shrink-0" />{" "}
-                                  {t("ExpenseList.edit")}
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    handlePrint(expense);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className={`flex w-full items-center gap-2 px-3 py-2 text-sm text-start ${
-                                    expense.approval_status === "approved"
-                                      ? "hover:bg-[var(--hover)]"
-                                      : "cursor-not-allowed text-[var(--muted)]"
-                                  }`}
-                                  title={
-                                    expense.approval_status === "approved"
-                                      ? t("ExpenseList.printReceipt")
-                                      : "Expense must be approved before printing."
-                                  }
-                                >
-                                  <Printer className="h-4 w-4 shrink-0" />{" "}
-                                  {t("ExpenseList.printReceipt")}
-                                </button>
-                                {canDelete && (
-                                  <>
-                                    <div className="my-1 border-t border-[var(--border)]" />
-                                    <PermissionWrapper
-                                      permissions={["expenses.delete"]}
-                                    >
-                                      <button
-                                        onClick={() => {
-                                          setDeleteTarget(expense);
-                                          setOpenDropdownId(null);
-                                        }}
-                                        className="flex w-full items-center gap-2 px-3 py-2 text-sm text-start text-red-600 hover:bg-red-500/10"
-                                      >
-                                        <Trash2 className="h-4 w-4 shrink-0" />{" "}
-                                        {t("ExpenseList.delete")}
-                                      </button>
-                                    </PermissionWrapper>
-                                  </>
-                                )}
-                              </div>
-                            </>
-                          )}
-                        </div>
+                        <button
+                          onClick={() => handlePrint(expense)}
+                          disabled={expense.approval_status !== "approved"}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--text)] disabled:cursor-not-allowed disabled:opacity-45"
+                          title={
+                            expense.approval_status === "approved"
+                              ? t("ExpenseList.printReceipt")
+                              : "Expense must be approved before printing."
+                          }
+                        >
+                          <Printer className="h-4 w-4" />
+                        </button>
+                        {canDelete && (
+                          <PermissionWrapper permissions={["expenses.delete"]}>
+                            <button
+                              onClick={() => setDeleteTarget(expense)}
+                              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[var(--danger)] hover:bg-[var(--danger)]/10"
+                              title={t("ExpenseList.delete")}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </PermissionWrapper>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -502,6 +451,7 @@ export default function ExpenseList({
         <div className="divide-y divide-[var(--border)] md:hidden">
           {filteredExpenses.map((expense) => {
             const displayAmount = getDisplayAmount(expense);
+            const equivalentTotals = getEquivalentTotals(expense);
             const category =
               categoryConfig[expense.category] || categoryConfig.other;
 
@@ -562,11 +512,11 @@ export default function ExpenseList({
                   </div>
                   <div>
                     <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-                      {t("ExpenseList.total")}
+                      {t("ExpenseList.total")} EQ
                     </dt>
                     <dd className="mt-1 break-words text-sm font-medium text-[var(--text)]">
-                      ${parseFloat(expense.total_usd || 0).toLocaleString()} / AFN{" "}
-                      {parseFloat(expense.total_afn || 0).toLocaleString()}
+                      ${equivalentTotals.usd.toLocaleString()} / AFN{" "}
+                      {equivalentTotals.afn.toLocaleString()}
                     </dd>
                   </div>
                   {expense.created_by_name && (
@@ -592,11 +542,11 @@ export default function ExpenseList({
                   )}
                 </dl>
 
-                <div className="flex flex-wrap items-center justify-end gap-2 border-t border-[var(--border)] pt-3">
+                <div className="grid grid-cols-2 gap-2 border-t border-[var(--border)] pt-3 min-[460px]:flex min-[460px]:flex-wrap min-[460px]:justify-end">
                   <button
                     type="button"
                     onClick={() => handleViewDetails(expense)}
-                    className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-3 text-sm font-medium text-[var(--text)]"
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[var(--border)] px-3 text-sm font-medium text-[var(--text)]"
                   >
                     <Eye className="h-4 w-4" />
                     {t("ExpenseList.viewDetails")}
@@ -604,7 +554,7 @@ export default function ExpenseList({
                   <button
                     type="button"
                     onClick={() => handleEdit(expense)}
-                    className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-3 text-sm font-medium text-[var(--text)]"
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[var(--border)] px-3 text-sm font-medium text-[var(--text)]"
                   >
                     <Edit2 className="h-4 w-4" />
                     {t("ExpenseList.edit")}
@@ -612,7 +562,8 @@ export default function ExpenseList({
                   <button
                     type="button"
                     onClick={() => handlePrint(expense)}
-                    className={`inline-flex h-12 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium ${
+                    disabled={expense.approval_status !== "approved"}
+                    className={`inline-flex h-12 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-55 ${
                       expense.approval_status === "approved"
                         ? "border-[var(--border)] text-[var(--success)]"
                         : "border-[var(--border)] text-[var(--muted)]"
@@ -626,7 +577,7 @@ export default function ExpenseList({
                       <button
                         type="button"
                         onClick={() => setDeleteTarget(expense)}
-                        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-red-500/20 px-3 text-sm font-medium text-[var(--danger)]"
+                        className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-red-500/20 px-3 text-sm font-medium text-[var(--danger)]"
                       >
                         <Trash2 className="h-4 w-4" />
                         {t("ExpenseList.delete")}

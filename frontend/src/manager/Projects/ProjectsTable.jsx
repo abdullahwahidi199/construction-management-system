@@ -277,7 +277,7 @@ export default function ProjectsTable({ projects = [], onDelete }) {
 
                     {/* Actions */}
                     <td className="whitespace-nowrap px-4 py-3">
-                      <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() =>
                             navigate(`/manager/projects/${project.id}`)

@@ -55,6 +55,16 @@ function getMarkedAttendanceCount(dayStatus) {
   return Number(dayStatus?.marked_count || 0);
 }
 
+function isWorkingAttendanceDay(dayStatus) {
+  if (typeof dayStatus?.work_calendar?.is_working_day === "boolean") {
+    return dayStatus.work_calendar.is_working_day;
+  }
+  if (typeof dayStatus?.is_working_day === "boolean") {
+    return dayStatus.is_working_day;
+  }
+  return true;
+}
+
 function WorkerPayrollManager({ onOpenAttendance }) {
   const {
     fetchPayrolls,
@@ -188,7 +198,9 @@ function WorkerPayrollManager({ onOpenAttendance }) {
         ),
       );
       const missingDates = dates.filter(
-        (_date, index) => getMarkedAttendanceCount(statuses[index]) === 0,
+        (_date, index) =>
+          isWorkingAttendanceDay(statuses[index]) &&
+          getMarkedAttendanceCount(statuses[index]) === 0,
       );
       if (missingDates.length > 0) {
         setMissingAttendanceDates(missingDates);
@@ -799,7 +811,7 @@ function MissingAttendanceModal({
   missingDates,
   t,
 }) {
-  const hasSingleMissingDate = missingDates.length === 1;
+  const firstMissingDate = missingDates[0];
 
   return (
     <Modal
@@ -813,13 +825,13 @@ function MissingAttendanceModal({
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
           <div className="space-y-2">
             <p className="text-sm font-medium">
-              {hasSingleMissingDate
-                ? t("WorkerPayrollManager.attendanceMissingSingle")
-                : t("WorkerPayrollManager.attendanceMissingMultiple")}
+              Attendance has not been recorded for {firstMissingDate}. Please complete attendance before generating payroll.
             </p>
-            <p className="text-sm leading-6">
-              {t("WorkerPayrollManager.attendanceMissingInstruction")}
-            </p>
+            {missingDates.length > 1 && (
+              <p className="text-sm leading-6">
+                {missingDates.length} working days are missing attendance.
+              </p>
+            )}
           </div>
         </div>
 

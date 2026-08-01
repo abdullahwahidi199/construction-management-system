@@ -13,6 +13,7 @@ from common.test_helpers import (
     create_expense,
     create_payroll,
     create_project,
+    create_salary_advance,
     create_subcontractor,
     create_worker,
     create_worker_payroll,
@@ -92,6 +93,71 @@ class DashboardAPITests(APITestCase):
 
         self.assertEqual(response.status_code, 403)
 
+    def test_dashboard_expenses_include_usd_equivalent_without_changing_raw_totals(self):
+        create_expense(
+            self.project,
+            amount_usd=Decimal("0.00"),
+            amount_afn=Decimal("700.00"),
+            exchange_rate=Decimal("70.0000"),
+        )
+
+        response = self.client.get("/api/dashboard/financial/")
+
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data["expenses"]["total_usd"], Decimal("125.00"))
+        self.assertEqual(response.data["expenses"]["total_afn"], Decimal("700.00"))
+        self.assertEqual(
+            response.data["expenses"]["total_usd_equivalent"],
+            Decimal("135.00"),
+        )
+
+    def test_expense_summary_uses_usd_equivalent_for_project_and_office_breakdown(self):
+        create_expense(
+            self.project,
+            amount_usd=Decimal("0.00"),
+            amount_afn=Decimal("700.00"),
+            exchange_rate=Decimal("70.0000"),
+        )
+        create_expense(
+            None,
+            expense_scope=Expense.ExpenseScope.OFFICE,
+            amount_usd=Decimal("60.00"),
+            expense_type="office_rent",
+        )
+        create_expense(
+            None,
+            expense_scope=Expense.ExpenseScope.OFFICE,
+            amount_usd=Decimal("0.00"),
+            amount_afn=Decimal("680.00"),
+            exchange_rate=Decimal("68.0000"),
+            expense_type="office_rent",
+        )
+
+        response = self.client.get("/api/dashboard/expenses/")
+
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(
+            Decimal(response.data["total_expenses_usd_equivalent"]),
+            Decimal("205.00"),
+        )
+
+        by_project = {
+            row["project__name"]: row
+            for row in response.data["by_project"]
+        }
+        self.assertEqual(
+            Decimal(by_project["Dashboard Project"]["total_usd_equivalent"]),
+            Decimal("135.00"),
+        )
+        self.assertEqual(
+            Decimal(by_project["Office Expenses"]["total_usd_equivalent"]),
+            Decimal("70.00"),
+        )
+        self.assertEqual(
+            Decimal(response.data["office_expenses"]["total_usd_equivalent"]),
+            Decimal("70.00"),
+        )
+
     def test_dashboard_expense_widgets_split_current_month_project_and_office(self):
         create_expense(
             self.project,
@@ -99,10 +165,26 @@ class DashboardAPITests(APITestCase):
             amount_usd=Decimal("40.00"),
         )
         create_expense(
+            self.project,
+            expense_date=date.today(),
+            amount_usd=Decimal("0.00"),
+            amount_afn=Decimal("680.00"),
+            exchange_rate=Decimal("68.0000"),
+        )
+        create_expense(
             None,
             expense_scope=Expense.ExpenseScope.OFFICE,
             expense_date=date.today(),
             amount_usd=Decimal("60.00"),
+            expense_type="office_rent",
+        )
+        create_expense(
+            None,
+            expense_scope=Expense.ExpenseScope.OFFICE,
+            expense_date=date.today(),
+            amount_usd=Decimal("0.00"),
+            amount_afn=Decimal("680.00"),
+            exchange_rate=Decimal("68.0000"),
             expense_type="office_rent",
         )
 
@@ -114,8 +196,76 @@ class DashboardAPITests(APITestCase):
             Decimal("40.00"),
         )
         self.assertEqual(
+            response.data["current_month"]["project"]["total_afn"],
+            Decimal("680.00"),
+        )
+        self.assertEqual(
+            response.data["current_month"]["project"]["total_usd_equivalent"],
+            Decimal("50.00"),
+        )
+        self.assertEqual(
             response.data["current_month"]["office"]["total_usd"],
             Decimal("60.00"),
+        )
+        self.assertEqual(
+            response.data["current_month"]["office"]["total_afn"],
+            Decimal("680.00"),
+        )
+        self.assertEqual(
+            response.data["current_month"]["office"]["total_usd_equivalent"],
+            Decimal("70.00"),
+        )
+        self.assertEqual(
+            response.data["current_month"]["total_usd_equivalent"],
+            Decimal("120.00"),
+        )
+
+    def test_salary_advance_is_immediate_outflow_and_payroll_does_not_double_count(self):
+        employee = create_employee(
+            email="advance.dashboard@example.com",
+            salary=Decimal("30000.00"),
+        )
+        baseline = DashboardService.get_financial_overview()["grand_total_outflow"]["afn"]
+
+        create_salary_advance(
+            employee=employee,
+            amount=Decimal("5000.00"),
+            remaining_balance=Decimal("5000.00"),
+            date=date(2026, 7, 1),
+        )
+        after_advance = DashboardService.get_financial_overview()
+
+        self.assertEqual(
+            after_advance["grand_total_outflow"]["afn"],
+            baseline + Decimal("5000.00"),
+        )
+        self.assertEqual(
+            after_advance["payroll"]["salary_advances_afn"],
+            Decimal("5000.00"),
+        )
+
+        response = self.client.post(
+            "/api/payrolls/",
+            {
+                "employee": employee.id,
+                "payroll_period_start": "2026-07-01",
+                "payroll_period_end": "2026-07-31",
+                "basic_salary": "30000.00",
+                "currency": "AFN",
+                "payment_method": "cash",
+                "advance_deduction_mode": "all",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(Decimal(response.data["advance_deductions"]), Decimal("5000.00"))
+        self.assertEqual(Decimal(response.data["net_pay"]), Decimal("25000.00"))
+
+        after_payroll = DashboardService.get_financial_overview()
+        self.assertEqual(
+            after_payroll["grand_total_outflow"]["afn"],
+            baseline + Decimal("30000.00"),
         )
 
 

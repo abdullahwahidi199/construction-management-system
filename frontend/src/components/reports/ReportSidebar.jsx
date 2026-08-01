@@ -35,10 +35,10 @@ export default function ReportSidebar({ activeKey, onSelect }) {
     : translateOrFallback(t, "reports.title", "Reports");
 
   return (
-    <section className="mb-6 rounded-lg bg-card p-3 shadow-sm shadow-black/5">
+    <section className="mb-5 rounded-md border border-[color:color-mix(in_srgb,var(--border)_72%,transparent)] bg-card p-2">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex min-w-0 items-center gap-3 px-1">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[color:color-mix(in_srgb,var(--primary)_12%,transparent)] text-[var(--primary)]">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[color:color-mix(in_srgb,var(--primary)_10%,transparent)] text-[var(--primary)]">
             <BarChart3 size={19} strokeWidth={2} />
           </span>
           <div className="min-w-0">
@@ -55,7 +55,7 @@ export default function ReportSidebar({ activeKey, onSelect }) {
           <select
             value={activeKey}
             onChange={(event) => onSelect(event.target.value)}
-            className="h-11 w-full appearance-none rounded-md bg-bg px-3 pr-10 text-sm font-medium text-text shadow-inner outline-none transition-colors focus:ring-2 focus:ring-[var(--primary)]/25"
+            className="h-11 w-full appearance-none rounded-md border border-[color:color-mix(in_srgb,var(--border)_72%,transparent)] bg-bg px-3 pr-10 text-sm font-medium text-text outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
             aria-label={translateOrFallback(t, "reports.selectReport", "Select report")}
           >
             {REPORT_LIST.map((report) => (
@@ -75,7 +75,7 @@ export default function ReportSidebar({ activeKey, onSelect }) {
         </div>
 
         <nav
-          className="hidden min-w-0 rounded-md bg-bg p-1 lg:flex"
+          className="hidden min-w-0 flex-wrap gap-1 rounded-md bg-bg p-1 lg:flex"
           aria-label="Report navigation"
         >
           {REPORT_LIST.map((report) => {
@@ -87,10 +87,10 @@ export default function ReportSidebar({ activeKey, onSelect }) {
                 type="button"
                 onClick={() => onSelect(report.key)}
                 aria-current={active ? "page" : undefined}
-                className={`inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]/35
+                className={`inline-flex h-9 items-center gap-2 rounded px-3 text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]/35
                   ${
                     active
-                      ? "bg-card text-[var(--primary)] shadow-sm shadow-black/5"
+                      ? "bg-card text-[var(--primary)]"
                       : "text-muted hover:bg-hover hover:text-text"
                   }`}
               >

@@ -24,12 +24,11 @@ import {
   Users,
   X,
 } from "lucide-react";
-import ThemeToggle from "../components/ui/ToggleButton";
 import { useLanguage } from "../hooks/useLanguage";
-import LanguageSwitcher from "../components/LanguageSwitcher";
 import NotificationBell from "../components/notifications/NotificationBell";
 import { useRealtimeNotifications } from "../components/notifications/RealtimeNotificationCenter";
 import { useAuth } from "../auth/AuthContext";
+import { useCompany } from "../context/CompanyContext";
 import { hasAnyPermission } from "../../utils/permissions";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 
@@ -412,15 +411,6 @@ function ProfileDropdown({ open, onToggle, onClose, user, logout, t }) {
               <User className="h-4 w-4" />
               <span>{t("managerNavbar.profile")}</span>
             </NavLink>
-            <NavLink
-              to="/manager/settings"
-              role="menuitem"
-              onClick={onClose}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-(--muted) transition duration-200 hover:bg-(--hover) hover:text-(--text) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35"
-            >
-              <Settings className="h-4 w-4" />
-              <span>{t("managerNavbar.settings")}</span>
-            </NavLink>
             <button
               type="button"
               role="menuitem"
@@ -437,6 +427,65 @@ function ProfileDropdown({ open, onToggle, onClose, user, logout, t }) {
   );
 }
 
+function MobileDrawerLink({ item, pathname, onClose }) {
+  const Icon = item.icon;
+  const active = isRouteActive(pathname, item.path);
+
+  return (
+    <NavLink
+      to={item.path}
+      onClick={onClose}
+      className={`group flex min-h-12 w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-sm font-semibold transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35 ${
+        active
+          ? "border-(--primary)/25 bg-(--primary)/10 text-(--primary) shadow-sm"
+          : "border-transparent text-(--text) hover:border-(--border) hover:bg-(--hover)"
+      }`}
+    >
+      <span
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition duration-200 ${
+          active
+            ? "bg-(--primary) text-white"
+            : "bg-(--card) text-(--muted) ring-1 ring-(--border) group-hover:text-(--text)"
+        }`}
+      >
+        <Icon className="h-4 w-4" strokeWidth={1.9} />
+      </span>
+      <span className="min-w-0 flex-1 truncate">{item.name}</span>
+      <PendingBadge value={item.badge} />
+    </NavLink>
+  );
+}
+
+function MobileDrawerSection({ group, pathname, onClose }) {
+  if (group.type !== "group") {
+    return <MobileDrawerLink item={group} pathname={pathname} onClose={onClose} />;
+  }
+
+  const GroupIcon = group.icon;
+
+  return (
+    <section className="space-y-2" aria-labelledby={`mobile-${group.key}`}>
+      <h2
+        id={`mobile-${group.key}`}
+        className="flex items-center gap-2 px-1 text-xs font-semibold uppercase tracking-wider text-(--muted)"
+      >
+        {GroupIcon && <GroupIcon className="h-3.5 w-3.5" strokeWidth={2} />}
+        <span>{group.name}</span>
+      </h2>
+      <div className="grid gap-1">
+        {group.items.map((item) => (
+          <MobileDrawerLink
+            key={item.path}
+            item={item}
+            pathname={pathname}
+            onClose={onClose}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function ManagerNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -450,11 +499,14 @@ export default function ManagerNavbar() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { logout, user } = useAuth();
+  const { company } = useCompany();
   const { pendingExpenseApprovals } = useRealtimeNotifications();
   const permissions = user?.permissions || [];
   const username = user?.username || "Manager";
   const role = user?.role || "manager";
   const isAdmin = role === "admin";
+  const canOpenSettings = hasAnyPermission(permissions, ["settings.view", "settings.manage"]);
+  const companyName = company.company_name || t("managerNavbar.brand");
 
   const navGroups = (() => {
     const canView = (requiredPermissions) =>
@@ -579,12 +631,6 @@ export default function ManagerNavbar() {
         icon: BarChart3,
         permissions: ["reports.view", "reports.export"],
       },
-      settings: {
-        name: t("managerNavbar.settings"),
-        path: "/manager/settings",
-        icon: Settings,
-        permissions: ["settings.view", "settings.manage"],
-      },
     };
 
     const visible = (keys) =>
@@ -617,7 +663,6 @@ export default function ManagerNavbar() {
         items: visible(["attendance"]),
       },
       { type: "link", ...pages.reports, hidden: !canView(pages.reports.permissions) },
-      { type: "link", ...pages.settings, hidden: !canView(pages.settings.permissions) },
     ].filter((group) => !group.hidden && (group.type !== "group" || group.items.length));
   })();
 
@@ -640,16 +685,6 @@ export default function ManagerNavbar() {
     (group) => group.type === "group" || !primaryDesktopPaths.has(group.path),
   );
   const recentPages = allPages.slice(0, 5);
-  const mobilePrimaryPaths = new Set([
-    "/admin/dashboard",
-    "/manager/dashboard",
-    "/manager/projects",
-    "/manager/expenses",
-    "/manager/employees",
-  ]);
-  const mobilePrimaryPages = allPages
-    .filter((item) => mobilePrimaryPaths.has(item.path))
-    .slice(0, 4);
   const searchResults = allPages.filter((item) => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return true;
@@ -693,102 +728,139 @@ export default function ManagerNavbar() {
     setActiveSearchIndex(0);
   };
 
+  const closeMobileMenu = () => setMobileOpen(false);
+
+  const openMobileMenu = () => {
+    setSearchOpen(false);
+    setProfileOpen(false);
+    setOpenDropdown(null);
+    setMobileOpen(true);
+  };
+
+  const openMobileSearch = () => {
+    setMobileOpen(false);
+    setSearchOpen(true);
+    setActiveSearchIndex(0);
+    window.requestAnimationFrame(() => searchInputRef.current?.focus());
+  };
+
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-(--border) bg-(--bg)/90 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-none items-center gap-3 px-3 sm:px-4 xl:px-6">
-        <NavLink
-          to="/manager/dashboard"
-          className="flex min-w-0 shrink-0 items-center gap-2 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35"
-          aria-label={t("managerNavbar.brand")}
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--primary) text-sm font-bold text-white shadow-sm">
-            M
-          </span>
-          <span className="hidden min-w-0 sm:block">
-            <span className="block max-w-[7.5rem] truncate text-sm font-bold leading-5 text-(--text) xl:max-w-none">
-              {t("managerNavbar.brand")}
+    <>
+      <nav className="sticky top-0 z-50 w-full border-b border-(--border) bg-(--bg)/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-14 max-w-none items-center gap-3 px-3 sm:px-4 xl:px-6">
+          <NavLink
+            to="/manager/dashboard"
+            className="flex min-w-0 shrink-0 items-center gap-2 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35"
+            aria-label={companyName}
+          >
+            <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-(--primary) text-sm font-bold text-white shadow-sm">
+              {company.company_logo_url ? (
+                <img
+                  src={company.company_logo_url}
+                  alt=""
+                  className="h-full w-full object-contain bg-white p-0.5"
+                />
+              ) : (
+                initialsFor(companyName)
+              )}
             </span>
-          </span>
-        </NavLink>
+            <span className="hidden min-w-0 sm:block">
+              <span className="block max-w-[7.5rem] truncate text-sm font-bold leading-5 text-(--text) xl:max-w-none">
+                {companyName}
+              </span>
+            </span>
+          </NavLink>
 
-        <div className="hidden min-w-0 flex-1 items-center justify-start gap-1 px-1 lg:flex">
-          {desktopPrimaryGroups.map((group) => (
-            <DesktopNavItem
-              key={group.path}
-              item={group}
-              active={isRouteActive(location.pathname, group.path)}
-              onClick={() => setOpenDropdown(null)}
+          <div className="hidden min-w-0 flex-1 items-center justify-start gap-1 px-1 lg:flex">
+            {desktopPrimaryGroups.map((group) => (
+              <DesktopNavItem
+                key={group.path}
+                item={group}
+                active={isRouteActive(location.pathname, group.path)}
+                onClick={() => setOpenDropdown(null)}
+              />
+            ))}
+            <MoreNavMenu
+              groups={desktopMoreGroups}
+              pathname={location.pathname}
+              open={openDropdown === "more"}
+              onToggle={() =>
+                setOpenDropdown((current) => (current === "more" ? null : "more"))
+              }
+              onClose={() => setOpenDropdown(null)}
+              t={t}
             />
-          ))}
-          <MoreNavMenu
-            groups={desktopMoreGroups}
-            pathname={location.pathname}
-            open={openDropdown === "more"}
-            onToggle={() =>
-              setOpenDropdown((current) => (current === "more" ? null : "more"))
-            }
-            onClose={() => setOpenDropdown(null)}
-            t={t}
-          />
-        </div>
-
-        <div className="ml-auto flex shrink-0 items-center gap-1">
-          <SearchPanel
-            query={searchQuery}
-            setQuery={setSearchQuery}
-            open={searchOpen}
-            setOpen={setSearchOpen}
-            results={searchResults}
-            recentPages={recentPages}
-            activeIndex={activeSearchIndex}
-            setActiveIndex={setActiveSearchIndex}
-            onSelect={selectSearchItem}
-            t={t}
-            inputRef={searchInputRef}
-          />
-
-          <button
-            ref={searchButtonRef}
-            type="button"
-            onClick={() => setSearchOpen(true)}
-            className="hidden h-10 items-center gap-2 rounded-xl border border-(--border) bg-(--card) px-3 text-sm font-medium text-(--muted) transition duration-200 hover:border-(--muted) hover:text-(--text) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35 lg:flex 2xl:hidden"
-            aria-label={t("managerNavbar.searchPlaceholder")}
-          >
-            <Search className="h-4 w-4" />
-            <kbd className="rounded-md border border-(--border) bg-(--bg) px-1.5 py-0.5 text-[11px]">
-              Ctrl K
-            </kbd>
-          </button>
-
-          <div className="hidden xl:block">
-            <LanguageSwitcher />
-          </div>
-          <div className="hidden xl:block">
-            <ThemeToggle />
           </div>
 
-          <NotificationBell />
+          <div className="ml-auto flex shrink-0 items-center gap-1">
+            <SearchPanel
+              query={searchQuery}
+              setQuery={setSearchQuery}
+              open={searchOpen}
+              setOpen={setSearchOpen}
+              results={searchResults}
+              recentPages={recentPages}
+              activeIndex={activeSearchIndex}
+              setActiveIndex={setActiveSearchIndex}
+              onSelect={selectSearchItem}
+              t={t}
+              inputRef={searchInputRef}
+            />
 
-          <ProfileDropdown
-            open={profileOpen}
-            onToggle={() => setProfileOpen((open) => !open)}
-            onClose={() => setProfileOpen(false)}
-            user={user}
-            logout={logout}
-            t={t}
-          />
+            <button
+              ref={searchButtonRef}
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="hidden h-10 items-center gap-2 rounded-xl border border-(--border) bg-(--card) px-3 text-sm font-medium text-(--muted) transition duration-200 hover:border-(--muted) hover:text-(--text) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35 lg:flex 2xl:hidden"
+              aria-label={t("managerNavbar.searchPlaceholder")}
+            >
+              <Search className="h-4 w-4" />
+              <kbd className="rounded-md border border-(--border) bg-(--bg) px-1.5 py-0.5 text-[11px]">
+                Ctrl K
+              </kbd>
+            </button>
 
-          <IconButton
-            label={mobileOpen ? t("managerNavbar.closeMenu") : t("managerNavbar.openMenu")}
-            onClick={() => setMobileOpen((open) => !open)}
-            className="lg:hidden"
-            aria-expanded={mobileOpen}
-            aria-controls="manager-mobile-drawer"
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </IconButton>
+            <NotificationBell />
+
+            {canOpenSettings && (
+              <IconButton
+                label={t("managerNavbar.settings")}
+                onClick={() => navigate("/manager/settings")}
+                className={
+                  isRouteActive(location.pathname, "/manager/settings")
+                    ? "bg-(--primary)/10 text-(--primary)"
+                    : ""
+                }
+              >
+                <Settings className="h-5 w-5" />
+              </IconButton>
+            )}
+
+            <ProfileDropdown
+              open={profileOpen}
+              onToggle={() => setProfileOpen((open) => !open)}
+              onClose={() => setProfileOpen(false)}
+              user={user}
+              logout={logout}
+              t={t}
+            />
+
+            <IconButton
+              label={
+                mobileOpen
+                  ? t("managerNavbar.closeMenu")
+                  : t("managerNavbar.openMenu")
+              }
+              onClick={mobileOpen ? closeMobileMenu : openMobileMenu}
+              className="lg:hidden"
+              aria-expanded={mobileOpen}
+              aria-controls="manager-mobile-drawer"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </IconButton>
+          </div>
         </div>
-      </div>
+      </nav>
 
       {searchOpen && (
         <div className="2xl:hidden">
@@ -802,6 +874,7 @@ export default function ManagerNavbar() {
             <div className="relative mb-2">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--muted)" />
               <input
+                ref={searchInputRef}
                 autoFocus
                 type="search"
                 value={searchQuery}
@@ -820,7 +893,7 @@ export default function ManagerNavbar() {
                   className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-(--muted) transition duration-200 hover:bg-(--hover) hover:text-(--text)"
                 >
                   <Icon className="h-4 w-4" />
-                  <span>{item.name}</span>
+                  <span className="min-w-0 flex-1 truncate">{item.name}</span>
                   <PendingBadge value={item.badge} />
                 </button>
               );
@@ -829,163 +902,96 @@ export default function ManagerNavbar() {
         </div>
       )}
 
-      <aside
-        id="manager-mobile-drawer"
-        className={`fixed inset-0 z-[100] flex-col overflow-hidden bg-(--bg) transition duration-[250ms] lg:hidden ${
-          mobileOpen
-            ? "flex pointer-events-auto translate-x-0 opacity-100"
-            : "hidden pointer-events-none translate-x-full opacity-0 rtl:-translate-x-full"
-        }`}
-        style={{ backgroundColor: "var(--bg)" }}
-        aria-hidden={!mobileOpen}
-      >
-        <div className="flex shrink-0 items-center justify-between border-b border-(--border) px-4 py-3">
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-(--primary) text-base font-semibold text-white">
-              {initialsFor(username)}
-            </span>
-            <span className="min-w-0">
-              <span className="block truncate text-sm font-semibold text-(--text)">
-                {username}
-              </span>
-              <span className="block truncate text-xs capitalize text-(--muted)">
-                {role}
-              </span>
-            </span>
-          </div>
-          <IconButton
-            label={t("managerNavbar.closeMenu")}
-            onClick={() => setMobileOpen(false)}
-          >
-            <X className="h-5 w-5" />
-          </IconButton>
-        </div>
-
-        <div className="shrink-0 border-b border-(--border) px-4 py-3">
+      {mobileOpen && (
+        <div className="fixed inset-0 z-[100] lg:hidden">
           <button
             type="button"
-            onClick={() => setSearchOpen(true)}
-            className="flex h-12 w-full items-center justify-between rounded-xl border border-(--border) bg-(--card) px-4 text-sm text-(--muted)"
+            aria-label={t("managerNavbar.closeMenu")}
+            className="absolute inset-0 bg-black/35 backdrop-blur-[2px]"
+            onClick={closeMobileMenu}
+          />
+          <aside
+            id="manager-mobile-drawer"
+            role="dialog"
+            aria-label={companyName}
+            aria-modal="true"
+            className="absolute inset-y-0 right-0 flex h-[100dvh] max-h-[100dvh] w-[min(24rem,92vw)] flex-col overflow-hidden border-l border-(--border) bg-(--bg) shadow-2xl shadow-black/25 rtl:left-0 rtl:right-auto rtl:border-l-0 rtl:border-r"
+            style={{ backgroundColor: "var(--bg)" }}
           >
-            <span className="flex items-center gap-3">
-              <Search className="h-4 w-4" />
-              <span>{t("managerNavbar.searchPlaceholder")}</span>
-            </span>
-            <kbd className="rounded-md border border-(--border) bg-(--bg) px-1.5 py-0.5 text-[11px]">
-              Ctrl K
-            </kbd>
-          </button>
-        </div>
+            <div className="flex shrink-0 items-center justify-between border-b border-(--border) px-4 py-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-(--primary) text-base font-semibold text-white shadow-sm">
+                  {initialsFor(username)}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold text-(--text)">
+                    {username}
+                  </span>
+                  <span className="block truncate text-xs capitalize text-(--muted)">
+                    {role}
+                  </span>
+                </span>
+              </div>
+              <IconButton label={t("managerNavbar.closeMenu")} onClick={closeMobileMenu}>
+                <X className="h-5 w-5" />
+              </IconButton>
+            </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 mobile-scrollbar">
-          <div className="space-y-4">
-            {navGroups.map((group) => {
-              if (group.type !== "group") {
-                const Icon = group.icon;
-                const active = isRouteActive(location.pathname, group.path);
-                return (
-                  <NavLink
-                    key={group.path}
-                    to={group.path}
-                    onClick={() => setMobileOpen(false)}
-                    className={`flex min-h-14 items-center gap-3 rounded-xl px-4 text-base font-semibold transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35 ${
-                      active
-                        ? "bg-(--primary)/10 text-(--primary)"
-                        : "text-(--text) hover:bg-(--hover)"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span>{group.name}</span>
-                    <PendingBadge value={group.badge} />
-                  </NavLink>
-                );
-              }
-
-              return (
-                <section key={group.key} aria-labelledby={`mobile-${group.key}`}>
-                  <h2
-                    id={`mobile-${group.key}`}
-                    className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-(--muted)"
-                  >
-                    {group.name}
-                  </h2>
-                  <div className="space-y-1">
-                    {group.items.map((item) => {
-                      const Icon = item.icon;
-                      const active = isRouteActive(location.pathname, item.path);
-                      return (
-                        <NavLink
-                          key={item.path}
-                          to={item.path}
-                          onClick={() => setMobileOpen(false)}
-                          className={`flex min-h-14 items-center gap-3 rounded-xl px-4 text-base font-medium transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35 ${
-                            active
-                              ? "bg-(--primary)/10 text-(--primary)"
-                              : "text-(--muted) hover:bg-(--hover) hover:text-(--text)"
-                          }`}
-                        >
-                          <Icon className="h-5 w-5" />
-                          <span>{item.name}</span>
-                          <PendingBadge value={item.badge} />
-                        </NavLink>
-                      );
-                    })}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-
-          <div className="mt-5 grid gap-3 border-t border-(--border) pt-4">
-            <LanguageSwitcher />
-            <ThemeToggle />
-          </div>
-        </div>
-
-        <div className="shrink-0 border-t border-(--border) bg-(--bg) p-4">
-          <button
-            type="button"
-            onClick={logout}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-(--danger) px-4 text-sm font-semibold text-white transition duration-200 hover:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-(--danger)/35"
-          >
-            <LogOut className="h-4 w-4" />
-            <span>{t("auth.logout")}</span>
-          </button>
-        </div>
-      </aside>
-
-      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-(--border) bg-(--bg)/95 px-[max(0.5rem,var(--safe-left))] pb-[var(--safe-bottom)] shadow-[0_-12px_30px_var(--shadow)] backdrop-blur-xl lg:hidden">
-        <div className="mx-auto grid h-16 max-w-md grid-cols-5 items-center gap-1">
-          {mobilePrimaryPages.map((item) => {
-            const Icon = item.icon;
-            const active = isRouteActive(location.pathname, item.path);
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1 text-[11px] font-medium transition ${
-                  active
-                    ? "text-(--primary)"
-                    : "text-(--muted) active:bg-(--hover)"
-                }`}
+            <div className="shrink-0 border-b border-(--border) px-4 py-3">
+              <button
+                type="button"
+                onClick={openMobileSearch}
+                className="flex min-h-12 w-full items-center justify-between gap-3 rounded-lg border border-(--border) bg-(--card) px-3 text-left text-sm font-medium text-(--muted) transition duration-200 hover:border-(--muted) hover:text-(--text) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35"
               >
-                <Icon className="h-5 w-5 shrink-0" />
-                <span className="max-w-full truncate">{item.name}</span>
-                <PendingBadge value={item.badge} />
-              </NavLink>
-            );
-          })}
-          <button
-            type="button"
-            onClick={() => setMobileOpen(true)}
-            className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1 text-[11px] font-medium text-(--muted) transition active:bg-(--hover)"
-            aria-label={t("managerNavbar.more")}
-          >
-            <MoreHorizontal className="h-5 w-5" />
-            <span>{t("managerNavbar.more")}</span>
-          </button>
+                <span className="flex min-w-0 items-center gap-3">
+                  <Search className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{t("managerNavbar.searchPlaceholder")}</span>
+                </span>
+                <kbd className="hidden shrink-0 rounded-md border border-(--border) bg-(--bg) px-1.5 py-0.5 text-[11px] sm:inline-flex">
+                  Ctrl K
+                </kbd>
+              </button>
+            </div>
+
+            <nav
+              aria-label={companyName}
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 mobile-scrollbar"
+            >
+              <div className="grid gap-4">
+                {navGroups.map((group) => (
+                  <MobileDrawerSection
+                    key={group.type === "group" ? group.key : group.path}
+                    group={group}
+                    pathname={location.pathname}
+                    onClose={closeMobileMenu}
+                  />
+                ))}
+              </div>
+            </nav>
+
+            <div className="shrink-0 border-t border-(--border) bg-(--bg) p-4 pb-[max(1rem,var(--safe-bottom))]">
+              <div className="grid grid-cols-2 gap-2">
+                <NavLink
+                  to="/manager/settings"
+                  onClick={closeMobileMenu}
+                  className="flex h-11 items-center justify-center gap-2 rounded-lg border border-(--border) bg-(--card) px-3 text-sm font-semibold text-(--text) transition duration-200 hover:bg-(--hover) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35"
+                >
+                  <User className="h-4 w-4" />
+                  <span className="truncate">{t("managerNavbar.profile")}</span>
+                </NavLink>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="flex h-11 items-center justify-center gap-2 rounded-lg bg-(--danger) px-3 text-sm font-semibold text-white transition duration-200 hover:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-(--danger)/35"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="truncate">{t("auth.logout")}</span>
+                </button>
+              </div>
+            </div>
+          </aside>
         </div>
-      </div>
-    </nav>
+      )}
+    </>
   );
 }

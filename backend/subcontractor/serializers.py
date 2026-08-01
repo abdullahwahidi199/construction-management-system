@@ -20,6 +20,44 @@ from .models import (
 )
 from .services import ContractService
 from .validators import validate_file_extension, validate_file_size
+from .utils.file_compress import compress_image, compress_pdf
+
+
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
+
+
+def _reset_file_pointer(file_obj):
+    try:
+        file_obj.seek(0)
+    except (AttributeError, OSError):
+        pass
+
+
+def _file_extension(file_obj):
+    name = getattr(file_obj, "name", "") or ""
+    return f".{name.rsplit('.', 1)[-1].lower()}" if "." in name else ""
+
+
+def compress_upload_before_size_check(value):
+    """
+    Apply the same compression used at save time before size validation runs.
+    Large photos should be judged by their upload-ready size, not the raw camera file.
+    """
+    content_type = getattr(value, "content_type", "") or ""
+    extension = _file_extension(value)
+
+    try:
+        if content_type.startswith("image/") or extension in IMAGE_EXTENSIONS:
+            _reset_file_pointer(value)
+            return compress_image(value, quality=70)
+
+        if content_type == "application/pdf" or extension == ".pdf":
+            _reset_file_pointer(value)
+            return compress_pdf(value)
+    except Exception:
+        _reset_file_pointer(value)
+
+    return value
 
 
 # ──────────────────────────────────────────────
@@ -228,8 +266,9 @@ class ContractDocumentSerializer(CalendarModelSerializer):
 
     def validate_file(self, value):
         validate_file_extension(value)
-        validate_file_size(value)
-        return value
+        compressed = compress_upload_before_size_check(value)
+        validate_file_size(compressed)
+        return compressed
 
 
 class ContractDocumentCreateSerializer(CalendarModelSerializer):
@@ -252,8 +291,9 @@ class ContractDocumentCreateSerializer(CalendarModelSerializer):
 
     def validate_file(self, value):
         validate_file_extension(value)
-        validate_file_size(value)
-        return value
+        compressed = compress_upload_before_size_check(value)
+        validate_file_size(compressed)
+        return compressed
 
 
 # ──────────────────────────────────────────────
@@ -381,6 +421,12 @@ class ContractInvoiceDocumentSerializer(CalendarModelSerializer):
             "uploaded_at",
         ]
 
+    def validate_file(self, value):
+        validate_file_extension(value)
+        compressed = compress_upload_before_size_check(value)
+        validate_file_size(compressed)
+        return compressed
+
 class ContractInvoiceSerializer(CalendarModelSerializer):
     calendar_module = "invoices"
     
@@ -487,3 +533,9 @@ class ContractInvoiceDocumentCreateSerializer(CalendarModelSerializer):
             "id",
             "uploaded_at",
         ]
+
+    def validate_file(self, value):
+        validate_file_extension(value)
+        compressed = compress_upload_before_size_check(value)
+        validate_file_size(compressed)
+        return compressed

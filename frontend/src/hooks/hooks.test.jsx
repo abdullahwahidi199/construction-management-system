@@ -44,7 +44,7 @@ describe("API hooks", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.data).toEqual([]);
-    expect(result.current.error).toBe("Something went wrong. Please try again later.");
+    expect(result.current.error).toBe("Something went wrong. Please try again in a moment.");
   });
 
   it("usePost toggles loading and returns response data", async () => {
@@ -62,7 +62,10 @@ describe("API hooks", () => {
   });
 
   it("useDelete surfaces friendly errors", async () => {
-    api.delete.mockRejectedValueOnce({ response: { status: 403 } });
+    api.delete.mockRejectedValueOnce({
+      response: { status: 403 },
+      config: { method: "delete", url: "employees/1/" },
+    });
     const { result } = renderHook(() => useDelete());
 
     let thrown;
@@ -76,7 +79,9 @@ describe("API hooks", () => {
 
     expect(thrown).toBeTruthy();
     await waitFor(() =>
-      expect(result.current.error).toBe("You don't have permission to perform this action."),
+      expect(result.current.error).toBe(
+        "You don't have permission to delete employees.",
+      ),
     );
   });
 });

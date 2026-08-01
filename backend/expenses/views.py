@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from django.shortcuts import get_object_or_404
 
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import (
@@ -14,20 +15,26 @@ from django.db.models import (
     DecimalField,
     ExpressionWrapper)
 
-from .models import Expense
+from .models import Expense, ExpenseEditRequest
 from .serializers import (
     ExpenseApprovalActionSerializer,
     ExpenseApprovalSettingsSerializer,
+    ExpenseEditRequestSerializer,
     ExpenseSerializer,
 )
 from .services import (
+    apply_edit_request_filters,
     apply_approval_filters,
+    approval_queue_summary,
     approval_summary,
     approve_expense,
+    approve_expense_edit_request,
     create_expense,
+    expense_currency_totals,
     get_expense_approval_settings,
     is_expense_approval_enabled,
     reject_expense,
+    reject_expense_edit_request,
     set_expense_approval_settings,
     update_expense,
 )
@@ -71,6 +78,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         "approve": ("expenses.approve",),
         "reject": ("expenses.approve",),
         "approvals": ("expenses.approve",),
+        "approve_edit_request": ("expenses.approve",),
+        "reject_edit_request": ("expenses.approve",),
         "approval_summary": ("expenses.view", "expenses.approve"),
         "approval_settings": ("settings.view", "settings.manage"),
         "save_approval_settings": ("settings.manage",),
@@ -147,16 +156,49 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     # =========================
     # UPDATE
     # =========================
+    def _ensure_update_permission(self, instance):
+        if has_permission(self.request.user, "expenses.update"):
+            return
+
+        if instance.created_by_id == self.request.user.id:
+            return
+
+        raise PermissionDenied(
+            "You can only edit expense entries you created."
+        )
+
     def perform_update(self, serializer):
-        if not has_permission(self.request.user, "expenses.update"):
-            instance = self.get_object()
-
-            if instance.created_by_id != self.request.user.id:
-                raise PermissionDenied(
-                    "You can only update your own expense entries."
-                )
-
+        self._ensure_update_permission(self.get_object())
         update_expense(serializer, self.request.user, request=self.request)
+
+    def _update_expense(self, request, *args, partial=False, **kwargs):
+        instance = self.get_object()
+        self._ensure_update_permission(instance)
+
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        result = update_expense(serializer, request.user, request=request)
+
+        if isinstance(result, ExpenseEditRequest):
+            return Response(
+                {
+                    "detail": (
+                        "Your changes were submitted for approval. "
+                        "The approved expense will stay unchanged until an approver reviews the request."
+                    ),
+                    "expense": self.get_serializer(result.expense).data,
+                    "edit_request": ExpenseEditRequestSerializer(result).data,
+                },
+                status=status.HTTP_202_ACCEPTED,
+            )
+
+        return Response(self.get_serializer(result).data)
+
+    def update(self, request, *args, **kwargs):
+        return self._update_expense(request, *args, partial=False, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        return self._update_expense(request, *args, partial=True, **kwargs)
 
     @action(detail=True, methods=["post"])
     def approve(self, request, pk=None):
@@ -180,14 +222,84 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         )
         return Response(self.get_serializer(expense).data)
 
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path=r"edit-requests/(?P<edit_request_id>[^/.]+)/approve",
+    )
+    def approve_edit_request(self, request, edit_request_id=None):
+        edit_request = get_object_or_404(
+            ExpenseEditRequest.objects.select_related(
+                "expense",
+                "expense__project",
+                "requested_by",
+                "reviewed_by",
+            ),
+            pk=edit_request_id,
+        )
+        edit_request = approve_expense_edit_request(
+            edit_request,
+            request.user,
+            notes=request.data.get("approval_notes", ""),
+            request=request,
+        )
+        return Response(ExpenseEditRequestSerializer(edit_request).data)
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path=r"edit-requests/(?P<edit_request_id>[^/.]+)/reject",
+    )
+    def reject_edit_request(self, request, edit_request_id=None):
+        serializer = ExpenseApprovalActionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        edit_request = get_object_or_404(
+            ExpenseEditRequest.objects.select_related(
+                "expense",
+                "expense__project",
+                "requested_by",
+                "reviewed_by",
+            ),
+            pk=edit_request_id,
+        )
+        edit_request = reject_expense_edit_request(
+            edit_request,
+            request.user,
+            notes=serializer.validated_data.get("approval_notes", ""),
+            request=request,
+        )
+        return Response(ExpenseEditRequestSerializer(edit_request).data)
+
     @action(detail=False, methods=["get"])
     def approvals(self, request):
         queryset = self.filter_queryset(self.get_queryset())
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page or queryset, many=True)
+        edit_queryset = apply_edit_request_filters(
+            ExpenseEditRequest.objects.select_related(
+                "expense",
+                "expense__project",
+                "requested_by",
+                "reviewed_by",
+            ),
+            request.query_params,
+        )
+
+        expense_rows = self.get_serializer(queryset, many=True).data
+        for row in expense_rows:
+            row["approval_item_type"] = "expense_creation"
+            row["queue_id"] = f"expense:{row['id']}"
+            row["expense_id"] = row["id"]
+
+        edit_rows = ExpenseEditRequestSerializer(edit_queryset, many=True).data
+        combined_rows = sorted(
+            [*expense_rows, *edit_rows],
+            key=lambda item: item.get("created_at") or "",
+            reverse=True,
+        )
+
+        page = self.paginate_queryset(combined_rows)
         payload = {
-            "results": serializer.data,
-            "summary": approval_summary(self.get_queryset()),
+            "results": page if page is not None else combined_rows,
+            "summary": approval_queue_summary(queryset, edit_queryset),
         }
         if page is not None:
             return self.get_paginated_response(payload)
@@ -195,7 +307,11 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="approval-summary")
     def approval_summary(self, request):
-        return Response(approval_summary(self.get_queryset()))
+        edit_queryset = apply_edit_request_filters(
+            ExpenseEditRequest.objects.select_related("expense"),
+            request.query_params,
+        )
+        return Response(approval_queue_summary(self.get_queryset(), edit_queryset))
 
     @action(detail=False, methods=["get"], url_path="approval-settings")
     def approval_settings(self, request):
@@ -238,6 +354,28 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             usd=Sum("amount_usd"),
             afn=Sum("amount_afn"),
         )
+        equivalent_totals = expense_currency_totals(financial_qs)
+        project_equivalent_totals = expense_currency_totals(
+            financial_qs.filter(expense_scope=Expense.ExpenseScope.PROJECT)
+        )
+        office_equivalent_totals = expense_currency_totals(
+            financial_qs.filter(expense_scope=Expense.ExpenseScope.OFFICE)
+        )
+        totals_payload = {
+            "usd": usd_total,
+            "afn": afn_total,
+            **equivalent_totals,
+            "project": {
+                "usd": project_totals["usd"] or 0,
+                "afn": project_totals["afn"] or 0,
+                **project_equivalent_totals,
+            },
+            "office": {
+                "usd": office_totals["usd"] or 0,
+                "afn": office_totals["afn"] or 0,
+                **office_equivalent_totals,
+            },
+        }
 
         # -------- PAGINATION --------
         page = self.paginate_queryset(base_qs)
@@ -246,36 +384,14 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response({
                 "results": serializer.data,
-                "totals": {
-                    "usd": usd_total,
-                    "afn": afn_total,
-                    "project": {
-                        "usd": project_totals["usd"] or 0,
-                        "afn": project_totals["afn"] or 0,
-                    },
-                    "office": {
-                        "usd": office_totals["usd"] or 0,
-                        "afn": office_totals["afn"] or 0,
-                    },
-                },
+                "totals": totals_payload,
                 "approval": approval_summary(base_qs),
             })
 
         serializer = self.get_serializer(base_qs, many=True)
         return Response({
             "results": serializer.data,
-            "totals": {
-                "usd": usd_total,
-                "afn": afn_total,
-                "project": {
-                    "usd": project_totals["usd"] or 0,
-                    "afn": project_totals["afn"] or 0,
-                },
-                "office": {
-                    "usd": office_totals["usd"] or 0,
-                    "afn": office_totals["afn"] or 0,
-                },
-            },
+            "totals": totals_payload,
             "approval": approval_summary(base_qs),
         })
 
@@ -306,6 +422,7 @@ from bidi.algorithm import get_display
 
 from expenses.models import Expense
 from project.models import Project
+from reports.branding import build_pdf_branding_elements, draw_pdf_branding_footer
 
 
 # ----------------------------------------------------
@@ -411,7 +528,7 @@ class ExpensePDFExportView(APIView):
             leftMargin=15,
             rightMargin=15,
             topMargin=15,
-            bottomMargin=15,
+            bottomMargin=30,
         )
 
         styles = getSampleStyleSheet()
@@ -491,25 +608,13 @@ class ExpensePDFExportView(APIView):
             for e in expenses
         )
 
-        # ------------------------------------------
-        # HEADER
-        # ------------------------------------------
-
-        elements.append(
-            Paragraph(
-                "Expense Report",
-                title_style,
-            )
+        company, branding = build_pdf_branding_elements(
+            title="Expense Report",
+            subtitle=f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}",
+            request=request,
+            styles=styles,
         )
-
-        elements.append(
-            Paragraph(
-                f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}",
-                normal_style,
-            )
-        )
-
-        elements.append(Spacer(1, 10))
+        elements.extend(branding)
 
         # ------------------------------------------
         # FILTER TABLE
@@ -739,6 +844,20 @@ class ExpensePDFExportView(APIView):
 
         elements.append(expense_table)
 
-        doc.build(elements)
+        doc.build(
+            elements,
+            onFirstPage=lambda canvas, document: draw_pdf_branding_footer(
+                canvas,
+                document,
+                company=company,
+                font_name="NotoArabic",
+            ),
+            onLaterPages=lambda canvas, document: draw_pdf_branding_footer(
+                canvas,
+                document,
+                company=company,
+                font_name="NotoArabic",
+            ),
+        )
 
         return response

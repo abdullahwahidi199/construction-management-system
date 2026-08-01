@@ -16,6 +16,7 @@ from django.utils import timezone
 
 from project.models import Project
 from expenses.models import Expense
+from Employees.finance import salary_advance_queryset, salary_advance_totals
 from Employees.models import Employee, Payroll, Attendance
 from labour.models import WorkerPayroll
 from subcontractor.models import (
@@ -34,6 +35,32 @@ class DashboardService:
     # ════════════════════════════════════════════
     # 1. PROJECT METRICS
     # ════════════════════════════════════════════
+
+    @staticmethod
+    def _expense_usd_equivalent(queryset):
+        """Dashboard-only USD equivalent using each expense's own exchange rate."""
+        total = Decimal("0.00")
+        for amount_usd, amount_afn, exchange_rate in queryset.values_list(
+            "amount_usd",
+            "amount_afn",
+            "exchange_rate",
+        ):
+            total += amount_usd or Decimal("0.00")
+            if amount_afn and exchange_rate and exchange_rate > 0:
+                total += amount_afn / exchange_rate
+        return total.quantize(Decimal("0.01"))
+
+    @staticmethod
+    def _expense_totals(queryset):
+        totals = queryset.aggregate(
+            total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
+            total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
+            count=Count("id"),
+        )
+        totals["total_usd_equivalent"] = DashboardService._expense_usd_equivalent(
+            queryset
+        )
+        return totals
 
     @staticmethod
     def get_project_overview():
@@ -180,54 +207,141 @@ class DashboardService:
         expenses = Expense.objects.approved()
 
         # --- Overall totals ---
-        totals = expenses.aggregate(
-            total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
-            total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
-            total_count=Count("id"),
+        totals = DashboardService._expense_totals(expenses)
+        totals["total_count"] = totals["count"]
+        project_totals = DashboardService._expense_totals(
+            expenses.filter(expense_scope=Expense.ExpenseScope.PROJECT)
         )
-        project_totals = expenses.filter(
-            expense_scope=Expense.ExpenseScope.PROJECT,
-        ).aggregate(
-            total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
-            total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
-            count=Count("id"),
-        )
-        office_totals = expenses.filter(
-            expense_scope=Expense.ExpenseScope.OFFICE,
-        ).aggregate(
-            total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
-            total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
-            count=Count("id"),
+        office_totals = DashboardService._expense_totals(
+            expenses.filter(expense_scope=Expense.ExpenseScope.OFFICE)
         )
 
-        # --- By expense type ---
-        by_type = list(
-            expenses.values("expense_type")
-            .annotate(
-                total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
-                total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
-                count=Count("id"),
-            )
-            .order_by("-total_usd")
+        def add_row_totals(bucket, amount_usd, amount_afn, exchange_rate):
+            amount_usd = amount_usd or Decimal("0.00")
+            amount_afn = amount_afn or Decimal("0.00")
+            exchange_rate = exchange_rate or Decimal("0.00")
+
+            bucket["total_usd"] += amount_usd
+            bucket["total_afn"] += amount_afn
+            bucket["total_usd_equivalent"] += amount_usd
+            if amount_afn and exchange_rate > 0:
+                bucket["total_usd_equivalent"] += amount_afn / exchange_rate
+            bucket["count"] += 1
+
+        def money(value):
+            return value.quantize(Decimal("0.01"))
+
+        by_type_map = defaultdict(
+            lambda: {
+                "expense_type": "",
+                "total_afn": Decimal("0.00"),
+                "total_usd": Decimal("0.00"),
+                "total_usd_equivalent": Decimal("0.00"),
+                "count": 0,
+            }
+        )
+        by_project_map = defaultdict(
+            lambda: {
+                "project__id": None,
+                "project__name": "",
+                "expense_scope": Expense.ExpenseScope.PROJECT,
+                "total_afn": Decimal("0.00"),
+                "total_usd": Decimal("0.00"),
+                "total_usd_equivalent": Decimal("0.00"),
+                "count": 0,
+            }
+        )
+        monthly_map = defaultdict(
+            lambda: {
+                "month": "",
+                "total_afn": Decimal("0.00"),
+                "total_usd": Decimal("0.00"),
+                "total_usd_equivalent": Decimal("0.00"),
+                "count": 0,
+            }
         )
 
         # --- Monthly trend (last 12 months) ---
         twelve_months_ago = date.today() - timedelta(days=365)
-        monthly_trend = list(
-            expenses.filter(expense_date__gte=twelve_months_ago)
-            .annotate(month=TruncMonth("expense_date"))
-            .values("month")
-            .annotate(
-                total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
-                total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
-                count=Count("id"),
+        for expense in expenses.values(
+            "expense_type",
+            "expense_scope",
+            "project_id",
+            "project__name",
+            "expense_date",
+            "amount_usd",
+            "amount_afn",
+            "exchange_rate",
+        ):
+            type_key = expense["expense_type"] or "other"
+            type_bucket = by_type_map[type_key]
+            type_bucket["expense_type"] = type_key
+            add_row_totals(
+                type_bucket,
+                expense["amount_usd"],
+                expense["amount_afn"],
+                expense["exchange_rate"],
             )
-            .order_by("month")
-        )
 
-        # Format month for JSON
-        for entry in monthly_trend:
-            entry["month"] = entry["month"].strftime("%Y-%m")
+            if expense["expense_scope"] == Expense.ExpenseScope.OFFICE:
+                project_key = "office"
+                project_name = "Office Expenses"
+            else:
+                project_key = expense["project_id"]
+                project_name = expense["project__name"] or ""
+
+            project_bucket = by_project_map[project_key]
+            project_bucket["project__id"] = project_key
+            project_bucket["project__name"] = project_name
+            project_bucket["expense_scope"] = expense["expense_scope"]
+            add_row_totals(
+                project_bucket,
+                expense["amount_usd"],
+                expense["amount_afn"],
+                expense["exchange_rate"],
+            )
+
+            if expense["expense_date"] and expense["expense_date"] >= twelve_months_ago:
+                month_key = expense["expense_date"].strftime("%Y-%m")
+                month_bucket = monthly_map[month_key]
+                month_bucket["month"] = month_key
+                add_row_totals(
+                    month_bucket,
+                    expense["amount_usd"],
+                    expense["amount_afn"],
+                    expense["exchange_rate"],
+                )
+
+        def finalize(rows, order_key="-total_usd_equivalent"):
+            finalized = []
+            for row in rows:
+                row = dict(row)
+                row["total_afn"] = money(row["total_afn"])
+                row["total_usd"] = money(row["total_usd"])
+                row["total_usd_equivalent"] = money(row["total_usd_equivalent"])
+                finalized.append(row)
+
+            reverse = order_key.startswith("-")
+            key = order_key.lstrip("-")
+            return sorted(finalized, key=lambda item: item[key], reverse=reverse)
+
+        by_type = finalize(by_type_map.values())
+        monthly_trend = finalize(monthly_map.values(), order_key="month")
+        project_breakdown = finalize(
+            [
+                row
+                for row in by_project_map.values()
+                if row["expense_scope"] == Expense.ExpenseScope.PROJECT
+            ]
+        )[:10]
+        office_breakdown = finalize(
+            [
+                row
+                for row in by_project_map.values()
+                if row["expense_scope"] == Expense.ExpenseScope.OFFICE
+            ]
+        )
+        by_project = project_breakdown + office_breakdown
 
         # --- Top 5 expenses ---
         # We can't sort by a property, so we get recent ones
@@ -244,27 +358,17 @@ class DashboardService:
             if expense["expense_scope"] == Expense.ExpenseScope.OFFICE:
                 expense["project__name"] = "Office"
 
-        # --- By project ---
-        by_project = list(
-            expenses.filter(expense_scope=Expense.ExpenseScope.PROJECT)
-            .values("project__id", "project__name")
-            .annotate(
-                total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
-                total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
-                count=Count("id"),
-            )
-            .order_by("-total_usd")[:10]
-        )
-
         return {
             "total_expenses_afn": totals["total_afn"],
             "total_expenses_usd": totals["total_usd"],
+            "total_expenses_usd_equivalent": totals["total_usd_equivalent"],
             "total_expense_count": totals["total_count"],
             "project_expenses": project_totals,
             "office_expenses": office_totals,
             "overall_expenses": {
                 "total_afn": totals["total_afn"],
                 "total_usd": totals["total_usd"],
+                "total_usd_equivalent": totals["total_usd_equivalent"],
                 "count": totals["total_count"],
             },
             "by_expense_type": by_type,
@@ -284,11 +388,7 @@ class DashboardService:
             expense_date__gte=first_of_month,
             expense_date__lte=today,
         )
-        current_month = current_month_qs.aggregate(
-            total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
-            total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
-            count=Count("id"),
-        )
+        current_month = DashboardService._expense_totals(current_month_qs)
 
         # Previous month for comparison
         prev_month_start = (first_of_month - timedelta(days=1)).replace(day=1)
@@ -298,22 +398,16 @@ class DashboardService:
             expense_date__gte=prev_month_start,
             expense_date__lte=prev_month_end,
         )
-        previous_month = previous_month_qs.aggregate(
-            total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
-            total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
-            count=Count("id"),
-        )
+        previous_month = DashboardService._expense_totals(previous_month_qs)
 
         def scope_totals(queryset, scope):
-            return queryset.filter(expense_scope=scope).aggregate(
-                total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
-                total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
-                count=Count("id"),
+            return DashboardService._expense_totals(
+                queryset.filter(expense_scope=scope)
             )
 
         # Calculate change percentage
-        prev_usd = float(previous_month["total_usd"])
-        curr_usd = float(current_month["total_usd"])
+        prev_usd = float(previous_month["total_usd_equivalent"])
+        curr_usd = float(current_month["total_usd_equivalent"])
         change_pct = (
             round(((curr_usd - prev_usd) / prev_usd) * 100, 1)
             if prev_usd > 0 else 0
@@ -323,6 +417,7 @@ class DashboardService:
             "current_month": {
                 "total_afn": current_month["total_afn"],
                 "total_usd": current_month["total_usd"],
+                "total_usd_equivalent": current_month["total_usd_equivalent"],
                 "count": current_month["count"],
                 "project": scope_totals(current_month_qs, Expense.ExpenseScope.PROJECT),
                 "office": scope_totals(current_month_qs, Expense.ExpenseScope.OFFICE),
@@ -330,6 +425,7 @@ class DashboardService:
             "previous_month": {
                 "total_afn": previous_month["total_afn"],
                 "total_usd": previous_month["total_usd"],
+                "total_usd_equivalent": previous_month["total_usd_equivalent"],
                 "count": previous_month["count"],
                 "project": scope_totals(previous_month_qs, Expense.ExpenseScope.PROJECT),
                 "office": scope_totals(previous_month_qs, Expense.ExpenseScope.OFFICE),
@@ -1104,24 +1200,15 @@ class DashboardService:
         """
 
         # ── Direct Expenses ─────────────────────────
-        total_expenses_usd = Expense.objects.approved().aggregate(
-            total=Coalesce(Sum("amount_usd"), Decimal("0.00"))
-        )["total"]
-
-        total_expenses_afn = Expense.objects.approved().aggregate(
-            total=Coalesce(Sum("amount_afn"), Decimal("0.00"))
-        )["total"]
-        project_expenses = Expense.objects.approved().filter(
-            expense_scope=Expense.ExpenseScope.PROJECT,
-        ).aggregate(
-            total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
-            total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
+        approved_expenses = Expense.objects.approved()
+        total_expenses = DashboardService._expense_totals(approved_expenses)
+        total_expenses_usd = total_expenses["total_usd"]
+        total_expenses_afn = total_expenses["total_afn"]
+        project_expenses = DashboardService._expense_totals(
+            approved_expenses.filter(expense_scope=Expense.ExpenseScope.PROJECT)
         )
-        office_expenses = Expense.objects.approved().filter(
-            expense_scope=Expense.ExpenseScope.OFFICE,
-        ).aggregate(
-            total_usd=Coalesce(Sum("amount_usd"), Decimal("0.00")),
-            total_afn=Coalesce(Sum("amount_afn"), Decimal("0.00")),
+        office_expenses = DashboardService._expense_totals(
+            approved_expenses.filter(expense_scope=Expense.ExpenseScope.OFFICE)
         )
 
         # ── Payroll ────────────────────────────────
@@ -1142,6 +1229,14 @@ class DashboardService:
                 Sum("net_pay", filter=Q(currency="AFN")),
                 Decimal("0.00"),
             ),
+            advance_deductions_usd=Coalesce(
+                Sum("advance_deductions", filter=Q(currency="USD")),
+                Decimal("0.00"),
+            ),
+            advance_deductions_afn=Coalesce(
+                Sum("advance_deductions", filter=Q(currency="AFN")),
+                Decimal("0.00"),
+            ),
         )
         worker_payroll = WorkerPayroll.objects.aggregate(
             gross_usd=Coalesce(
@@ -1160,6 +1255,17 @@ class DashboardService:
                 Sum("net_amount", filter=Q(currency="AFN")),
                 Decimal("0.00"),
             ),
+        )
+        salary_advances = salary_advance_totals()
+        payroll_outflow_usd = (
+            payroll["net_usd"]
+            + worker_payroll["net_usd"]
+            + salary_advances["total_usd"]
+        )
+        payroll_outflow_afn = (
+            payroll["net_afn"]
+            + worker_payroll["net_afn"]
+            + salary_advances["total_afn"]
         )
 
         # ── Contract Payments ──────────────────────
@@ -1213,10 +1319,13 @@ class DashboardService:
             "expenses": {
                 "total_usd": total_expenses_usd,
                 "total_afn": total_expenses_afn,
+                "total_usd_equivalent": total_expenses["total_usd_equivalent"],
                 "project_usd": project_expenses["total_usd"],
                 "project_afn": project_expenses["total_afn"],
+                "project_usd_equivalent": project_expenses["total_usd_equivalent"],
                 "office_usd": office_expenses["total_usd"],
                 "office_afn": office_expenses["total_afn"],
+                "office_usd_equivalent": office_expenses["total_usd_equivalent"],
             },
 
             "payroll": {
@@ -1224,10 +1333,18 @@ class DashboardService:
                 "gross_afn": payroll["gross_afn"] + worker_payroll["gross_afn"],
                 "net_usd": payroll["net_usd"] + worker_payroll["net_usd"],
                 "net_afn": payroll["net_afn"] + worker_payroll["net_afn"],
+                "cash_outflow_usd": payroll_outflow_usd,
+                "cash_outflow_afn": payroll_outflow_afn,
                 "employee_net_usd": payroll["net_usd"],
                 "employee_net_afn": payroll["net_afn"],
                 "daily_worker_net_usd": worker_payroll["net_usd"],
                 "daily_worker_net_afn": worker_payroll["net_afn"],
+                "salary_advances_usd": salary_advances["total_usd"],
+                "salary_advances_afn": salary_advances["total_afn"],
+                "salary_advances_outstanding_usd": salary_advances["outstanding_usd"],
+                "salary_advances_outstanding_afn": salary_advances["outstanding_afn"],
+                "employee_advance_deductions_usd": payroll["advance_deductions_usd"],
+                "employee_advance_deductions_afn": payroll["advance_deductions_afn"],
             },
 
             "contracts": {
@@ -1251,14 +1368,12 @@ class DashboardService:
             "grand_total_outflow": {
                 "usd": (
                     total_expenses_usd
-                    + payroll["net_usd"]
-                    + worker_payroll["net_usd"]
+                    + payroll_outflow_usd
                     + contract_payments["total_usd"]
                 ),
                 "afn": (
                     total_expenses_afn
-                    + payroll["net_afn"]
-                    + worker_payroll["net_afn"]
+                    + payroll_outflow_afn
                     + contract_payments["total_afn"]
                 ),
             },
@@ -1282,12 +1397,18 @@ class DashboardService:
                 net_afn=Coalesce(Sum("net_pay", filter=Q(currency="AFN")), Decimal("0.00")),
                 deductions_usd=Coalesce(Sum("deductions", filter=Q(currency="USD")), Decimal("0.00")),
                 deductions_afn=Coalesce(Sum("deductions", filter=Q(currency="AFN")), Decimal("0.00")),
+                advance_deductions_usd=Coalesce(Sum("advance_deductions", filter=Q(currency="USD")), Decimal("0.00")),
+                advance_deductions_afn=Coalesce(Sum("advance_deductions", filter=Q(currency="AFN")), Decimal("0.00")),
                 tax_usd=Coalesce(Sum("tax_deducted", filter=Q(currency="USD")), Decimal("0.00")),
                 tax_afn=Coalesce(Sum("tax_deducted", filter=Q(currency="AFN")), Decimal("0.00")),
                 bonus_usd=Coalesce(Sum("bonus", filter=Q(currency="USD")), Decimal("0.00")),
                 bonus_afn=Coalesce(Sum("bonus", filter=Q(currency="AFN")), Decimal("0.00")),
                 overtime_usd=Coalesce(Sum("overtime_amount", filter=Q(currency="USD")), Decimal("0.00")),
                 overtime_afn=Coalesce(Sum("overtime_amount", filter=Q(currency="AFN")), Decimal("0.00")),
+                paid_usd=Coalesce(Sum("amount_paid", filter=Q(currency="USD")), Decimal("0.00")),
+                paid_afn=Coalesce(Sum("amount_paid", filter=Q(currency="AFN")), Decimal("0.00")),
+                balance_due_usd=Coalesce(Sum("balance_due", filter=Q(currency="USD")), Decimal("0.00")),
+                balance_due_afn=Coalesce(Sum("balance_due", filter=Q(currency="AFN")), Decimal("0.00")),
                 count=Count("id"),
             )
 
@@ -1315,14 +1436,33 @@ class DashboardService:
         employee_previous = employee_totals(Payroll.objects.filter(payroll_period_start__gte=prev_month_start, payroll_period_start__lt=first_of_month))
         worker_current = worker_totals(WorkerPayroll.objects.filter(period_start__gte=first_of_month))
         worker_previous = worker_totals(WorkerPayroll.objects.filter(period_start__gte=prev_month_start, period_start__lt=first_of_month))
+        advance_current = salary_advance_totals(
+            salary_advance_queryset(start=first_of_month)
+        )
+        advance_previous = salary_advance_totals(
+            salary_advance_queryset(
+                start=prev_month_start,
+                end=first_of_month - timedelta(days=1),
+            )
+        )
 
         current_month = {
             "gross_usd": employee_current["gross_usd"] + worker_current["gross_usd"],
             "gross_afn": employee_current["gross_afn"] + worker_current["gross_afn"],
             "net_usd": employee_current["net_usd"] + worker_current["net_usd"],
             "net_afn": employee_current["net_afn"] + worker_current["net_afn"],
-            "total_deductions_usd": employee_current["deductions_usd"] + worker_current["deductions_usd"] + worker_current["advances_usd"],
-            "total_deductions_afn": employee_current["deductions_afn"] + worker_current["deductions_afn"] + worker_current["advances_afn"],
+            "cash_outflow_usd": employee_current["net_usd"] + worker_current["net_usd"] + advance_current["total_usd"],
+            "cash_outflow_afn": employee_current["net_afn"] + worker_current["net_afn"] + advance_current["total_afn"],
+            "total_deductions_usd": employee_current["deductions_usd"] + employee_current["advance_deductions_usd"] + worker_current["deductions_usd"] + worker_current["advances_usd"],
+            "total_deductions_afn": employee_current["deductions_afn"] + employee_current["advance_deductions_afn"] + worker_current["deductions_afn"] + worker_current["advances_afn"],
+            "total_advances_paid_usd": advance_current["total_usd"],
+            "total_advances_paid_afn": advance_current["total_afn"],
+            "total_advance_deductions_usd": employee_current["advance_deductions_usd"] + worker_current["advances_usd"],
+            "total_advance_deductions_afn": employee_current["advance_deductions_afn"] + worker_current["advances_afn"],
+            "amount_already_paid_usd": employee_current["paid_usd"],
+            "amount_already_paid_afn": employee_current["paid_afn"],
+            "outstanding_salary_usd": employee_current["balance_due_usd"],
+            "outstanding_salary_afn": employee_current["balance_due_afn"],
             "total_tax_usd": employee_current["tax_usd"],
             "total_tax_afn": employee_current["tax_afn"],
             "total_bonus_usd": employee_current["bonus_usd"],
@@ -1340,6 +1480,10 @@ class DashboardService:
             "gross_afn": employee_previous["gross_afn"] + worker_previous["gross_afn"],
             "net_usd": employee_previous["net_usd"] + worker_previous["net_usd"],
             "net_afn": employee_previous["net_afn"] + worker_previous["net_afn"],
+            "cash_outflow_usd": employee_previous["net_usd"] + worker_previous["net_usd"] + advance_previous["total_usd"],
+            "cash_outflow_afn": employee_previous["net_afn"] + worker_previous["net_afn"] + advance_previous["total_afn"],
+            "total_advances_paid_usd": advance_previous["total_usd"],
+            "total_advances_paid_afn": advance_previous["total_afn"],
             "count": employee_previous["count"] + worker_previous["count"],
         }
 
@@ -1363,6 +1507,12 @@ class DashboardService:
             methods[method]["count"] += row["count"]
             methods[method]["total_usd"] += row["total_usd"]
             methods[method]["total_afn"] += row["total_afn"]
+        advance_all_time = salary_advance_totals()
+        if advance_all_time["count"]:
+            methods["salary_advance"]["payment_method"] = "salary_advance"
+            methods["salary_advance"]["count"] += advance_all_time["count"]
+            methods["salary_advance"]["total_usd"] += advance_all_time["total_usd"]
+            methods["salary_advance"]["total_afn"] += advance_all_time["total_afn"]
 
         recent_payrolls = []
         for payroll in Payroll.objects.select_related("employee").order_by("-created_at")[:5]:

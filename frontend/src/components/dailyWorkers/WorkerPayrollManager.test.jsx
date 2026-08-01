@@ -337,6 +337,11 @@ describe("WorkerPayrollManager", () => {
     expect(
       screen.getByRole("heading", { name: "Attendance required before payroll" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Attendance has not been recorded for 2026-08-05. Please complete attendance before generating payroll.",
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText("2026-08-05")).toBeInTheDocument();
     expect(screen.getByText("2026-08-08")).toBeInTheDocument();
     expect(screen.queryByText("2026-08-06")).not.toBeInTheDocument();
@@ -348,6 +353,41 @@ describe("WorkerPayrollManager", () => {
         screen.queryByRole("heading", { name: "Attendance required before payroll" }),
       ).not.toBeInTheDocument(),
     );
+  });
+
+  it("skips non-working days during attendance validation", async () => {
+    hookState.fetchDailyStatus = vi.fn((date) =>
+      Promise.resolve({
+        marked_records: date === "2026-08-06" ? [{ id: date }] : [],
+        work_calendar: {
+          is_working_day: date !== "2026-08-05",
+          day_type: date === "2026-08-05" ? "official_holiday" : "working_day",
+        },
+      }),
+    );
+    await renderLoaded();
+
+    fireEvent.change(screen.getByLabelText("Period start"), {
+      target: { value: "2026-08-05" },
+    });
+    fireEvent.change(screen.getByLabelText("Period end"), {
+      target: { value: "2026-08-06" },
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Generate payroll" }));
+    });
+
+    expect(hookState.fetchDailyStatus).toHaveBeenCalledTimes(2);
+    expect(hookState.generatePayrolls).toHaveBeenCalledWith(
+      expect.objectContaining({
+        period_start: "2026-08-05",
+        period_end: "2026-08-06",
+      }),
+    );
+    expect(
+      screen.queryByRole("heading", { name: "Attendance required before payroll" }),
+    ).not.toBeInTheDocument();
   });
 
   it("creates payrolls from the modal and fills rates from the selected worker", async () => {
@@ -443,8 +483,9 @@ describe("WorkerPayrollManager", () => {
   it("approves, marks paid, deletes, and reports delete failures", async () => {
     await renderLoaded();
 
+    const approveButtons = await screen.findAllByRole("button", { name: "Approve" });
     await act(async () => {
-      fireEvent.click(screen.getAllByRole("button", { name: "Approve" })[0]);
+      fireEvent.click(approveButtons[0]);
     });
     expect(hookState.approvePayroll).toHaveBeenCalledWith(1);
     expect(toast.success).toHaveBeenCalledWith("Payroll approved.");

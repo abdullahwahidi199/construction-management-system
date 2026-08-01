@@ -26,6 +26,16 @@ export const CALENDAR_MODULES = [
   "contract_variations",
 ];
 
+export const WORK_CALENDAR_WEEKDAYS = [
+  { value: 0, label: "Monday", shortLabel: "Mon" },
+  { value: 1, label: "Tuesday", shortLabel: "Tue" },
+  { value: 2, label: "Wednesday", shortLabel: "Wed" },
+  { value: 3, label: "Thursday", shortLabel: "Thu" },
+  { value: 4, label: "Friday", shortLabel: "Fri" },
+  { value: 5, label: "Saturday", shortLabel: "Sat" },
+  { value: 6, label: "Sunday", shortLabel: "Sun" },
+];
+
 export const AFGHAN_MONTH_NAMES = {
   "fa-AF": [
     "حمل",
@@ -76,6 +86,14 @@ export const defaultCalendarSettings = {
   modules: Object.fromEntries(
     CALENDAR_MODULES.map((module) => [module, CALENDAR_TYPES.INHERIT]),
   ),
+  work_calendar: {
+    weekly_off_days: [],
+    holidays: [],
+    policies: {
+      holiday_payment: "paid",
+      attendance_on_holidays: "allowed",
+    },
+  },
 };
 
 const VALID_GLOBAL = new Set([CALENDAR_TYPES.SHAMSI, CALENDAR_TYPES.GREGORIAN]);
@@ -84,9 +102,86 @@ const VALID_MODULE = new Set([
   CALENDAR_TYPES.GREGORIAN,
   CALENDAR_TYPES.INHERIT,
 ]);
+const VALID_HOLIDAY_PAYMENT_POLICIES = new Set([
+  "paid",
+  "unpaid",
+  "attendance_based",
+]);
+
+function boolValue(value, fallback = false) {
+  if (typeof value === "boolean") return value;
+  if (value == null || value === "") return fallback;
+  if (typeof value === "string")
+    return ["1", "true", "yes", "on"].includes(value.trim().toLowerCase());
+  return Boolean(value);
+}
+
+export function normalizeWorkCalendar(value = {}, calendar = CALENDAR_TYPES.GREGORIAN) {
+  const incoming = value && typeof value === "object" ? value : {};
+  const weeklyOffDays = [
+    ...new Set(
+      (Array.isArray(incoming.weekly_off_days) ? incoming.weekly_off_days : [])
+        .map((day) => Number(day))
+        .filter((day) => Number.isInteger(day) && day >= 0 && day <= 6),
+    ),
+  ].sort((a, b) => a - b);
+
+  const incomingPolicies =
+    incoming.policies && typeof incoming.policies === "object"
+      ? incoming.policies
+      : {};
+  const holidayPayment = VALID_HOLIDAY_PAYMENT_POLICIES.has(
+    incomingPolicies.holiday_payment,
+  )
+    ? incomingPolicies.holiday_payment
+    : "paid";
+
+  const holidays = (Array.isArray(incoming.holidays) ? incoming.holidays : [])
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const name = String(item.name || "").trim();
+      const startDate = parseDate(item.start_date, calendar);
+      const endDate =
+        parseDate(item.end_date || item.start_date, calendar) ||
+        startDate;
+      if (!name || !startDate) return null;
+      const paidHoliday = boolValue(item.paid_holiday, true);
+      let paymentPolicy = item.payment_policy || holidayPayment;
+      if (!VALID_HOLIDAY_PAYMENT_POLICIES.has(paymentPolicy)) {
+        paymentPolicy = paidHoliday ? "paid" : "unpaid";
+      }
+      return {
+        id:
+          String(item.id || "").trim() ||
+          `holiday-${name.toLowerCase().replace(/\s+/g, "-")}-${startDate}`,
+        name,
+        start_date: startDate,
+        end_date: endDate,
+        description: String(item.description || "").trim(),
+        paid_holiday: paidHoliday,
+        active: boolValue(item.active, true),
+        payment_policy: paymentPolicy,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.start_date.localeCompare(b.start_date) || a.name.localeCompare(b.name));
+
+  return {
+    weekly_off_days: weeklyOffDays,
+    holidays,
+    policies: {
+      holiday_payment: holidayPayment,
+      attendance_on_holidays:
+        incomingPolicies.attendance_on_holidays || "allowed",
+    },
+  };
+}
 
 export function normalizeCalendarSettings(value) {
   const incoming = value && typeof value === "object" ? value : {};
+  const defaultCalendar = VALID_GLOBAL.has(incoming.default_calendar)
+    ? incoming.default_calendar
+    : CALENDAR_TYPES.SHAMSI;
   const modules = { ...defaultCalendarSettings.modules };
   const incomingModules =
     incoming.modules && typeof incoming.modules === "object"
@@ -98,10 +193,9 @@ export function normalizeCalendarSettings(value) {
       : CALENDAR_TYPES.INHERIT;
   });
   return {
-    default_calendar: VALID_GLOBAL.has(incoming.default_calendar)
-      ? incoming.default_calendar
-      : CALENDAR_TYPES.SHAMSI,
+    default_calendar: defaultCalendar,
     modules,
+    work_calendar: normalizeWorkCalendar(incoming.work_calendar, defaultCalendar),
   };
 }
 
@@ -270,10 +364,14 @@ export function parseDate(value, calendar = CALENDAR_TYPES.GREGORIAN) {
   if (!value) return "";
   const parsed = parseYmd(value);
   if (!parsed) return "";
-  if (calendar === CALENDAR_TYPES.SHAMSI)
+  if (calendar === CALENDAR_TYPES.SHAMSI) {
+    if (parsed.year >= 1700) {
+      return parseDate(value, CALENDAR_TYPES.GREGORIAN);
+    }
     return toGregorian(
       `${parsed.year}-${pad(parsed.month)}-${pad(parsed.day)}`,
     );
+  }
   const max = new Date(parsed.year, parsed.month, 0).getDate();
   if (
     parsed.month < 1 ||
@@ -325,6 +423,101 @@ export function formatByModule(value, module, settings, locale = "en") {
 export function todayIso() {
   const today = new Date();
   return `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+}
+
+function isoToUtcDate(value) {
+  const iso = parseDate(value, CALENDAR_TYPES.GREGORIAN);
+  if (!iso) return null;
+  const [year, month, day] = iso.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function isoWeekday(value) {
+  const date = isoToUtcDate(value);
+  if (!date) return null;
+  return (date.getUTCDay() + 6) % 7;
+}
+
+export function getDatesInRange(start, end) {
+  const startDate = isoToUtcDate(start);
+  const endDate = isoToUtcDate(end);
+  if (!startDate || !endDate || startDate > endDate) return [];
+
+  const dates = [];
+  const cursor = new Date(startDate);
+  while (cursor <= endDate) {
+    dates.push(cursor.toISOString().slice(0, 10));
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+  return dates;
+}
+
+export function getHolidayForDate(
+  value,
+  settings = defaultCalendarSettings,
+) {
+  const iso = parseDate(value, CALENDAR_TYPES.GREGORIAN);
+  if (!iso) return null;
+  const normalized = normalizeCalendarSettings(settings);
+  return (
+    normalized.work_calendar.holidays.find((holiday) => {
+      if (!holiday.active) return false;
+      return holiday.start_date <= iso && iso <= holiday.end_date;
+    }) || null
+  );
+}
+
+export function isWeeklyOff(
+  value,
+  settings = defaultCalendarSettings,
+) {
+  const weekday = isoWeekday(value);
+  if (weekday == null) return false;
+  const normalized = normalizeCalendarSettings(settings);
+  return normalized.work_calendar.weekly_off_days.includes(weekday);
+}
+
+export function isHoliday(
+  value,
+  settings = defaultCalendarSettings,
+) {
+  return Boolean(getHolidayForDate(value, settings));
+}
+
+export function isWorkingDay(
+  value,
+  settings = defaultCalendarSettings,
+) {
+  return !isWeeklyOff(value, settings) && !isHoliday(value, settings);
+}
+
+export function getDateInfo(
+  value,
+  settings = defaultCalendarSettings,
+) {
+  const holiday = getHolidayForDate(value, settings);
+  const weeklyOff = isWeeklyOff(value, settings);
+  const dayType = holiday ? "official_holiday" : weeklyOff ? "weekly_off" : "working_day";
+  return {
+    date: parseDate(value, CALENDAR_TYPES.GREGORIAN),
+    is_working_day: dayType === "working_day",
+    is_weekly_off: weeklyOff,
+    is_holiday: Boolean(holiday),
+    day_type: dayType,
+    label: holiday?.name || (weeklyOff ? "Weekly Off Day" : "Working Day"),
+    holiday,
+  };
+}
+
+export function getWorkingDays(
+  start,
+  end,
+  settings = defaultCalendarSettings,
+) {
+  return getDatesInRange(start, end).filter((date) =>
+    isWorkingDay(date, settings),
+  );
 }
 
 export function currentMonthKey(calendar = CALENDAR_TYPES.GREGORIAN) {

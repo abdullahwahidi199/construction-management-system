@@ -1,6 +1,7 @@
 from decimal import Decimal
 from unittest.mock import patch
 
+from django.core.files.base import ContentFile
 from rest_framework.test import APITestCase
 
 from common.test_helpers import (
@@ -10,6 +11,7 @@ from common.test_helpers import (
     create_contract_variation,
     create_project,
     create_subcontractor,
+    create_user,
     contract_payload,
     uploaded_file,
 )
@@ -115,6 +117,28 @@ class SubcontractorAndContractAPITests(APITestCase):
         self.assertEqual(contract.adjusted_contract_value, Decimal("150.00"))
         self.assertEqual(contract.remaining_amount, Decimal("30.00"))
 
+    def test_nested_payment_create_uses_contract_payment_permission(self):
+        contract = create_contract(project=self.project, contract_value=Decimal("100.00"))
+        user = create_user(
+            username="payment-clerk",
+            role="data_entry",
+            permissions=["contract_payments.create"],
+        )
+        self.client.force_authenticate(user)
+
+        response = self.client.post(
+            f"/api/contracts/{contract.id}/payments/",
+            {
+                "amount": "25.00",
+                "payment_date": "2026-03-05",
+                "payment_type": "progress",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertTrue(ContractPayment.objects.filter(contract=contract, amount=Decimal("25.00")).exists())
+
     def test_contract_document_upload_download_and_invalid_type(self):
         contract = create_contract(project=self.project)
 
@@ -141,6 +165,33 @@ class SubcontractorAndContractAPITests(APITestCase):
             format="multipart",
         )
         self.assertEqual(invalid.status_code, 400)
+
+    def test_contract_document_upload_compresses_image_before_size_validation(self):
+        contract = create_contract(project=self.project)
+        large_image = uploaded_file(
+            "site-photo.jpg",
+            b"x" * ((1024 * 1024) + 1),
+            "image/jpeg",
+        )
+
+        with patch("subcontractor.validators.MAX_FILE_SIZE_MB", 1), patch(
+            "subcontractor.serializers.compress_image",
+            return_value=ContentFile(b"compressed image", name="site-photo.jpg"),
+        ) as compress_image:
+            response = self.client.post(
+                f"/api/contracts/{contract.id}/documents/",
+                {
+                    "title": "Site Photo",
+                    "document_type": "supporting",
+                    "file": large_image,
+                },
+                format="multipart",
+            )
+
+        self.assertEqual(response.status_code, 201, response.data)
+        compress_image.assert_called_once()
+        document = ContractDocument.objects.get(contract=contract, title="Site Photo")
+        self.assertLessEqual(document.file.size, 1024 * 1024)
 
     def test_contract_invoice_crud_filter_search_and_documents(self):
         contract = create_contract(project=self.project)

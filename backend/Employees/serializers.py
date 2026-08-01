@@ -313,7 +313,10 @@ class PayrollSerializer(CalendarModelSerializer):
             if duplicate.exists():
                 raise serializers.ValidationError({
                     "non_field_errors": [
-                        "A payroll already exists for this employee and selected month."
+                        (
+                            "A payroll already exists for this employee and selected month. "
+                            "Please review the existing payroll before creating another one."
+                        )
                     ]
                 })
 

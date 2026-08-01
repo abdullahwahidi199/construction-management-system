@@ -37,6 +37,7 @@ PERMISSIONS = [
     ("expenses.view", "View Expenses", "Expenses"),
     ("expenses.create", "Create Expenses", "Expenses"),
     ("expenses.update", "Update Expenses", "Expenses"),
+    ("expenses.update_own", "Update Own Expenses", "Expenses"),
     ("expenses.delete", "Delete Expenses", "Expenses"),
     ("expenses.approve", "Approve Expenses", "Expenses"),
 
@@ -172,6 +173,7 @@ ROLE_PERMISSIONS = {
 
         "expenses.view",
         "expenses.create",
+        "expenses.update_own",
 
         "attendance.view",
         "attendance.create",

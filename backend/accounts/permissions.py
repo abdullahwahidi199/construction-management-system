@@ -26,7 +26,11 @@ class RBACPermission(BasePermission):
         action = getattr(view, "action", None)
         action_requirements = getattr(view, "rbac_action_permissions", {})
         if action in action_requirements:
-            return self._has_any(request.user, action_requirements[action])
+            requirements = action_requirements[action]
+            if isinstance(requirements, dict):
+                method = request.method.upper()
+                requirements = requirements.get(method, requirements.get("*", ()))
+            return self._has_any(request.user, requirements)
 
         if action in SAFE_ACTIONS:
             return self._allowed(request.user, resource, ("view", "view_assigned"))

@@ -109,8 +109,16 @@ async function renderLoaded() {
   expect(await screen.findByText("Users")).toBeInTheDocument();
 }
 
-function field(label, index = 0) {
-  return screen.getAllByLabelText(label)[index];
+function desktopTable() {
+  return screen.getByRole("table");
+}
+
+function modalPanel(name) {
+  return screen.getByRole("heading", { name }).closest(".mobile-modal-panel");
+}
+
+function modalField(modal, label) {
+  return within(modal).getByLabelText(label);
 }
 
 describe("UserManagement", () => {
@@ -128,14 +136,14 @@ describe("UserManagement", () => {
     await renderLoaded();
 
     expect(screen.getByText("Manage accounts")).toBeInTheDocument();
-    expect(screen.getByText("amina")).toBeInTheDocument();
-    expect(screen.getByText("bilal")).toBeInTheDocument();
-    expect(screen.getByText("amina@example.com")).toBeInTheDocument();
-    expect(screen.getByText("-")).toBeInTheDocument();
-    expect(screen.getByText("Active")).toBeInTheDocument();
-    expect(screen.getByText("Inactive")).toBeInTheDocument();
+    expect(screen.getAllByText("amina").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("bilal").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("amina@example.com").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("-").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Active").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Inactive").length).toBeGreaterThan(0);
 
-    const row = screen.getByText("amina").closest("tr");
+    const row = within(desktopTable()).getByText("amina").closest("tr");
     fireEvent.mouseEnter(row);
     expect(row.style.backgroundColor).toBe("var(--hover)");
     fireEvent.mouseLeave(row);
@@ -150,7 +158,7 @@ describe("UserManagement", () => {
     vi.clearAllMocks();
     mockSuccessfulLoad({ userPayload: [] });
     render(<UserManagement />);
-    expect(await screen.findByText("No users yet")).toBeInTheDocument();
+    expect((await screen.findAllByText("No users yet")).length).toBeGreaterThan(0);
   });
 
   it("shows the loading skeleton and reports load failures with a friendly toast", async () => {
@@ -170,7 +178,7 @@ describe("UserManagement", () => {
     });
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith("No permission."));
-    expect(await screen.findByText("No users yet")).toBeInTheDocument();
+    expect((await screen.findAllByText("No users yet")).length).toBeGreaterThan(0);
   });
 
   it("updates roles and active status, then reloads after successful mutations", async () => {
@@ -185,19 +193,19 @@ describe("UserManagement", () => {
     expect(toast.success).toHaveBeenCalledWith("User role updated.");
     expect(api.get).toHaveBeenCalledTimes(4);
 
-    fireEvent.click(screen.getByRole("button", { name: "Disable" }));
+    fireEvent.click(within(desktopTable()).getByRole("button", { name: "Disable" }));
     await waitFor(() =>
       expect(api.patch).toHaveBeenCalledWith("auth/users/1/", { is_active: false }),
     );
     expect(toast.success).toHaveBeenCalledWith("User disabled.");
 
-    fireEvent.click(screen.getByRole("button", { name: "Enable" }));
+    fireEvent.click(within(desktopTable()).getByRole("button", { name: "Enable" }));
     await waitFor(() =>
       expect(api.patch).toHaveBeenCalledWith("auth/users/2/", { is_active: true }),
     );
     expect(toast.success).toHaveBeenCalledWith("User enabled.");
 
-    const toggle = screen.getByRole("button", { name: "Disable" });
+    const toggle = within(desktopTable()).getByRole("button", { name: "Disable" });
     fireEvent.mouseEnter(toggle);
     expect(toggle.style.backgroundColor).toContain("var(--danger) 22%");
     fireEvent.mouseLeave(toggle);
@@ -214,7 +222,7 @@ describe("UserManagement", () => {
     });
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith("Role denied."));
 
-    fireEvent.click(screen.getByRole("button", { name: "Disable" }));
+    fireEvent.click(within(desktopTable()).getByRole("button", { name: "Disable" }));
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith("Patch denied."));
   });
 
@@ -223,27 +231,28 @@ describe("UserManagement", () => {
     expect(await screen.findByText("Users")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /\+ create/i }));
-    expect(screen.getByRole("heading", { name: "Create User" })).toBeInTheDocument();
+    let createModal = modalPanel("Create User");
+    expect(createModal).toBeInTheDocument();
 
-    fireEvent.submit(screen.getByRole("heading", { name: "Create User" }).closest("div").querySelector("form"));
+    fireEvent.submit(within(createModal).getByRole("button", { name: "Create" }).closest("form"));
     expect(await screen.findByText("Username is required.")).toBeInTheDocument();
 
-    fireEvent.change(field("Username"), { target: { value: "  newuser  " } });
-    fireEvent.change(field("Password"), { target: { value: "123" } });
-    fireEvent.change(field("Confirm Password"), { target: { value: "123" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create" }));
+    fireEvent.change(modalField(createModal, "Username"), { target: { value: "  newuser  " } });
+    fireEvent.change(modalField(createModal, "Password"), { target: { value: "123" } });
+    fireEvent.change(modalField(createModal, "Confirm Password"), { target: { value: "123" } });
+    fireEvent.click(within(createModal).getByRole("button", { name: "Create" }));
     expect(await screen.findByText("Password must be at least 6 characters.")).toBeInTheDocument();
 
-    fireEvent.change(field("Password"), { target: { value: "123456" } });
-    fireEvent.change(field("Confirm Password"), { target: { value: "654321" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create" }));
+    fireEvent.change(modalField(createModal, "Password"), { target: { value: "123456" } });
+    fireEvent.change(modalField(createModal, "Confirm Password"), { target: { value: "654321" } });
+    fireEvent.click(within(createModal).getByRole("button", { name: "Create" }));
     expect(await screen.findByText("Passwords do not match.")).toBeInTheDocument();
 
-    fireEvent.change(field("Email"), { target: { value: " new@example.com " } });
-    fireEvent.change(field("Confirm Password"), { target: { value: "123456" } });
-    fireEvent.change(field("Role"), { target: { value: "accountant" } });
+    fireEvent.change(modalField(createModal, "Email"), { target: { value: " new@example.com " } });
+    fireEvent.change(modalField(createModal, "Confirm Password"), { target: { value: "123456" } });
+    fireEvent.change(modalField(createModal, "Role"), { target: { value: "accountant" } });
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Create" }));
+      fireEvent.click(within(createModal).getByRole("button", { name: "Create" }));
     });
 
     expect(hookState.postData).toHaveBeenCalledWith("auth/users/", {
@@ -260,24 +269,26 @@ describe("UserManagement", () => {
     hookState.createError = "Duplicate username.";
     rerender(<UserManagement />);
     fireEvent.click(screen.getByRole("button", { name: /\+ create/i }));
+    createModal = modalPanel("Create User");
     expect(screen.getByText("Duplicate username.")).toBeInTheDocument();
 
     hookState.createError = { username: ["Already taken."] };
     rerender(<UserManagement />);
     expect(screen.getByText("Something went wrong.")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText("Cancel"));
+    fireEvent.click(within(createModal).getByText("Cancel"));
     expect(screen.queryByRole("heading", { name: "Create User" })).not.toBeInTheDocument();
 
     hookState.postData = vi.fn(() => Promise.reject(new Error("server")));
     hookState.createError = null;
     rerender(<UserManagement />);
     fireEvent.click(screen.getByRole("button", { name: /\+ create/i }));
-    fireEvent.change(field("Username"), { target: { value: "failed" } });
-    fireEvent.change(field("Password"), { target: { value: "123456" } });
-    fireEvent.change(field("Confirm Password"), { target: { value: "123456" } });
+    createModal = modalPanel("Create User");
+    fireEvent.change(modalField(createModal, "Username"), { target: { value: "failed" } });
+    fireEvent.change(modalField(createModal, "Password"), { target: { value: "123456" } });
+    fireEvent.change(modalField(createModal, "Confirm Password"), { target: { value: "123456" } });
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Create" }));
+      fireEvent.click(within(createModal).getByRole("button", { name: "Create" }));
     });
     expect(screen.getByRole("heading", { name: "Create User" })).toBeInTheDocument();
   });
@@ -285,24 +296,25 @@ describe("UserManagement", () => {
   it("validates edit-user passwords, saves profile/role/password changes, and handles API errors", async () => {
     await renderLoaded();
 
-    fireEvent.click(screen.getAllByRole("button", { name: /edit/i })[0]);
-    expect(screen.getByRole("heading", { name: "Edit" })).toBeInTheDocument();
+    fireEvent.click(within(desktopTable()).getAllByRole("button", { name: /edit/i })[0]);
+    let editModal = modalPanel("Edit");
+    expect(editModal).toBeInTheDocument();
 
-    fireEvent.change(field("New Password"), { target: { value: "123" } });
-    fireEvent.click(screen.getByRole("button", { name: "Update User" }));
+    fireEvent.change(modalField(editModal, "New Password"), { target: { value: "123" } });
+    fireEvent.click(within(editModal).getByRole("button", { name: "Update User" }));
     expect(await screen.findByText("Password must be at least 6 characters.")).toBeInTheDocument();
 
-    fireEvent.change(field("New Password"), { target: { value: "123456" } });
-    fireEvent.change(field("Confirm New Password"), { target: { value: "abcdef" } });
-    fireEvent.click(screen.getByRole("button", { name: "Update User" }));
+    fireEvent.change(modalField(editModal, "New Password"), { target: { value: "123456" } });
+    fireEvent.change(modalField(editModal, "Confirm New Password"), { target: { value: "abcdef" } });
+    fireEvent.click(within(editModal).getByRole("button", { name: "Update User" }));
     expect(await screen.findByText("Passwords do not match.")).toBeInTheDocument();
 
-    fireEvent.change(field("Username"), { target: { value: " amina2 " } });
-    fireEvent.change(field("Email"), { target: { value: " amina2@example.com " } });
-    fireEvent.change(field("Role"), { target: { value: "manager" } });
-    fireEvent.change(field("Confirm New Password"), { target: { value: "123456" } });
+    fireEvent.change(modalField(editModal, "Username"), { target: { value: " amina2 " } });
+    fireEvent.change(modalField(editModal, "Email"), { target: { value: " amina2@example.com " } });
+    fireEvent.change(modalField(editModal, "Role"), { target: { value: "manager" } });
+    fireEvent.change(modalField(editModal, "Confirm New Password"), { target: { value: "123456" } });
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Update User" }));
+      fireEvent.click(within(editModal).getByRole("button", { name: "Update User" }));
     });
 
     expect(api.patch).toHaveBeenCalledWith("auth/users/1/", {
@@ -319,18 +331,19 @@ describe("UserManagement", () => {
     );
 
     api.patch.mockRejectedValueOnce({ response: { data: { detail: "Cannot save." } } });
-    fireEvent.click(screen.getAllByRole("button", { name: /edit/i })[0]);
+    fireEvent.click(within(desktopTable()).getAllByRole("button", { name: /edit/i })[0]);
+    editModal = modalPanel("Edit");
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Update User" }));
+      fireEvent.click(within(editModal).getByRole("button", { name: "Update User" }));
     });
     expect(await screen.findByText("Cannot save.")).toBeInTheDocument();
 
-    const cancel = screen.getByText("Cancel");
+    const cancel = within(editModal).getByText("Cancel");
     fireEvent.mouseEnter(cancel);
     expect(cancel.style.backgroundColor).toBe("var(--hover)");
     fireEvent.mouseLeave(cancel);
     expect(cancel.style.backgroundColor).toBe("var(--card)");
-    fireEvent.click(screen.getByRole("heading", { name: "Edit" }).parentElement.parentElement);
+    fireEvent.click(editModal.parentElement);
     expect(screen.queryByRole("heading", { name: "Edit" })).not.toBeInTheDocument();
   });
 });

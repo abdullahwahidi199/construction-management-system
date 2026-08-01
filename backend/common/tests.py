@@ -128,9 +128,9 @@ class ExceptionUtilityTests(SimpleTestCase):
             errors={"amount": [ValidationError("Invalid amount").detail[0]], "other": None},
         )
         self.assertEqual(payload["code"], "validation_error")
-        self.assertEqual(payload["detail"], "Please check the submitted information.")
+        self.assertEqual(payload["detail"], "Please check the highlighted fields and try again.")
         self.assertEqual(payload["errors"]["amount"], ["Invalid amount"])
-        self.assertEqual(payload["errors"]["other"], "")
+        self.assertNotIn("other", payload["errors"])
 
     def test_response_for_exception_maps_common_exception_types(self):
         cases = [

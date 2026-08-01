@@ -4,15 +4,18 @@ import { Building2, ReceiptText, WalletCards } from "lucide-react";
 import { useLanguage } from "../../hooks/useLanguage";
 
 const formatCurrency = (val, currency = "USD") => {
-  if (val === null || val === undefined) return "$0";
+  if (val === null || val === undefined) return "0";
   const num = parseFloat(val);
-  if (num >= 1000000) return `${(num / 1000000).toFixed(2)}M`;
-  if (num >= 1000) return `${(num / 1000).toFixed(2)}K`;
+  if (Number.isNaN(num)) return "0";
   return num.toLocaleString("en-US", {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   });
 };
+
+const currencyBreakdown = (usd, afn) =>
+  `USD: $${formatCurrency(usd)}
+AFN: ${formatCurrency(afn)}`;
 
 function KPICard({
   icon,
@@ -48,9 +51,11 @@ function KPICard({
       </div>
       <div className="min-w-0 flex-1">
         <p className="break-words text-sm text-[var(--muted)]">{label}</p>
-        <p className="mt-0.5 break-words text-3xl font-bold leading-tight text-[var(--text)] sm:text-2xl">
-          {value}
-        </p>
+        {value !== null && value !== undefined && (
+          <p className="mt-0.5 break-words text-3xl font-bold leading-tight text-[var(--text)] sm:text-2xl">
+            {value}
+          </p>
+        )}
         <div className="mt-2 flex flex-wrap items-center gap-2">
           {trend && (
             <span
@@ -97,16 +102,18 @@ export default function KPICards({
     {
       icon: "💰",
       label: t("kpi.totalOutflow"),
-      value: `$${formatCurrency(financial?.grand_total_outflow?.usd)}`,
-      sub: `USD: ${formatCurrency(financial?.grand_total_outflow?.usd)}
-AFN: ${formatCurrency(financial?.grand_total_outflow?.afn)}`,
+      value: null,
+      sub: currencyBreakdown(
+        financial?.grand_total_outflow?.usd,
+        financial?.grand_total_outflow?.afn,
+      ),
       color: "warning",
     },
     {
       icon: "📋",
       label: t("kpi.activeContracts"),
       value: contracts?.status_breakdown?.active || 0,
-      sub: `USD: ${formatCurrency(
+      sub: `USD: $${formatCurrency(
         financial?.contracts?.total_contract_value_usd,
       )}
 AFN: ${formatCurrency(financial?.contracts?.total_contract_value_afn)}`,
@@ -121,35 +128,43 @@ AFN: ${formatCurrency(financial?.contracts?.total_contract_value_afn)}`,
     {
       icon: <Building2 className="h-6 w-6" />,
       label: t("kpi.officeExpensesThisMonth"),
-      value: `$${formatCurrency(expenseMonth?.current_month?.office?.total_usd)}`,
-      sub: `USD: ${formatCurrency(expenseMonth?.current_month?.office?.total_usd)}
-AFN: ${formatCurrency(expenseMonth?.current_month?.office?.total_afn)}`,
+      value: null,
+      sub: currencyBreakdown(
+        expenseMonth?.current_month?.office?.total_usd,
+        expenseMonth?.current_month?.office?.total_afn,
+      ),
       color: "warning",
     },
     {
       icon: <ReceiptText className="h-6 w-6" />,
       label: t("kpi.projectExpensesThisMonth"),
-      value: `$${formatCurrency(expenseMonth?.current_month?.project?.total_usd)}`,
-      sub: `USD: ${formatCurrency(expenseMonth?.current_month?.project?.total_usd)}
-AFN: ${formatCurrency(expenseMonth?.current_month?.project?.total_afn)}`,
+      value: null,
+      sub: currencyBreakdown(
+        expenseMonth?.current_month?.project?.total_usd,
+        expenseMonth?.current_month?.project?.total_afn,
+      ),
       color: "primary",
     },
     {
       icon: <WalletCards className="h-6 w-6" />,
       label: t("kpi.totalExpenses"),
-      value: `$${formatCurrency(financial?.expenses?.total_usd)}`,
-      sub: `USD: ${formatCurrency(financial?.expenses?.total_usd)}
-AFN: ${formatCurrency(financial?.expenses?.total_afn)}`,
+      value: null,
+      sub: currencyBreakdown(
+        financial?.expenses?.total_usd,
+        financial?.expenses?.total_afn,
+      ),
       color: "success",
     },
     {
       icon: "📊",
       label: t("kpi.thisMonthExpenses"),
-      value: `$${formatCurrency(expenseMonth?.current_month?.total_usd)}`,
+      value: null,
       trend: expenseMonth?.trend,
       trendValue: `${Math.abs(expenseMonth?.change_percentage || 0)}%`,
-      sub: `USD: ${formatCurrency(expenseMonth?.current_month?.total_usd)}
-AFN: ${formatCurrency(expenseMonth?.current_month?.total_afn)}`,
+      sub: currencyBreakdown(
+        expenseMonth?.current_month?.total_usd,
+        expenseMonth?.current_month?.total_afn,
+      ),
       color:
         expenseMonth?.trend === "up"
           ? "danger"

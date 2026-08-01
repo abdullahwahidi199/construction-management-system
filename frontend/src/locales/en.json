@@ -212,6 +212,7 @@
   },
   "common": {
     "cancel": "Cancel",
+    "close": "Close",
     "create": "Create",
     "active": "Active",
     "inactive": "Inactive",
@@ -853,6 +854,12 @@
     "documents": "Documents",
     "backToContracts": "Back to Contracts",
     "progress": "Progress",
+    "updateProgress": "Update Progress",
+    "progressPercentage": "Progress %",
+    "progressHelp": "Enter a value from 0 to 100. Setting progress to 100% will mark the contract as completed.",
+    "progressRange": "Enter a progress value from 0 to 100.",
+    "saveProgress": "Save Progress",
+    "progressUpdated": "Contract progress updated.",
     "downloadPdf": "Download PDF",
     "failedToLoadContractDetails": "Failed to load contract details.",
     "contractDetails": "Contract Details",
@@ -944,6 +951,7 @@
     "supportedFiles": "Supports PDF, DOCX, XLSX, JPG, PNG",
     "documentUploaded": "Document uploaded successfully!",
     "uploadFailed": "Upload failed",
+    "fileTooLargeAfterCompression": "This file is still too large after compression. Please upload a file under {{size}}.",
     "viewDownload": "View / Download",
     "noDocuments": "No documents uploaded yet.",
     "document": "Document"
@@ -1080,7 +1088,9 @@
     "uploading": "Uploading...",
     "browse": "browse",
     "dragAndDrop": "Drag and drop or",
-    "supportedFiles": "PDF, Images, Word, Excel — Max 50MB",
+    "supportedFiles": "PDF, images, Word, Excel, DWG, ZIP — max 50MB. Images are compressed before upload.",
+    "preparingFile": "Preparing file...",
+    "compressedFileNote": "Compressed from {{original}} to {{current}}",
     "removeFile": "Remove file",
     "close": "Close",
     "signedContract": "Signed Contract",
@@ -1093,7 +1103,7 @@
     "titlePlaceholder": "e.g. Signed Contract V1",
     "titleRequired": "Title is required",
     "fileRequired": "File is required",
-    "fileTooLarge": "File size must be under 50 MB"
+    "fileTooLarge": "This file is still too large after compression. Please upload a file under 50 MB."
   },
 
   "ExpensesMain": {

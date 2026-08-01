@@ -1,7 +1,9 @@
 from collections import defaultdict
 from decimal import Decimal
 
+from Employees.finance import SALARY_ADVANCE_CURRENCY, salary_advance_queryset
 from Employees.models import Payroll
+from common.work_calendar import get_work_calendar_service
 from labour.models import WorkerPayroll
 from .base import BaseReport
 
@@ -20,12 +22,17 @@ def empty_currency_summary(currency):
         "currency": currency,
         "count": 0,
         "employee_count": 0,
+        "salary_advance_count": 0,
         "daily_worker_count": 0,
         "total_gross": ZERO,
         "total_net": ZERO,
         "total_tax": ZERO,
         "total_deductions": ZERO,
         "total_advances": ZERO,
+        "total_advance_deductions": ZERO,
+        "total_amount_paid": ZERO,
+        "total_balance_due": ZERO,
+        "total_cash_outflow": ZERO,
     }
 
 
@@ -38,11 +45,27 @@ def empty_source_summary(source_type):
         "total_tax": ZERO,
         "total_deductions": ZERO,
         "total_advances": ZERO,
+        "total_advance_deductions": ZERO,
+        "total_amount_paid": ZERO,
+        "total_balance_due": ZERO,
+        "total_cash_outflow": ZERO,
     }
 
 
 class PayrollReport(BaseReport):
     report_name = "Payroll Report"
+
+    def _calendar_summary(self):
+        start, end = self.get_date_range()
+        if not start or not end:
+            return {
+                "total_calendar_days": 0,
+                "total_working_days": 0,
+                "weekly_off_days": 0,
+                "official_holidays": 0,
+                "days": [],
+            }
+        return get_work_calendar_service().get_range_summary(start, end)
 
     def _employee_queryset(self):
         if self.filters.get("source_type") == "daily_worker":
@@ -92,6 +115,23 @@ class PayrollReport(BaseReport):
 
         return qs
 
+    def _salary_advance_queryset(self):
+        if self.filters.get("source_type") == "daily_worker":
+            return salary_advance_queryset().none()
+        currency = self.filters.get("currency")
+        payment_method = self.filters.get("payment_method")
+        if currency and currency != SALARY_ADVANCE_CURRENCY:
+            return salary_advance_queryset().none()
+        if payment_method:
+            return salary_advance_queryset().none()
+
+        start, end = self.get_date_range()
+        return salary_advance_queryset(
+            start=start,
+            end=end,
+            employee_id=self.filters.get("employee_id"),
+        )
+
     def _add_summary(self, by_currency, by_source, row):
         currency = row["currency"] or "AFN"
         source_type = row["source_type"]
@@ -109,6 +149,8 @@ class PayrollReport(BaseReport):
 
         if source_type == "Employee":
             currency_summary["employee_count"] += 1
+        elif source_type == "Salary Advance":
+            currency_summary["salary_advance_count"] += 1
         else:
             currency_summary["daily_worker_count"] += 1
 
@@ -118,8 +160,12 @@ class PayrollReport(BaseReport):
             "total_tax",
             "total_deductions",
             "total_advances",
+            "total_advance_deductions",
+            "total_amount_paid",
+            "total_balance_due",
+            "total_cash_outflow",
         ]:
-            row_key = key.replace("total_", "")
+            row_key = "advance_paid" if key == "total_advances" else key.replace("total_", "")
             amount = money(row.get(row_key))
             currency_summary[key] += amount
             source_summary[key] += amount
@@ -143,12 +189,17 @@ class PayrollReport(BaseReport):
             "allowances": payroll.allowances,
             "gross": payroll.gross_pay,
             "gross_pay": payroll.gross_pay,
-            "advances": ZERO,
+            "advances": payroll.advance_deductions,
+            "advance_paid": ZERO,
+            "advance_deductions": payroll.advance_deductions,
+            "cash_outflow": payroll.net_pay,
             "deductions": payroll.deductions,
             "tax": payroll.tax_deducted,
             "tax_deducted": payroll.tax_deducted,
             "net": payroll.net_pay,
             "net_pay": payroll.net_pay,
+            "amount_paid": payroll.amount_paid,
+            "balance_due": payroll.balance_due,
             "status": "Paid" if payroll.payment_date else "Recorded",
             "payment_method": payroll.get_payment_method_display(),
             "payment_date": payroll.payment_date,
@@ -178,21 +229,65 @@ class PayrollReport(BaseReport):
             "gross": payroll.gross_amount,
             "gross_pay": payroll.gross_amount,
             "advances": payroll.advances,
+            "advance_paid": payroll.advances,
+            "advance_deductions": payroll.advances,
+            "cash_outflow": payroll.net_amount,
             "deductions": payroll.deductions,
             "tax": ZERO,
             "tax_deducted": ZERO,
             "net": payroll.net_amount,
             "net_pay": payroll.net_amount,
+            "amount_paid": payroll.net_amount if payroll.status == "paid" else ZERO,
+            "balance_due": ZERO if payroll.status == "paid" else payroll.net_amount,
             "status": payroll.get_status_display(),
             "payment_method": payroll.get_payment_method_display(),
             "payment_date": payroll.payment_date,
         }
 
+    def _salary_advance_row(self, advance):
+        return {
+            "id": f"salary-advance-{advance.id}",
+            "source_type": "Salary Advance",
+            "employee": advance.employee.full_name,
+            "employee_id": advance.employee.employee_id,
+            "project": "",
+            "department": advance.employee.get_department_display(),
+            "period_start": advance.date,
+            "period_end": advance.date,
+            "currency": SALARY_ADVANCE_CURRENCY,
+            "basic_salary": None,
+            "daily_rate": None,
+            "overtime_hours": ZERO,
+            "overtime_amount": ZERO,
+            "bonus": ZERO,
+            "allowances": ZERO,
+            "gross": ZERO,
+            "gross_pay": ZERO,
+            "advances": advance.amount,
+            "advance_paid": advance.amount,
+            "advance_deductions": ZERO,
+            "cash_outflow": advance.amount,
+            "deductions": ZERO,
+            "tax": ZERO,
+            "tax_deducted": ZERO,
+            "net": ZERO,
+            "net_pay": ZERO,
+            "amount_paid": advance.amount,
+            "balance_due": ZERO,
+            "status": advance.get_status_display(),
+            "payment_method": "Advance",
+            "payment_date": advance.date,
+        }
+
     def generate(self):
         employee_rows = [self._employee_row(p) for p in self._employee_queryset()]
+        salary_advance_rows = [
+            self._salary_advance_row(advance)
+            for advance in self._salary_advance_queryset()
+        ]
         worker_rows = [self._worker_row(p) for p in self._worker_queryset()]
         rows = sorted(
-            [*employee_rows, *worker_rows],
+            [*employee_rows, *salary_advance_rows, *worker_rows],
             key=lambda row: (row["period_start"], row["source_type"], row["employee"]),
             reverse=True,
         )
@@ -207,21 +302,36 @@ class PayrollReport(BaseReport):
         total_net = sum((money(row["net"]) for row in rows), ZERO)
         total_deductions = sum((money(row["deductions"]) for row in rows), ZERO)
         total_tax = sum((money(row["tax"]) for row in rows), ZERO)
-        total_advances = sum((money(row["advances"]) for row in rows), ZERO)
+        total_advances = sum((money(row["advance_paid"]) for row in rows), ZERO)
+        total_advance_deductions = sum((money(row["advance_deductions"]) for row in rows), ZERO)
+        total_amount_paid = sum((money(row["amount_paid"]) for row in rows), ZERO)
+        total_balance_due = sum((money(row["balance_due"]) for row in rows), ZERO)
+        total_cash_outflow = sum((money(row["cash_outflow"]) for row in rows), ZERO)
+        calendar_summary = self._calendar_summary()
 
         return {
             **self.get_metadata(),
             "summary": {
                 "total_records": len(rows),
+                "total_calendar_days": calendar_summary["total_calendar_days"],
+                "total_working_days": calendar_summary["total_working_days"],
+                "weekly_off_days": calendar_summary["weekly_off_days"],
+                "official_holidays": calendar_summary["official_holidays"],
                 "employee_payroll_records": len(employee_rows),
+                "salary_advance_records": len(salary_advance_rows),
                 "daily_worker_payroll_records": len(worker_rows),
                 "total_gross": total_gross,
                 "total_net": total_net,
                 "total_deductions": total_deductions,
                 "total_tax": total_tax,
                 "total_advances": total_advances,
+                "total_advance_deductions": total_advance_deductions,
+                "total_amount_paid": total_amount_paid,
+                "total_balance_due": total_balance_due,
+                "total_cash_outflow": total_cash_outflow,
                 "by_currency": list(by_currency.values()),
                 "by_source": list(by_source.values()),
+                "calendar_summary": calendar_summary,
             },
             "rows": rows,
         }

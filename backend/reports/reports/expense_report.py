@@ -2,6 +2,7 @@ from decimal import Decimal
 from django.db.models import Sum, Count, Value, DecimalField
 from django.db.models.functions import Coalesce, TruncMonth
 
+from Employees.finance import salary_advance_queryset, salary_advance_totals
 from expenses.models import Expense
 from .base import BaseReport
 
@@ -43,6 +44,21 @@ class ExpenseReport(BaseReport):
     # ---------------------------------------------------------
     def generate(self):
         qs = self._base_queryset()
+        include_salary_advances = not any(
+            self.filters.get(key)
+            for key in ["project_id", "expense_scope", "expense_type"]
+        )
+        requested_status = self.filters.get("status") or self.filters.get("approval_status")
+        if requested_status and requested_status != Expense.ApprovalStatus.APPROVED:
+            include_salary_advances = False
+        start, end = self.get_date_range()
+        salary_advances = salary_advance_totals(
+            salary_advance_queryset(start=start, end=end)
+        ) if include_salary_advances else {
+            "total_usd": Decimal("0"),
+            "total_afn": Decimal("0"),
+            "count": 0,
+        }
 
         # =====================================================
         # 1. GLOBAL SUMMARY (FAST SQL AGGREGATION)
@@ -140,6 +156,10 @@ class ExpenseReport(BaseReport):
                 "total_office_expense_count": office_totals["count"],
                 "overall_total_expenses_afn": totals["total_afn"],
                 "overall_total_expenses_usd": totals["total_usd"],
+                "employee_advances_paid_afn": salary_advances["total_afn"],
+                "employee_advances_paid_usd": salary_advances["total_usd"],
+                "overall_total_outflow_afn": totals["total_afn"] + salary_advances["total_afn"],
+                "overall_total_outflow_usd": totals["total_usd"] + salary_advances["total_usd"],
                 **totals,
             },
             "type_breakdown": type_breakdown,

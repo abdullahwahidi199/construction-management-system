@@ -34,6 +34,7 @@ export const OPERATIONAL_PERMISSIONS = [
   "expenses.view",
   "expenses.create",
   "expenses.update",
+  "expenses.update_own",
   "expenses.delete",
   "expenses.approve",
   "employees.view",
@@ -192,7 +193,7 @@ const OPERATIONAL_ROUTE_RULES = [
   },
   {
     path: "/manager/expenses",
-    permissions: ["expenses.view", "expenses.create", "expenses.update", "expenses.delete"],
+    permissions: ["expenses.view", "expenses.create", "expenses.update", "expenses.update_own", "expenses.delete"],
   },
   {
     path: "/manager/expense-approvals",

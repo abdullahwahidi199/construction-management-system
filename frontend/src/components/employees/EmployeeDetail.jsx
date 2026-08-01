@@ -21,6 +21,9 @@ export default function EmployeeDetail({ employeeId, onClose }) {
   const { data: payrollHistory } = useFetch(
     `/employees/${employeeId}/payroll_history/`,
   );
+  const { data: advanceHistory } = useFetch(
+    `/employees/${employeeId}/advance_history/`,
+  );
 
   const fetchEmployeeDetails = async () => {
     setLoading(true);
@@ -212,7 +215,7 @@ export default function EmployeeDetail({ employeeId, onClose }) {
       )}
 
       {activeTab === "payroll" && (
-        <div>
+        <div className="space-y-6">
           <h3
             className="text-sm font-semibold mb-4"
             style={{ color: "var(--text)" }}
@@ -253,17 +256,78 @@ export default function EmployeeDetail({ employeeId, onClose }) {
                     </div>
                     <div className={isRTL ? "text-left" : "text-right"}>
                       <p className="font-bold" style={{ color: "var(--text)" }}>
-                        {t("EmployeeDetail.currency")}
+                        {payroll.currency || t("EmployeeDetail.currency")}{" "}
                         {Number(payroll.net_pay || 0).toLocaleString()}
                       </p>
                       <p className="text-xs" style={{ color: "var(--muted)" }}>
                         {t("EmployeeDetail.netPay")}
+                      </p>
+                      <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
+                        Gross: {payroll.currency || ""}
+                        {Number(payroll.gross_pay || 0).toLocaleString()} / Advance:{" "}
+                        {payroll.currency || ""}
+                        {Number(payroll.advance_deductions || 0).toLocaleString()}
                       </p>
                     </div>
                   </div>
                 ))}
             </div>
           )}
+
+          <div>
+            <h3
+              className="text-sm font-semibold mb-4"
+              style={{ color: "var(--text)" }}
+            >
+              Salary Advances
+            </h3>
+            {!Array.isArray(advanceHistory) || advanceHistory.length === 0 ? (
+              <p style={{ color: "var(--muted)" }}>No advances recorded.</p>
+            ) : (
+              <div className="space-y-3">
+                {advanceHistory.map((advance) => (
+                  <div
+                    key={advance.id}
+                    className="grid gap-3 p-4 rounded-lg sm:grid-cols-4"
+                    style={{ backgroundColor: "var(--hover)" }}
+                  >
+                    <div>
+                      <p className="text-xs" style={{ color: "var(--muted)" }}>
+                        Date
+                      </p>
+                      <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
+                        {formatPayrollDate(advance.date) || advance.date}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs" style={{ color: "var(--muted)" }}>
+                        Advance Paid
+                      </p>
+                      <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
+                        AFN {Number(advance.amount || 0).toLocaleString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs" style={{ color: "var(--muted)" }}>
+                        Remaining
+                      </p>
+                      <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
+                        AFN {Number(advance.remaining_balance || 0).toLocaleString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs" style={{ color: "var(--muted)" }}>
+                        Status
+                      </p>
+                      <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
+                        {advance.advance_status_label || advance.status}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

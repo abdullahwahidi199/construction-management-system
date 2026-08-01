@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action, api_view, permission_classes
@@ -7,18 +8,23 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 
-from audit.utils import create_audit_log
+from audit.models import AuditLog
+from audit.serializers import AuditLogDetailSerializer
+from audit.utils import create_audit_log, get_changed_fields
 
 from .permissions import AccountPermission
 from .throttles import AuthRateLimitExceeded, LoginFailedRateThrottle
 from .serializers import (
     CalendarSettingsSerializer,
+    CompanyInformationSerializer,
     CustomRoleSerializer,
     LoginSerializer,
     ProjectAssignmentSerializer,
     PermissionSerializer,
 RolePermissionSerializer,
+    SettingsPreferencesSerializer,
     UserCreateSerializer,
     UserPermissionOverrideSerializer,
     UserSerializer,
@@ -29,6 +35,7 @@ RolePermissionSerializer,
 from .services import get_effective_permissions, get_user_role, has_permission
 from .models import (
     ApplicationSettings,
+    CompanyInformation,
     CustomRole,
     ProjectAssignment,
     UserPermissionOverride,
@@ -282,12 +289,145 @@ class CalendarSettingsView(APIView):
         if not has_permission(request.user, "settings.manage"):
             raise PermissionDenied()
         settings_obj = ApplicationSettings.get_solo()
+        old_data = CalendarSettingsSerializer(settings_obj).data
         serializer = CalendarSettingsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         settings_obj.set_calendar_settings(serializer.validated_data)
         settings_obj.updated_by = request.user
         settings_obj.save(update_fields=["app_settings", "updated_by", "updated_at"])
-        return Response(CalendarSettingsSerializer(settings_obj).data)
+        new_data = CalendarSettingsSerializer(settings_obj).data
+        create_audit_log(
+            user=request.user,
+            action="settings.calendar.update",
+            model_name="ApplicationSettings",
+            object_id=settings_obj.pk,
+            object_repr="Calendar Settings",
+            old_data=old_data,
+            new_data=new_data,
+            description="Updated calendar settings",
+            request=request,
+            extra_metadata={"changed_fields": get_changed_fields(old_data, new_data)},
+        )
+        return Response(new_data)
+
+
+class CompanyInformationView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_object(self):
+        return CompanyInformation.get_for_request(self.request)
+
+    def get(self, request):
+        company = self.get_object()
+        return Response(
+            CompanyInformationSerializer(company, context={"request": request}).data
+        )
+
+    def put(self, request):
+        return self._save(request, partial=False)
+
+    def patch(self, request):
+        return self._save(request, partial=True)
+
+    def _save(self, request, partial):
+        if not has_permission(request.user, "settings.manage"):
+            raise PermissionDenied()
+
+        company = self.get_object()
+        old_data = CompanyInformationSerializer(
+            company,
+            context={"request": request},
+        ).data
+        serializer = CompanyInformationSerializer(
+            company,
+            data=request.data,
+            partial=partial,
+            context={"request": request},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save(updated_by=request.user)
+        new_data = CompanyInformationSerializer(
+            company,
+            context={"request": request},
+        ).data
+        create_audit_log(
+            user=request.user,
+            action="settings.company_information.update",
+            model_name="CompanyInformation",
+            object_id=company.pk,
+            object_repr=company.company_name,
+            old_data=old_data,
+            new_data=new_data,
+            description="Updated company information",
+            request=request,
+            extra_metadata={"changed_fields": get_changed_fields(old_data, new_data)},
+        )
+        return Response(new_data)
+
+
+class SettingsPreferencesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        settings_obj = ApplicationSettings.get_solo()
+        return Response(SettingsPreferencesSerializer(settings_obj).data)
+
+    def put(self, request):
+        if not has_permission(request.user, "settings.manage"):
+            raise PermissionDenied()
+
+        settings_obj = ApplicationSettings.get_solo()
+        old_data = SettingsPreferencesSerializer(settings_obj).data
+        serializer = SettingsPreferencesSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        settings_obj.app_settings = {
+            **(settings_obj.app_settings or {}),
+            "settings_preferences": serializer.validated_data,
+        }
+        settings_obj.updated_by = request.user
+        settings_obj.save(update_fields=["app_settings", "updated_by", "updated_at"])
+        new_data = SettingsPreferencesSerializer(settings_obj).data
+        create_audit_log(
+            user=request.user,
+            action="settings.preferences.update",
+            model_name="ApplicationSettings",
+            object_id=settings_obj.pk,
+            object_repr="Settings Preferences",
+            old_data=old_data,
+            new_data=new_data,
+            description="Updated settings preferences",
+            request=request,
+            extra_metadata={"changed_fields": get_changed_fields(old_data, new_data)},
+        )
+        return Response(new_data)
+
+
+class SettingsAuditLogView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not (
+            has_permission(request.user, "settings.view")
+            or has_permission(request.user, "settings.manage")
+            or has_permission(request.user, "audit_logs.view")
+        ):
+            raise PermissionDenied()
+
+        try:
+            limit = min(max(int(request.query_params.get("limit", 25)), 1), 100)
+        except (TypeError, ValueError):
+            limit = 25
+
+        queryset = (
+            AuditLog.objects.select_related("user")
+            .filter(
+                Q(action__startswith="settings.")
+                | Q(model_name__in=["CompanyInformation", "ApplicationSettings"])
+            )
+            .order_by("-timestamp")[:limit]
+        )
+        return Response(AuditLogDetailSerializer(queryset, many=True).data)
 
 class RolePermissionViewSet(ModelViewSet):
     queryset = RolePermission.objects.select_related(

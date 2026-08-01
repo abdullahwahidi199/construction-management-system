@@ -15,6 +15,31 @@ vi.mock("../../hooks/useFetch", () => ({
   },
 }));
 
+vi.mock("../../hooks/useCalendar", () => ({
+  useCalendar: () => ({
+    formatDate: (value) =>
+      ({
+        "2026-07-01": "1405-04-10",
+        "2026-07-25": "1405-05-03",
+        "2026-07-31": "1405-05-09",
+      })[value] || value,
+    parseDate: (value) => value,
+  }),
+}));
+
+vi.mock("../../context/CompanyContext", () => ({
+  useCompany: () => ({
+    company: {
+      company_name: "Acme Construction",
+      company_logo_url: "",
+      print_footer_text: "Company footer",
+      phone_number: "0700000000",
+      email: "office@example.com",
+      website: "https://example.com",
+    },
+  }),
+}));
+
 import PayrollPrintModal from "./PayrollPrintModal";
 
 const richPayroll = {
@@ -25,6 +50,8 @@ const richPayroll = {
   payment_date: "2026-07-25",
   payroll_period_start: "2026-07-01",
   payroll_period_end: "2026-07-31",
+  payment_method: "cash",
+  payment_status: "fully_paid",
   currency: "USD",
   basic_salary: 3000,
   overtime_amount: 250.5,
@@ -33,6 +60,11 @@ const richPayroll = {
   allowances: 75,
   deductions: 50,
   tax_deducted: 25,
+  advance_deductions: 0,
+  gross_pay: 3475.5,
+  total_deductions: 75,
+  amount_paid: 3400.5,
+  balance_due: 0,
   net_pay: 3400.5,
   amount_in_words: "Three thousand four hundred dollars",
 };
@@ -87,37 +119,39 @@ describe("PayrollPrintModal", () => {
     expect(screen.getByRole("button", { name: /print/i })).toBeDisabled();
   });
 
-  it("renders voucher data, closes from header and backdrop, and keeps inner clicks inside the modal", () => {
+  it("renders a branded receipt, closes from header and backdrop, and keeps inner clicks inside the modal", () => {
     const onClose = vi.fn();
     fetchState.data = richPayroll;
 
     renderModal({ onClose });
 
-    expect(screen.getAllByText("Cash Payment Voucher").length).toBeGreaterThan(0);
-    expect(screen.getByText("Tower A")).toBeInTheDocument();
-    expect(screen.getAllByText("Ahmad Rahimi").length).toBeGreaterThan(1);
+    expect(screen.getAllByText("Employee Payroll Receipt").length).toBeGreaterThan(0);
+    expect(screen.getByText("Acme Construction")).toBeInTheDocument();
+    expect(screen.getAllByText("PAY-000005").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Tower A").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Ahmad Rahimi").length).toBeGreaterThan(0);
+    expect(screen.getByText("EMP-105")).toBeInTheDocument();
     expect(screen.getByText("Site Engineer")).toBeInTheDocument();
-    expect(screen.getByText("105")).toBeInTheDocument();
-    expect(screen.getByText("2026-07-25")).toBeInTheDocument();
-    expect(screen.getAllByText(/2026-07-01 - 2026-07-31/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("1405-05-03").length).toBeGreaterThan(0);
+    expect(screen.getByText("1405-04-10 to 1405-05-09")).toBeInTheDocument();
     expect(screen.getAllByText("30").length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/USD\s+3,000/).length).toBeGreaterThan(0);
-    expect(screen.getByText(/USD\s+250.5/)).toBeInTheDocument();
-    expect(screen.getAllByText(/USD\s+75/).length).toBeGreaterThan(0);
-    expect(screen.getByText(/USD\s+3,400.5/)).toBeInTheDocument();
+    expect(screen.getAllByText("Net Pay").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/USD\s+3,400.50/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/USD\s+12.50/)).toBeInTheDocument();
     expect(screen.getByText(/Three thousand four hundred dollars/)).toBeInTheDocument();
+    expect(screen.getByText("Employee Signature")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText("Cash Payment Voucher Preview"));
+    fireEvent.click(document.querySelector(".mobile-modal-panel"));
     expect(onClose).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getAllByRole("button").at(-1));
+    fireEvent.click(screen.getByRole("button", { name: "Close receipt" }));
     expect(onClose).toHaveBeenCalledTimes(1);
 
     fireEvent.click(document.querySelector(".fixed.inset-0.bg-black\\/50"));
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
-  it("writes the printable voucher, prints, closes, and handles blocked print windows", () => {
+  it("writes the printable receipt, prints, closes, and handles blocked print windows", () => {
     vi.useFakeTimers();
     fetchState.data = richPayroll;
     const printableDocument = {
@@ -130,24 +164,29 @@ describe("PayrollPrintModal", () => {
       print: vi.fn(),
       close: vi.fn(),
     };
-    const open = vi.spyOn(window, "open").mockReturnValueOnce(printWindow).mockReturnValueOnce(null);
+    const open = vi
+      .spyOn(window, "open")
+      .mockReturnValueOnce(printWindow)
+      .mockReturnValueOnce(null);
 
     renderModal();
 
     fireEvent.click(screen.getByRole("button", { name: /print/i }));
 
-    expect(open).toHaveBeenCalledWith("", "_blank", "width=1050,height=750");
+    expect(open).toHaveBeenCalledWith("", "_blank", "width=940,height=720");
     expect(printableDocument.write).toHaveBeenCalledTimes(1);
     const html = printableDocument.write.mock.calls[0][0];
-    expect(html).toContain("Cash Payment Voucher - Ahmad Rahimi");
+    expect(html).toContain("Employee Payroll Receipt PAY-000005");
+    expect(html).toContain("Acme Construction");
     expect(html).toContain("Tower A");
-    expect(html).toContain("USD 3,000");
+    expect(html).toContain("USD 3,000.00");
     expect(html).toContain("USD 12.50");
-    expect(html).toContain("USD 3,400.5");
+    expect(html).toContain("USD 3,400.50");
+    expect(html).toContain("Amount in words: Three thousand four hundred dollars");
     expect(printableDocument.close).toHaveBeenCalled();
     expect(printWindow.focus).toHaveBeenCalled();
 
-    vi.advanceTimersByTime(300);
+    vi.advanceTimersByTime(250);
     expect(printWindow.print).toHaveBeenCalled();
     expect(printWindow.close).toHaveBeenCalled();
 
@@ -174,6 +213,7 @@ describe("PayrollPrintModal", () => {
       allowances: "",
       deductions: "",
       tax_deducted: "",
+      advance_deductions: "",
       net_pay: 0,
       amount_in_words: "",
     };
@@ -191,20 +231,21 @@ describe("PayrollPrintModal", () => {
 
     renderModal();
 
-    expect(screen.getByText("PROJECT")).toBeInTheDocument();
-    expect(screen.getByText("__ / __ / ____")).toBeInTheDocument();
-    expect(screen.getAllByText("—").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("0").length).toBeGreaterThan(0);
+    expect(screen.getByText("Payroll payment")).toBeInTheDocument();
+    expect(screen.getByText("General")).toBeInTheDocument();
+    expect(screen.getAllByText("-").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("30").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/AFN\s+0.00/).length).toBeGreaterThan(0);
 
     fireEvent.click(screen.getByRole("button", { name: /print/i }));
 
     const html = printableDocument.write.mock.calls[0][0];
-    expect(html).toContain("Cash Payment Voucher - ");
-    expect(html).toContain("PROJECT");
-    expect(html).toContain("LALANDER 5 Employee's Payroll Voucher");
-    expect(html).toContain("__ / __ / ____");
-    expect(html).toContain("Salary for</span>");
-    expect(html).toContain("<strong>30</strong> days");
-    expect(html).toContain("H/R <strong>AFN 0</strong>");
+    expect(html).toContain("Employee Payroll Receipt PAY-000005");
+    expect(html).toContain("Acme Construction");
+    expect(html).toContain("Payroll payment");
+    expect(html).toContain("General");
+    expect(html).toContain("AFN 0.00");
+    expect(html).toContain("<td>Basic Salary</td>");
+    expect(html).toContain("<td>Days Worked</td>");
   });
 });

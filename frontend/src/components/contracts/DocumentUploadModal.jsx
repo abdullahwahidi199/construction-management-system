@@ -6,18 +6,13 @@ import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 import { useLanguage } from "../../hooks/useLanguage";
+import { formatFileSize, prepareUploadFile } from "../../utils/fileCompression";
 
-const ACCEPTED_EXTENSIONS = ".pdf,.jpg,.jpeg,.png,.tiff,.doc,.docx,.xls,.xlsx";
+const ACCEPTED_EXTENSIONS = ".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.dwg,.zip";
 const ACCEPTED_EXTENSION_SET = new Set(
   ACCEPTED_EXTENSIONS.split(",").map((ext) => ext.trim().toLowerCase()),
 );
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
-
-function formatFileSize(bytes) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
-}
 
 function isAcceptedFile(file) {
   const lowerName = file.name.toLowerCase();
@@ -36,9 +31,11 @@ export default function DocumentUploadModal({
   const [title, setTitle] = useState("");
   const [documentType, setDocumentType] = useState("supporting");
   const [file, setFile] = useState(null);
+  const [fileMeta, setFileMeta] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [compressing, setCompressing] = useState(false);
 
   const DOCUMENT_TYPE_OPTIONS = [
     {
@@ -46,19 +43,20 @@ export default function DocumentUploadModal({
       label: t("DocumentUploadModal.signedContract"),
     },
     { value: "boq", label: t("DocumentUploadModal.billOfQuantities") },
-    { value: "drawings", label: t("DocumentUploadModal.drawings") },
+    { value: "drawing", label: t("DocumentUploadModal.drawings") },
     { value: "invoice", label: t("DocumentUploadModal.invoice") },
     { value: "quotation", label: t("DocumentUploadModal.quotation") },
     { value: "supporting", label: t("DocumentUploadModal.supportingDocument") },
-    { value: "other", label: t("DocumentUploadModal.other") },
   ];
 
   const reset = () => {
     setTitle("");
     setDocumentType("supporting");
     setFile(null);
+    setFileMeta(null);
     setErrors({});
     setSubmitting(false);
+    setCompressing(false);
   };
 
   const handleClose = () => {
@@ -79,23 +77,38 @@ export default function DocumentUploadModal({
     }
   };
 
-  const selectFile = (nextFile) => {
+  const selectFile = async (nextFile) => {
     if (!nextFile) return;
     if (!isAcceptedFile(nextFile)) {
       setFile(null);
+      setFileMeta(null);
       setErrors((prev) => ({
         ...prev,
-        file: "Unsupported file type. Please upload PDF, image, Word, or Excel files.",
+        file: "Unsupported file type. Please upload PDF, image, Word, Excel, DWG, ZIP, JPG, or PNG files.",
       }));
       return;
     }
-    if (nextFile.size > MAX_FILE_SIZE) {
-      setFile(null);
-      setErrors((prev) => ({ ...prev, file: t("DocumentUploadModal.fileTooLarge") }));
-      return;
+
+    setCompressing(true);
+    setErrors((prev) => ({ ...prev, file: undefined }));
+
+    try {
+      const prepared = await prepareUploadFile(nextFile);
+      if (prepared.file.size > MAX_FILE_SIZE) {
+        setFile(null);
+        setFileMeta(null);
+        setErrors((prev) => ({
+          ...prev,
+          file: t("DocumentUploadModal.fileTooLarge"),
+        }));
+        return;
+      }
+
+      setFile(prepared.file);
+      setFileMeta(prepared);
+    } finally {
+      setCompressing(false);
     }
-    setFile(nextFile);
-    if (errors.file) setErrors((prev) => ({ ...prev, file: undefined }));
   };
 
   const handleDrop = (e) => {
@@ -103,19 +116,20 @@ export default function DocumentUploadModal({
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      selectFile(e.dataTransfer.files[0]);
+      void selectFile(e.dataTransfer.files[0]);
     }
   };
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      selectFile(e.target.files[0]);
+      void selectFile(e.target.files[0]);
     }
   };
 
   const removeFile = (e) => {
     e.stopPropagation();
     setFile(null);
+    setFileMeta(null);
   };
 
   const validate = () => {
@@ -123,7 +137,7 @@ export default function DocumentUploadModal({
     if (!title.trim()) e.title = t("DocumentUploadModal.titleRequired");
     if (!file) e.file = t("DocumentUploadModal.fileRequired");
     if (file && !isAcceptedFile(file))
-      e.file = "Unsupported file type. Please upload PDF, image, Word, or Excel files.";
+      e.file = "Unsupported file type. Please upload PDF, image, Word, Excel, DWG, ZIP, JPG, or PNG files.";
     if (file && file.size > MAX_FILE_SIZE)
       e.file = t("DocumentUploadModal.fileTooLarge");
     setErrors(e);
@@ -132,6 +146,7 @@ export default function DocumentUploadModal({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (compressing) return;
     if (!validate()) return;
     setSubmitting(true);
 
@@ -149,6 +164,8 @@ export default function DocumentUploadModal({
   };
 
   if (!isOpen) return null;
+
+  const isBusy = submitting || submitLoading || compressing;
 
   const dropZoneState = file
     ? "has-file"
@@ -248,6 +265,7 @@ export default function DocumentUploadModal({
                   onDrop={handleDrop}
                   onClick={() =>
                     !file &&
+                    !isBusy &&
                     document.getElementById("file-input-contract")?.click()
                   }
                   role="button"
@@ -255,7 +273,9 @@ export default function DocumentUploadModal({
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      document.getElementById("file-input-contract")?.click();
+                      if (!file && !isBusy) {
+                        document.getElementById("file-input-contract")?.click();
+                      }
                     }
                   }}
                 >
@@ -265,6 +285,7 @@ export default function DocumentUploadModal({
                     className="hidden"
                     onChange={handleFileChange}
                     accept={ACCEPTED_EXTENSIONS}
+                    disabled={isBusy}
                   />
 
                   {file ? (
@@ -279,11 +300,20 @@ export default function DocumentUploadModal({
                         <p className="text-xs text-[var(--muted)]">
                           {formatFileSize(file.size)}
                         </p>
+                        {fileMeta?.compressed && (
+                          <p className="text-xs text-[var(--success)]">
+                            {t("DocumentUploadModal.compressedFileNote", {
+                              original: formatFileSize(fileMeta.originalSize),
+                              current: formatFileSize(file.size),
+                            })}
+                          </p>
+                        )}
                       </div>
                       <button
                         type="button"
                         onClick={removeFile}
-                        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--danger)] transition-colors sm:h-8 sm:w-8"
+                        disabled={isBusy}
+                        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--danger)] transition-colors disabled:cursor-not-allowed disabled:opacity-50 sm:h-8 sm:w-8"
                         aria-label={t("DocumentUploadModal.removeFile")}
                       >
                         <X size={16} />
@@ -295,10 +325,16 @@ export default function DocumentUploadModal({
                         <Upload size={22} className="text-[var(--primary)]" />
                       </div>
                       <p className="text-sm text-[var(--text)]">
-                        {t("DocumentUploadModal.dragAndDrop")}{" "}
-                        <span className="text-[var(--primary)] font-semibold hover:underline">
-                          {t("DocumentUploadModal.browse")}
-                        </span>
+                        {compressing ? (
+                          t("DocumentUploadModal.preparingFile")
+                        ) : (
+                          <>
+                            {t("DocumentUploadModal.dragAndDrop")}{" "}
+                            <span className="text-[var(--primary)] font-semibold hover:underline">
+                              {t("DocumentUploadModal.browse")}
+                            </span>
+                          </>
+                        )}
                       </p>
                       <p className="text-xs text-[var(--muted)] mt-1.5">
                         {t("DocumentUploadModal.supportedFiles")}
@@ -321,17 +357,19 @@ export default function DocumentUploadModal({
                 type="button"
                 variant="secondary"
                 onClick={handleClose}
-                disabled={submitting}
+                disabled={isBusy}
               >
                 {t("DocumentUploadModal.cancel")}
               </Button>
               <Button
                 type="submit"
                 variant="primary"
-                disabled={submitting}
-                leftIcon={!submitting && <Upload size={16} />}
+                disabled={isBusy}
+                leftIcon={!isBusy && <Upload size={16} />}
               >
-                {submitting
+                {compressing
+                  ? t("DocumentUploadModal.preparingFile")
+                  : submitting || submitLoading
                   ? t("DocumentUploadModal.uploading")
                   : t("DocumentUploadModal.uploadDocument")}
               </Button>

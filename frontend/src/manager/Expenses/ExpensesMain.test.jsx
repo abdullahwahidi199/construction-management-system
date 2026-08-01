@@ -180,7 +180,12 @@ const populatedExpenses = {
   next: "/api/expenses/?page=2",
   previous: null,
   results: {
-    totals: { usd: "300", afn: "6800" },
+    totals: {
+      usd: "300",
+      afn: "6800",
+      usd_equivalent: "400",
+      afn_equivalent: "10000",
+    },
     results: [{ id: 11, description: "Concrete" }],
   },
 };
@@ -223,7 +228,8 @@ describe("ExpensesMain", () => {
     renderPage();
 
     expect(screen.getByText("Expenses")).toBeInTheDocument();
-    expect(screen.getByText("$300.00")).toBeInTheDocument();
+    expect(screen.getByText("Total USD EQ")).toBeInTheDocument();
+    expect(screen.getByText("$400.00")).toBeInTheDocument();
     expect(screen.getByText("Rows: 1")).toBeInTheDocument();
     expect(
       screen.getAllByText((_, node) => node?.textContent?.includes("Showing")).length,

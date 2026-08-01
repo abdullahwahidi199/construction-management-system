@@ -10,6 +10,7 @@ from rest_framework.response import Response
 
 from accounts.permissions import RBACPermission
 from common.calendar_utils import get_module_calendar, parse_calendar_date
+from common.work_calendar import get_work_calendar_service
 from project.models import Project
 
 from .models import DailyWorker, WorkerAdvance, WorkerAttendance, WorkerPayroll
@@ -170,11 +171,16 @@ class WorkerAttendanceViewSet(viewsets.ModelViewSet):
         if project:
             active_workers = active_workers.filter(assigned_project_id=project)
             records = records.filter(project_id=project)
+        calendar_service = get_work_calendar_service()
+        work_calendar = calendar_service.get_date_info(target_date)
         marked_ids = records.values_list("worker_id", flat=True)
         unmarked = active_workers.exclude(id__in=marked_ids)
         counts = dict(records.values_list("status").annotate(count=Count("id")).values_list("status", "count"))
         return Response({
             "date": target_date.isoformat(),
+            "work_calendar": work_calendar,
+            "is_working_day": work_calendar["is_working_day"],
+            "day_type": work_calendar["day_type"],
             "status_counts": {
                 "present": counts.get("present", 0),
                 "absent": counts.get("absent", 0),
@@ -192,14 +198,29 @@ class WorkerAttendanceViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def summary(self, request):
         qs = self.get_queryset()
-        return Response({
+        payload = {
             "total_records": qs.count(),
             "present": qs.filter(status="present").count(),
             "absent": qs.filter(status="absent").count(),
             "half_day": qs.filter(status="half_day").count(),
             "overtime": qs.filter(status="overtime").count(),
             "overtime_hours": qs.aggregate(total=Coalesce(Sum("overtime_hours"), Decimal("0.00")))["total"],
-        })
+        }
+        start_date = request.query_params.get("start_date")
+        end_date = request.query_params.get("end_date")
+        if start_date and end_date:
+            calendar_type = get_module_calendar("daily_worker_attendance", request=request)
+            start = parse_calendar_date(start_date, calendar_type)
+            end = parse_calendar_date(end_date, calendar_type)
+            calendar_summary = get_work_calendar_service().get_range_summary(start, end)
+            payload.update({
+                "total_calendar_days": calendar_summary["total_calendar_days"],
+                "total_working_days": calendar_summary["total_working_days"],
+                "weekly_off_days": calendar_summary["weekly_off_days"],
+                "official_holidays": calendar_summary["official_holidays"],
+                "calendar_summary": calendar_summary,
+            })
+        return Response(payload)
 
 
 class WorkerAdvanceViewSet(viewsets.ModelViewSet):
@@ -279,6 +300,52 @@ class WorkerPayrollViewSet(viewsets.ModelViewSet):
         if project_id:
             workers = workers.filter(Q(assigned_project_id=project_id) | Q(attendances__project_id=project_id)).distinct()
 
+        calendar_service = get_work_calendar_service()
+        missing_attendance = []
+        for worker in workers:
+            working_days = calendar_service.get_working_days(
+                start_date,
+                end_date,
+            )
+            if not working_days:
+                continue
+
+            attendance = WorkerAttendance.objects.filter(
+                worker=worker,
+                date__gte=start_date,
+                date__lte=end_date,
+            )
+            if project_id:
+                attendance = attendance.filter(project_id=project_id)
+            marked_dates = set(attendance.values_list("date", flat=True))
+            missing_dates = [
+                working_day
+                for working_day in working_days
+                if working_day not in marked_dates
+            ]
+            if missing_dates:
+                first_missing = missing_dates[0]
+                missing_attendance.append({
+                    "worker": worker.full_name,
+                    "worker_id": worker.id,
+                    "date": first_missing.isoformat(),
+                    "dates": [day.isoformat() for day in missing_dates],
+                    "message": (
+                        f"Attendance has not been recorded for {first_missing.isoformat()}. "
+                        "Please complete attendance before generating payroll."
+                    ),
+                })
+
+        if missing_attendance:
+            first = missing_attendance[0]
+            return Response(
+                {
+                    "detail": first["message"],
+                    "missing_attendance": missing_attendance,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         generated, errors = [], []
         for worker in workers:
             attendance = WorkerAttendance.objects.filter(worker=worker, date__gte=start_date, date__lte=end_date)
@@ -329,7 +396,7 @@ class WorkerPayrollViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def summary(self, request):
         qs = self.get_queryset()
-        return Response({
+        payload = {
             "records": qs.count(),
             "gross_amount": qs.aggregate(total=Coalesce(Sum("gross_amount"), Decimal("0.00")))["total"],
             "advances": qs.aggregate(total=Coalesce(Sum("advances"), Decimal("0.00")))["total"],
@@ -337,7 +404,22 @@ class WorkerPayrollViewSet(viewsets.ModelViewSet):
             "net_amount": qs.aggregate(total=Coalesce(Sum("net_amount"), Decimal("0.00")))["total"],
             "pending": qs.exclude(status="paid").count(),
             "paid": qs.filter(status="paid").count(),
-        })
+        }
+        start_date = request.query_params.get("start_date")
+        end_date = request.query_params.get("end_date")
+        if start_date and end_date:
+            calendar_type = get_module_calendar("daily_worker_payroll", request=request)
+            start = parse_calendar_date(start_date, calendar_type)
+            end = parse_calendar_date(end_date, calendar_type)
+            calendar_summary = get_work_calendar_service().get_range_summary(start, end)
+            payload.update({
+                "total_calendar_days": calendar_summary["total_calendar_days"],
+                "total_working_days": calendar_summary["total_working_days"],
+                "weekly_off_days": calendar_summary["weekly_off_days"],
+                "official_holidays": calendar_summary["official_holidays"],
+                "calendar_summary": calendar_summary,
+            })
+        return Response(payload)
 
     @action(detail=False, methods=["get"])
     def reports(self, request):

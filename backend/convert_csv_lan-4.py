@@ -1,166 +1,309 @@
-import pandas as pd
 import json
 import math
+import re
+import sys
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+from pathlib import Path
 
-PROJECT_ID = 4
+import pandas as pd
+
+
+PROJECT_ID = 1
 START_PK = 1
-LATEST_SERIAL = 0
+START_SERIAL = 0
 
-csv_file = "Lalander 4 general reports.csv"
-output_file = "lalander4_expenses.json"
+BASE_DIR = Path(__file__).resolve().parent
+CSV_FILE = BASE_DIR / "Genral Expnsess Sheet LALANDER 4.csv"
+OUTPUT_FILE = BASE_DIR / "lalander4_expenses.json"
 
-df = pd.read_csv(csv_file)
+COL_REMARKS = 0
+COL_RUNNING_TOTAL = 1
+COL_TOTAL_USD = 2
+COL_USD = 3
+COL_RATE = 4
+COL_RUNNING_AFN = 5
+COL_AFN = 6
+COL_CATEGORY = 7
+COL_DESC = 8
+COL_DATE = 9
+COL_SERIAL = 10
+COL_EXTRA_NOTE = 11
 
-df.columns = [
-    "running_total",
-    "total_usd",
-    "exchange_rate",
-    "amount_usd",
-    "amount_afn",
-    "description",
-    "expense_date",
-    "serial_number",
-    "extra",
-]
-
-df = df.iloc[1:].copy().reset_index(drop=True)
-
-records = []
-pk = START_PK
+CENT = Decimal("0.01")
+FOUR_PLACES = Decimal("0.0001")
+ZERO = Decimal("0")
 
 
-# ---------------- SAFE HELPERS ----------------
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 
 def safe_decimal(value):
-    # 1. handle pandas real NaN
     if value is None:
-        return 0.0
+        return ZERO
 
     if isinstance(value, float) and math.isnan(value):
-        return 0.0
+        return ZERO
 
-    # 2. convert safely to string
-    value = str(value).replace(",", "").replace("AFN", "").replace("$", "").strip()
+    value = (
+        str(value)
+        .replace(",", "")
+        .replace("AFN", "")
+        .replace("USD", "")
+        .replace("$", "")
+        .strip()
+    )
 
-    # 3. handle string cases
-    if value.lower() in ["", "nan", "none", "nat"]:
-        return 0.0
+    if value.lower() in ["", "nan", "none", "nat", "-", "#div/0!"]:
+        return ZERO
+
+    match = re.search(r"-?\d+(\.\d+)?", value)
+    if not match:
+        return ZERO
 
     try:
-        num = float(value)
-        if math.isnan(num) or math.isinf(num):
-            return 0.0
-        return num
-    except:
-        return 0.0
+        return Decimal(match.group())
+    except InvalidOperation:
+        return ZERO
+
+
+def money(value):
+    return Decimal(value).quantize(CENT, rounding=ROUND_HALF_UP)
+
+
+def rate_value(value):
+    return Decimal(value).quantize(FOUR_PLACES, rounding=ROUND_HALF_UP)
+
+
+def json_decimal(value, places=CENT):
+    return float(Decimal(value).quantize(places, rounding=ROUND_HALF_UP))
+
+
+def clean_text(value, fallback=""):
+    if value is None:
+        return fallback
+
+    value = str(value).strip()
+    if value.lower() in ["", "nan", "none", "nat", "#div/0!"]:
+        return fallback
+
+    return value
 
 
 def safe_date(value):
-    """
-    Returns YYYY-MM-DD string (never fails)
-    """
     try:
-        dt = pd.to_datetime(value, errors="coerce", dayfirst=True)
-        if pd.isna(dt):
+        parsed = pd.to_datetime(value, errors="coerce", dayfirst=True)
+        if pd.isna(parsed):
             return "1970-01-01"
-        return dt.strftime("%Y-%m-%d")
-    except:
+        return parsed.strftime("%Y-%m-%d")
+    except Exception:
         return "1970-01-01"
 
 
-def safe_serial(value):
-    global LATEST_SERIAL
+def build_serial_generator(start):
+    current = start
 
-    value = str(value).strip() if value is not None else ""
+    def next_serial(value):
+        nonlocal current
 
-    if value in ["", "nan", "None"]:
-        LATEST_SERIAL += 1
-        return LATEST_SERIAL
+        value = clean_text(value)
+        if not value:
+            current += 1
+            return current
 
-    try:
-        serial = int(float(value))
-    except:
-        LATEST_SERIAL += 1
-        return LATEST_SERIAL
+        try:
+            serial = int(Decimal(re.search(r"-?\d+(\.\d+)?", value).group()))
+        except Exception:
+            current += 1
+            return current
 
-    if serial <= LATEST_SERIAL:
-        LATEST_SERIAL += 1
-        return LATEST_SERIAL
+        if serial <= current:
+            current += 1
+            return current
 
-    LATEST_SERIAL = serial
-    return serial
+        current = serial
+        return serial
+
+    return next_serial
 
 
-# ---------------- MAIN LOOP ----------------
+def usd_equivalent(usd, afn, rate):
+    total = usd
+    if afn and rate:
+        total += afn / rate
+    return money(total)
+
+
+def afn_equivalent(usd, afn, rate):
+    total = afn
+    if usd and rate:
+        total += usd * rate
+    return money(total)
+
+
+def row_value(row, index):
+    if index >= len(row):
+        return None
+    return row.iloc[index]
+
+
+def clean_remarks(row, expense_date):
+    values = [
+        clean_text(row_value(row, COL_REMARKS)),
+        clean_text(row_value(row, COL_EXTRA_NOTE)),
+    ]
+    remarks = []
+    for value in values:
+        if not value:
+            continue
+        if safe_date(value) == expense_date:
+            continue
+        remarks.append(value)
+    return " | ".join(remarks)
+
+
+df = pd.read_csv(
+    CSV_FILE,
+    skiprows=4,
+    header=None,
+    dtype=str,
+    encoding="utf-8-sig",
+)
+
+records = []
+get_serial = build_serial_generator(START_SERIAL)
+pk = START_PK
+
+raw_usd_sum = ZERO
+raw_afn_sum = ZERO
+usd_equivalent_sum = ZERO
+afn_equivalent_sum = ZERO
+excel_row_total_sum = ZERO
+mismatches = []
+missing_rate_rows = []
+last_excel_running = ZERO
+last_valid_date = None
 
 for _, row in df.iterrows():
+    description = clean_text(row_value(row, COL_DESC), "No description provided")
+    afn = safe_decimal(row_value(row, COL_AFN))
+    usd = safe_decimal(row_value(row, COL_USD))
+    rate = safe_decimal(row_value(row, COL_RATE))
+    excel_row_total = money(safe_decimal(row_value(row, COL_TOTAL_USD)))
+    excel_running = money(safe_decimal(row_value(row, COL_RUNNING_TOTAL)))
 
-    description = str(row.get("description", "")).strip()
-    if description in ["", "nan", "None"]:
-        description = "No description provided"
+    if afn == ZERO and usd == ZERO and excel_row_total == ZERO:
+        continue
 
-    afn = safe_decimal(row.get("amount_afn"))
-    usd = safe_decimal(row.get("amount_usd"))
+    parsed_date = safe_date(row_value(row, COL_DATE))
+    if parsed_date == "1970-01-01":
+        expense_date = last_valid_date or parsed_date
+    else:
+        expense_date = parsed_date
+        last_valid_date = parsed_date
 
-    try:
-        exchange_rate = float(row.get("exchange_rate") or 0)
-    except:
-        exchange_rate = 0.0
-
-    expense_date = safe_date(row.get("expense_date"))
-
-    serial_number = safe_serial(row.get("serial_number"))
-
-    excel_total = safe_decimal(row.get("total_usd"))
-
-    calculated_total = round(
-        usd + (afn / exchange_rate if exchange_rate else 0),
-        2
-    )
-
-    diff = round(calculated_total - excel_total, 2)
-
-    if abs(diff) > 1:
-        print(
-            f"Serial {serial_number}: "
-            f"Excel={excel_total}, "
-            f"Calc={calculated_total}, "
-            f"Diff={diff}, "
-            f"AFN={afn}, "
-            f"USD={usd}, "
-            f"Rate={exchange_rate}"
+    if (afn or usd) and rate == ZERO:
+        missing_rate_rows.append(
+            {
+                "date": clean_text(row_value(row, COL_DATE)),
+                "description": description,
+                "afn": afn,
+                "usd": usd,
+                "excel_total": excel_row_total,
+            }
         )
 
-    fixture = {
+    row_usd_equivalent = usd_equivalent(usd, afn, rate)
+    row_afn_equivalent = afn_equivalent(usd, afn, rate)
+
+    raw_usd_sum += usd
+    raw_afn_sum += afn
+    usd_equivalent_sum += row_usd_equivalent
+    afn_equivalent_sum += row_afn_equivalent
+    excel_row_total_sum += excel_row_total
+    if excel_running:
+        last_excel_running = excel_running
+
+    diff = money(row_usd_equivalent - excel_row_total)
+    if abs(diff) > Decimal("1.00"):
+        mismatches.append(
+            {
+                "date": clean_text(row_value(row, COL_DATE)),
+                "description": description,
+                "excel": excel_row_total,
+                "calculated": row_usd_equivalent,
+                "difference": diff,
+                "afn": afn,
+                "usd": usd,
+                "rate": rate,
+            }
+        )
+
+    record = {
         "model": "expenses.expense",
         "pk": pk,
         "fields": {
             "project": PROJECT_ID,
-            "serial_number": serial_number,
+            "serial_number": get_serial(row_value(row, COL_SERIAL)),
             "expense_date": expense_date,
             "description": description,
-            "remarks": "",
+            "remarks": clean_remarks(row, expense_date),
             "paid_to": "",
-
-            # IMPORTANT: keep numeric (NOT string)
-            "amount_afn": round(afn, 2),
-            "amount_usd": round(usd, 2),
-            "exchange_rate": round(exchange_rate, 4),
-
+            "amount_afn": json_decimal(afn),
+            "amount_usd": json_decimal(usd),
+            "exchange_rate": json_decimal(rate, FOUR_PLACES),
             "expense_type": "general",
-
-            # SAFE FOR OLD DATA (NO timezone.now)
             "created_at": expense_date,
             "updated_at": expense_date,
         },
     }
 
-    records.append(fixture)
+    records.append(record)
     pk += 1
 
-
-with open(output_file, "w", encoding="utf-8") as f:
+with OUTPUT_FILE.open("w", encoding="utf-8") as f:
     json.dump(records, f, ensure_ascii=False, indent=2)
 
-print(f"Created {len(records)} records.")
-print(f"Saved to {output_file}")
+print(f"Detected columns: {df.shape[1]}")
+print(f"Created records: {len(records)}")
+print(f"Saved to: {OUTPUT_FILE.name}")
+print(f"Raw direct USD total: ${raw_usd_sum:,.2f}")
+print(f"Raw AFN total: AFN {raw_afn_sum:,.2f}")
+print(f"Excel row USD total sum: ${excel_row_total_sum:,.2f}")
+print(f"Generated USD equivalent total: ${usd_equivalent_sum:,.2f}")
+print(f"Generated AFN equivalent total: AFN {afn_equivalent_sum:,.2f}")
+if usd_equivalent_sum:
+    print(f"Implied average rate: {money(afn_equivalent_sum / usd_equivalent_sum)}")
+print(f"Excel final running total: ${last_excel_running:,.2f}")
+print(f"Difference from Excel running: ${money(usd_equivalent_sum - last_excel_running):,.2f}")
+
+if missing_rate_rows:
+    print()
+    print(f"Found {len(missing_rate_rows)} amount row(s) with no exchange rate.")
+    for row in missing_rate_rows[:10]:
+        print(
+            "Missing rate -> "
+            f"Date={row['date']}, "
+            f"USD={row['usd']}, AFN={row['afn']}, "
+            f"Excel={row['excel_total']}, "
+            f"Description={row['description']}"
+        )
+else:
+    print("No amount rows have missing exchange rates.")
+
+if mismatches:
+    print()
+    print(f"Found {len(mismatches)} row total mismatch(es) over $1.00:")
+    for mismatch in mismatches[:10]:
+        print(
+            "Mismatch -> "
+            f"Date={mismatch['date']}, "
+            f"Excel={mismatch['excel']}, "
+            f"Calculated={mismatch['calculated']}, "
+            f"Diff={mismatch['difference']}, "
+            f"AFN={mismatch['afn']}, USD={mismatch['usd']}, "
+            f"Rate={mismatch['rate']}, "
+            f"Description={mismatch['description']}"
+        )
+else:
+    print("No row total mismatches over $1.00.")

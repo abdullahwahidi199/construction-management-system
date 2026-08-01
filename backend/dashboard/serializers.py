@@ -40,7 +40,13 @@ class ExpenseSummarySerializer(serializers.Serializer):
     total_expenses_usd = serializers.DecimalField(
         max_digits=15, decimal_places=2
     )
+    total_expenses_usd_equivalent = serializers.DecimalField(
+        max_digits=15, decimal_places=2
+    )
     total_expense_count = serializers.IntegerField()
+    project_expenses = serializers.DictField()
+    office_expenses = serializers.DictField()
+    overall_expenses = serializers.DictField()
     by_expense_type = serializers.ListField()
     monthly_trend = serializers.ListField()
     recent_expenses = serializers.ListField()
@@ -84,8 +90,18 @@ class CurrencySummarySerializer(serializers.Serializer):
     net_afn = serializers.DecimalField(max_digits=15, decimal_places=2)
 
     count = serializers.IntegerField()
+    cash_outflow_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    cash_outflow_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
     total_deductions_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
     total_deductions_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    total_advances_paid_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    total_advances_paid_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    total_advance_deductions_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    total_advance_deductions_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    amount_already_paid_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    amount_already_paid_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    outstanding_salary_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    outstanding_salary_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
     total_tax_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
     total_tax_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
     total_bonus_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)

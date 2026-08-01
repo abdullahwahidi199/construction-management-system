@@ -1,6 +1,7 @@
 from calendar import monthrange
 from copy import deepcopy
 from datetime import date, datetime, time, timedelta
+from hashlib import sha1
 
 from django.utils import timezone
 from rest_framework import serializers
@@ -43,10 +44,129 @@ AFGHAN_MONTH_NAMES = {
 DEFAULT_CALENDAR_SETTINGS = {
     "default_calendar": CALENDAR_SHAMSI,
     "modules": {module: CALENDAR_INHERIT for module in CALENDAR_MODULES},
+    "work_calendar": {
+        "weekly_off_days": [],
+        "holidays": [],
+        "policies": {
+            "holiday_payment": "paid",
+            "attendance_on_holidays": "allowed",
+        },
+    },
 }
 
 _VALID_GLOBAL = {CALENDAR_GREGORIAN, CALENDAR_SHAMSI}
 _VALID_MODULE = {CALENDAR_GREGORIAN, CALENDAR_SHAMSI, CALENDAR_INHERIT}
+_VALID_HOLIDAY_PAYMENT_POLICIES = {"paid", "unpaid", "attendance_based"}
+
+
+def _date_iso(value, calendar_type=CALENDAR_GREGORIAN):
+    if isinstance(value, datetime):
+        value = value.date()
+    if isinstance(value, date):
+        return value.isoformat()
+    parsed = parse_calendar_date(value, calendar_type)
+    return parsed.isoformat() if parsed else ""
+
+
+def _as_bool(value, default=False):
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return default
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    return bool(value)
+
+
+def _holiday_identity(holiday):
+    parts = [
+        holiday.get("name", ""),
+        holiday.get("start_date", ""),
+        holiday.get("end_date", ""),
+    ]
+    return "holiday-" + sha1("|".join(parts).encode("utf-8")).hexdigest()[:12]
+
+
+def normalize_work_calendar(value=None, calendar_type=CALENDAR_GREGORIAN):
+    raw = value if isinstance(value, dict) else {}
+
+    weekly_off_days = []
+    seen_days = set()
+    for item in raw.get("weekly_off_days") or []:
+        try:
+            day = int(item)
+        except (TypeError, ValueError):
+            raise ValueError("Weekly off days must be weekday numbers from 0 to 6.")
+        if day < 0 or day > 6:
+            raise ValueError("Weekly off days must be weekday numbers from 0 to 6.")
+        if day in seen_days:
+            raise ValueError("Duplicate recurring off-day configuration.")
+        seen_days.add(day)
+        weekly_off_days.append(day)
+
+    policies = raw.get("policies") if isinstance(raw.get("policies"), dict) else {}
+    holiday_payment = policies.get("holiday_payment", "paid")
+    if holiday_payment not in _VALID_HOLIDAY_PAYMENT_POLICIES:
+        holiday_payment = "paid"
+
+    normalized_holidays = []
+    seen_holidays = set()
+    for item in raw.get("holidays") or []:
+        if not isinstance(item, dict):
+            raise ValueError("Holiday entries must be objects.")
+        name = str(item.get("name") or "").strip()
+        if not name:
+            raise ValueError("Holiday name is required.")
+        start_date = _date_iso(item.get("start_date"), calendar_type)
+        end_date = _date_iso(item.get("end_date") or item.get("start_date"), calendar_type)
+        if not start_date:
+            raise ValueError("Holiday start date is required.")
+        if end_date < start_date:
+            raise ValueError("Holiday end date cannot be before start date.")
+
+        holiday = {
+            "id": str(item.get("id") or "").strip(),
+            "name": name,
+            "start_date": start_date,
+            "end_date": end_date,
+            "description": str(item.get("description") or "").strip(),
+            "paid_holiday": _as_bool(item.get("paid_holiday"), True),
+            "active": _as_bool(item.get("active"), True),
+            "payment_policy": item.get("payment_policy") or holiday_payment,
+        }
+        if holiday["payment_policy"] not in _VALID_HOLIDAY_PAYMENT_POLICIES:
+            holiday["payment_policy"] = "paid" if holiday["paid_holiday"] else "unpaid"
+        if not holiday["id"]:
+            holiday["id"] = _holiday_identity(holiday)
+
+        duplicate_key = (
+            holiday["name"].lower(),
+            holiday["start_date"],
+            holiday["end_date"],
+        )
+        if duplicate_key in seen_holidays:
+            raise ValueError("Duplicate holiday configuration.")
+        seen_holidays.add(duplicate_key)
+        normalized_holidays.append(holiday)
+
+    active_holidays = [holiday for holiday in normalized_holidays if holiday["active"]]
+    for index, holiday in enumerate(active_holidays):
+        for other in active_holidays[index + 1 :]:
+            overlaps = (
+                holiday["start_date"] <= other["end_date"]
+                and other["start_date"] <= holiday["end_date"]
+            )
+            if overlaps:
+                raise ValueError("Official holiday ranges cannot overlap.")
+
+    return {
+        "weekly_off_days": weekly_off_days,
+        "holidays": sorted(normalized_holidays, key=lambda item: (item["start_date"], item["name"])),
+        "policies": {
+            "holiday_payment": holiday_payment,
+            "attendance_on_holidays": policies.get("attendance_on_holidays") or "allowed",
+        },
+    }
 
 
 def normalize_calendar_settings(settings_value=None):
@@ -61,6 +181,13 @@ def normalize_calendar_settings(settings_value=None):
         for module in set(CALENDAR_MODULES) | set(module_values.keys()):
             value = module_values.get(module, CALENDAR_INHERIT)
             normalized["modules"][module] = value if value in _VALID_MODULE else CALENDAR_INHERIT
+    try:
+        normalized["work_calendar"] = normalize_work_calendar(
+            settings_value.get("work_calendar"),
+            normalized["default_calendar"],
+        )
+    except ValueError:
+        raise
     return normalized
 
 

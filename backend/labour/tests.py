@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from rest_framework.test import APITestCase
 
+from accounts.models import ApplicationSettings
 from common.test_helpers import (
     create_admin,
     create_project,
@@ -68,6 +69,7 @@ class DailyWorkerAPITests(APITestCase):
         daily = self.client.get(f"/api/worker-attendance/daily_status/?date=2026-02-01&project={self.project.id}")
         summary = self.client.get("/api/worker-attendance/summary/")
         self.assertEqual(daily.data["status_counts"]["overtime"], 1)
+        self.assertIn("work_calendar", daily.data)
         self.assertEqual(summary.data["overtime"], 1)
 
     def test_absent_worker_attendance_cannot_have_overtime(self):
@@ -111,7 +113,7 @@ class DailyWorkerAPITests(APITestCase):
                 "worker_ids": [worker.id],
                 "project": self.project.id,
                 "period_start": "2026-02-01",
-                "period_end": "2026-02-28",
+                "period_end": "2026-02-02",
                 "payment_method": "cash",
                 "deductions": "5.00",
             },
@@ -132,6 +134,96 @@ class DailyWorkerAPITests(APITestCase):
         self.assertEqual(paid.status_code, 200, paid.data)
         self.assertEqual(WorkerAdvance.objects.get(worker=worker).remaining_balance, Decimal("0.00"))
 
+    def test_generate_worker_payroll_skips_configured_off_days_and_holidays(self):
+        settings_obj = ApplicationSettings.get_solo()
+        settings_obj.set_calendar_settings({
+            "default_calendar": "gregorian",
+            "modules": {},
+            "work_calendar": {
+                "weekly_off_days": [4],
+                "holidays": [
+                    {
+                        "name": "Company Holiday",
+                        "start_date": "2026-02-03",
+                        "end_date": "2026-02-03",
+                        "paid_holiday": True,
+                        "active": True,
+                    }
+                ],
+            },
+        })
+        settings_obj.save()
+        worker = create_worker(project=self.project, daily_rate=Decimal("20.00"), overtime_hourly_rate=Decimal("0.00"))
+        for attendance_date in [
+            date(2026, 2, 1),
+            date(2026, 2, 2),
+            date(2026, 2, 4),
+            date(2026, 2, 5),
+        ]:
+            create_worker_attendance(
+                worker=worker,
+                project=self.project,
+                date=attendance_date,
+                status="present",
+                overtime_hours=Decimal("0.00"),
+            )
+
+        response = self.client.post(
+            "/api/worker-payroll/generate/",
+            {
+                "worker_ids": [worker.id],
+                "project": self.project.id,
+                "period_start": "2026-02-01",
+                "period_end": "2026-02-06",
+                "payment_method": "cash",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201, response.data)
+        payroll = WorkerPayroll.objects.get(worker=worker)
+        self.assertEqual(payroll.total_days_worked, Decimal("4.00"))
+        self.assertEqual(payroll.gross_amount, Decimal("80.00"))
+
+    def test_generate_worker_payroll_only_errors_for_missing_working_days(self):
+        settings_obj = ApplicationSettings.get_solo()
+        settings_obj.set_calendar_settings({
+            "default_calendar": "gregorian",
+            "modules": {},
+            "work_calendar": {
+                "weekly_off_days": [4],
+                "holidays": [
+                    {
+                        "name": "Company Holiday",
+                        "start_date": "2026-02-03",
+                        "end_date": "2026-02-03",
+                        "paid_holiday": True,
+                        "active": True,
+                    }
+                ],
+            },
+        })
+        settings_obj.save()
+        worker = create_worker(project=self.project)
+        create_worker_attendance(worker=worker, project=self.project, date=date(2026, 2, 1))
+        create_worker_attendance(worker=worker, project=self.project, date=date(2026, 2, 2))
+
+        response = self.client.post(
+            "/api/worker-payroll/generate/",
+            {
+                "worker_ids": [worker.id],
+                "project": self.project.id,
+                "period_start": "2026-02-01",
+                "period_end": "2026-02-04",
+                "payment_method": "cash",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400, response.data)
+        self.assertIn("Attendance has not been recorded for 2026-02-04", response.data["detail"])
+        self.assertNotIn("2026-02-03", response.data["detail"])
+
     def test_worker_payroll_reports_and_summary(self):
         worker = create_worker(project=self.project)
         create_worker_attendance(worker=worker, project=self.project)
@@ -141,7 +233,7 @@ class DailyWorkerAPITests(APITestCase):
                 "worker_ids": [worker.id],
                 "project": self.project.id,
                 "period_start": "2026-02-01",
-                "period_end": "2026-02-28",
+                "period_end": "2026-02-01",
             },
             format="json",
         )

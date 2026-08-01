@@ -13,6 +13,76 @@ import ReportToolbar from "../../reports/ReportToolbar";
 import ReportVisuals from "../../reports/ReportVisuals";
 import { getReportRows, translateOrFallback } from "../../reports/reportUtils";
 
+const CONTENT_KEYS_TO_IGNORE = new Set([
+  "rows",
+  "preview",
+  "summary",
+  "generated_at",
+  "report_name",
+  "filters",
+]);
+
+function ReportLoadingState() {
+  return (
+    <div className="space-y-5" aria-live="polite">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="h-32 animate-pulse rounded-md border border-[color:color-mix(in_srgb,var(--border)_70%,transparent)] bg-card p-4"
+          >
+            <div className="h-3 w-2/5 rounded-full bg-hover" />
+            <div className="mt-6 h-8 w-3/4 rounded-full bg-hover" />
+            <div className="mt-5 h-3 w-1/2 rounded-full bg-hover" />
+          </div>
+        ))}
+      </div>
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.9fr)]">
+        {Array.from({ length: 2 }).map((_, index) => (
+          <div
+            key={index}
+            className="h-96 animate-pulse rounded-md border border-[color:color-mix(in_srgb,var(--border)_70%,transparent)] bg-card p-5"
+          >
+            <div className="h-4 w-44 rounded-full bg-hover" />
+            <div className="mt-3 h-3 w-64 max-w-full rounded-full bg-hover" />
+            <div className="mt-10 h-56 rounded-md bg-hover/70" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ReportStatePanel({ tone = "neutral", children }) {
+  const toneClass =
+    tone === "danger" ? "text-danger" : tone === "warning" ? "text-warning" : "text-muted";
+
+  return (
+    <div
+      className={`rounded-md border border-[color:color-mix(in_srgb,var(--border)_72%,transparent)] bg-card px-5 py-12 text-center text-sm ${toneClass}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+const hasReportContent = (data, rows) => {
+  if (!data) return false;
+  if (rows.length > 0) return true;
+
+  const summaryHasContent = Object.values(data.summary || {}).some((value) => {
+    if (Array.isArray(value)) return value.length > 0;
+    return value !== null && value !== undefined && value !== "";
+  });
+
+  if (summaryHasContent) return true;
+
+  return Object.entries(data).some(
+    ([key, value]) =>
+      !CONTENT_KEYS_TO_IGNORE.has(key) && Array.isArray(value) && value.length > 0,
+  );
+};
+
 export default function ReportsPage() {
   const [activeKey, setActiveKey] = useState("projects");
   const [filterValues, setFilterValues] = useState({});
@@ -48,10 +118,11 @@ export default function ReportsPage() {
     exportPdf(filterValues, `${report.key}_report.pdf`);
 
   const rows = getReportRows(data);
+  const hasContent = hasReportContent(data, rows);
 
   return (
-    <div className="min-h-0 bg-bg text-text">
-      <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:py-10">
+    <div className="min-h-0 bg-[color:color-mix(in_srgb,var(--bg)_94%,var(--card))] text-text">
+      <main className="mx-auto w-full max-w-[1500px] px-3 py-5 sm:px-6 lg:py-8">
         <ReportToolbar
           report={report}
           onExportPdf={handleExport}
@@ -69,23 +140,29 @@ export default function ReportsPage() {
           onReset={handleReset}
         />
 
-        {loading && (
-          <div className="rounded-lg bg-card p-12 text-center text-sm text-muted shadow-sm shadow-black/5">
-            {translateOrFallback(t, "reports.states.loading", "Loading report...")}
-          </div>
-        )}
+        {loading && <ReportLoadingState />}
 
         {error && (
-          <div className="rounded-lg bg-card p-12 text-center text-sm text-danger shadow-sm shadow-black/5">
+          <ReportStatePanel tone="danger">
             {translateOrFallback(
               t,
               "reports.states.error",
               "Failed to load report. Please try again.",
             )}
-          </div>
+          </ReportStatePanel>
         )}
 
-        {!loading && !error && data && (
+        {!loading && !error && data && !hasContent && (
+          <ReportStatePanel>
+            {translateOrFallback(
+              t,
+              "reports.states.noRecords",
+              "No records found for the selected filters.",
+            )}
+          </ReportStatePanel>
+        )}
+
+        {!loading && !error && data && hasContent && (
           <div className="space-y-6">
             <ReportSummary summary={data.summary} />
             <ReportVisuals reportKey={activeKey} data={data} rows={rows} />

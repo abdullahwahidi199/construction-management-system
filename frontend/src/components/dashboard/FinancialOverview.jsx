@@ -126,6 +126,20 @@ export default function FinancialOverview({ data }) {
         />
 
         <FinancialRow
+          label="Payroll Cash Outflow USD"
+          value={data.payroll?.cash_outflow_usd}
+          prefix="$"
+          color="var(--primary)"
+        />
+
+        <FinancialRow
+          label="Payroll Cash Outflow AFN"
+          value={data.payroll?.cash_outflow_afn}
+          prefix="AFN "
+          color="var(--primary)"
+        />
+
+        <FinancialRow
           label="Employee Payroll USD"
           value={data.payroll?.employee_net_usd}
           prefix="$"
@@ -149,6 +163,34 @@ export default function FinancialOverview({ data }) {
         <FinancialRow
           label="Daily Worker Payroll AFN"
           value={data.payroll?.daily_worker_net_afn}
+          prefix="AFN "
+          color="var(--muted)"
+        />
+
+        <FinancialRow
+          label="Employee Advances Paid USD"
+          value={data.payroll?.salary_advances_usd}
+          prefix="$"
+          color="var(--danger)"
+        />
+
+        <FinancialRow
+          label="Employee Advances Paid AFN"
+          value={data.payroll?.salary_advances_afn}
+          prefix="AFN "
+          color="var(--danger)"
+        />
+
+        <FinancialRow
+          label="Employee Advance Deductions USD"
+          value={data.payroll?.employee_advance_deductions_usd}
+          prefix="$"
+          color="var(--muted)"
+        />
+
+        <FinancialRow
+          label="Employee Advance Deductions AFN"
+          value={data.payroll?.employee_advance_deductions_afn}
           prefix="AFN "
           color="var(--muted)"
         />
@@ -216,7 +258,6 @@ export default function FinancialOverview({ data }) {
             label={t("financialOverview.grandTotalOutflowUsd")}
             value={data.grand_total_outflow?.usd}
             prefix="$"
-            bold
             color="var(--primary)"
           />
 
@@ -224,7 +265,6 @@ export default function FinancialOverview({ data }) {
             label={t("financialOverview.grandTotalOutflowAfn")}
             value={data.grand_total_outflow?.afn}
             prefix="AFN "
-            bold
             color="var(--primary)"
           />
         </div>

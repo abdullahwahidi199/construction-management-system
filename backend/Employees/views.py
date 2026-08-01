@@ -12,6 +12,8 @@ from decimal import Decimal
 from accounts.permissions import RBACPermission
 from accounts.services import has_permission
 from common.calendar_utils import calendar_month_bounds, calendar_year_bounds, get_module_calendar, parse_calendar_date, to_shamsi
+from common.work_calendar import get_work_calendar_service
+from .finance import salary_advance_queryset, salary_advance_totals
 from .models import Employee, Payroll, PayrollPayment, SalaryAdvance
 from .serializers import (
     EmployeeSerializer,
@@ -103,7 +105,12 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         start, end = calendar_year_bounds(year, get_module_calendar("payroll", request=request))
         payrolls = employee.payrolls.filter(payroll_period_start__gte=start, payroll_period_start__lte=end)
         all_payrolls = employee.payrolls.all()
-        advances = employee.salary_advances.all()
+        advances = salary_advance_queryset(employee_id=employee.id)
+        year_advances = salary_advance_queryset(
+            start=start,
+            end=end,
+            employee_id=employee.id,
+        )
         summary = payrolls.aggregate(
             total_gross=Sum('gross_pay'),
             total_net=Sum('net_pay'),
@@ -114,10 +121,8 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             total_tax=Sum('tax_deducted'),
             payroll_count=Count('id')
         )
-        advance_summary = advances.aggregate(
-            outstanding=Sum("remaining_balance"),
-            total_given=Sum("amount"),
-        )
+        advance_summary = salary_advance_totals(advances)
+        year_advance_summary = salary_advance_totals(year_advances)
         last_payroll = all_payrolls.order_by("-payroll_period_end").first()
         
         return Response({
@@ -131,10 +136,12 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             'summary': {
                 **summary,
                 'outstanding_advances': advance_summary["outstanding"] or Decimal("0.00"),
-                'total_advances_given': advance_summary["total_given"] or Decimal("0.00"),
+                'total_advances_given': advance_summary["total_paid"] or Decimal("0.00"),
+                'total_advances_paid_this_year': year_advance_summary["total_paid"] or Decimal("0.00"),
                 'total_advances_deducted': all_payrolls.aggregate(total=Sum("advance_deductions"))["total"] or Decimal("0.00"),
                 'total_payrolls_processed': all_payrolls.count(),
                 'total_amount_paid_this_year': payrolls.aggregate(total=Sum("amount_paid"))["total"] or Decimal("0.00"),
+                'total_outstanding_salary_this_year': payrolls.aggregate(total=Sum("balance_due"))["total"] or Decimal("0.00"),
                 'last_payroll_date': last_payroll.payroll_period_end if last_payroll else None,
             }
         })
@@ -427,6 +434,8 @@ class PayrollViewSet(viewsets.ModelViewSet):
     def summary(self, request):
         """Get overall payroll summary"""
         period = request.query_params.get('period', None)
+        period_start = None
+        period_end = None
         
         queryset = self.get_queryset()
         
@@ -443,10 +452,27 @@ class PayrollViewSet(viewsets.ModelViewSet):
                     payroll_period_start__gte=start,
                     payroll_period_start__lte=end,
                 )
+                period_start = start
+                period_end = end
             elif period == 'yearly':
                 current_year = to_shamsi(today)[0] if calendar_type == "shamsi" else today.year
                 start, end = calendar_year_bounds(current_year, calendar_type)
                 queryset = queryset.filter(payroll_period_start__gte=start, payroll_period_start__lte=end)
+                period_start = start
+                period_end = end
+
+        if not period_start and request.query_params.get("start_date") and request.query_params.get("end_date"):
+            calendar_type = get_module_calendar("payroll", request=request)
+            period_start = parse_calendar_date(request.query_params.get("start_date"), calendar_type)
+            period_end = parse_calendar_date(request.query_params.get("end_date"), calendar_type)
+
+        employee_id = request.query_params.get('employee_id', None)
+        advances = salary_advance_queryset(
+            start=period_start,
+            end=period_end,
+            employee_id=employee_id,
+        )
+        advance_summary = salary_advance_totals(advances)
         
         summary = queryset.aggregate(
             total_gross=Sum('gross_pay'),
@@ -454,9 +480,24 @@ class PayrollViewSet(viewsets.ModelViewSet):
             total_overtime=Sum('overtime_amount'),
             total_bonus=Sum('bonus'),
             total_deductions=Sum('deductions'),
+            total_advance_deductions=Sum('advance_deductions'),
             total_tax=Sum('tax_deducted'),
+            total_amount_paid=Sum('amount_paid'),
+            total_balance_due=Sum('balance_due'),
             total_records=Count('id')
         )
+        summary["total_advances_paid"] = advance_summary["total_paid"]
+        summary["total_outstanding_advances"] = advance_summary["outstanding"]
+        summary["total_cash_outflow"] = (summary["total_net"] or Decimal("0.00")) + advance_summary["total_paid"]
+        if period_start and period_end:
+            calendar_summary = get_work_calendar_service().get_range_summary(period_start, period_end)
+            summary.update({
+                "total_calendar_days": calendar_summary["total_calendar_days"],
+                "total_working_days": calendar_summary["total_working_days"],
+                "weekly_off_days": calendar_summary["weekly_off_days"],
+                "official_holidays": calendar_summary["official_holidays"],
+                "calendar_summary": calendar_summary,
+            })
         
         method_breakdown = queryset.values('payment_method', 'currency').annotate(
             count=Count('id'),
@@ -487,9 +528,16 @@ class PayrollViewSet(viewsets.ModelViewSet):
             'total_employees': payrolls.count(),
             'total_gross': payrolls.aggregate(total=Sum('gross_pay'))['total'] or 0,
             'total_net': payrolls.aggregate(total=Sum('net_pay'))['total'] or 0,
+            'total_advance_deductions': payrolls.aggregate(total=Sum('advance_deductions'))['total'] or 0,
+            'total_advances_paid': salary_advance_totals(
+                salary_advance_queryset(start=start, end=end)
+            )["total_paid"],
+            'total_balance_due': payrolls.aggregate(total=Sum('balance_due'))['total'] or 0,
+            'total_amount_paid': payrolls.aggregate(total=Sum('amount_paid'))['total'] or 0,
             'payment_methods': {},
             'department_breakdown': {},
         }
+        report['total_cash_outflow'] = report['total_net'] + report['total_advances_paid']
         
         # Payment method breakdown
         for method in dict(Payroll.PAYMENT_METHOD_CHOICES):
@@ -704,9 +752,13 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         }
 
         serializer = AttendanceListSerializer(records, many=True)
+        work_calendar = get_work_calendar_service().get_date_info(target_date)
 
         return Response({
             'date': target_date.isoformat(),
+            'work_calendar': work_calendar,
+            'is_working_day': work_calendar['is_working_day'],
+            'day_type': work_calendar['day_type'],
             'total_marked': records.count(),
             'total_unmarked': unmarked_employees.count(),
             'status_counts': status_counts,
@@ -757,6 +809,16 @@ class AttendanceViewSet(viewsets.ModelViewSet):
 
         # Effective working days: present counts as 1, half_day counts as 0.5
         effective_days = total_present + (total_half_day * Decimal('0.5'))
+        calendar_summary = get_work_calendar_service().get_range_summary(
+            start,
+            end,
+        )
+        total_working_days = calendar_summary["total_working_days"]
+        attendance_percentage = Decimal("0.00")
+        if total_working_days:
+            attendance_percentage = (
+                effective_days / Decimal(total_working_days) * Decimal("100")
+            ).quantize(Decimal("0.01"))
 
         return Response({
             'employee': {
@@ -773,6 +835,12 @@ class AttendanceViewSet(viewsets.ModelViewSet):
             'leave': total_leave,
             'overtime_hours': total_overtime,
             'effective_working_days': effective_days,
+            'total_calendar_days': calendar_summary["total_calendar_days"],
+            'total_working_days': total_working_days,
+            'weekly_off_days': calendar_summary["weekly_off_days"],
+            'official_holidays': calendar_summary["official_holidays"],
+            'attendance_percentage': attendance_percentage,
+            'calendar_summary': calendar_summary,
         })
 
 
@@ -795,6 +863,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 
 from .models import Payroll, Employee
 from accounts.permissions import RBACPermission
+from reports.branding import build_pdf_branding_elements, draw_pdf_branding_footer
 
 
 class PayrollPDFExportView(APIView):
@@ -854,28 +923,19 @@ class PayrollPDFExportView(APIView):
             leftMargin=20,
             rightMargin=20,
             topMargin=20,
-            bottomMargin=20,
+            bottomMargin=32,
         )
 
         styles = getSampleStyleSheet()
         elements = []
 
-        # ==========================================
-        # HEADER
-        # ==========================================
-
-        elements.append(
-            Paragraph("Payroll Report", styles["Title"])
+        company, branding = build_pdf_branding_elements(
+            title="Payroll Report",
+            subtitle=f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}",
+            request=request,
+            styles=styles,
         )
-
-        elements.append(
-            Paragraph(
-                f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}",
-                styles["Normal"],
-            )
-        )
-
-        elements.append(Spacer(1, 10))
+        elements.extend(branding)
 
         filter_table = Table(
             [
@@ -914,9 +974,14 @@ class PayrollPDFExportView(APIView):
             lambda: {
                 "gross": 0,
                 "net": 0,
+                "cash_outflow": 0,
                 "bonus": 0,
                 "allowances": 0,
                 "deductions": 0,
+                "advance_deductions": 0,
+                "salary_advances": 0,
+                "amount_paid": 0,
+                "balance_due": 0,
                 "tax": 0,
                 "overtime": 0,
                 "count": 0,
@@ -933,6 +998,9 @@ class PayrollPDFExportView(APIView):
             currency_summary[curr]["net"] += float(
                 payroll.net_pay or 0
             )
+            currency_summary[curr]["cash_outflow"] += float(
+                payroll.net_pay or 0
+            )
 
             currency_summary[curr]["bonus"] += float(
                 payroll.bonus or 0
@@ -945,6 +1013,15 @@ class PayrollPDFExportView(APIView):
             currency_summary[curr]["deductions"] += float(
                 payroll.deductions or 0
             )
+            currency_summary[curr]["advance_deductions"] += float(
+                payroll.advance_deductions or 0
+            )
+            currency_summary[curr]["amount_paid"] += float(
+                payroll.amount_paid or 0
+            )
+            currency_summary[curr]["balance_due"] += float(
+                payroll.balance_due or 0
+            )
 
             currency_summary[curr]["tax"] += float(
                 payroll.tax_deducted or 0
@@ -955,6 +1032,21 @@ class PayrollPDFExportView(APIView):
             )
 
             currency_summary[curr]["count"] += 1
+
+        if not payment_method:
+            advance_summary = salary_advance_totals(
+                salary_advance_queryset(
+                    start=start_date,
+                    end=end_date,
+                    employee_id=employee_id,
+                )
+            )
+            currency_summary["AFN"]["salary_advances"] += float(
+                advance_summary["total_paid"] or 0
+            )
+            currency_summary["AFN"]["cash_outflow"] += float(
+                advance_summary["total_paid"] or 0
+            )
 
         elements.append(
             Paragraph("Payroll Summary", styles["Heading1"])
@@ -979,6 +1071,26 @@ class PayrollPDFExportView(APIView):
                     [
                         "Total Net Pay",
                         f"{currency} {data['net']:,.2f}",
+                    ],
+                    [
+                        "Salary Advances Paid",
+                        f"{currency} {data['salary_advances']:,.2f}",
+                    ],
+                    [
+                        "Advance Deductions",
+                        f"{currency} {data['advance_deductions']:,.2f}",
+                    ],
+                    [
+                        "Payroll Cash Outflow",
+                        f"{currency} {data['cash_outflow']:,.2f}",
+                    ],
+                    [
+                        "Amount Already Paid",
+                        f"{currency} {data['amount_paid']:,.2f}",
+                    ],
+                    [
+                        "Outstanding Salary",
+                        f"{currency} {data['balance_due']:,.2f}",
                     ],
                     [
                         "Total Bonus",
@@ -1043,7 +1155,10 @@ class PayrollPDFExportView(APIView):
                 "Employee ID",
                 "Period",
                 "Gross",
+                "Advances",
                 "Net",
+                "Paid",
+                "Balance",
                 "Currency",
                 "Method",
             ]
@@ -1059,7 +1174,10 @@ class PayrollPDFExportView(APIView):
                         f"\n{payroll.payroll_period_end}"
                     ),
                     f"{float(payroll.gross_pay):,.2f}",
+                    f"{float(payroll.advance_deductions):,.2f}",
                     f"{float(payroll.net_pay):,.2f}",
+                    f"{float(payroll.amount_paid):,.2f}",
+                    f"{float(payroll.balance_due):,.2f}",
                     payroll.currency,
                     payroll.get_payment_method_display(),
                 ]
@@ -1069,13 +1187,16 @@ class PayrollPDFExportView(APIView):
             payroll_data,
             repeatRows=1,
             colWidths=[
-                120,
-                70,
-                90,
-                70,
-                70,
-                50,
-                80,
+                105,
+                60,
+                82,
+                55,
+                55,
+                55,
+                55,
+                55,
+                40,
+                62,
             ],
         )
 
@@ -1103,7 +1224,19 @@ class PayrollPDFExportView(APIView):
 
         elements.append(details_table)
 
-        doc.build(elements)
+        doc.build(
+            elements,
+            onFirstPage=lambda canvas, document: draw_pdf_branding_footer(
+                canvas,
+                document,
+                company=company,
+            ),
+            onLaterPages=lambda canvas, document: draw_pdf_branding_footer(
+                canvas,
+                document,
+                company=company,
+            ),
+        )
 
         return response
     
@@ -1166,24 +1299,24 @@ class AttendancePDFExportView(APIView):
             f'attachment; filename="attendance-report-{timezone.now().date()}.pdf"'
         )
 
-        doc = SimpleDocTemplate(response)
+        doc = SimpleDocTemplate(
+            response,
+            leftMargin=20,
+            rightMargin=20,
+            topMargin=20,
+            bottomMargin=32,
+        )
         styles = getSampleStyleSheet()
 
         elements = []
 
-        # Title
-        elements.append(
-            Paragraph("Attendance Report", styles["Title"])
+        company, branding = build_pdf_branding_elements(
+            title="Attendance Report",
+            subtitle=f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}",
+            request=request,
+            styles=styles,
         )
-
-        elements.append(
-            Paragraph(
-                f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}",
-                styles["Normal"],
-            )
-        )
-
-        elements.append(Spacer(1, 12))
+        elements.extend(branding)
 
         # Applied Filters
         filter_data = [
@@ -1298,6 +1431,18 @@ class AttendancePDFExportView(APIView):
         )
         elements.append(attendance_table)
 
-        doc.build(elements)
+        doc.build(
+            elements,
+            onFirstPage=lambda canvas, document: draw_pdf_branding_footer(
+                canvas,
+                document,
+                company=company,
+            ),
+            onLaterPages=lambda canvas, document: draw_pdf_branding_footer(
+                canvas,
+                document,
+                company=company,
+            ),
+        )
 
         return response

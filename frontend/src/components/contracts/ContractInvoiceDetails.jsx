@@ -7,8 +7,9 @@ import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 import { useCalendar } from "../../hooks/useCalendar";
 import { resolveFileUrl } from "../../utils/fileUrls";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
+import { formatFileSize, prepareUploadFile } from "../../utils/fileCompression";
 
-const ACCEPTED_EXTENSIONS = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png"];
+const ACCEPTED_EXTENSIONS = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png", ".dwg", ".zip"];
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 function isAcceptedFile(file) {
@@ -70,14 +71,7 @@ export default function ContractInvoiceDetails({ id, onClose, currency }) {
     if (!isAcceptedFile(file)) {
       setUploadMessage({
         type: "error",
-        text: "Unsupported file type. Please upload PDF, image, Word, or Excel files.",
-      });
-      return;
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      setUploadMessage({
-        type: "error",
-        text: "File is too large. Maximum size is 50 MB.",
+        text: "Unsupported file type. Please upload PDF, image, Word, Excel, DWG, ZIP, JPG, or PNG files.",
       });
       return;
     }
@@ -85,11 +79,22 @@ export default function ContractInvoiceDetails({ id, onClose, currency }) {
     setUploading(true);
     setUploadMessage({ type: "", text: "" });
 
-    const formData = new FormData();
-    formData.append("invoice", id);
-    formData.append("file", file);
-
     try {
+      const prepared = await prepareUploadFile(file);
+      if (prepared.file.size > MAX_FILE_SIZE) {
+        setUploadMessage({
+          type: "error",
+          text: t("ContractInvoiceDetails.fileTooLargeAfterCompression", {
+            size: formatFileSize(MAX_FILE_SIZE),
+          }),
+        });
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("invoice", id);
+      formData.append("file", prepared.file);
+
       await instance.post("/invoice-documents/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -284,7 +289,7 @@ export default function ContractInvoiceDetails({ id, onClose, currency }) {
             onChange={handleFileSelect}
             style={{ display: "none" }}
             disabled={uploading}
-            accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+            accept={ACCEPTED_EXTENSIONS.join(",")}
           />
           {uploading ? (
             <p

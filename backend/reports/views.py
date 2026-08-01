@@ -48,7 +48,7 @@ class BaseReportView(APIView):
         data = report.generate()
 
         if export == "pdf":
-            pdf_buffer = generate_pdf(data, columns=self.pdf_columns)
+            pdf_buffer = generate_pdf(data, columns=self.pdf_columns, request=request)
             return FileResponse(
                 pdf_buffer,
                 as_attachment=True,
@@ -119,9 +119,13 @@ class PayrollReportView(BaseReportView):
         ("currency", "Cur"),
         ("gross_pay", "Gross"),
         ("advances", "Advances"),
+        ("advance_deductions", "Advance Deduct"),
         ("deductions", "Deduct"),
         ("tax_deducted", "Tax"),
         ("net_pay", "Net"),
+        ("amount_paid", "Paid"),
+        ("balance_due", "Balance"),
+        ("cash_outflow", "Cash Outflow"),
         ("status", "Status"),
     ]
 

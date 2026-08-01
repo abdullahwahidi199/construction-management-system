@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     CalendarSettingsView,
+    CompanyInformationView,
     CustomRoleViewSet,
     LoginView,
     LogoutView,
@@ -11,6 +12,8 @@ from .views import (
     # RolePermissionOverrideViewSet,
     PermissionViewSet,
     RolePermissionViewSet,
+    SettingsAuditLogView,
+    SettingsPreferencesView,
     UserPermissionOverrideViewSet,
     UserViewSet,
     roles_and_permissions,
@@ -34,5 +37,8 @@ urlpatterns = [
     path("me/", MeView.as_view(), name="me"),
     path("meta/", roles_and_permissions, name="roles-permissions"),
     path("settings/calendar/", CalendarSettingsView.as_view(), name="calendar-settings"),
+    path("settings/company/", CompanyInformationView.as_view(), name="company-settings"),
+    path("settings/preferences/", SettingsPreferencesView.as_view(), name="settings-preferences"),
+    path("settings/audit-logs/", SettingsAuditLogView.as_view(), name="settings-audit-logs"),
     path("", include(router.urls)),
 ]

@@ -11,7 +11,7 @@ from common.test_helpers import (
     create_user,
     expense_payload,
 )
-from expenses.models import Expense
+from expenses.models import Expense, ExpenseEditRequest
 
 
 class ExpenseWorkflowAPITests(APITestCase):
@@ -38,7 +38,6 @@ class ExpenseWorkflowAPITests(APITestCase):
         response = self.client.post(
             "/api/expenses/",
             expense_payload(
-                None,
                 expense_scope=Expense.ExpenseScope.OFFICE,
                 project=None,
                 expense_type="office_rent",
@@ -76,13 +75,14 @@ class ExpenseWorkflowAPITests(APITestCase):
             expense_payload(self.project, expense_scope=Expense.ExpenseScope.OFFICE),
             format="json",
         )
+        project_payload = expense_payload(
+            self.project,
+            expense_scope=Expense.ExpenseScope.PROJECT,
+        )
+        project_payload["project"] = None
         project_without_project = self.client.post(
             "/api/expenses/",
-            expense_payload(
-                None,
-                expense_scope=Expense.ExpenseScope.PROJECT,
-                project=None,
-            ),
+            project_payload,
             format="json",
         )
 
@@ -113,12 +113,31 @@ class ExpenseWorkflowAPITests(APITestCase):
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(response.data["results"]["totals"]["usd"], Decimal("100"))
         self.assertEqual(response.data["results"]["totals"]["afn"], 0)
+        self.assertEqual(
+            response.data["results"]["totals"]["usd_equivalent"],
+            Decimal("100.00"),
+        )
+        self.assertEqual(
+            response.data["results"]["totals"]["afn_equivalent"],
+            Decimal("7000.00"),
+        )
         self.assertEqual(len(response.data["results"]["results"]), 1)
 
         office = self.client.get("/api/expenses/?expense_scope=office")
         self.assertEqual(office.status_code, 200, office.data)
         self.assertEqual(office.data["results"]["totals"]["office"]["usd"], Decimal("50"))
         self.assertEqual(office.data["results"]["results"][0]["project_name"], "Office")
+
+        all_expenses = self.client.get("/api/expenses/")
+        self.assertEqual(all_expenses.status_code, 200, all_expenses.data)
+        self.assertEqual(
+            all_expenses.data["results"]["totals"]["usd_equivalent"],
+            Decimal("160.00"),
+        )
+        self.assertEqual(
+            all_expenses.data["results"]["totals"]["afn_equivalent"],
+            Decimal("11200.00"),
+        )
 
     def test_approval_workflow_pending_approve_reject_and_notifications(self):
         approver = create_user(
@@ -235,9 +254,100 @@ class ExpenseWorkflowAPITests(APITestCase):
             format="json",
         )
 
-        self.assertEqual(response.status_code, 200, response.data)
-        self.assertEqual(response.data["serial_number"], 2)
-        self.assertEqual(response.data["project_name"], "Office")
+        self.assertEqual(response.status_code, 202, response.data)
+        project_expense.refresh_from_db()
+        self.assertEqual(project_expense.expense_scope, Expense.ExpenseScope.PROJECT)
+
+        edit_request = ExpenseEditRequest.objects.get(expense=project_expense)
+        approved = self.client.post(
+            f"/api/expenses/edit-requests/{edit_request.id}/approve/",
+            {"approval_notes": "Ledger change approved"},
+            format="json",
+        )
+
+        self.assertEqual(approved.status_code, 200, approved.data)
+        project_expense.refresh_from_db()
+        self.assertEqual(project_expense.serial_number, 2)
+        self.assertEqual(project_expense.project_label, "Office")
+
+    def test_approved_financial_edit_requires_approval_and_preserves_original_until_approved(self):
+        requester = create_user(
+            username="requester",
+            role="site_engineer",
+            permissions=["expenses.view", "expenses.create", "expenses.update_own"],
+        )
+        expense = create_expense(
+            self.project,
+            created_by=requester,
+            amount_usd=Decimal("250.00"),
+            approval_status=Expense.ApprovalStatus.APPROVED,
+        )
+        self.client.force_authenticate(requester)
+
+        response = self.client.patch(
+            f"/api/expenses/{expense.id}/",
+            {"amount_usd": "300.00"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 202, response.data)
+        self.assertEqual(response.data["edit_request"]["approval_status"], "pending")
+        self.assertIn("amount_usd", response.data["edit_request"]["changed_fields"])
+        expense.refresh_from_db()
+        self.assertEqual(expense.amount_usd, Decimal("250.00"))
+
+        self.client.force_authenticate(self.admin)
+        queue = self.client.get("/api/expenses/approvals/?status=pending")
+        self.assertEqual(queue.status_code, 200, queue.data)
+        rows = queue.data["results"]["results"]
+        self.assertTrue(any(row.get("approval_item_type") == "expense_edit" for row in rows))
+
+        edit_request = ExpenseEditRequest.objects.get(expense=expense)
+        approved = self.client.post(
+            f"/api/expenses/edit-requests/{edit_request.id}/approve/",
+            {"approval_notes": "Amount verified"},
+            format="json",
+        )
+
+        self.assertEqual(approved.status_code, 200, approved.data)
+        expense.refresh_from_db()
+        edit_request.refresh_from_db()
+        self.assertEqual(expense.amount_usd, Decimal("300.00"))
+        self.assertEqual(edit_request.approval_status, ExpenseEditRequest.ApprovalStatus.APPROVED)
+
+    def test_rejected_expense_edit_request_keeps_original_values(self):
+        requester = create_user(
+            username="requester_reject",
+            role="site_engineer",
+            permissions=["expenses.view", "expenses.create", "expenses.update_own"],
+        )
+        expense = create_expense(
+            self.project,
+            created_by=requester,
+            amount_usd=Decimal("250.00"),
+            approval_status=Expense.ApprovalStatus.APPROVED,
+        )
+        self.client.force_authenticate(requester)
+        response = self.client.patch(
+            f"/api/expenses/{expense.id}/",
+            {"amount_usd": "400.00"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 202, response.data)
+
+        edit_request = ExpenseEditRequest.objects.get(expense=expense)
+        self.client.force_authenticate(self.admin)
+        rejected = self.client.post(
+            f"/api/expenses/edit-requests/{edit_request.id}/reject/",
+            {"approval_notes": "Receipt does not match"},
+            format="json",
+        )
+
+        self.assertEqual(rejected.status_code, 200, rejected.data)
+        expense.refresh_from_db()
+        edit_request.refresh_from_db()
+        self.assertEqual(expense.amount_usd, Decimal("250.00"))
+        self.assertEqual(edit_request.approval_status, ExpenseEditRequest.ApprovalStatus.REJECTED)
 
     def test_network_broadcast_failures_do_not_break_expense_approval(self):
         expense = create_expense(self.project, approval_status=Expense.ApprovalStatus.PENDING)

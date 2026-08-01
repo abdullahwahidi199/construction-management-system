@@ -1,6 +1,12 @@
 import React from "react";
-import { Sun, Moon, HardHat } from "lucide-react";
+import { HardHat, Moon, Sun } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
+
+const OPTIONS = [
+  { value: "light", label: "Light Theme", icon: Sun },
+  { value: "dark", label: "Dark Theme", icon: Moon },
+  { value: "construction", label: "Construction Theme", icon: HardHat },
+];
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -13,45 +19,25 @@ export default function ThemeToggle() {
         borderColor: "var(--border)",
       }}
     >
-      <button
-        onClick={() => setTheme("light")}
-        className={`p-2 rounded-md transition-all ${
-          theme === "light" ? "shadow-sm" : ""
-        }`}
-        style={{
-          backgroundColor: theme === "light" ? "var(--hover)" : "transparent",
-          color: "var(--text)",
-        }}
-      >
-        <Sun size={18} />
-      </button>
-
-      <button
-        onClick={() => setTheme("dark")}
-        className={`p-2 rounded-md transition-all ${
-          theme === "dark" ? "shadow-sm" : ""
-        }`}
-        style={{
-          backgroundColor: theme === "dark" ? "var(--hover)" : "transparent",
-          color: "var(--text)",
-        }}
-      >
-        <Moon size={18} />
-      </button>
-
-      <button
-        onClick={() => setTheme("construction")}
-        className={`p-2 rounded-md transition-all ${
-          theme === "construction" ? "shadow-sm" : ""
-        }`}
-        style={{
-          backgroundColor:
-            theme === "construction" ? "var(--hover)" : "transparent",
-          color: "var(--text)",
-        }}
-      >
-        <HardHat size={18} />
-      </button>
+      {OPTIONS.map(({ value, label, icon: Icon }) => (
+        <button
+          key={value}
+          type="button"
+          onClick={() => setTheme(value)}
+          className={`p-2 rounded-md transition-all ${
+            theme === value ? "shadow-sm" : ""
+          }`}
+          style={{
+            backgroundColor: theme === value ? "var(--hover)" : "transparent",
+            color: "var(--text)",
+          }}
+          title={label}
+          aria-label={label}
+          aria-pressed={theme === value}
+        >
+          <Icon size={18} />
+        </button>
+      ))}
     </div>
   );
 }

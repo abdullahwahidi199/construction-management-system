@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -157,3 +158,99 @@ class ApplicationSettings(models.Model):
         from common.calendar_utils import normalize_calendar_settings
 
         self.app_settings["calendar_settings"] = normalize_calendar_settings(value)
+
+
+def company_branding_upload_path(instance, filename):
+    tenant = instance.tenant_identifier or "default"
+    return f"company/{tenant}/{filename}"
+
+
+class CompanyInformation(models.Model):
+    tenant_identifier = models.CharField(
+        max_length=120,
+        default="default",
+        unique=True,
+        db_index=True,
+    )
+    company_name = models.CharField(max_length=255, default="Construction Management System")
+    legal_company_name = models.CharField(max_length=255, blank=True, default="")
+    company_logo = models.ImageField(
+        upload_to=company_branding_upload_path,
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(["jpg", "jpeg", "png", "webp"])],
+    )
+    favicon = models.ImageField(
+        upload_to=company_branding_upload_path,
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(["jpg", "jpeg", "png", "webp", "ico"])],
+    )
+    address = models.TextField(blank=True, default="")
+    city = models.CharField(max_length=120, blank=True, default="")
+    province_state = models.CharField(max_length=120, blank=True, default="")
+    country = models.CharField(max_length=120, blank=True, default="")
+    postal_code = models.CharField(max_length=32, blank=True, default="")
+    phone_number = models.CharField(
+        max_length=40,
+        blank=True,
+        default="",
+        validators=[
+            RegexValidator(
+                regex=r"^[0-9+\-()\s.]{0,40}$",
+                message=_("Enter a valid phone number."),
+            )
+        ],
+    )
+    alternative_phone = models.CharField(
+        max_length=40,
+        blank=True,
+        default="",
+        validators=[
+            RegexValidator(
+                regex=r"^[0-9+\-()\s.]{0,40}$",
+                message=_("Enter a valid phone number."),
+            )
+        ],
+    )
+    email = models.EmailField(blank=True, default="")
+    website = models.URLField(blank=True, default="")
+    tax_number = models.CharField(max_length=120, blank=True, default="")
+    registration_number = models.CharField(max_length=120, blank=True, default="")
+    company_description = models.TextField(blank=True, default="")
+    print_footer_text = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="updated_company_information",
+    )
+
+    class Meta:
+        verbose_name = _("Company information")
+        verbose_name_plural = _("Company information")
+
+    def __str__(self):
+        return self.company_name
+
+    @classmethod
+    def tenant_identifier_for_request(cls, request=None):
+        tenant = getattr(request, "tenant", None) if request is not None else None
+        if tenant is not None:
+            return str(getattr(tenant, "pk", None) or getattr(tenant, "id", None) or tenant)
+        tenant_id = getattr(request, "tenant_id", None) if request is not None else None
+        if tenant_id:
+            return str(tenant_id)
+        return "default"
+
+    @classmethod
+    def get_for_request(cls, request=None):
+        tenant_identifier = cls.tenant_identifier_for_request(request)
+        obj, _ = cls.objects.get_or_create(
+            tenant_identifier=tenant_identifier,
+            defaults={"company_name": "Construction Management System"},
+        )
+        return obj

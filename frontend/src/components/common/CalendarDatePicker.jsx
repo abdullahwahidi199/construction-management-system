@@ -47,11 +47,13 @@ export default function CalendarDatePicker({
   error,
   name,
   module = "dashboard",
+  calendarOverride = "",
   className = "",
   placeholder = "YYYY-MM-DD",
   ...props
 }) {
-  const { calendar } = useCalendar(module);
+  const { calendar: moduleCalendar } = useCalendar(module);
+  const calendar = calendarOverride || moduleCalendar;
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
 

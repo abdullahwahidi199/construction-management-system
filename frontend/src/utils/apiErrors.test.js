@@ -19,22 +19,34 @@ describe("api error helpers", () => {
     });
 
     expect(messages).toContain("First Name: This field is required.");
-    expect(messages).toContain("Amount Usd: Must be greater than zero.");
+    expect(messages).toContain("Amount USD: Must be greater than zero.");
     expect(messages.join(" ")).not.toMatch(/IntegrityError/i);
   });
 
   it("returns user-friendly messages for common transport failures", () => {
     expect(getFriendlyErrorMessage({ code: "ECONNABORTED" })).toBe(
-      "The request timed out. Please try again.",
+      "The request timed out. Please check your connection and try again.",
     );
     expect(getFriendlyErrorMessage({ message: "Network Error" })).toBe(
-      "Network connection lost.",
+      "Network connection lost. Please check your internet connection and try again.",
     );
     expect(
       getFriendlyErrorMessage({
         response: { status: 403, data: { detail: "Forbidden" } },
       }),
     ).toBe("You don't have permission to perform this action.");
+    expect(
+      getFriendlyErrorMessage({
+        response: { status: 403, data: { detail: "Forbidden" } },
+        config: { method: "get", url: "subcontractors/" },
+      }),
+    ).toBe("You don't have permission to view subcontractors.");
+    expect(
+      getFriendlyErrorMessage({
+        response: { status: 403, data: { detail: "Forbidden" } },
+        config: { method: "delete", url: "contracts/12/" },
+      }),
+    ).toBe("You don't have permission to delete contracts.");
   });
 
   it("shows retry-after minutes for login rate limits", () => {

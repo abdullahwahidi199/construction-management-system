@@ -5,6 +5,15 @@ import Button from "../../components/ui/Button";
 import { useLanguage } from "../../hooks/useLanguage";
 import { getFriendlyErrorMessage } from "../../utils/apiErrors";
 import CalendarDatePicker from "../../components/common/CalendarDatePicker";
+import InlineAlert from "../../components/common/InlineAlert";
+import {
+  fieldControlClass,
+  fieldControlErrorClass,
+  fieldErrorClass,
+  fieldLabelClass,
+  RequiredMark,
+  textareaControlClass,
+} from "../../components/ui/formStyles.jsx";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -83,6 +92,9 @@ export default function ExpenseEdit({
   if (!isOpen || !expense) return null;
   const projectLabel =
     formData.expense_scope === "office" ? "Office" : expense.project_name || "-";
+  const approvalNotice = expense.approval_status === "approved";
+  const controlClass = (hasError = false, extra = "") =>
+    `${fieldControlClass} ${hasError ? fieldControlErrorClass : ""} ${extra}`;
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({
@@ -114,8 +126,13 @@ export default function ExpenseEdit({
     if (!formData.expense_date) {
       newErrors.expense_date = t("ExpenseEdit.dateRequired");
     }
-    if (!formData.amount_usd && !formData.amount_afn) {
+    const usd = Number(formData.amount_usd || 0);
+    const afn = Number(formData.amount_afn || 0);
+    if (usd <= 0 && afn <= 0) {
       newErrors.amount = t("ExpenseEdit.amountRequired");
+    }
+    if (usd > 0 && afn > 0) {
+      newErrors.amount = "Enter the amount in either USD or AFN, not both.";
     }
     if (formData.expense_scope === "project" && !formData.project) {
       newErrors.project = t("ExpenseEdit.projectRequired");
@@ -156,6 +173,7 @@ export default function ExpenseEdit({
       onClose();
     } catch (error) {
       setErrors({
+        ...(error?.validationErrors || {}),
         submit: getFriendlyErrorMessage(error, t("ExpenseEdit.saveFailed")),
       });
     } finally {
@@ -199,35 +217,34 @@ export default function ExpenseEdit({
           {/* Form */}
           <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
             <div className="mobile-modal-content p-6 space-y-6">
+            {approvalNotice && (
+              <InlineAlert type="info">
+                Financial changes to this approved expense will be sent for approval. The current approved values stay unchanged until the request is approved.
+              </InlineAlert>
+            )}
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                {t("ExpenseEdit.description")}{" "}
-                <span className="text-red-500">*</span>
+              <label className={fieldLabelClass}>
+                {t("ExpenseEdit.description")} <RequiredMark />
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => handleChange("description", e.target.value)}
                 rows={3}
-                className={`w-full rounded-xl border ${
-                  errors.description
-                    ? "border-red-500"
-                    : "border-[var(--border)]"
-                } bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] placeholder-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
+                className={`${textareaControlClass} ${
+                  errors.description ? fieldControlErrorClass : ""
+                }`}
                 placeholder={t("ExpenseEdit.enterDescription")}
               />
               {errors.description && (
-                <p className="mt-1 text-xs text-red-500">
-                  {errors.description}
-                </p>
+                <p className={fieldErrorClass}>{errors.description}</p>
               )}
             </div>
 
             {/* Date */}
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                {t("ExpenseEdit.expenseDate")}{" "}
-                <span className="text-red-500">*</span>
+              <label className={fieldLabelClass}>
+                {t("ExpenseEdit.expenseDate")} <RequiredMark />
               </label>
               <div className="relative">
                 <Calendar className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
@@ -239,16 +256,14 @@ export default function ExpenseEdit({
                 />
               </div>
               {errors.expense_date && (
-                <p className="mt-1 text-xs text-red-500">
-                  {errors.expense_date}
-                </p>
+                <p className={fieldErrorClass}>{errors.expense_date}</p>
               )}
             </div>
 
             {/* Amounts */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                <label className={fieldLabelClass}>
                   {t("ExpenseEdit.amountUsd")}
                 </label>
                 <div className="relative">
@@ -258,18 +273,14 @@ export default function ExpenseEdit({
                     step="0.01"
                     value={formData.amount_usd}
                     onChange={(e) => handleChange("amount_usd", e.target.value)}
-                    className={`w-full rounded-xl border ${
-                      errors.amount
-                        ? "border-red-500"
-                        : "border-[var(--border)]"
-                    } bg-[var(--bg)] ps-10 pe-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
+                    className={controlClass(errors.amount, "ps-10")}
                     placeholder="0.00"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                <label className={fieldLabelClass}>
                   {t("ExpenseEdit.amountAfn")}
                 </label>
                 <div className="relative">
@@ -281,23 +292,19 @@ export default function ExpenseEdit({
                     step="0.01"
                     value={formData.amount_afn}
                     onChange={(e) => handleChange("amount_afn", e.target.value)}
-                    className={`w-full rounded-xl border ${
-                      errors.amount
-                        ? "border-red-500"
-                        : "border-[var(--border)]"
-                    } bg-[var(--bg)] ps-10 pe-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
+                    className={controlClass(errors.amount, "ps-10")}
                     placeholder="0.00"
                   />
                 </div>
               </div>
             </div>
             {errors.amount && (
-              <p className="text-xs text-red-500">{errors.amount}</p>
+              <p className={fieldErrorClass}>{errors.amount}</p>
             )}
 
             {/* Exchange Rate */}
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+              <label className={fieldLabelClass}>
                 {t("ExpenseEdit.exchangeRate")}
               </label>
               <input
@@ -305,14 +312,14 @@ export default function ExpenseEdit({
                 step="0.0001"
                 value={formData.exchange_rate}
                 onChange={(e) => handleChange("exchange_rate", e.target.value)}
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors"
+                className={fieldControlClass}
                 placeholder="68.2000"
               />
             </div>
 
             {/* Paid To */}
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+              <label className={fieldLabelClass}>
                 {t("ExpenseEdit.paidTo")}
               </label>
               <div className="relative">
@@ -321,7 +328,7 @@ export default function ExpenseEdit({
                   type="text"
                   value={formData.paid_to}
                   onChange={(e) => handleChange("paid_to", e.target.value)}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] ps-10 pe-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors"
+                  className={`${fieldControlClass} ps-10`}
                   placeholder={t("ExpenseEdit.paidToPlaceholder")}
                 />
               </div>
@@ -329,7 +336,7 @@ export default function ExpenseEdit({
 
             {/* Expense Scope */}
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+              <label className={fieldLabelClass}>
                 {t("ExpenseEdit.expenseType")}
               </label>
               <div className="relative">
@@ -337,7 +344,7 @@ export default function ExpenseEdit({
                 <select
                   value={formData.expense_scope}
                   onChange={(e) => handleChange("expense_scope", e.target.value)}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] ps-10 pe-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors"
+                  className={`${fieldControlClass} ps-10`}
                 >
                   <option value="project">{t("ExpenseEdit.projectExpense")}</option>
                   <option value="office">{t("ExpenseEdit.officeExpense")}</option>
@@ -347,13 +354,13 @@ export default function ExpenseEdit({
 
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+              <label className={fieldLabelClass}>
                 {t("ExpenseEdit.category")}
               </label>
               <select
                 value={formData.expense_type}
                 onChange={(e) => handleChange("expense_type", e.target.value)}
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors"
+                className={fieldControlClass}
               >
                 {(formData.expense_scope === "office"
                   ? OFFICE_EXPENSE_CATEGORIES
@@ -368,16 +375,13 @@ export default function ExpenseEdit({
 
             {formData.expense_scope === "project" && (
               <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                  {t("ExpenseEdit.project")}{" "}
-                  <span className="text-red-500">*</span>
+                <label className={fieldLabelClass}>
+                  {t("ExpenseEdit.project")} <RequiredMark />
                 </label>
                 <select
                   value={formData.project}
                   onChange={(e) => handleChange("project", e.target.value)}
-                  className={`w-full rounded-xl border ${
-                    errors.project ? "border-red-500" : "border-[var(--border)]"
-                  } bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors`}
+                  className={controlClass(errors.project)}
                 >
                   <option value="">{t("ExpenseEdit.selectProject")}</option>
                   {projects.map((project) => (
@@ -387,32 +391,28 @@ export default function ExpenseEdit({
                   ))}
                 </select>
                 {errors.project && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.project}
-                  </p>
+                  <p className={fieldErrorClass}>{errors.project}</p>
                 )}
               </div>
             )}
 
             {/* Remarks */}
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+              <label className={fieldLabelClass}>
                 {t("ExpenseEdit.remarks")}
               </label>
               <textarea
                 value={formData.remarks}
                 onChange={(e) => handleChange("remarks", e.target.value)}
                 rows={2}
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text)] placeholder-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors"
+                className={textareaControlClass}
                 placeholder={t("ExpenseEdit.remarksPlaceholder")}
               />
             </div>
 
             {/* Error Message */}
             {errors.submit && (
-              <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4">
-                <p className="text-sm text-red-600">{errors.submit}</p>
-              </div>
+              <InlineAlert type="error">{errors.submit}</InlineAlert>
             )}
             </div>
 
@@ -426,7 +426,7 @@ export default function ExpenseEdit({
                 {t("ExpenseEdit.cancel")}
               </button>
               <PermissionWrapper
-                permissions={["expenses.update"]}
+                permissions={["expenses.update", "expenses.update_own"]}
                 fallback={
                   <Button
                     type="submit"
@@ -446,7 +446,9 @@ export default function ExpenseEdit({
                   <Save className="h-4 w-4" />
                   {isSubmitting
                     ? t("ExpenseEdit.saving")
-                    : t("ExpenseEdit.saveChanges")}
+                    : approvalNotice
+                      ? "Submit for Approval"
+                      : t("ExpenseEdit.saveChanges")}
                 </button>
               </PermissionWrapper>
             </div>

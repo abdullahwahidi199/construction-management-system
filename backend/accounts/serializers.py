@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -6,6 +8,7 @@ from common.calendar_utils import DEFAULT_CALENDAR_SETTINGS, normalize_calendar_
 from .constants import Role
 from .models import (
     ApplicationSettings,
+    CompanyInformation,
     CustomRole,
     ProjectAssignment,
     UserPermissionOverride,
@@ -16,6 +19,105 @@ from .models import (
 from .services import get_effective_permissions, get_user_role
 
 User = get_user_model()
+
+MAX_BRANDING_IMAGE_SIZE = 5 * 1024 * 1024
+ALLOWED_THEMES = {"light", "dark", "construction"}
+ALLOWED_LANGUAGES = {"en", "dr", "ps"}
+
+DEFAULT_SETTINGS_PREFERENCES = {
+    "appearance": {
+        "theme": "construction",
+    },
+    "language": {
+        "language": "en",
+    },
+    "notifications": {
+        "in_app": True,
+        "email": False,
+        "real_time": True,
+    },
+    "security": {
+        "session_timeout_minutes": 60,
+        "password_min_length": 8,
+        "require_uppercase": True,
+        "require_number": True,
+        "login_lockout_enabled": True,
+    },
+}
+
+
+def _as_bool(value, default=False):
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return default
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    return bool(value)
+
+
+def normalize_settings_preferences(value=None):
+    raw = value or {}
+    normalized = deepcopy(DEFAULT_SETTINGS_PREFERENCES)
+
+    appearance = raw.get("appearance") or {}
+    theme = appearance.get("theme", normalized["appearance"]["theme"])
+    if theme == "system":
+        theme = "construction"
+    if theme not in ALLOWED_THEMES:
+        raise serializers.ValidationError({"appearance": {"theme": _("Invalid theme.")}})
+    normalized["appearance"]["theme"] = theme
+
+    language = raw.get("language") or {}
+    lang = language.get("language", normalized["language"]["language"])
+    if lang not in ALLOWED_LANGUAGES:
+        raise serializers.ValidationError({"language": {"language": _("Invalid language.")}})
+    normalized["language"]["language"] = lang
+
+    notifications = raw.get("notifications") or {}
+    for key, default in normalized["notifications"].items():
+        normalized["notifications"][key] = _as_bool(notifications.get(key), default)
+
+    security = raw.get("security") or {}
+    timeout = security.get(
+        "session_timeout_minutes",
+        normalized["security"]["session_timeout_minutes"],
+    )
+    try:
+        timeout = int(timeout)
+    except (TypeError, ValueError):
+        raise serializers.ValidationError(
+            {"security": {"session_timeout_minutes": _("Session timeout must be a number.")}}
+        )
+    if timeout < 5 or timeout > 1440:
+        raise serializers.ValidationError(
+            {"security": {"session_timeout_minutes": _("Session timeout must be between 5 and 1440 minutes.")}}
+        )
+    normalized["security"]["session_timeout_minutes"] = timeout
+
+    min_length = security.get(
+        "password_min_length",
+        normalized["security"]["password_min_length"],
+    )
+    try:
+        min_length = int(min_length)
+    except (TypeError, ValueError):
+        raise serializers.ValidationError(
+            {"security": {"password_min_length": _("Password length must be a number.")}}
+        )
+    if min_length < 6 or min_length > 128:
+        raise serializers.ValidationError(
+            {"security": {"password_min_length": _("Password length must be between 6 and 128 characters.")}}
+        )
+    normalized["security"]["password_min_length"] = min_length
+
+    for key in ("require_uppercase", "require_number", "login_lockout_enabled"):
+        normalized["security"][key] = _as_bool(
+            security.get(key),
+            normalized["security"][key],
+        )
+
+    return normalized
 
 
 class LoginSerializer(serializers.Serializer):
@@ -259,6 +361,7 @@ class CalendarSettingsSerializer(serializers.Serializer):
         child=serializers.ChoiceField(choices=["inherit", "shamsi", "gregorian"]),
         required=False,
     )
+    work_calendar = serializers.DictField(required=False)
 
     def to_representation(self, instance):
         if isinstance(instance, ApplicationSettings):
@@ -266,4 +369,137 @@ class CalendarSettingsSerializer(serializers.Serializer):
         return normalize_calendar_settings(instance or DEFAULT_CALENDAR_SETTINGS)
 
     def validate(self, attrs):
-        return normalize_calendar_settings(attrs)
+        try:
+            return normalize_calendar_settings(attrs)
+        except ValueError as exc:
+            raise serializers.ValidationError({"work_calendar": str(exc)}) from exc
+
+
+class CompanyInformationSerializer(serializers.ModelSerializer):
+    company_logo_url = serializers.SerializerMethodField()
+    favicon_url = serializers.SerializerMethodField()
+    clear_company_logo = serializers.BooleanField(write_only=True, required=False)
+    clear_favicon = serializers.BooleanField(write_only=True, required=False)
+
+    class Meta:
+        model = CompanyInformation
+        fields = (
+            "id",
+            "tenant_identifier",
+            "company_name",
+            "legal_company_name",
+            "company_logo",
+            "company_logo_url",
+            "favicon",
+            "favicon_url",
+            "address",
+            "city",
+            "province_state",
+            "country",
+            "postal_code",
+            "phone_number",
+            "alternative_phone",
+            "email",
+            "website",
+            "tax_number",
+            "registration_number",
+            "company_description",
+            "print_footer_text",
+            "created_at",
+            "updated_at",
+            "updated_by",
+            "clear_company_logo",
+            "clear_favicon",
+        )
+        read_only_fields = (
+            "id",
+            "tenant_identifier",
+            "company_logo_url",
+            "favicon_url",
+            "created_at",
+            "updated_at",
+            "updated_by",
+        )
+
+    def _absolute_file_url(self, file_field):
+        if not file_field:
+            return ""
+        try:
+            url = file_field.url
+        except ValueError:
+            return ""
+        request = self.context.get("request")
+        if request is not None:
+            return request.build_absolute_uri(url)
+        return url
+
+    def get_company_logo_url(self, obj):
+        return self._absolute_file_url(obj.company_logo)
+
+    def get_favicon_url(self, obj):
+        return self._absolute_file_url(obj.favicon)
+
+    def validate_company_name(self, value):
+        value = (value or "").strip()
+        if not value:
+            raise serializers.ValidationError(_("Company name is required."))
+        return value
+
+    def validate_company_logo(self, value):
+        if value and value.size > MAX_BRANDING_IMAGE_SIZE:
+            raise serializers.ValidationError(_("Company logo must be 5MB or smaller."))
+        return value
+
+    def validate_favicon(self, value):
+        if value and value.size > MAX_BRANDING_IMAGE_SIZE:
+            raise serializers.ValidationError(_("Favicon must be 5MB or smaller."))
+        return value
+
+    def validate(self, attrs):
+        for field in (
+            "legal_company_name",
+            "city",
+            "province_state",
+            "country",
+            "postal_code",
+            "phone_number",
+            "alternative_phone",
+            "email",
+            "website",
+            "tax_number",
+            "registration_number",
+        ):
+            if field in attrs and isinstance(attrs[field], str):
+                attrs[field] = attrs[field].strip()
+        return attrs
+
+    def update(self, instance, validated_data):
+        clear_company_logo = validated_data.pop("clear_company_logo", False)
+        clear_favicon = validated_data.pop("clear_favicon", False)
+
+        if clear_company_logo and instance.company_logo:
+            instance.company_logo.delete(save=False)
+            instance.company_logo = None
+
+        if clear_favicon and instance.favicon:
+            instance.favicon.delete(save=False)
+            instance.favicon = None
+
+        return super().update(instance, validated_data)
+
+
+class SettingsPreferencesSerializer(serializers.Serializer):
+    appearance = serializers.DictField(required=False)
+    language = serializers.DictField(required=False)
+    notifications = serializers.DictField(required=False)
+    security = serializers.DictField(required=False)
+
+    def to_representation(self, instance):
+        if isinstance(instance, ApplicationSettings):
+            return normalize_settings_preferences(
+                instance.app_settings.get("settings_preferences")
+            )
+        return normalize_settings_preferences(instance)
+
+    def validate(self, attrs):
+        return normalize_settings_preferences(attrs)

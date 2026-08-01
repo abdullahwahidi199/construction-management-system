@@ -7,6 +7,8 @@ from reportlab.platypus import (
     SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 )
 
+from .branding import build_pdf_branding_elements, draw_pdf_branding_footer
+
 
 def _format_value(value):
     if value is None:
@@ -14,7 +16,7 @@ def _format_value(value):
     return str(value)
 
 
-def generate_pdf(report_data: dict, columns: list = None) -> BytesIO:
+def generate_pdf(report_data: dict, columns: list = None, request=None) -> BytesIO:
     """
     Generic PDF generator.
     report_data: dict from BaseReport.generate()
@@ -25,8 +27,8 @@ def generate_pdf(report_data: dict, columns: list = None) -> BytesIO:
     doc = SimpleDocTemplate(
         buffer,
         pagesize=landscape(A4),
-        topMargin=15 * mm,
-        bottomMargin=15 * mm,
+        topMargin=12 * mm,
+        bottomMargin=22 * mm,
         leftMargin=12 * mm,
         rightMargin=12 * mm,
     )
@@ -43,11 +45,13 @@ def generate_pdf(report_data: dict, columns: list = None) -> BytesIO:
 
     elements = []
 
-    # Title
-    elements.append(Paragraph(report_data.get("report_name", "Report"), title_style))
-    elements.append(Paragraph(
-        f"Generated at: {report_data.get('generated_at', '')}", meta_style))
-    elements.append(Spacer(1, 8))
+    company, branding = build_pdf_branding_elements(
+        title=report_data.get("report_name", "Report"),
+        subtitle=f"Generated at: {report_data.get('generated_at', '')}",
+        request=request,
+        styles=styles,
+    )
+    elements.extend(branding)
 
     # Summary section
     summary = report_data.get("summary")
@@ -94,6 +98,18 @@ def generate_pdf(report_data: dict, columns: list = None) -> BytesIO:
         ]))
         elements.append(table)
 
-    doc.build(elements)
+    doc.build(
+        elements,
+        onFirstPage=lambda canvas, document: draw_pdf_branding_footer(
+            canvas,
+            document,
+            company=company,
+        ),
+        onLaterPages=lambda canvas, document: draw_pdf_branding_footer(
+            canvas,
+            document,
+            company=company,
+        ),
+    )
     buffer.seek(0)
     return buffer

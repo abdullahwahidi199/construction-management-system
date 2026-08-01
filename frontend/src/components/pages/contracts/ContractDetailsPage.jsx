@@ -5,11 +5,14 @@ import {
   ArrowLeft,
   ArrowRight,
   DollarSign,
-  Calendar,
   FileText,
   GitBranch,
   TrendingUp,
   Download,
+  Pencil,
+  Plus,
+  Save,
+  X,
 } from "lucide-react";
 import useFetch from "../../../hooks/useFetch";
 import usePost from "../../../hooks/usePost";
@@ -27,6 +30,7 @@ import VariationFormModal from "../../contracts/VariationFormModal";
 import DocumentTable from "../../contracts/DocumentTable";
 import DocumentUploadModal from "../../contracts/DocumentUploadModal";
 import ContractInvoicesPage from "./ContractInvoicesPage";
+import PermissionWrapper from "../../../auth/PermissionWrapper";
 import { useLanguage } from "../../../hooks/useLanguage";
 import { useCalendar } from "../../../hooks/useCalendar";
 import toast from "react-hot-toast";
@@ -36,6 +40,10 @@ export default function ContractDetailsPage() {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("info");
+  const [showProgressForm, setShowProgressForm] = useState(false);
+  const [progressValue, setProgressValue] = useState("");
+  const [progressError, setProgressError] = useState("");
+  const [progressSaving, setProgressSaving] = useState(false);
 
   // Modals
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -103,6 +111,51 @@ export default function ContractDetailsPage() {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+
+  const openCreatePayment = useCallback(() => {
+    setActiveTab("payments");
+    setEditingPayment(null);
+    setShowPaymentForm(true);
+  }, []);
+
+  const openProgressForm = () => {
+    setProgressValue(String(contract?.completion_percentage ?? 0));
+    setProgressError("");
+    setShowProgressForm(true);
+  };
+
+  const closeProgressForm = () => {
+    if (!progressSaving) {
+      setShowProgressForm(false);
+      setProgressError("");
+    }
+  };
+
+  const handleUpdateProgress = async (event) => {
+    event.preventDefault();
+    const rawValue = String(progressValue).trim();
+    const parsedValue = Number(rawValue);
+
+    if (!rawValue || !Number.isFinite(parsedValue) || parsedValue < 0 || parsedValue > 100) {
+      setProgressError(t("ContractDetailsPage.progressRange"));
+      return;
+    }
+
+    setProgressSaving(true);
+    setProgressError("");
+    try {
+      await instance.patch(`contracts/${id}/`, {
+        completion_percentage: parsedValue,
+      });
+      setShowProgressForm(false);
+      refetch();
+      toast.success(t("ContractDetailsPage.progressUpdated"));
+    } catch (err) {
+      // Central axios handling shows the user-facing error.
+    } finally {
+      setProgressSaving(false);
+    }
+  };
 
   // --- Payments ---
   const handleCreatePayment = async (payload) => {
@@ -268,6 +321,8 @@ export default function ContractDetailsPage() {
     );
   }
 
+  const canCreatePayment = ["active", "draft"].includes(contract.status);
+
   return (
     <div className="space-y-6">
       {/* Back Button */}
@@ -291,13 +346,38 @@ export default function ContractDetailsPage() {
             {contract.contract_number}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-[var(--muted)]">
-            {t("ContractDetailsPage.progress")}:
-          </span>
-          <div className="w-32">
-            <ProgressBar value={contract.completion_percentage} size="sm" />
+        <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <div className="flex min-w-0 items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-2">
+            <span className="shrink-0 text-sm text-[var(--muted)]">
+              {t("ContractDetailsPage.progress")}:
+            </span>
+            <div className="w-32 min-w-24">
+              <ProgressBar value={contract.completion_percentage} size="sm" />
+            </div>
+            <span className="shrink-0 text-sm font-semibold text-[var(--text)]">
+              {contract.completion_percentage}%
+            </span>
           </div>
+          <PermissionWrapper permissions={["contracts.update"]}>
+            <Button
+              variant="secondary"
+              onClick={openProgressForm}
+              leftIcon={<Pencil className="h-4 w-4" />}
+            >
+              {t("ContractDetailsPage.updateProgress")}
+            </Button>
+          </PermissionWrapper>
+          {canCreatePayment && (
+            <PermissionWrapper permissions={["contract_payments.create"]}>
+              <Button
+                variant="primary"
+                onClick={openCreatePayment}
+                leftIcon={<Plus className="h-4 w-4" />}
+              >
+                {t("ContractDetailsPage.addPayment")}
+              </Button>
+            </PermissionWrapper>
+          )}
           <Button
             variant="secondary"
             onClick={handleDownloadContractPDF}
@@ -439,16 +519,16 @@ export default function ContractDetailsPage() {
             <h3 className="text-lg font-semibold text-[var(--text)]">
               {t("ContractDetailsPage.payments")}
             </h3>
-            {contract.status === "active" && (
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setEditingPayment(null);
-                  setShowPaymentForm(true);
-                }}
-              >
-                {t("ContractDetailsPage.addPayment")}
-              </Button>
+            {canCreatePayment && (
+              <PermissionWrapper permissions={["contract_payments.create"]}>
+                <Button
+                  variant="primary"
+                  onClick={openCreatePayment}
+                  leftIcon={<Plus className="h-4 w-4" />}
+                >
+                  {t("ContractDetailsPage.addPayment")}
+                </Button>
+              </PermissionWrapper>
             )}
           </div>
           <PaymentTable
@@ -473,7 +553,11 @@ export default function ContractDetailsPage() {
             }
             payment={editingPayment}
             loading={posting}
-            maxAmount={contract.remaining_amount}
+            maxAmount={
+              contract.remaining_amount ??
+              contract.financial_summary?.remaining_amount ??
+              null
+            }
           />
           <DeleteConfirmModal
             isOpen={!!deletePayment}
@@ -570,6 +654,19 @@ export default function ContractDetailsPage() {
           />
         </div>
       )}
+      <ProgressUpdateModal
+        isOpen={showProgressForm}
+        onClose={closeProgressForm}
+        onSubmit={handleUpdateProgress}
+        value={progressValue}
+        onChange={(value) => {
+          setProgressValue(value);
+          if (progressError) setProgressError("");
+        }}
+        error={progressError}
+        loading={progressSaving}
+        t={t}
+      />
     </div>
   );
 }
@@ -587,6 +684,132 @@ function Row({ label, value, highlight = false }) {
       >
         {value}
       </span>
+    </div>
+  );
+}
+
+function ProgressUpdateModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  value,
+  onChange,
+  error,
+  loading,
+  t,
+}) {
+  if (!isOpen) return null;
+
+  const numericValue = Number(value);
+  const rangeValue = Number.isFinite(numericValue)
+    ? Math.min(100, Math.max(0, numericValue))
+    : 0;
+
+  return (
+    <div
+      className="mobile-modal-surface fixed inset-0 z-50 flex"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="progress-modal-title"
+    >
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div className="mobile-modal-panel relative w-full max-w-md overflow-hidden rounded-2xl">
+        <Card
+          className="flex h-full min-h-0 flex-col p-0"
+          contentClassName="flex min-h-0 flex-1 flex-col p-0"
+        >
+          <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col">
+            <div className="mobile-modal-header flex items-center justify-between border-b border-[var(--border)] px-6 py-4">
+              <h2
+                id="progress-modal-title"
+                className="text-lg font-semibold text-[var(--text)]"
+              >
+                {t("ContractDetailsPage.updateProgress")}
+              </h2>
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={loading}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-[var(--text)] hover:bg-[var(--hover)] disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9"
+                aria-label={t("common.close")}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="mobile-modal-content space-y-5 px-6 py-5">
+              <div className="rounded-lg border border-[var(--border)] bg-[var(--hover)]/60 p-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <span className="text-sm font-medium text-[var(--text)]">
+                    {t("ContractDetailsPage.progressPercentage")}
+                  </span>
+                  <span className="text-2xl font-bold text-[var(--primary)]">
+                    {rangeValue}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  value={rangeValue}
+                  onChange={(event) => onChange(event.target.value)}
+                  className="h-2 w-full cursor-pointer accent-[var(--primary)]"
+                  aria-label={t("ContractDetailsPage.progressPercentage")}
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-[var(--text)]">
+                  {t("ContractDetailsPage.progressPercentage")}
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  value={value}
+                  onChange={(event) => onChange(event.target.value)}
+                  className={`w-full rounded-lg border bg-[var(--card)] px-3 py-3 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] sm:text-sm ${
+                    error ? "border-[var(--danger)]" : "border-[var(--border)]"
+                  }`}
+                />
+                {error ? (
+                  <p className="mt-1.5 text-xs text-[var(--danger)]">
+                    {error}
+                  </p>
+                ) : (
+                  <p className="mt-1.5 text-xs text-[var(--muted)]">
+                    {t("ContractDetailsPage.progressHelp")}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="mobile-modal-footer flex items-center justify-end gap-3 border-t border-[var(--border)] px-6 py-4">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={onClose}
+                disabled={loading}
+              >
+                {t("ContractFormModal.buttons.cancel")}
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={loading}
+                leftIcon={!loading && <Save className="h-4 w-4" />}
+              >
+                {loading
+                  ? t("ContractFormModal.buttons.saving")
+                  : t("ContractDetailsPage.saveProgress")}
+              </Button>
+            </div>
+          </form>
+        </Card>
+      </div>
     </div>
   );
 }

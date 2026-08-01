@@ -31,9 +31,35 @@ const formatCurrency = (val) => {
   return `$${num.toFixed(0)}`;
 };
 
+const usdEq = (item) => parseFloat(item?.total_usd_equivalent ?? 0) || 0;
+
 export default function ExpenseSummary({ data }) {
   if (!data) return null;
   const { t } = useLanguage();
+  const allExpensesUsdEq =
+    data.total_expenses_usd_equivalent ??
+    data.overall_expenses?.total_usd_equivalent ??
+    data.total_expenses_usd;
+  const officeBreakdown =
+    (data.by_project || []).find(
+      (item) => item.expense_scope === "office" || item.project__id === "office",
+    ) ||
+    (data.office_expenses
+      ? {
+          project__id: "office",
+          project__name: "Office Expenses",
+          expense_scope: "office",
+          total_usd_equivalent: data.office_expenses.total_usd_equivalent,
+          count: data.office_expenses.count,
+        }
+      : null);
+  const projectBreakdown = (data.by_project || []).filter(
+    (item) => item.expense_scope !== "office" && item.project__id !== "office",
+  );
+  const visibleProjectRows = [
+    ...projectBreakdown.slice(0, officeBreakdown ? 5 : 6),
+    ...(officeBreakdown && usdEq(officeBreakdown) > 0 ? [officeBreakdown] : []),
+  ];
 
   const EXPENSE_TYPE_LABELS = {
     general: t("expenseSummary.general"),
@@ -48,7 +74,7 @@ export default function ExpenseSummary({ data }) {
 
   const trendData = (data.monthly_trend || []).map((m) => ({
     month: m.month,
-    usd: parseFloat(m.total_usd),
+    usd: usdEq(m),
     afn: parseFloat(m.total_afn),
     count: m.count,
   }));
@@ -76,7 +102,7 @@ export default function ExpenseSummary({ data }) {
       right={
         <div className="text-right">
           <span className="text-sm font-semibold text-[var(--text)]">
-            ${parseFloat(data.total_expenses_usd).toLocaleString()}
+            ${parseFloat(allExpensesUsdEq || 0).toLocaleString()} USD EQ
           </span>
           <span className="text-xs text-[var(--muted)] ml-2">
             ({data.total_expense_count} {t("expenseSummary.entries")})
@@ -130,7 +156,7 @@ export default function ExpenseSummary({ data }) {
               <Area
                 type="monotone"
                 dataKey="usd"
-                name="USD"
+                name="USD EQ"
                 stroke="var(--primary)"
                 fill="var(--primary)"
                 fillOpacity={0.1}
@@ -165,12 +191,11 @@ export default function ExpenseSummary({ data }) {
           <div className="space-y-2">
             {(data.by_expense_type || []).slice(0, 6).map((item) => {
               const maxVal = Math.max(
-                ...(data.by_expense_type || []).map((i) =>
-                  parseFloat(i.total_usd),
-                ),
+                ...(data.by_expense_type || []).map((i) => usdEq(i)),
               );
+              const value = usdEq(item);
               const pct =
-                maxVal > 0 ? (parseFloat(item.total_usd) / maxVal) * 100 : 0;
+                maxVal > 0 ? (value / maxVal) * 100 : 0;
 
               return (
                 <div key={item.expense_type}>
@@ -180,7 +205,7 @@ export default function ExpenseSummary({ data }) {
                         item.expense_type}
                     </span>
                     <span className="text-[var(--muted)] font-medium">
-                      {formatCurrency(item.total_usd)} ({item.count})
+                      {formatCurrency(value)} USD EQ ({item.count})
                     </span>
                   </div>
                   <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
@@ -202,15 +227,15 @@ export default function ExpenseSummary({ data }) {
         {/* By Project */}
         <div>
           <h4 className="text-sm font-medium text-[var(--muted)] mb-3">
-            By Project
+            By Project / Office
           </h4>
           <div className="space-y-2">
-            {(data.by_project || []).slice(0, 6).map((item) => {
+            {visibleProjectRows.map((item) => {
               const maxVal = Math.max(
-                ...(data.by_project || []).map((i) => parseFloat(i.total_usd)),
+                ...visibleProjectRows.map((i) => usdEq(i)),
               );
-              const pct =
-                maxVal > 0 ? (parseFloat(item.total_usd) / maxVal) * 100 : 0;
+              const value = usdEq(item);
+              const pct = maxVal > 0 ? (value / maxVal) * 100 : 0;
 
               return (
                 <div key={item.project__id}>
@@ -219,7 +244,7 @@ export default function ExpenseSummary({ data }) {
                       {item.project__name}
                     </span>
                     <span className="text-[var(--muted)] font-medium whitespace-nowrap">
-                      {formatCurrency(item.total_usd)}
+                      {formatCurrency(value)} USD EQ
                     </span>
                   </div>
                   <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">

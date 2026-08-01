@@ -344,6 +344,32 @@ def contract_document_upload_path(instance, filename):
     return f"contracts/documents/{filename}"
 
 
+def _reset_file_pointer(file_obj):
+    try:
+        file_obj.seek(0)
+    except (AttributeError, OSError):
+        pass
+
+
+def compress_upload_for_storage(file_obj):
+    if not file_obj:
+        return file_obj
+
+    content_type = getattr(file_obj, "content_type", "") or ""
+    try:
+        if content_type.startswith("image"):
+            _reset_file_pointer(file_obj)
+            return compress_image(file_obj, quality=70)
+
+        if content_type == "application/pdf":
+            _reset_file_pointer(file_obj)
+            return compress_pdf(file_obj)
+    except Exception:
+        _reset_file_pointer(file_obj)
+
+    return file_obj
+
+
 class ContractDocument(models.Model):
     contract      = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='documents')
     title         = models.CharField(max_length=255)
@@ -370,13 +396,7 @@ class ContractDocument(models.Model):
 
     def save(self, *args, **kwargs):
         if self.file:
-            content_type = getattr(self.file, "content_type", "")
-
-            if content_type.startswith("image"):
-                self.file = compress_image(self.file, quality=70)
-
-            elif content_type == "application/pdf":
-                self.file = compress_pdf(self.file)
+            self.file = compress_upload_for_storage(self.file)
 
         super().save(*args, **kwargs)
 
@@ -562,12 +582,6 @@ class ContractInvoiceDocument(models.Model):
     )
     def save(self, *args, **kwargs):
         if self.file:
-            content_type = getattr(self.file, "content_type", "")
-
-            if content_type.startswith("image"):
-                self.file = compress_image(self.file, quality=70)
-
-            elif content_type == "application/pdf":
-                self.file = compress_pdf(self.file)
+            self.file = compress_upload_for_storage(self.file)
 
         super().save(*args, **kwargs)
