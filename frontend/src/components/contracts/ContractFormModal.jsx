@@ -10,12 +10,14 @@ import useFetch from "../../hooks/useFetch";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
 
+const DEFAULT_CURRENCY = "AFN";
+
 const emptyForm = {
   project: "",
   subcontractor: "",
   title: "",
   scope_of_work: "",
-  currency: "",
+  currency: DEFAULT_CURRENCY,
   contract_value: "",
   retention_percentage: "5",
   start_date: "",
@@ -73,6 +75,29 @@ export default function ContractFormModal({
     },
   ];
 
+  const normalizeValue = (value) => {
+    if (value && typeof value === "object" && "target" in value) {
+      return value.target.value;
+    }
+    return value ?? "";
+  };
+
+  const normalizedForm = () => ({
+    ...form,
+    project: normalizeValue(form.project),
+    subcontractor: normalizeValue(form.subcontractor),
+    title: String(normalizeValue(form.title)).trim(),
+    scope_of_work: String(normalizeValue(form.scope_of_work)).trim(),
+    currency: String(normalizeValue(form.currency) || DEFAULT_CURRENCY).trim(),
+    contract_value: normalizeValue(form.contract_value),
+    retention_percentage: normalizeValue(form.retention_percentage),
+    start_date: String(normalizeValue(form.start_date)).trim(),
+    end_date: String(normalizeValue(form.end_date)).trim(),
+    completion_percentage: normalizeValue(form.completion_percentage),
+    status: normalizeValue(form.status),
+    notes: String(normalizeValue(form.notes)).trim(),
+  });
+
   useEffect(() => {
     if (contract) {
       setForm({
@@ -96,7 +121,7 @@ export default function ContractFormModal({
   }, [contract, isOpen]);
 
   const handleChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [field]: normalizeValue(value) }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
@@ -104,32 +129,33 @@ export default function ContractFormModal({
 
   const validate = () => {
     const newErrors = {};
+    const values = normalizedForm();
 
-    if (!form.project)
+    if (!values.project)
       newErrors.project = t("ContractFormModal.validation.projectRequired");
-    if (!form.subcontractor)
+    if (!values.subcontractor)
       newErrors.subcontractor = t(
         "ContractFormModal.validation.subcontractorRequired",
       );
-    if (!form.title.trim())
+    if (!values.title)
       newErrors.title = t("ContractFormModal.validation.titleRequired");
-    if (!form.currency)
+    if (!values.currency)
       newErrors.currency = t("ContractFormModal.validation.currencyRequired");
-    if (!form.contract_value || Number(form.contract_value) <= 0)
+    if (!values.contract_value || Number(values.contract_value) <= 0)
       newErrors.contract_value = t(
         "ContractFormModal.validation.contractValuePositive",
       );
-    if (!form.start_date)
+    if (!values.start_date)
       newErrors.start_date = t(
         "ContractFormModal.validation.startDateRequired",
       );
     // if (!form.end_date) newErrors.end_date = "End date is required";
-    if (form.start_date && form.end_date && form.start_date > form.end_date)
+    if (values.start_date && values.end_date && values.start_date > values.end_date)
       newErrors.end_date = t("ContractFormModal.validation.endDateInvalid");
     if (
-      form.completion_percentage !== "" &&
-      (Number(form.completion_percentage) < 0 ||
-        Number(form.completion_percentage) > 100)
+      values.completion_percentage !== "" &&
+      (Number(values.completion_percentage) < 0 ||
+        Number(values.completion_percentage) > 100)
     )
       newErrors.completion_percentage = t(
         "ContractFormModal.validation.progressRange",
@@ -146,11 +172,12 @@ export default function ContractFormModal({
       return;
     }
 
+    const values = normalizedForm();
     const payload = {
-      ...form,
-      contract_value: Number(form.contract_value),
-      retention_percentage: Number(form.retention_percentage),
-      completion_percentage: Number(form.completion_percentage),
+      ...values,
+      contract_value: Number(values.contract_value),
+      retention_percentage: Number(values.retention_percentage),
+      completion_percentage: Number(values.completion_percentage),
     };
 
     await onSubmit(payload);
@@ -304,6 +331,7 @@ export default function ContractFormModal({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
                   label={t("ContractFormModal.fields.startDate")}
+                  name="start_date"
                   type="date"
                   value={form.start_date}
                   onChange={(val) => handleChange("start_date", val)}
@@ -313,6 +341,7 @@ export default function ContractFormModal({
                 />
                 <Input
                   label={t("ContractFormModal.fields.endDate")}
+                  name="end_date"
                   type="date"
                   value={form.end_date}
                   onChange={(val) => handleChange("end_date", val)}
