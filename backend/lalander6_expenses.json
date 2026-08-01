@@ -4,7 +4,7 @@
     "pk": 5257,
     "fields": {
       "project": 3,
-      "serial_number": 5257,
+      "serial_number": 5258,
       "expense_date": "2025-05-20",
       "description": "پرداخت مصارفات استعلام های ریاست صدور مجوز بابت تعمیرللندر 6 واقع شهر نو از قبیل کرای موتر , به حوزه دریایی,کرای موتر به ریاست برشنا,کرای موتر به جکشن 5 کلوله پشته,نان چاشت , کارت مبایل و غیره",
       "remarks": "",
@@ -22,7 +22,7 @@
     "pk": 5258,
     "fields": {
       "project": 3,
-      "serial_number": 5258,
+      "serial_number": 5259,
       "expense_date": "2025-06-03",
       "description": "پرداخت کرای تکسی به ریاست آبرسانی فاضلاب شهری , کرای موتر به شهر نو و برگشت و خریداری نوشابه و آب معدنی بابت تعمیرللندر 6",
       "remarks": "",
@@ -40,7 +40,7 @@
     "pk": 5259,
     "fields": {
       "project": 3,
-      "serial_number": 5259,
+      "serial_number": 5260,
       "expense_date": "2025-06-03",
       "description": "پرداخت کرای موتر به شهر نو و کرای تکسی با ریاست اطفائیه بخاطر نقشه تعمیرللندر 6",
       "remarks": "",
@@ -58,7 +58,7 @@
     "pk": 5260,
     "fields": {
       "project": 3,
-      "serial_number": 5260,
+      "serial_number": 5261,
       "expense_date": "2025-06-16",
       "description": "پرداخت کرای موتر به ریاست آبرسانی بخاطر اخذ تعرفه تعمیرللندر 6 و خریداری کارت مبایل به رایگان نمودن سیم کارت",
       "remarks": "",
@@ -76,7 +76,7 @@
     "pk": 5261,
     "fields": {
       "project": 3,
-      "serial_number": 5261,
+      "serial_number": 5262,
       "expense_date": "2025-06-21",
       "description": "خریداری تیل پطرول به موتر هایلکس",
       "remarks": "",
@@ -94,7 +94,7 @@
     "pk": 5262,
     "fields": {
       "project": 3,
-      "serial_number": 5262,
+      "serial_number": 5263,
       "expense_date": "2025-06-22",
       "description": "پرداخت کرای موتر به ریاست اطفائیه بابت نقشه للندر 6 , کرای موتر به ریاست اطفائیه بابت نقشه اصلاح شده للندر 6 و کرای موتر به دفتر انجنیر فیصل شهرنو",
       "remarks": "",
@@ -112,7 +112,7 @@
     "pk": 5263,
     "fields": {
       "project": 3,
-      "serial_number": 5263,
+      "serial_number": 5264,
       "expense_date": "2025-06-28",
       "description": "خریداری تیل پطرول به موتر هایلکس",
       "remarks": "",
@@ -130,7 +130,7 @@
     "pk": 5264,
     "fields": {
       "project": 3,
-      "serial_number": 5264,
+      "serial_number": 5265,
       "expense_date": "2025-06-30",
       "description": "پرداخت کرای موتر به ریاست آبرسانی بابت استعلام تعمیر للندر 6 , مصارف نان چاشت ,کمیشن بانکی تعرفه آبرسانی, و کرای تکسی به شهر نو دفتر انجنیر فیصل",
       "remarks": "",
@@ -148,7 +148,7 @@
     "pk": 5265,
     "fields": {
       "project": 3,
-      "serial_number": 5265,
+      "serial_number": 5266,
       "expense_date": "2025-07-02",
       "description": "پرداخت کرای موتر به شهر نو بخاطر فورم دستور نقشه تعمیرللندر 6",
       "remarks": "",
@@ -166,7 +166,7 @@
     "pk": 5266,
     "fields": {
       "project": 3,
-      "serial_number": 5266,
+      "serial_number": 5267,
       "expense_date": "2025-07-02",
       "description": "کرای موتر به کارته نو بابت نقشه فاضلاب ,کرای موتر به دفتر انجنیر فیصل بابت انتقال اسناد تست خاک تعمیرللندر 6",
       "remarks": "",
@@ -184,7 +184,7 @@
     "pk": 5267,
     "fields": {
       "project": 3,
-      "serial_number": 5267,
+      "serial_number": 5268,
       "expense_date": "2025-07-02",
       "description": "خریداری تیل پطرول به موتر موتر هایلکس",
       "remarks": "",
@@ -202,7 +202,7 @@
     "pk": 5268,
     "fields": {
       "project": 3,
-      "serial_number": 5268,
+      "serial_number": 5269,
       "expense_date": "2025-07-11",
       "description": "خریداری تیل پطرول به موتر موتر هایلکس",
       "remarks": "",
@@ -220,7 +220,7 @@
     "pk": 5269,
     "fields": {
       "project": 3,
-      "serial_number": 5269,
+      "serial_number": 5270,
       "expense_date": "2025-07-17",
       "description": "خریداری تیل پطرول به موتر موتر هایلکس",
       "remarks": "",
@@ -238,7 +238,7 @@
     "pk": 5270,
     "fields": {
       "project": 3,
-      "serial_number": 5270,
+      "serial_number": 5271,
       "expense_date": "2025-07-26",
       "description": "خریداری تیل پطرول به موتر موتر هایلکس",
       "remarks": "",
@@ -256,7 +256,7 @@
     "pk": 5271,
     "fields": {
       "project": 3,
-      "serial_number": 5271,
+      "serial_number": 5272,
       "expense_date": "2025-08-12",
       "description": "خریداری تیل پطرول به موتر هایلکس تعمیرللندر 6",
       "remarks": "",
@@ -274,7 +274,7 @@
     "pk": 5272,
     "fields": {
       "project": 3,
-      "serial_number": 5272,
+      "serial_number": 5273,
       "expense_date": "2025-08-28",
       "description": "پرداخت برای مبلایل تبدیلی و فلتر مبلایل به موتر هایلکس بابت تعمیرللندر6",
       "remarks": "",
@@ -292,7 +292,7 @@
     "pk": 5273,
     "fields": {
       "project": 3,
-      "serial_number": 5273,
+      "serial_number": 5274,
       "expense_date": "2025-09-02",
       "description": "خریداری تیل پطرول به موتر هایلکس",
       "remarks": "",
@@ -310,7 +310,7 @@
     "pk": 5274,
     "fields": {
       "project": 3,
-      "serial_number": 5274,
+      "serial_number": 5275,
       "expense_date": "2025-09-06",
       "description": "خریداری تیل پطرول به موتر هالکس بخاطر تعمیرللندر 6",
       "remarks": "",
@@ -328,7 +328,7 @@
     "pk": 5275,
     "fields": {
       "project": 3,
-      "serial_number": 5275,
+      "serial_number": 5276,
       "expense_date": "2025-09-06",
       "description": "خریداری غذا از رستورانت به مهمانان تعمیرللندر 6",
       "remarks": "",
@@ -346,7 +346,7 @@
     "pk": 5276,
     "fields": {
       "project": 3,
-      "serial_number": 5276,
+      "serial_number": 5277,
       "expense_date": "2025-09-06",
       "description": "پرداخت برای رئیس صدور مجوز توسط حاجی رفیع الله بخاطر امر اعمار تعمیرللندر 6",
       "remarks": "",
@@ -364,7 +364,7 @@
     "pk": 5277,
     "fields": {
       "project": 3,
-      "serial_number": 5277,
+      "serial_number": 5278,
       "expense_date": "2025-09-06",
       "description": "خریداری پیتزا به کارمندان ریاست صدور مجوز بابت تعمیرللندر 6",
       "remarks": "",
@@ -382,7 +382,7 @@
     "pk": 5278,
     "fields": {
       "project": 3,
-      "serial_number": 5278,
+      "serial_number": 5279,
       "expense_date": "2025-09-08",
       "description": "خریداری تار رجه به تعمیرللندر 6",
       "remarks": "",
@@ -400,7 +400,7 @@
     "pk": 5279,
     "fields": {
       "project": 3,
-      "serial_number": 5279,
+      "serial_number": 5280,
       "expense_date": "2025-09-09",
       "description": "پرداخت برای رئیس صدور مجوز بابت تعمیرللندر 6",
       "remarks": "",
@@ -418,7 +418,7 @@
     "pk": 5280,
     "fields": {
       "project": 3,
-      "serial_number": 5280,
+      "serial_number": 5281,
       "expense_date": "2025-09-09",
       "description": "پرداخت برای پسر رئیس صدور مجوز بابت تعمیرللندر 6",
       "remarks": "",
@@ -436,7 +436,7 @@
     "pk": 5281,
     "fields": {
       "project": 3,
-      "serial_number": 5281,
+      "serial_number": 5282,
       "expense_date": "2025-09-09",
       "description": "پرداخت برای ملازمین ریاست صدور مجوز بابت تعمیرللندر 6",
       "remarks": "",
@@ -454,7 +454,7 @@
     "pk": 5282,
     "fields": {
       "project": 3,
-      "serial_number": 5282,
+      "serial_number": 5283,
       "expense_date": "2025-09-09",
       "description": "خریداری جای نماز به مسجد ریاست صدور مجوز بابت تعمیرللندر 6",
       "remarks": "",
@@ -472,7 +472,7 @@
     "pk": 5283,
     "fields": {
       "project": 3,
-      "serial_number": 5283,
+      "serial_number": 5284,
       "expense_date": "2025-09-09",
       "description": "پرداخت پول کمیشن حاجی عبدالحق به جاوید سکندری",
       "remarks": "",
@@ -490,7 +490,7 @@
     "pk": 5284,
     "fields": {
       "project": 3,
-      "serial_number": 5284,
+      "serial_number": 5285,
       "expense_date": "2025-09-09",
       "description": "پرداخت برای جاوید سکندری بابت قباله تعمیرللندر 6",
       "remarks": "",
@@ -508,7 +508,7 @@
     "pk": 5285,
     "fields": {
       "project": 3,
-      "serial_number": 5285,
+      "serial_number": 5286,
       "expense_date": "2025-09-09",
       "description": "پرداخت برای حاجی عبدالحق بابت جایداد تعمیرللندر 6",
       "remarks": "",
@@ -526,7 +526,7 @@
     "pk": 5286,
     "fields": {
       "project": 3,
-      "serial_number": 5286,
+      "serial_number": 5287,
       "expense_date": "2025-09-09",
       "description": "پرداخت برای خریداری تحفه به فامیل رئیس صدور مجوز بابت تعمیرللندر 6",
       "remarks": "",
@@ -544,7 +544,7 @@
     "pk": 5287,
     "fields": {
       "project": 3,
-      "serial_number": 5287,
+      "serial_number": 5288,
       "expense_date": "2025-09-11",
       "description": "خریداری تیل پطرول به موتر هایلکس",
       "remarks": "",
@@ -562,7 +562,7 @@
     "pk": 5288,
     "fields": {
       "project": 3,
-      "serial_number": 5288,
+      "serial_number": 5289,
       "expense_date": "2025-09-21",
       "description": "پرداخت برای رئیس صدور مجوز توسط حاجی رفیع الله بخاطر امر اعمار تعمیرللندر 6",
       "remarks": "",
@@ -580,7 +580,7 @@
     "pk": 5289,
     "fields": {
       "project": 3,
-      "serial_number": 5289,
+      "serial_number": 5290,
       "expense_date": "2025-09-25",
       "description": "خریداری تیل پطرول به موتر هایلکس",
       "remarks": "",
@@ -598,7 +598,7 @@
     "pk": 5290,
     "fields": {
       "project": 3,
-      "serial_number": 5290,
+      "serial_number": 5291,
       "expense_date": "2025-09-25",
       "description": "پیش پرداخت برای اسماعیل بابت کندن کاری پایل های تعمیرللندر 6",
       "remarks": "",
@@ -616,7 +616,7 @@
     "pk": 5291,
     "fields": {
       "project": 3,
-      "serial_number": 5291,
+      "serial_number": 5292,
       "expense_date": "2025-09-30",
       "description": "خریداری تیل پطرول به موتر بابت تعمیرللندر 6",
       "remarks": "",
@@ -634,7 +634,7 @@
     "pk": 5292,
     "fields": {
       "project": 3,
-      "serial_number": 5292,
+      "serial_number": 5293,
       "expense_date": "2025-09-30",
       "description": "خریداری غذا از رستورانت به مهمانان تعمیرللندر 6",
       "remarks": "",
@@ -652,7 +652,7 @@
     "pk": 5293,
     "fields": {
       "project": 3,
-      "serial_number": 5293,
+      "serial_number": 5294,
       "expense_date": "2025-10-01",
       "description": "خریداری تیل پطرول به موتر لکسس بخاطر تعمیرللندر 6",
       "remarks": "",
@@ -670,7 +670,7 @@
     "pk": 5294,
     "fields": {
       "project": 3,
-      "serial_number": 5294,
+      "serial_number": 5295,
       "expense_date": "2025-10-02",
       "description": "پرداخت برای حاجی گل نظر بابت خریداری لباس به فامیل رئیس صدور مجوز و به مصارف حاجی گل نظر بابت تعمیرللندر 6",
       "remarks": "",
@@ -688,7 +688,7 @@
     "pk": 5295,
     "fields": {
       "project": 3,
-      "serial_number": 5295,
+      "serial_number": 5296,
       "expense_date": "2025-10-02",
       "description": "پرداخت برای حاجی گل نظر بخاطر حوض آب بازی و مصارف متفرقه بابت تعمیرللندر 6",
       "remarks": "",
@@ -706,7 +706,7 @@
     "pk": 5296,
     "fields": {
       "project": 3,
-      "serial_number": 5296,
+      "serial_number": 5297,
       "expense_date": "2025-10-04",
       "description": "پرداخت به ریاست کنترول ساختمانها توسط حاجی رفیع الله بابت امر اعمار تعمیرللندر6",
       "remarks": "",
@@ -724,7 +724,7 @@
     "pk": 5297,
     "fields": {
       "project": 3,
-      "serial_number": 5297,
+      "serial_number": 5298,
       "expense_date": "2025-10-05",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -742,7 +742,7 @@
     "pk": 5298,
     "fields": {
       "project": 3,
-      "serial_number": 5298,
+      "serial_number": 5299,
       "expense_date": "2025-10-13",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -760,7 +760,7 @@
     "pk": 5299,
     "fields": {
       "project": 3,
-      "serial_number": 5299,
+      "serial_number": 5300,
       "expense_date": "2025-10-15",
       "description": "پرداخت رشوه برای انجنیران کنترول ساختمانها بابت خط اندازی تعمیرللندر 6 (نوت: از مجموع پرداخت 200$ دالر مبلغ 100$ آن توسط حاجی مطیع الله پرداخت گردیده که دوباره برایش پرداخت گردیده.",
       "remarks": "",
@@ -778,7 +778,7 @@
     "pk": 5300,
     "fields": {
       "project": 3,
-      "serial_number": 5300,
+      "serial_number": 5301,
       "expense_date": "2025-10-15",
       "description": "خریداری پایپ لیول , اسپری و میخ فولادی به تعمیرللندر 6",
       "remarks": "",
@@ -796,7 +796,7 @@
     "pk": 5301,
     "fields": {
       "project": 3,
-      "serial_number": 5301,
+      "serial_number": 5302,
       "expense_date": "2025-10-15",
       "description": "خریداری چکش و رجه به تعمیرللندر 6",
       "remarks": "",
@@ -814,7 +814,7 @@
     "pk": 5302,
     "fields": {
       "project": 3,
-      "serial_number": 5302,
+      "serial_number": 5303,
       "expense_date": "2025-10-15",
       "description": "خریداری متر 50 متره به تعمیر للندر 6",
       "remarks": "",
@@ -832,7 +832,7 @@
     "pk": 5303,
     "fields": {
       "project": 3,
-      "serial_number": 5303,
+      "serial_number": 5304,
       "expense_date": "2025-10-15",
       "description": "خریداری سمنت سفید به تعمیرللندر 6",
       "remarks": "",
@@ -850,7 +850,7 @@
     "pk": 5304,
     "fields": {
       "project": 3,
-      "serial_number": 5304,
+      "serial_number": 5305,
       "expense_date": "2025-10-18",
       "description": "خریداری برمه چارجی ,کلگی پیچکش به تعمیر للندر6",
       "remarks": "",
@@ -868,7 +868,7 @@
     "pk": 5305,
     "fields": {
       "project": 3,
-      "serial_number": 5305,
+      "serial_number": 5306,
       "expense_date": "2025-10-18",
       "description": "پرداخت برای مصارفات تعمیرللندر 6 از قبیل کرای تکسی ع رشوه ب رئیس صدور مجوز,تعرفه ریاست کنترول ساختمانها,کاپی نقشه ها,تعرفه خط اندازی, مصارفات متفرقه و غیره توسط حاجی احسان الله سهاک",
       "remarks": "",
@@ -886,7 +886,7 @@
     "pk": 5306,
     "fields": {
       "project": 3,
-      "serial_number": 5306,
+      "serial_number": 5307,
       "expense_date": "2025-10-18",
       "description": "پرداخت کرای تکسی بابت انتقال مواد فلز کاری به تعمیرللندر 6",
       "remarks": "",
@@ -904,7 +904,7 @@
     "pk": 5307,
     "fields": {
       "project": 3,
-      "serial_number": 5307,
+      "serial_number": 5308,
       "expense_date": "2025-10-18",
       "description": "خریداری چرخ کلان, رول , مترو پل برش , چاقو , اسکرنج به تعمیرللندر 6",
       "remarks": "",
@@ -922,7 +922,7 @@
     "pk": 5308,
     "fields": {
       "project": 3,
-      "serial_number": 5308,
+      "serial_number": 5309,
       "expense_date": "2025-10-18",
       "description": "خریداری اسپری و مارکر به خط اندازی تعمیرللندر 6",
       "remarks": "",
@@ -940,7 +940,7 @@
     "pk": 5309,
     "fields": {
       "project": 3,
-      "serial_number": 5309,
+      "serial_number": 5310,
       "expense_date": "2025-10-18",
       "description": "خریداری تیل پطرول به موتر هایلکس",
       "remarks": "",
@@ -958,7 +958,7 @@
     "pk": 5310,
     "fields": {
       "project": 3,
-      "serial_number": 5310,
+      "serial_number": 5311,
       "expense_date": "2025-10-20",
       "description": "خریداری یک پایه ماشین جنراتور 27hp دیزلی به تعمیرللندر 6",
       "remarks": "",
@@ -976,7 +976,7 @@
     "pk": 5311,
     "fields": {
       "project": 3,
-      "serial_number": 5311,
+      "serial_number": 5312,
       "expense_date": "2025-10-20",
       "description": "خریداری مبلایل , کرای موتر ,جوالی بابت بالا کردن جنراتور تعمیرللندر 6",
       "remarks": "",
@@ -994,7 +994,7 @@
     "pk": 5312,
     "fields": {
       "project": 3,
-      "serial_number": 5312,
+      "serial_number": 5313,
       "expense_date": "2025-10-21",
       "description": "خریداری کندکسر و دستکش به تعمیرللندر 6",
       "remarks": "",
@@ -1012,7 +1012,7 @@
     "pk": 5313,
     "fields": {
       "project": 3,
-      "serial_number": 5313,
+      "serial_number": 5314,
       "expense_date": "2025-10-21",
       "description": "خریداری آب نوشیدنی , نوار طفلون , گوتکه ,برشینگ,زانوخم و فلق به تعمیرللندر6",
       "remarks": "",
@@ -1030,7 +1030,7 @@
     "pk": 5314,
     "fields": {
       "project": 3,
-      "serial_number": 5314,
+      "serial_number": 5315,
       "expense_date": "2025-10-21",
       "description": "خریداری تیل پطرول به موتر بخاطر تعمیرللندر6",
       "remarks": "",
@@ -1048,7 +1048,7 @@
     "pk": 5315,
     "fields": {
       "project": 3,
-      "serial_number": 5315,
+      "serial_number": 5316,
       "expense_date": "2025-10-21",
       "description": "خریداری پایپ 1\" پی پی آر و ریسمان 14 ملی به تعمیرللندر 6",
       "remarks": "",
@@ -1066,7 +1066,7 @@
     "pk": 5316,
     "fields": {
       "project": 3,
-      "serial_number": 5316,
+      "serial_number": 5317,
       "expense_date": "2025-10-21",
       "description": "خریداری رجه و کرای باربری به تعمیرللندر 6",
       "remarks": "",
@@ -1084,7 +1084,7 @@
     "pk": 5317,
     "fields": {
       "project": 3,
-      "serial_number": 5317,
+      "serial_number": 5318,
       "expense_date": "2025-10-21",
       "description": "خریداری آب بازک 2/2 1\" به چاه آب تعمیرللندر 6",
       "remarks": "",
@@ -1102,7 +1102,7 @@
     "pk": 5318,
     "fields": {
       "project": 3,
-      "serial_number": 5318,
+      "serial_number": 5319,
       "expense_date": "2025-10-23",
       "description": "پرداخت برای نورگل بابت اجرت ساعتوار اسکواتور و انتقال پرانه از تعمیرللندر 6",
       "remarks": "",
@@ -1120,7 +1120,7 @@
     "pk": 5319,
     "fields": {
       "project": 3,
-      "serial_number": 5319,
+      "serial_number": 5320,
       "expense_date": "2025-10-23",
       "description": "پرداخت برای سفر برقی بابت آب بازک تعمیرللندر 6",
       "remarks": "",
@@ -1138,7 +1138,7 @@
     "pk": 5320,
     "fields": {
       "project": 3,
-      "serial_number": 5320,
+      "serial_number": 5321,
       "expense_date": "2025-10-28",
       "description": "پرداخت برای خریداری 700 خریطه سمنت ایرانی به نرخ 550 افغانی و 250 خریطه سمنت ایرانی به نرخ 561 افغانی به تعیمرللندر 6",
       "remarks": "",
@@ -1156,7 +1156,7 @@
     "pk": 5321,
     "fields": {
       "project": 3,
-      "serial_number": 5321,
+      "serial_number": 5322,
       "expense_date": "2025-10-28",
       "description": "پیش پرداخت برای غلام علی مکسر کار بابت تعمیرللندر 6",
       "remarks": "",
@@ -1174,7 +1174,7 @@
     "pk": 5322,
     "fields": {
       "project": 3,
-      "serial_number": 5322,
+      "serial_number": 5323,
       "expense_date": "2025-10-30",
       "description": "پیش پرداخت برای انجنیر صفی الله بابت تعمیرللندر 6",
       "remarks": "",
@@ -1192,7 +1192,7 @@
     "pk": 5323,
     "fields": {
       "project": 3,
-      "serial_number": 5323,
+      "serial_number": 5324,
       "expense_date": "2025-10-30",
       "description": "پرداخت برای نورالدین بابت کرای انتقال خرک و غیره به تعیمرللندر 6",
       "remarks": "",
@@ -1210,7 +1210,7 @@
     "pk": 5324,
     "fields": {
       "project": 3,
-      "serial_number": 5324,
+      "serial_number": 5325,
       "expense_date": "2025-11-03",
       "description": "پرداخت پول باقیمانده و تصفیه حساب غلام علی مکسر کار بابت کانکریت ریزی 38 حلقه پایل فی دانه از قرار 1150 افغانی",
       "remarks": "",
@@ -1228,7 +1228,7 @@
     "pk": 5325,
     "fields": {
       "project": 3,
-      "serial_number": 5325,
+      "serial_number": 5326,
       "expense_date": "2025-11-03",
       "description": "پرداخت قسط اول برای عظیم الله ستانکزی بابت حفاری پایل های تحکیماتی تعمیرللندر 6",
       "remarks": "",
@@ -1246,7 +1246,7 @@
     "pk": 5326,
     "fields": {
       "project": 3,
-      "serial_number": 5326,
+      "serial_number": 5327,
       "expense_date": "2025-11-03",
       "description": "پرداخت شرکت مواد ساختمانی سلیمان داودزی بابت خریداری ریگ شسته و کرش به کانکریت ریزی پایل های تعمیرللندر 6",
       "remarks": "",
@@ -1264,7 +1264,7 @@
     "pk": 5327,
     "fields": {
       "project": 3,
-      "serial_number": 5327,
+      "serial_number": 5328,
       "expense_date": "2025-11-04",
       "description": "پراخت برای مصارفات تاریخ های مختلف تعمیرللندر6 از تاریخ 21 اکتوبر 2025 الی 04 نوامبر 2025 از قبیل چای صبح , نان چاشت ,رول اصلی , گاز مایع,فیوز اتومات,تیل دیزل به جنراتور,رینگ ایرانی به دفتر ساحوی ,بیل گرد,متر 5 متره ,نوشابه,آب معدنی,گوشت مرغ,نان خشک , بوره,تار رجه,دستکش,مبلایل به جنراتور,وسایل آشپزخانه از قبیل ترموز چای ,گیلاس,کپگیر,دسترخوان,کاسه,مواد شوینده,تیل دیزل به جنراتور,رشوه به برقی ساحه بخاطر وصل نمودن برق ,ذخیره آب ,کراچی ,نل 40 , لوازم آشپزخانه ,مواد ساختمانی و یک بندل پایپ پلاستیکی به تعمیرللندر 6",
       "remarks": "",
@@ -1282,7 +1282,7 @@
     "pk": 5328,
     "fields": {
       "project": 3,
-      "serial_number": 5328,
+      "serial_number": 5329,
       "expense_date": "2025-11-04",
       "description": "پرداخت اجرت مزد دو نفر مزدور کار بابت کندن کاری رینگ های تعمیرللندر 6",
       "remarks": "",
@@ -1300,7 +1300,7 @@
     "pk": 5329,
     "fields": {
       "project": 3,
-      "serial_number": 5329,
+      "serial_number": 5330,
       "expense_date": "2025-11-04",
       "description": "خریداری گاز مایع به دفتر ساحوی تعمیرللندر 6",
       "remarks": "",
@@ -1318,7 +1318,7 @@
     "pk": 5330,
     "fields": {
       "project": 3,
-      "serial_number": 5330,
+      "serial_number": 5331,
       "expense_date": "2025-11-04",
       "description": "پرداخت برای خریداری مصارفات تاریخ های مختلف تعمیرللندر 6 از تاریخ 16 اکتوبر 2025 الی 04 نوامبر 2025 از قبیل تیل جنراتور,نان خشک , نوشابه,آب معدنی,گوشت ,روغن,پیاز , کچالو,چای صبح,کرای زرنج باخاطرانتقال تخته ها,خرید سامان آلات برقی,قفل , مبلایل,پل چرخ,تیل دیزل,نان چاشت ,پرزه جات به جنراتور و غیره",
       "remarks": "",
@@ -1336,7 +1336,7 @@
     "pk": 5331,
     "fields": {
       "project": 3,
-      "serial_number": 5331,
+      "serial_number": 5332,
       "expense_date": "2025-11-04",
       "description": "پرداخت برای کرن کار بابت پائین کردن پایل های تعمیرللندر 6",
       "remarks": "",
@@ -1354,7 +1354,7 @@
     "pk": 5332,
     "fields": {
       "project": 3,
-      "serial_number": 5332,
+      "serial_number": 5333,
       "expense_date": "2025-11-04",
       "description": "پرداخت برای خریداری مصارفات تاریخ های مختلف تعمیرللندر 6 از تاریخ 19 اکتوبر 2025 الی 04 نوامبر 2025 نان خشک به چای صبح,کرای موتر چوکیداربابت طی مراحل اسناد برق ,خریداری مواد خوراکه برنج,روغن ,لوبیا,نخود,مایع ظرفشویی,نمک,بوره,شامپو,صابون,پیاز ,رومی,کچالو,مرچ تازه,نان شب,لحاف ,دوشک,بالشت,اجرت کرن بخاطر کشیدن آب بازک از چاه,گوشت به دفتر ساحوی,لوبیا,رومی,کرای تکسی,سرکی بالون گاز,صافی ,نان خشک و سیخ ولدینگ به تعمیرللندر 6",
       "remarks": "",
@@ -1372,7 +1372,7 @@
     "pk": 5333,
     "fields": {
       "project": 3,
-      "serial_number": 5333,
+      "serial_number": 5334,
       "expense_date": "2025-11-04",
       "description": "پرداخت برای تخلیه یک تیلر سیمنت به تعمیرللندر 6",
       "remarks": "",
@@ -1390,7 +1390,7 @@
     "pk": 5334,
     "fields": {
       "project": 3,
-      "serial_number": 5334,
+      "serial_number": 5335,
       "expense_date": "2025-11-04",
       "description": "پرداخت برای کرن کار بابت پائین کردن پایل های تعمیرللندر 6",
       "remarks": "",
@@ -1408,7 +1408,7 @@
     "pk": 5335,
     "fields": {
       "project": 3,
-      "serial_number": 5335,
+      "serial_number": 5336,
       "expense_date": "2025-11-04",
       "description": "پرداخت مصرف بل برق تعمیرللندر 6 همراه با کرای موتر به تعمیرللندر 6",
       "remarks": "",
@@ -1426,7 +1426,7 @@
     "pk": 5336,
     "fields": {
       "project": 3,
-      "serial_number": 5336,
+      "serial_number": 5337,
       "expense_date": "2025-11-04",
       "description": "پرداخت برای چاه کن پایل های دستی در چاه سپتیک به تعداد 2 پایل 5 متره تعمیرللندر 6",
       "remarks": "",
@@ -1444,7 +1444,7 @@
     "pk": 5337,
     "fields": {
       "project": 3,
-      "serial_number": 5337,
+      "serial_number": 5338,
       "expense_date": "2025-11-04",
       "description": "پرداخت برای تخلیه چاه فاضلاب تعمیرللندر 6 توسط تانکر کلان",
       "remarks": "",
@@ -1462,7 +1462,7 @@
     "pk": 5338,
     "fields": {
       "project": 3,
-      "serial_number": 5338,
+      "serial_number": 5339,
       "expense_date": "2025-11-04",
       "description": "پرداخت برای تیمور شاه بابت اجرت سه نفر مزدور کار بخاطر پاک کاری کی از دیوار های استنادی و خالی کردن در جای مناسب بابت تعمیرللندر 6",
       "remarks": "",
@@ -1480,7 +1480,7 @@
     "pk": 5339,
     "fields": {
       "project": 3,
-      "serial_number": 5339,
+      "serial_number": 5340,
       "expense_date": "2025-11-04",
       "description": "پرداخت کرای زرنج بخاطر انتقال ماشین سوخته شده جنراتور تعمیرللندر 6",
       "remarks": "",
@@ -1498,7 +1498,7 @@
     "pk": 5340,
     "fields": {
       "project": 3,
-      "serial_number": 5340,
+      "serial_number": 5341,
       "expense_date": "2025-11-04",
       "description": "پرداخت برای حسین کرن کار بابت انتقال دیوار های استنادی للندر 6 از داخل حویلی به پیاده رو به مقدار 11 عدد",
       "remarks": "",
@@ -1516,7 +1516,7 @@
     "pk": 5341,
     "fields": {
       "project": 3,
-      "serial_number": 5341,
+      "serial_number": 5342,
       "expense_date": "2025-11-04",
       "description": "خریداری بیل , گلگل و دسته بیل به تعمیرللندر 6",
       "remarks": "",
@@ -1534,7 +1534,7 @@
     "pk": 5342,
     "fields": {
       "project": 3,
-      "serial_number": 5342,
+      "serial_number": 5343,
       "expense_date": "2025-11-04",
       "description": "خریداری تیل دیزل به جنراتور تعمیرللندر 6",
       "remarks": "",
@@ -1552,7 +1552,7 @@
     "pk": 5343,
     "fields": {
       "project": 3,
-      "serial_number": 5343,
+      "serial_number": 5344,
       "expense_date": "2025-11-04",
       "description": "خریداری گلماله پلاستیکی و آب معدنی به تعمیرللندر 6",
       "remarks": "",
@@ -1570,7 +1570,7 @@
     "pk": 5344,
     "fields": {
       "project": 3,
-      "serial_number": 5344,
+      "serial_number": 5345,
       "expense_date": "2025-11-04",
       "description": "خریداری کچالو , سیر,مرچ تازه ,آب نوشیدنی به تعمیرللندر 6",
       "remarks": "",
@@ -1588,7 +1588,7 @@
     "pk": 5345,
     "fields": {
       "project": 3,
-      "serial_number": 5345,
+      "serial_number": 5346,
       "expense_date": "2025-11-04",
       "description": "خریداری یک رئس گوساله به خیرات تعمیرللندر 6 , اجرت قصابی گوساله,کرای انتقال به ساحه ,خریداری بادنجان رومی و آب نوشیدنی",
       "remarks": "",
@@ -1606,7 +1606,7 @@
     "pk": 5346,
     "fields": {
       "project": 3,
-      "serial_number": 5346,
+      "serial_number": 5347,
       "expense_date": "2025-11-04",
       "description": "پرداخت برای سرگروپ برقی بخاطر وصل نمودن میتر های سه فاز تعمیرللندر 6",
       "remarks": "",
@@ -1624,7 +1624,7 @@
     "pk": 5347,
     "fields": {
       "project": 3,
-      "serial_number": 5347,
+      "serial_number": 5348,
       "expense_date": "2025-11-04",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -1642,7 +1642,7 @@
     "pk": 5348,
     "fields": {
       "project": 3,
-      "serial_number": 5348,
+      "serial_number": 5349,
       "expense_date": "2025-11-06",
       "description": "پردخت برای نورالدین بابت انتقال پایه های فلزی از للندر 5 به للندر 6 و کرای انتقال چوب و قالب از للندر 5 به للندر 6",
       "remarks": "",
@@ -1660,7 +1660,7 @@
     "pk": 5349,
     "fields": {
       "project": 3,
-      "serial_number": 5349,
+      "serial_number": 5350,
       "expense_date": "2025-11-06",
       "description": "خریداری کارت مبایل به انجنیر صفی الله",
       "remarks": "",
@@ -1678,7 +1678,7 @@
     "pk": 5350,
     "fields": {
       "project": 3,
-      "serial_number": 5350,
+      "serial_number": 5351,
       "expense_date": "2025-11-06",
       "description": "خریداری تیل پطرول به موتر هایلکس",
       "remarks": "",
@@ -1696,7 +1696,7 @@
     "pk": 5351,
     "fields": {
       "project": 3,
-      "serial_number": 5351,
+      "serial_number": 5352,
       "expense_date": "2025-11-11",
       "description": "پرداخت برای نورگل بابت کندن کاری تهکوی تعمیرللندر 6",
       "remarks": "",
@@ -1714,7 +1714,7 @@
     "pk": 5352,
     "fields": {
       "project": 3,
-      "serial_number": 5352,
+      "serial_number": 5353,
       "expense_date": "2025-11-11",
       "description": "پرداخت دفعه دوم برای نورگل بابت کندن کاری تهکوی تعمیرللندر 6",
       "remarks": "",
@@ -1732,7 +1732,7 @@
     "pk": 5353,
     "fields": {
       "project": 3,
-      "serial_number": 5353,
+      "serial_number": 5354,
       "expense_date": "2025-11-16",
       "description": "پیش پرداخت برای عبدالمتین بابت ماه عقرب 1404",
       "remarks": "",
@@ -1750,7 +1750,7 @@
     "pk": 5354,
     "fields": {
       "project": 3,
-      "serial_number": 5354,
+      "serial_number": 5355,
       "expense_date": "2025-11-17",
       "description": "پرداخت برای نورگل بابت کندن کاری تهکوی تعمیرللندر6",
       "remarks": "",
@@ -1768,7 +1768,7 @@
     "pk": 5355,
     "fields": {
       "project": 3,
-      "serial_number": 5355,
+      "serial_number": 5356,
       "expense_date": "2025-11-18",
       "description": "پرداخت برای کرای تکسی کاریگرن به تعمیرللندر 6",
       "remarks": "",
@@ -1786,7 +1786,7 @@
     "pk": 5356,
     "fields": {
       "project": 3,
-      "serial_number": 5356,
+      "serial_number": 5357,
       "expense_date": "2025-11-18",
       "description": "پرداخت برای کرای انتقال مواد اضافی از للندر 6 به گدام کارته سه",
       "remarks": "",
@@ -1804,7 +1804,7 @@
     "pk": 5357,
     "fields": {
       "project": 3,
-      "serial_number": 5357,
+      "serial_number": 5358,
       "expense_date": "2025-11-20",
       "description": "پرداخت برای محمد نسیم کرن کار بابت انتقال کانتینر 20 فت از کارته سه به للندر 6",
       "remarks": "",
@@ -1822,7 +1822,7 @@
     "pk": 5358,
     "fields": {
       "project": 3,
-      "serial_number": 5358,
+      "serial_number": 5359,
       "expense_date": "2025-11-22",
       "description": "پرداخت برای مصارفات تعمیرللندر 6 توسط حاجی احسان الله سهاک از تاریخ 04 نوامبر الی 22 نوامبر 2025 از قبیل تیل دیزل به جنراتور,نان خشک به دفتر ساحوی,گاز مایع ,مواد خوراکه از قبیل پیاز,آب معدنی,پایپ کرمچی,رشوه به سرگروپ برقی , انجنیر حامد برقی ,کرای تکسی کاریگران,روغن مایع,متر 50 متره,مواد خوراکه بامیه,شلغم,مرچ تازه , گوشت مرغ و گاز مایع به دفتر ساحوی تعمیرللندر 6",
       "remarks": "",
@@ -1840,7 +1840,7 @@
     "pk": 5359,
     "fields": {
       "project": 3,
-      "serial_number": 5359,
+      "serial_number": 5360,
       "expense_date": "2025-11-22",
       "description": "پرداخت برای مصارفات تعمیرللندر 6 توسط حاجی احسان الله سهاک از تاریخ 04 نوامبر الی 22 نوامبر 2025 از قبیل جالی سبز به دروازه عمومی,فوتوکاپی 4 جلد نقشه ها همراه با پوش,مواد خوراکه ,تیل دیزل به جنراتور,فیوز اتومات سه فاز و پلک و ساکت 16 امپیر,لابرتیپ , بامیه , آب نوشیدنی,گاز مایع , نان خشک , گچ به خط اندازی,پل چرخ,شاول,دبل پیچ,نوک برمه,پل برمه 8 ملی,کرای جایداد شمسی تاور بخاطر کاریگران للندر 6  و خریداری رنگ اسپری به تعمیرللندر 6",
       "remarks": "",
@@ -1858,7 +1858,7 @@
     "pk": 5360,
     "fields": {
       "project": 3,
-      "serial_number": 5360,
+      "serial_number": 5361,
       "expense_date": "2025-11-22",
       "description": "پرداخت برای مصارفات تعمیرللندر 6 توسط حاجی احسان الله سهاک از تاریخ 04 نوامبر الی 22 نوامبر 2025 از قبیل رنگ فولادی و رنگ اسپری , مواد خوراکه سیر, رومی ,پیاز, کچالو, تخم مرغ ,آب معدنی,روغن مایع,مایع ظرفشویی,تار رجه,متر 50 متره,گوشت مرغ,سامی,شیردهن همرا با اجرت نصب,شیشه پاکن,انرژی به اسکواتورکاران , پرداخت برای انجنیران ناحیه 4 , کنترول ساختمانها و حوزه پولیس و نوشابه به انجینران ناحیه بابت تعمیرللندر 6",
       "remarks": "",
@@ -1876,7 +1876,7 @@
     "pk": 5361,
     "fields": {
       "project": 3,
-      "serial_number": 5361,
+      "serial_number": 5362,
       "expense_date": "2025-11-23",
       "description": "پرداخت برای نورگل بابت کندن کاری تهکوی تعمیرللندر 6",
       "remarks": "",
@@ -1894,7 +1894,7 @@
     "pk": 5362,
     "fields": {
       "project": 3,
-      "serial_number": 5362,
+      "serial_number": 5363,
       "expense_date": "2025-11-24",
       "description": "پرداخت اجرت ساعتوار اسکواتور در تعمیرللندر 6 بابت امورات پاک کاری ساحه بخاطر پایل های تحکیماتی للندر 6",
       "remarks": "",
@@ -1912,7 +1912,7 @@
     "pk": 5363,
     "fields": {
       "project": 3,
-      "serial_number": 5363,
+      "serial_number": 5364,
       "expense_date": "2025-11-24",
       "description": "خریداری پایپ کرمچی 6\" به کانکریت ریزی پایل های اساسی تعمیرللندر 6",
       "remarks": "",
@@ -1930,7 +1930,7 @@
     "pk": 5364,
     "fields": {
       "project": 3,
-      "serial_number": 5364,
+      "serial_number": 5365,
       "expense_date": "2025-11-24",
       "description": "خریداری تیل پطرول به موتر هایلکس",
       "remarks": "",
@@ -1948,7 +1948,7 @@
     "pk": 5365,
     "fields": {
       "project": 3,
-      "serial_number": 5365,
+      "serial_number": 5366,
       "expense_date": "2025-11-25",
       "description": "پرداخت معاش عبدالمتین ولد نیک محمد بابت سه روزه ماه میزان 1404 در تعمیرللندر6",
       "remarks": "",
@@ -1966,7 +1966,7 @@
     "pk": 5366,
     "fields": {
       "project": 3,
-      "serial_number": 5366,
+      "serial_number": 5367,
       "expense_date": "2025-11-25",
       "description": "پرداخت معاش عبدالمتین ولد نیک محمد بابت ماه عقرب 1404 بابت تعمیرللندر 6",
       "remarks": "",
@@ -1984,7 +1984,7 @@
     "pk": 5367,
     "fields": {
       "project": 3,
-      "serial_number": 5367,
+      "serial_number": 5368,
       "expense_date": "2025-11-25",
       "description": "پرداخت معاش محمد نادر ولد صوفی مقبول شاه بابت شش روزه ماه میزان 1404 در تعمیرللندر6",
       "remarks": "",
@@ -2002,7 +2002,7 @@
     "pk": 5368,
     "fields": {
       "project": 3,
-      "serial_number": 5368,
+      "serial_number": 5369,
       "expense_date": "2025-11-25",
       "description": "پرداخت معاش عحمد نادر ولد صوفی مقبول شاه بابت ماه عقرب 1404 بابت تعمیرللندر 6",
       "remarks": "",
@@ -2020,7 +2020,7 @@
     "pk": 5369,
     "fields": {
       "project": 3,
-      "serial_number": 5369,
+      "serial_number": 5370,
       "expense_date": "2025-11-25",
       "description": "پرداخت معاش عبدالبصیر ولد رضا بابت سه روزه ماه میزان 1404 در تعمیرللندر6",
       "remarks": "",
@@ -2038,7 +2038,7 @@
     "pk": 5370,
     "fields": {
       "project": 3,
-      "serial_number": 5370,
+      "serial_number": 5371,
       "expense_date": "2025-11-25",
       "description": "پرداخت معاش عبدالبصیر ولد رضا بابت ماه عقرب 1404 بابت تعمیرللندر 6",
       "remarks": "",
@@ -2056,7 +2056,7 @@
     "pk": 5371,
     "fields": {
       "project": 3,
-      "serial_number": 5371,
+      "serial_number": 5372,
       "expense_date": "2025-11-26",
       "description": "خریداری عطر توسط حاجی رفیع الله به رئیس صدور مجوز بابت تعمیرللندر6",
       "remarks": "",
@@ -2074,7 +2074,7 @@
     "pk": 5372,
     "fields": {
       "project": 3,
-      "serial_number": 5372,
+      "serial_number": 5373,
       "expense_date": "2025-11-27",
       "description": "پرداخت برای محمد نسیم کرن کار بابت تعمیر پائین نمودن پایل های تعمیرللندر 6",
       "remarks": "",
@@ -2092,7 +2092,7 @@
     "pk": 5373,
     "fields": {
       "project": 3,
-      "serial_number": 5373,
+      "serial_number": 5374,
       "expense_date": "2025-11-27",
       "description": "پرداخت برای نورگل بابت کندن کاری تعمیرللندر 6 معادل 5000$",
       "remarks": "",
@@ -2110,7 +2110,7 @@
     "pk": 5374,
     "fields": {
       "project": 3,
-      "serial_number": 5374,
+      "serial_number": 5375,
       "expense_date": "2025-11-27",
       "description": "پرداخت معاش عبدالبصیرولد محمد وکیل چوکیدار تعمیرللندر 6 ماه عقرب 1404",
       "remarks": "",
@@ -2128,7 +2128,7 @@
     "pk": 5375,
     "fields": {
       "project": 3,
-      "serial_number": 5375,
+      "serial_number": 5376,
       "expense_date": "2025-11-27",
       "description": "پرداخت برای نورالدین بابت سیم تابی پایل های تعمیرللندر 6",
       "remarks": "",
@@ -2146,7 +2146,7 @@
     "pk": 5376,
     "fields": {
       "project": 3,
-      "serial_number": 5376,
+      "serial_number": 5377,
       "expense_date": "2025-11-27",
       "description": "پیش پرداخت برای زین الله توسط حاجی احسان الله بابت ماه عقرب 1404",
       "remarks": "",
@@ -2164,7 +2164,7 @@
     "pk": 5377,
     "fields": {
       "project": 3,
-      "serial_number": 5377,
+      "serial_number": 5378,
       "expense_date": "2025-11-29",
       "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت به کانکریت ریزی پایل های اساسی تعمیرللندر 6",
       "remarks": "",
@@ -2182,7 +2182,7 @@
     "pk": 5378,
     "fields": {
       "project": 3,
-      "serial_number": 5378,
+      "serial_number": 5379,
       "expense_date": "2025-11-30",
       "description": "خریداری پایپ کرمچی به کانکریت ریزی پایل های اساسی تعمیرللندر 6",
       "remarks": "",
@@ -2200,7 +2200,7 @@
     "pk": 5379,
     "fields": {
       "project": 3,
-      "serial_number": 5379,
+      "serial_number": 5380,
       "expense_date": "2025-11-30",
       "description": "خریداری تیل پطرول به موتر کرولا نقره ایی استفاده به للندر 6",
       "remarks": "",
@@ -2218,7 +2218,7 @@
     "pk": 5380,
     "fields": {
       "project": 3,
-      "serial_number": 5380,
+      "serial_number": 5381,
       "expense_date": "2025-11-30",
       "description": "پرداخت برای علی داد مکسر کار بابت کانکریت ریزی پایل های اساسی تعمیرللندر 6",
       "remarks": "",
@@ -2236,7 +2236,7 @@
     "pk": 5381,
     "fields": {
       "project": 3,
-      "serial_number": 5381,
+      "serial_number": 5382,
       "expense_date": "2025-12-01",
       "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت به کانکریت ریزی پایل های تعمیرللندر 6",
       "remarks": "",
@@ -2254,7 +2254,7 @@
     "pk": 5382,
     "fields": {
       "project": 3,
-      "serial_number": 5382,
+      "serial_number": 5383,
       "expense_date": "2025-12-01",
       "description": "خریداری کندکسر به آب بازک تعمیرللندر 6",
       "remarks": "",
@@ -2272,7 +2272,7 @@
     "pk": 5383,
     "fields": {
       "project": 3,
-      "serial_number": 5383,
+      "serial_number": 5384,
       "expense_date": "2025-12-01",
       "description": "خریداری لین 3/4 به تعمیرللندر 6",
       "remarks": "",
@@ -2290,7 +2290,7 @@
     "pk": 5384,
     "fields": {
       "project": 3,
-      "serial_number": 5384,
+      "serial_number": 5385,
       "expense_date": "2025-12-01",
       "description": "خریداری پایپ لابری به تعمیرللندر 6",
       "remarks": "",
@@ -2308,7 +2308,7 @@
     "pk": 5385,
     "fields": {
       "project": 3,
-      "serial_number": 5385,
+      "serial_number": 5386,
       "expense_date": "2025-12-01",
       "description": "خریداری پایپ , زانو خم و برشینگ به تعمیرللندر 6",
       "remarks": "",
@@ -2326,7 +2326,7 @@
     "pk": 5386,
     "fields": {
       "project": 3,
-      "serial_number": 5386,
+      "serial_number": 5387,
       "expense_date": "2025-12-01",
       "description": "خریداری کوتگه سامی به تعمیرللندر 6",
       "remarks": "",
@@ -2344,7 +2344,7 @@
     "pk": 5387,
     "fields": {
       "project": 3,
-      "serial_number": 5387,
+      "serial_number": 5388,
       "expense_date": "2025-12-02",
       "description": "پرداخت برای جاوید سکندری بابت سیخ گول تعمیرللندر 6",
       "remarks": "",
@@ -2362,7 +2362,7 @@
     "pk": 5388,
     "fields": {
       "project": 3,
-      "serial_number": 5388,
+      "serial_number": 5389,
       "expense_date": "2025-12-03",
       "description": "پرداخت برای مصارفات حاجی احسان الله از تاریخ 25 نوامبر الی 03 دسمبر 2025 از قبیل تیل دیزل به جنراتور,لحاف یک نفره ,بوره , نمک,سیمک, آب معدنی,گچ,لوبیا,نخود,بوره,چای سبز,روغن ,کچالو,اندل به جنراتور,تخم مرغ,تیل پطول به موتر,گاز مایع ,جین لین,اسپیری ,پنچری تایر کراچی و اجرت پائین کردن سمنت توسط مزدورکاران تعمیرللندر 6",
       "remarks": "",
@@ -2380,7 +2380,7 @@
     "pk": 5389,
     "fields": {
       "project": 3,
-      "serial_number": 5389,
+      "serial_number": 5390,
       "expense_date": "2025-12-03",
       "description": "پرداخت برای مصارفات حاجی احسان الله از تاریخ 25 نوامبر الی 03 دسمبر 2025 از قبیل کرای رفت و آمد انجنیر وحید به للندر 4, کرای تکسی انجنیر محبوب الله و کرای موتر کارمندان به تعمیرللندر 6 ,پرداخت برای برقی ساحه بابت فیوز سوخته گی ,کرای تکسی سیخ از سرای مطیع الله,نان خشک , برشینگ ,تبدیل , تفلون, برق دستی ,آب نوشیدنی,جاین کلفت , دستکش ,مصاله دیگ , کتر , مبلایل تبدیلی جنراتور, و کری موتر و اجرت سه نفر مزدور کاران بابت پیش کردن سمنت به تعمیرللندر 6",
       "remarks": "",
@@ -2398,7 +2398,7 @@
     "pk": 5390,
     "fields": {
       "project": 3,
-      "serial_number": 5390,
+      "serial_number": 5391,
       "expense_date": "2025-12-03",
       "description": "خریداری تیل دیزل به جنراتور تعمیرللندر 6",
       "remarks": "",
@@ -2416,7 +2416,7 @@
     "pk": 5391,
     "fields": {
       "project": 3,
-      "serial_number": 5391,
+      "serial_number": 5392,
       "expense_date": "2025-12-04",
       "description": "پرداخت برای  حاجی عبدالکریم خریداری سیمنت ایرانی به کانکریت ریزی پایل های تعمیرللندر 6",
       "remarks": "",
@@ -2434,7 +2434,7 @@
     "pk": 5392,
     "fields": {
       "project": 3,
-      "serial_number": 5392,
+      "serial_number": 5393,
       "expense_date": "2025-12-04",
       "description": "پرداخت برای علی داد مکسر کار بدست زمان برادرش بابت کانکریت ریزی پایل های تعمیرللندر 6",
       "remarks": "",
@@ -2452,7 +2452,7 @@
     "pk": 5393,
     "fields": {
       "project": 3,
-      "serial_number": 5393,
+      "serial_number": 5394,
       "expense_date": "2025-12-04",
       "description": "پرداخت برای شرکت سلیمان داودزی بابت خریداری ریگ و کرش به پایل های تعمیرللندر 6",
       "remarks": "",
@@ -2470,7 +2470,7 @@
     "pk": 5394,
     "fields": {
       "project": 3,
-      "serial_number": 5394,
+      "serial_number": 5395,
       "expense_date": "2025-12-04",
       "description": "پرداخت برای نور گل بابت کندن کاری تهکوی تعمیرللندر 6",
       "remarks": "",
@@ -2488,7 +2488,7 @@
     "pk": 5395,
     "fields": {
       "project": 3,
-      "serial_number": 5395,
+      "serial_number": 5396,
       "expense_date": "2025-12-04",
       "description": "پرداخت برای نورالدین بابت سیم تابی پایل های تعمیرللندر 6",
       "remarks": "",
@@ -2506,7 +2506,7 @@
     "pk": 5396,
     "fields": {
       "project": 3,
-      "serial_number": 5396,
+      "serial_number": 5397,
       "expense_date": "2025-12-04",
       "description": "خریداری تحفه توسط حاجی رفیع الله بابت تعمیرللندر 6",
       "remarks": "",
@@ -2524,7 +2524,7 @@
     "pk": 5397,
     "fields": {
       "project": 3,
-      "serial_number": 5397,
+      "serial_number": 5398,
       "expense_date": "2025-12-07",
       "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت به تعمیرللندر 6",
       "remarks": "",
@@ -2542,7 +2542,7 @@
     "pk": 5398,
     "fields": {
       "project": 3,
-      "serial_number": 5398,
+      "serial_number": 5399,
       "expense_date": "2025-12-07",
       "description": "پرداخت برای نورالدین بابت سیم تابی پایل های تعمیرللندر 6",
       "remarks": "",
@@ -2560,7 +2560,7 @@
     "pk": 5399,
     "fields": {
       "project": 3,
-      "serial_number": 5399,
+      "serial_number": 5400,
       "expense_date": "2025-12-07",
       "description": "خریداری تیل پطرول به موتر هایلکس",
       "remarks": "",
@@ -2578,7 +2578,7 @@
     "pk": 5400,
     "fields": {
       "project": 3,
-      "serial_number": 5400,
+      "serial_number": 5401,
       "expense_date": "2025-12-10",
       "description": "پرداخت برای مصارفات بل های حاجی احسان الله سهاک از تاریخ 03 دسمبر 2025 الی 10 دسمبر 2025 تعمیرلندر6 از قبیل گوشت مرغ ,پیاز ,سبزی,آب نوشیدنی ,تاسک وال ماشین,تیل دیزل,بیلر بخاطر کانکریت,کرای زرنج,کرای رفت و آمد از ساحه للندر 6 به دفتر کارته چهار,گاز مایع,پل چرخ,جور کردن فیوز سوخته گی صندوق برق,تیل دیزل به جنراتور,اجرت مزدور کاران بخاطر پیش نمودن سمنت ,کراچی از نل 40 ,مواد خوراکه, اجرت 4 نفر  تیل دیزل به جنراتور و لابرتیب به تعمیرللندر 6",
       "remarks": "",
@@ -2596,7 +2596,7 @@
     "pk": 5401,
     "fields": {
       "project": 3,
-      "serial_number": 5401,
+      "serial_number": 5402,
       "expense_date": "2025-12-10",
       "description": "پیش پرداخت برای عبدالمتین بابت ماه قوس 1404",
       "remarks": "",
@@ -2614,7 +2614,7 @@
     "pk": 5402,
     "fields": {
       "project": 3,
-      "serial_number": 5402,
+      "serial_number": 5403,
       "expense_date": "2025-12-10",
       "description": "پرداخت برای مصارفات بل های حاجی احسان الله سهاک از تاریخ 03 دسمبر 2025 الی 10 دسمبر 2025 تعمیرلندر6 پش پرداخت برای میرویس ولد عبدالبصیر بابت ماه قوس 1404",
       "remarks": "",
@@ -2632,7 +2632,7 @@
     "pk": 5403,
     "fields": {
       "project": 3,
-      "serial_number": 5403,
+      "serial_number": 5404,
       "expense_date": "2025-12-10",
       "description": "پرداخت برای مصارفات بل های حاجی احسان الله سهاک از تاریخ 03 دسمبر 2025 الی 10 دسمبر 2025 تعمیرلندر6 رداخت برای مزدورکاران نورالدین بابت پائین نمودن سمنت و هموار کاری ساحه جاینت B و خریداری آب نوشیدنی به تعمیرللندر 6",
       "remarks": "",
@@ -2650,7 +2650,7 @@
     "pk": 5404,
     "fields": {
       "project": 3,
-      "serial_number": 5404,
+      "serial_number": 5405,
       "expense_date": "2025-12-10",
       "description": "پرداخت برای مصارفات بل های حاجی احسان الله سهاک از تاریخ 03 دسمبر 2025 الی 10 دسمبر 2025 تعمیرلندر6 از قبیل گوشت تیل دیزل , گاز مایع , پیچ کش برقی ,خرپیچ , سیمک دیگ ,آب نوشیدنی,اجرت 4 نفر مزدورکاران,بابت پیش کردن سمنت,تیل دیزل به جنراتور و خریداری پائیپ کرمچی به تعمیرللندر 6",
       "remarks": "",
@@ -2668,7 +2668,7 @@
     "pk": 5405,
     "fields": {
       "project": 3,
-      "serial_number": 5405,
+      "serial_number": 5406,
       "expense_date": "2025-12-10",
       "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت ایرانی به کانکریت ریزی پایل های تعمیرللندر6",
       "remarks": "",
@@ -2686,7 +2686,7 @@
     "pk": 5406,
     "fields": {
       "project": 3,
-      "serial_number": 5406,
+      "serial_number": 5407,
       "expense_date": "2025-12-10",
       "description": "پرداخت برای شرکت سلیمان داودزی توسط مشعل بابت خریداری ریگ و جغل به تعمیرللندر 6",
       "remarks": "",
@@ -2704,7 +2704,7 @@
     "pk": 5407,
     "fields": {
       "project": 3,
-      "serial_number": 5407,
+      "serial_number": 5408,
       "expense_date": "2025-12-10",
       "description": "پرداخت برای علی داد مکسر کار بابت کانکریت ریزی پایل های اساسی تعمیرللندر6",
       "remarks": "",
@@ -2722,7 +2722,7 @@
     "pk": 5408,
     "fields": {
       "project": 3,
-      "serial_number": 5408,
+      "serial_number": 5409,
       "expense_date": "2025-12-10",
       "description": "پرداخت برای نور گل بابت کندن کاری تعمیرللندر6 بدست مشعل به گفته نور گل توسط زنگ مبایل",
       "remarks": "",
@@ -2740,7 +2740,7 @@
     "pk": 5409,
     "fields": {
       "project": 3,
-      "serial_number": 5409,
+      "serial_number": 5410,
       "expense_date": "2025-12-10",
       "description": "پرداخت برای نورالدین بابت سیم تابی پایل های تعمیرللندر6",
       "remarks": "",
@@ -2758,7 +2758,7 @@
     "pk": 5410,
     "fields": {
       "project": 3,
-      "serial_number": 5410,
+      "serial_number": 5411,
       "expense_date": "2025-12-10",
       "description": "پرداخت برای محمد نسیم کرن کار بابت پائین نمودن پایل های تعمیرللندر6",
       "remarks": "",
@@ -2776,7 +2776,7 @@
     "pk": 5411,
     "fields": {
       "project": 3,
-      "serial_number": 5411,
+      "serial_number": 5412,
       "expense_date": "2025-12-11",
       "description": "پرداخت برای عظیم الله جهادیار بابت حفاری پایل های اساسی تعمیرللندر6",
       "remarks": "",
@@ -2794,7 +2794,7 @@
     "pk": 5412,
     "fields": {
       "project": 3,
-      "serial_number": 5412,
+      "serial_number": 5413,
       "expense_date": "2025-12-11",
       "description": "پرداخت برای انجنیر وحید الله صدیقی بخاطر انترنت و کارت مبایل  بابت تعمیرللندر6",
       "remarks": "",
@@ -2812,7 +2812,7 @@
     "pk": 5413,
     "fields": {
       "project": 3,
-      "serial_number": 5413,
+      "serial_number": 5414,
       "expense_date": "2025-12-11",
       "description": "پرداخت کرای تکسی کاریگرها به تعمیرللندر 6",
       "remarks": "",
@@ -2830,7 +2830,25 @@
     "pk": 5414,
     "fields": {
       "project": 3,
-      "serial_number": 5414,
+      "serial_number": 5415,
+      "expense_date": "2025-12-11",
+      "description": "خریداری تیل پطرول به موتر هایلکس",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 4810.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 66.15,
+      "expense_type": "general",
+      "created_at": "2025-12-11",
+      "updated_at": "2025-12-11"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5415,
+    "fields": {
+      "project": 3,
+      "serial_number": 5416,
       "expense_date": "2025-12-14",
       "description": "خریداری مواد ضد نم به کانکریت ریزی شفته بالای سنگ بولدر تعمیرللندر 6",
       "remarks": "",
@@ -2845,10 +2863,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5415,
+    "pk": 5416,
     "fields": {
       "project": 3,
-      "serial_number": 5415,
+      "serial_number": 5417,
       "expense_date": "2025-12-14",
       "description": "خریداری رجه به تعمیرللندر 6",
       "remarks": "",
@@ -2863,10 +2881,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5416,
+    "pk": 5417,
     "fields": {
       "project": 3,
-      "serial_number": 5416,
+      "serial_number": 5418,
       "expense_date": "2025-12-14",
       "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت به تعمیرللندر6",
       "remarks": "",
@@ -2881,10 +2899,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5417,
+    "pk": 5418,
     "fields": {
       "project": 3,
-      "serial_number": 5417,
+      "serial_number": 5419,
       "expense_date": "2025-12-14",
       "description": "پرداخت برای گلکار بابت شفته کاری تعمیرللندر6",
       "remarks": "",
@@ -2899,10 +2917,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5418,
+    "pk": 5419,
     "fields": {
       "project": 3,
-      "serial_number": 5418,
+      "serial_number": 5420,
       "expense_date": "2025-12-14",
       "description": "پرداخت برای انجنیر عبدالقدیر نبوی بابت تضمین جواز و انجنیر بابت امر تعمیرللندر 6",
       "remarks": "",
@@ -2917,10 +2935,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5419,
+    "pk": 5420,
     "fields": {
       "project": 3,
-      "serial_number": 5419,
+      "serial_number": 5421,
       "expense_date": "2025-12-14",
       "description": "خریداری و تهیه لباس برای  کارمندان ریاست صدور مجوز و کنترول ساختمانها بابت تعمیرللندر 6",
       "remarks": "",
@@ -2935,10 +2953,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5420,
+    "pk": 5421,
     "fields": {
       "project": 3,
-      "serial_number": 5420,
+      "serial_number": 5422,
       "expense_date": "2025-12-15",
       "description": "خریداری اسپیسر به تعمیرللندر 6",
       "remarks": "",
@@ -2953,10 +2971,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5421,
+    "pk": 5422,
     "fields": {
       "project": 3,
-      "serial_number": 5421,
+      "serial_number": 5423,
       "expense_date": "2025-12-17",
       "description": "پرداخت برای علی داد مکسر کار بابت کانکریت ریزی پایل های اساسی تعمیرللندر6",
       "remarks": "",
@@ -2971,10 +2989,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5422,
+    "pk": 5423,
     "fields": {
       "project": 3,
-      "serial_number": 5422,
+      "serial_number": 5424,
       "expense_date": "2025-12-18",
       "description": "پرداخت برای خریداری مواد ضد نم به تعمیرللندر 6",
       "remarks": "",
@@ -2989,10 +3007,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5423,
+    "pk": 5424,
     "fields": {
       "project": 3,
-      "serial_number": 5423,
+      "serial_number": 5425,
       "expense_date": "2025-12-18",
       "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت ایرانی به تعمیرللندر 6",
       "remarks": "",
@@ -3007,10 +3025,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5424,
+    "pk": 5425,
     "fields": {
       "project": 3,
-      "serial_number": 5424,
+      "serial_number": 5426,
       "expense_date": "2025-12-18",
       "description": "پرداخت برای نورالدین بابت سیم تابی تعمیرللندر 6",
       "remarks": "",
@@ -3025,10 +3043,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5425,
+    "pk": 5426,
     "fields": {
       "project": 3,
-      "serial_number": 5425,
+      "serial_number": 5427,
       "expense_date": "2025-12-18",
       "description": "پرداخت برای شرکت ساختمانی سلیمان داودزی بابت خریداری ریگ شسته و جغل بادامی به تعمیرللندر 6",
       "remarks": "",
@@ -3043,10 +3061,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5426,
+    "pk": 5427,
     "fields": {
       "project": 3,
-      "serial_number": 5426,
+      "serial_number": 5428,
       "expense_date": "2025-12-18",
       "description": "پرداخت برای نسیم کرن کار بابت پائین کردن پایل های تعمیرللندر 6",
       "remarks": "",
@@ -3061,10 +3079,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5427,
+    "pk": 5428,
     "fields": {
       "project": 3,
-      "serial_number": 5427,
+      "serial_number": 5429,
       "expense_date": "2025-12-20",
       "description": "پرداخت برای نورالدین بابت سیم تابی تعمیرللندر6",
       "remarks": "",
@@ -3079,10 +3097,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5428,
+    "pk": 5429,
     "fields": {
       "project": 3,
-      "serial_number": 5428,
+      "serial_number": 5430,
       "expense_date": "2025-12-21",
       "description": "پرداخت و تصفیه حساب عظیم الله بابت حفاری پایل های اساسی تعمیرللندر 6",
       "remarks": "",
@@ -3097,10 +3115,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5429,
+    "pk": 5430,
     "fields": {
       "project": 3,
-      "serial_number": 5429,
+      "serial_number": 5431,
       "expense_date": "2025-12-21",
       "description": "پرداخت و تصفیه حساب باقیمانده عظیم الله بابت حفاری پایل های تحکیماتی تعمیرللندر 6",
       "remarks": "",
@@ -3115,10 +3133,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5430,
+    "pk": 5431,
     "fields": {
       "project": 3,
-      "serial_number": 5430,
+      "serial_number": 5432,
       "expense_date": "2025-12-22",
       "description": "خریداری تیل پطرول A90 به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -3133,10 +3151,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5431,
+    "pk": 5432,
     "fields": {
       "project": 3,
-      "serial_number": 5431,
+      "serial_number": 5433,
       "expense_date": "2025-12-23",
       "description": "پرداخت برای مبلایل تبدیلی و فلتر مبلایل به موتر هایلکس بابت تعمیرللندر6",
       "remarks": "",
@@ -3151,10 +3169,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5432,
+    "pk": 5433,
     "fields": {
       "project": 3,
-      "serial_number": 5432,
+      "serial_number": 5434,
       "expense_date": "2025-12-24",
       "description": "پرداخت برای حاجی احسان الله سهاک بابت مصارفات تاریخ های مختلف به تعمیرللندر6 از تاریخ 10 دسمبر 2025 الی 24 دسمبر 2025 از قبیل خریداری گاز مایع به دفتر ساحوی , اسپیسر , تیل دیزل به جنراتور ,فیوز 20 امپیر,ساکت واتر پمپ ,لابرتیب ضد آب , استپلر,پلاستیک شیت ,سیخ ولدینگ ,مواد خوراکه ,کلند ,چای خشک , کچالو ,نل 1\" ,و غیره ضرویات مواد ساختمانی به تعمیرللندر 6",
       "remarks": "",
@@ -3169,10 +3187,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5433,
+    "pk": 5434,
     "fields": {
       "project": 3,
-      "serial_number": 5433,
+      "serial_number": 5435,
       "expense_date": "2025-12-24",
       "description": "پرداخت برای نورالدین بابت ازاجرت 43 نفر مزدورکار بابت پائین نمودن سمنت های خریداری شده به تعمیرللندر 6",
       "remarks": "",
@@ -3187,10 +3205,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5434,
+    "pk": 5435,
     "fields": {
       "project": 3,
-      "serial_number": 5434,
+      "serial_number": 5436,
       "expense_date": "2025-12-24",
       "description": "پرداخت برای اجرت اجاره کار در جاینت B تعمیرللندر 6",
       "remarks": "",
@@ -3205,10 +3223,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5435,
+    "pk": 5436,
     "fields": {
       "project": 3,
-      "serial_number": 5435,
+      "serial_number": 5437,
       "expense_date": "2025-12-24",
       "description": "خریداری بولت 12 و سر شاخ به تعمیرللندر6",
       "remarks": "",
@@ -3223,10 +3241,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5436,
+    "pk": 5437,
     "fields": {
       "project": 3,
-      "serial_number": 5436,
+      "serial_number": 5438,
       "expense_date": "2025-12-24",
       "description": "پرداخت برای قربان کرن کار بابت پائین نمودن 4 حلقه پایل رمپ تعمیرللندر 6",
       "remarks": "",
@@ -3241,10 +3259,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5437,
+    "pk": 5438,
     "fields": {
       "project": 3,
-      "serial_number": 5437,
+      "serial_number": 5439,
       "expense_date": "2025-12-24",
       "description": "پرداخت برای شرکت مواد ساختمانی سلیمان داودزی بابت خریداری ریگ شسته , جغل بادامی به تعمیرللندر 6",
       "remarks": "",
@@ -3259,10 +3277,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5438,
+    "pk": 5439,
     "fields": {
       "project": 3,
-      "serial_number": 5438,
+      "serial_number": 5440,
       "expense_date": "2025-12-24",
       "description": "پرداخت برای علی داد مکسر کار بابت کانکریت ریزی پایل های اساسی تعمیرللندر6",
       "remarks": "",
@@ -3277,10 +3295,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5439,
+    "pk": 5440,
     "fields": {
       "project": 3,
-      "serial_number": 5439,
+      "serial_number": 5441,
       "expense_date": "2025-12-24",
       "description": "پیش پرداخت برای انجنیر وحید الله ولد حبیب الله بابت ماه قوس 1404 للندر 6",
       "remarks": "",
@@ -3295,10 +3313,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5440,
+    "pk": 5441,
     "fields": {
       "project": 3,
-      "serial_number": 5440,
+      "serial_number": 5442,
       "expense_date": "2025-12-25",
       "description": "پرداخت و تصفیه حساب محمد نسیم کرن کار بابت پائین کردن پایل های تعمیرللندر6 بدست رحمت الله",
       "remarks": "",
@@ -3313,10 +3331,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5441,
+    "pk": 5442,
     "fields": {
       "project": 3,
-      "serial_number": 5441,
+      "serial_number": 5443,
       "expense_date": "2025-12-28",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -3331,10 +3349,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5442,
+    "pk": 5443,
     "fields": {
       "project": 3,
-      "serial_number": 5442,
+      "serial_number": 5444,
       "expense_date": "2025-12-29",
       "description": "پرداخت شرکت هرات الکتریک بابت خریداری کیبل مغان به تعمیرللندر 6",
       "remarks": "",
@@ -3349,10 +3367,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5443,
+    "pk": 5444,
     "fields": {
       "project": 3,
-      "serial_number": 5443,
+      "serial_number": 5445,
       "expense_date": "2025-12-30",
       "description": "خریداری تیل پطرول به موتر کرولا نقره ایی استفاده به للندر 6",
       "remarks": "",
@@ -3367,10 +3385,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5444,
+    "pk": 5445,
     "fields": {
       "project": 3,
-      "serial_number": 5444,
+      "serial_number": 5446,
       "expense_date": "2025-12-31",
       "description": "پرداخت معاش محمد نادر ولد صوفی مقبول شاه بابت ماه قوس 1404",
       "remarks": "",
@@ -3385,10 +3403,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5445,
+    "pk": 5446,
     "fields": {
       "project": 3,
-      "serial_number": 5445,
+      "serial_number": 5447,
       "expense_date": "2025-12-31",
       "description": "پرداخت معاش محمد بصیر ولد محمد وکیل چوکیدار تعمیرللندر 6 بابت ماه قوس 1404",
       "remarks": "",
@@ -3403,10 +3421,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5446,
+    "pk": 5447,
     "fields": {
       "project": 3,
-      "serial_number": 5446,
+      "serial_number": 5448,
       "expense_date": "2025-12-31",
       "description": "پرداخت معاش باقیمانده میرویس ولد عبدالبصیر کاریگر للندر 6 بابت ماه قوس 1404",
       "remarks": "",
@@ -3421,10 +3439,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5447,
+    "pk": 5448,
     "fields": {
       "project": 3,
-      "serial_number": 5447,
+      "serial_number": 5449,
       "expense_date": "2025-12-31",
       "description": "پرداخت معاش باقیمانده عبدالمتین ولد نیک محمد کاریگر للندر 6 بابت ماه قوس 1404",
       "remarks": "",
@@ -3439,10 +3457,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5448,
+    "pk": 5449,
     "fields": {
       "project": 3,
-      "serial_number": 5448,
+      "serial_number": 5450,
       "expense_date": "2025-12-31",
       "description": "پرداخت معاش عبدالبصیر ولد رضا کاریگر للندر 6 بابت ماه قوس 1404",
       "remarks": "",
@@ -3457,10 +3475,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5449,
+    "pk": 5450,
     "fields": {
       "project": 3,
-      "serial_number": 5449,
+      "serial_number": 5451,
       "expense_date": "2025-12-31",
       "description": "پرداخت برای مصارف نان چاشت حاجی عاشق الله , فرید و نورالدین قالبکار بابت خریدرای مواد قالبکاری به تعمیرللندر6",
       "remarks": "",
@@ -3475,10 +3493,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5450,
+    "pk": 5451,
     "fields": {
       "project": 3,
-      "serial_number": 5450,
+      "serial_number": 5452,
       "expense_date": "2025-12-31",
       "description": "پرداخت معاش باقیمانده انجنیر وحید الله ولد حبیب الله بابت ماه قوس 1404",
       "remarks": "",
@@ -3493,10 +3511,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5451,
+    "pk": 5452,
     "fields": {
       "project": 3,
-      "serial_number": 5451,
+      "serial_number": 5453,
       "expense_date": "2025-12-31",
       "description": "پیش پرداخت برای انجنیر وحید الله ولد حبیب الله بابت ماه جدی 1404",
       "remarks": "",
@@ -3511,10 +3529,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5452,
+    "pk": 5453,
     "fields": {
       "project": 3,
-      "serial_number": 5452,
+      "serial_number": 5454,
       "expense_date": "2025-12-31",
       "description": "پرداخت برای نورالدین بابت سیم تابی تعمیرللندر6",
       "remarks": "",
@@ -3529,10 +3547,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5453,
+    "pk": 5454,
     "fields": {
       "project": 3,
-      "serial_number": 5453,
+      "serial_number": 5455,
       "expense_date": "2026-01-03",
       "description": "پرداخت برای نورالدین قالبکاربابت سیم تابی تعمیرللندر6",
       "remarks": "",
@@ -3547,10 +3565,28 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5454,
+    "pk": 5455,
     "fields": {
       "project": 3,
-      "serial_number": 5454,
+      "serial_number": 5456,
+      "expense_date": "2026-01-06",
+      "description": "خریداری تیل پطرول به موتر هایلکس",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 4000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.5,
+      "expense_type": "general",
+      "created_at": "2026-01-06",
+      "updated_at": "2026-01-06"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5456,
+    "fields": {
+      "project": 3,
+      "serial_number": 5457,
       "expense_date": "2026-01-07",
       "description": "پرداخت برای مصارف روزانه  حاجی احسان الله سهاک در تعمیرللندر 6 از قبیل خریداری لابرتیپ ,کیک برای مهمانن , آب نوشیدنی, تیوب , تیل دیزل , تار رجه , دسته بیل , مواد ایزومات و ضد نم",
       "remarks": "",
@@ -3565,10 +3601,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5455,
+    "pk": 5457,
     "fields": {
       "project": 3,
-      "serial_number": 5455,
+      "serial_number": 5458,
       "expense_date": "2026-01-07",
       "description": "پرداخت برای مصارف روزانه  حاجی احسان الله سهاک در تعمیرللندر 6 خریداری تیل دیزل , پل برش , دستکش , شش رخی , رول یک متره , کرا ی موتر به ریاست شهر سازی , تیل دیزل , آب نوشیدنی , مبلایل و میخ 4\" و میخ 12 \" به تعمیرللندر 6",
       "remarks": "",
@@ -3583,10 +3619,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5456,
+    "pk": 5458,
     "fields": {
       "project": 3,
-      "serial_number": 5456,
+      "serial_number": 5459,
       "expense_date": "2026-01-07",
       "description": "پرداخت برای مصارف روزانه  حاجی احسان الله سهاک در تعمیرللندر 6 خریداری گاز مایع , روب , روغن , گوشت , آب معدنی, کچالو , زردک , پیاز,میخ ساده و میخ فولادی , تیل دیزل به جنراتور , برای ترافیک بخاطر تخلیه 5 موتر سیخ گول و خرید میخ فولادی , لابرتیب به تعمیرللندر 6",
       "remarks": "",
@@ -3601,10 +3637,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5457,
+    "pk": 5459,
     "fields": {
       "project": 3,
-      "serial_number": 5457,
+      "serial_number": 5460,
       "expense_date": "2026-01-07",
       "description": "پرداخت برای مصارف روزانه  حاجی احسان الله سهاک در تعمیرللندر 6 پرداخت اجرت دو نفر کاریگر و یک نفر برقی بخاطر کانکریت ریزی ,خریداری گاز مایع , روب کلان , چای خشک , دال نخود, روغن مایع , ظرفشویی , گوشت ,کرای موتر , پول نان خشک , اجرت شش نفر مزدورکار ,خرید ساکت برق و فوتوکاپی نقشه های تعمیرللندر 6",
       "remarks": "",
@@ -3619,10 +3655,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5458,
+    "pk": 5460,
     "fields": {
       "project": 3,
-      "serial_number": 5458,
+      "serial_number": 5461,
       "expense_date": "2026-01-07",
       "description": "پرداخت برای برای سلیمان داودزی بابت خریداری کرش به تعمیرللندر6",
       "remarks": "",
@@ -3637,10 +3673,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5459,
+    "pk": 5461,
     "fields": {
       "project": 3,
-      "serial_number": 5459,
+      "serial_number": 5462,
       "expense_date": "2026-01-07",
       "description": "پرداخت برای نور گل بابت کندن کاری تعمیرللندر6",
       "remarks": "",
@@ -3655,10 +3691,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5460,
+    "pk": 5462,
     "fields": {
       "project": 3,
-      "serial_number": 5460,
+      "serial_number": 5463,
       "expense_date": "2026-01-11",
       "description": "پرداخت برای نورالدین بابت سیم تابی تعمیرللندر6",
       "remarks": "",
@@ -3673,10 +3709,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5461,
+    "pk": 5463,
     "fields": {
       "project": 3,
-      "serial_number": 5461,
+      "serial_number": 5464,
       "expense_date": "2026-01-11",
       "description": "خریداری تیل پطرول به موتر هایلکس به تعمیرللندر 6",
       "remarks": "",
@@ -3691,10 +3727,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5462,
+    "pk": 5464,
     "fields": {
       "project": 3,
-      "serial_number": 5462,
+      "serial_number": 5465,
       "expense_date": "2026-01-14",
       "description": "پرداخت برای نورالدین سیم تابی بابت تعمیرللندر6",
       "remarks": "",
@@ -3709,10 +3745,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5463,
+    "pk": 5465,
     "fields": {
       "project": 3,
-      "serial_number": 5463,
+      "serial_number": 5466,
       "expense_date": "2026-01-14",
       "description": "پرداخت برای نورالدین قالبکاری پایل های تحکیماتی  تعمیرللندر6",
       "remarks": "",
@@ -3727,10 +3763,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5464,
+    "pk": 5466,
     "fields": {
       "project": 3,
-      "serial_number": 5464,
+      "serial_number": 5467,
       "expense_date": "2026-01-14",
       "description": "پرداخت و تصفیه حساب مکمل علی داد مکسر کار بابت تعمیرللندر6",
       "remarks": "",
@@ -3745,10 +3781,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5465,
+    "pk": 5467,
     "fields": {
       "project": 3,
-      "serial_number": 5465,
+      "serial_number": 5468,
       "expense_date": "2026-01-14",
       "description": "پرداخت برای علی داد مکسر کاری بابت کرای انتقال مکسر کانکریت ریزی به تعمیرللندر6",
       "remarks": "",
@@ -3763,10 +3799,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5466,
+    "pk": 5468,
     "fields": {
       "project": 3,
-      "serial_number": 5466,
+      "serial_number": 5469,
       "expense_date": "2026-01-14",
       "description": "پرداخت برای شرکت ساختمانی سلیمان داودزی بابت خریداری کرش و ریگ به تعمیرللندر6",
       "remarks": "",
@@ -3781,10 +3817,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5467,
+    "pk": 5469,
     "fields": {
       "project": 3,
-      "serial_number": 5467,
+      "serial_number": 5470,
       "expense_date": "2026-01-14",
       "description": "پرداخت و تصفیه حساب مکمل نور گل بابت کندن کاری دو منزل تهکوی تعمیرللندر و اجرت ساعتوار اسکواتو در تعمیرللندر 6",
       "remarks": "",
@@ -3799,10 +3835,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5468,
+    "pk": 5470,
     "fields": {
       "project": 3,
-      "serial_number": 5468,
+      "serial_number": 5471,
       "expense_date": "2026-01-14",
       "description": "خریداری کارت مبایل به انجنیر وحیدالله بابت انترنت دو ماهه در تعمیرللندر6",
       "remarks": "",
@@ -3817,10 +3853,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5469,
+    "pk": 5471,
     "fields": {
       "project": 3,
-      "serial_number": 5469,
+      "serial_number": 5472,
       "expense_date": "2026-01-14",
       "description": "خریدرای سیم 1.5 ملی جستی به تعمیرللندر6",
       "remarks": "",
@@ -3835,10 +3871,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5470,
+    "pk": 5472,
     "fields": {
       "project": 3,
-      "serial_number": 5470,
+      "serial_number": 5473,
       "expense_date": "2026-01-15",
       "description": "پیش پرداخت برای انجنیر وحید الله ولد حبیب الله بابت ماه جدی 1404",
       "remarks": "",
@@ -3853,10 +3889,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5471,
+    "pk": 5473,
     "fields": {
       "project": 3,
-      "serial_number": 5471,
+      "serial_number": 5474,
       "expense_date": "2026-01-15",
       "description": "خریداری تیل پطرول به موتر هایلکس تعمیرللندر 6",
       "remarks": "",
@@ -3871,10 +3907,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5472,
+    "pk": 5474,
     "fields": {
       "project": 3,
-      "serial_number": 5472,
+      "serial_number": 5475,
       "expense_date": "2026-01-24",
       "description": "پرداخت معاش میرویس ولد عبدالبصیر بابت ماه جدی 1404 کاریگر تعمیرللندر 6",
       "remarks": "",
@@ -3889,10 +3925,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5473,
+    "pk": 5475,
     "fields": {
       "project": 3,
-      "serial_number": 5473,
+      "serial_number": 5476,
       "expense_date": "2026-01-24",
       "description": "پرداخت معاش عبدالبصیر ولد رضا کاریگر تعمیرللندر6 بابت ماه جدی 1404",
       "remarks": "",
@@ -3907,10 +3943,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5474,
+    "pk": 5476,
     "fields": {
       "project": 3,
-      "serial_number": 5474,
+      "serial_number": 5477,
       "expense_date": "2026-01-26",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -3925,10 +3961,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5475,
+    "pk": 5477,
     "fields": {
       "project": 3,
-      "serial_number": 5475,
+      "serial_number": 5478,
       "expense_date": "2026-01-27",
       "description": "پرداخت معاش عبدالمتین ولد نیک محمد کاریگر تعمیرللندر 6 بابت ماه جدی 1404",
       "remarks": "",
@@ -3943,10 +3979,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5476,
+    "pk": 5478,
     "fields": {
       "project": 3,
-      "serial_number": 5476,
+      "serial_number": 5479,
       "expense_date": "2026-01-27",
       "description": "پرداخت معاش باقیمانده انجنیر وحید الله ولد حبیب الله بابت تعمیرللندر 6",
       "remarks": "",
@@ -3961,10 +3997,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5477,
+    "pk": 5479,
     "fields": {
       "project": 3,
-      "serial_number": 5477,
+      "serial_number": 5480,
       "expense_date": "2026-01-29",
       "description": "پرداخت معاش عبدالبصیر ولد محمد وکیل چوکیدار تعمیرللندر 6 بابت ماه جدی 1404",
       "remarks": "",
@@ -3979,10 +4015,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5478,
+    "pk": 5480,
     "fields": {
       "project": 3,
-      "serial_number": 5478,
+      "serial_number": 5481,
       "expense_date": "2026-01-29",
       "description": "پرداخت معاش سردار ولی ولد صبرالله بابت ماه جدی 1404 کاریگر تعمیرللندر6",
       "remarks": "",
@@ -3997,10 +4033,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5479,
+    "pk": 5481,
     "fields": {
       "project": 3,
-      "serial_number": 5479,
+      "serial_number": 5482,
       "expense_date": "2026-01-29",
       "description": "پرداخت معاش صبرالله ولد الله محمد بابت ماه جدی 1404 کاریگر تعمیرللندر6",
       "remarks": "",
@@ -4015,10 +4051,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5480,
+    "pk": 5482,
     "fields": {
       "project": 3,
-      "serial_number": 5480,
+      "serial_number": 5483,
       "expense_date": "2026-01-29",
       "description": "پرداخت معاش علی محمد ولد جمعه خان بابت ماه جدی 1404 کاریگرتعمیرللندر6",
       "remarks": "",
@@ -4033,10 +4069,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5481,
+    "pk": 5483,
     "fields": {
       "project": 3,
-      "serial_number": 5481,
+      "serial_number": 5484,
       "expense_date": "2026-01-29",
       "description": "پرداخت معاش محمد نادر ولد صوفی مقبول شاه بابت ماه جدی 1404 کاریگر تعمیرللندر6",
       "remarks": "",
@@ -4051,10 +4087,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5482,
+    "pk": 5484,
     "fields": {
       "project": 3,
-      "serial_number": 5482,
+      "serial_number": 5485,
       "expense_date": "2026-01-31",
       "description": "پرداخت برای شیرباز بابت خریداری سنگ بولدر به تعمیرللندر 6",
       "remarks": "",
@@ -4069,10 +4105,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5483,
+    "pk": 5485,
     "fields": {
       "project": 3,
-      "serial_number": 5483,
+      "serial_number": 5486,
       "expense_date": "2026-01-31",
       "description": "پرداخت برای نورالدین بابت سیم تابی تعمیرللندر 6",
       "remarks": "",
@@ -4087,10 +4123,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5484,
+    "pk": 5486,
     "fields": {
       "project": 3,
-      "serial_number": 5484,
+      "serial_number": 5487,
       "expense_date": "2026-01-31",
       "description": "پرداخت برای شرکت زمزم استیل بابت خریداری سیم جستی 1.5 ملی به تعمیرللندر6 (بتاریخ 19 جنوری پرداخت گردیده و شامل راپور 31 گردیده )",
       "remarks": "",
@@ -4105,10 +4141,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5485,
+    "pk": 5487,
     "fields": {
       "project": 3,
-      "serial_number": 5485,
+      "serial_number": 5488,
       "expense_date": "2026-01-31",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -4123,10 +4159,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5486,
+    "pk": 5488,
     "fields": {
       "project": 3,
-      "serial_number": 5486,
+      "serial_number": 5489,
       "expense_date": "2026-02-02",
       "description": "پرداخت برای مصارفات روزانه حاجی احسان الله سهاک در تعمیرللندر 6 از قبیل اجرت سه نفر علی داد بخاطر کانکریت ریزی ,  کشیدن مکسر توسط کرن از تهکوی به روی زمین و دو نفر کاریگر ,خرید آب  کچالو , تیل دیزل به جنراتور ,",
       "remarks": "",
@@ -4141,10 +4177,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5487,
+    "pk": 5489,
     "fields": {
       "project": 3,
-      "serial_number": 5487,
+      "serial_number": 5490,
       "expense_date": "2026-02-02",
       "description": "پرداخت برای مصارفات روزانه حاجی احسان الله سهاک در تعمیرللندر 6 از قبیل خرید لحاف یک نفره , دسته بیل , کلند,جین کلفت ترکی , قفل  و پرداخت برای انجنیران ناحیه 4 بخاطر بازدید و امضا سیخ بندی  های تعمیرللندر 6",
       "remarks": "",
@@ -4159,10 +4195,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5488,
+    "pk": 5490,
     "fields": {
       "project": 3,
-      "serial_number": 5488,
+      "serial_number": 5491,
       "expense_date": "2026-02-02",
       "description": "پرداخت برای مصارفات روزانه حاجی احسان الله سهاک در تعمیرللندر 6 از قبیل خریداری گوشت , آب معدنی , مرچ تازه , گاز مایع ,بالشت ,چاینک و موا دخوراکه برای کاریگران تعمیرللندر 6",
       "remarks": "",
@@ -4177,10 +4213,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5489,
+    "pk": 5491,
     "fields": {
       "project": 3,
-      "serial_number": 5489,
+      "serial_number": 5492,
       "expense_date": "2026-02-02",
       "description": "پرداخت برای مصارفات روزانه حاجی احسان الله سهاک در تعمیرللندر 6 از قبیل پرداخت بل برق و کرای موتر بصیر, گاز مایع , گوشت , مرچ تازه , آب معدنی  , پرداخت برای خبازی بابت خرید نان خشک و کرای ماه دلو و شمس پلازا بابت کاریگران نورالدین",
       "remarks": "",
@@ -4195,10 +4231,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5490,
+    "pk": 5492,
     "fields": {
       "project": 3,
-      "serial_number": 5490,
+      "serial_number": 5493,
       "expense_date": "2026-02-02",
       "description": "پرداخت برای مصارفات روزانه حاجی احسان الله سهاک در تعمیرللندر 6 از قبیل خریداری گاز مایع , رومی خشک , گوشت , سبزی , برنج , لوبیا , دالنخود , مایع ظرفشویی , پیاز , کچالو , سیر و کرای موتر و خرید دستکش به کاریگران تعمیرللندر 6",
       "remarks": "",
@@ -4213,10 +4249,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5491,
+    "pk": 5493,
     "fields": {
       "project": 3,
-      "serial_number": 5491,
+      "serial_number": 5494,
       "expense_date": "2026-02-02",
       "description": "پرداخت برای مصارفات روزانه حاجی احسان الله سهاک در تعمیرللندر 6 از قبیل خریداری تکه صافی , آب معدنی , ریگ شسته , پلاس , پیچکش , قفل , دبل , چکش آهنی و پیچ اسکرو به تعمیرللندر 6",
       "remarks": "",
@@ -4231,10 +4267,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5492,
+    "pk": 5494,
     "fields": {
       "project": 3,
-      "serial_number": 5492,
+      "serial_number": 5495,
       "expense_date": "2026-02-03",
       "description": "پرداخت برای مبلایل تبدیلی و فلتر مبلایل به موتر هایلکس بابت تعمیرللندر6",
       "remarks": "",
@@ -4249,10 +4285,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5493,
+    "pk": 5495,
     "fields": {
       "project": 3,
-      "serial_number": 5493,
+      "serial_number": 5496,
       "expense_date": "2026-02-04",
       "description": "پرداخت برای نورالدین بابت سیم تابی تعمیرللندر 6",
       "remarks": "",
@@ -4267,10 +4303,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5494,
+    "pk": 5496,
     "fields": {
       "project": 3,
-      "serial_number": 5494,
+      "serial_number": 5497,
       "expense_date": "2026-02-04",
       "description": "پرداخت برای برای مصارفات روزانه کاریگران نورالدین بخاطر توقف کار پروژه للندر6",
       "remarks": "",
@@ -4285,10 +4321,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5495,
+    "pk": 5497,
     "fields": {
       "project": 3,
-      "serial_number": 5495,
+      "serial_number": 5498,
       "expense_date": "2026-02-04",
       "description": "پرداخت برای نورالدین بابت سیم تابی تعمیرللندر 6 که بتاریخ 26 فبروری پرداخت گردیده بود",
       "remarks": "",
@@ -4303,10 +4339,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5496,
+    "pk": 5498,
     "fields": {
       "project": 3,
-      "serial_number": 5496,
+      "serial_number": 5499,
       "expense_date": "2026-02-05",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -4321,10 +4357,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5497,
+    "pk": 5499,
     "fields": {
       "project": 3,
-      "serial_number": 5497,
+      "serial_number": 5500,
       "expense_date": "2026-02-07",
       "description": "پیش پرداخت برای انجنیر وحید الله ولد حبیب الله بابت ماه دلو 1404 تعمیرللندر 6",
       "remarks": "",
@@ -4339,10 +4375,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5498,
+    "pk": 5500,
     "fields": {
       "project": 3,
-      "serial_number": 5498,
+      "serial_number": 5501,
       "expense_date": "2026-02-08",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -4357,10 +4393,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5499,
+    "pk": 5501,
     "fields": {
       "project": 3,
-      "serial_number": 5499,
+      "serial_number": 5502,
       "expense_date": "2026-02-15",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -4375,10 +4411,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5500,
+    "pk": 5502,
     "fields": {
       "project": 3,
-      "serial_number": 5500,
+      "serial_number": 5503,
       "expense_date": "2026-02-16",
       "description": "پرداخت برای حاجی عبدالکریم بابت خریداری سمنت به تعمیرللندر 6",
       "remarks": "",
@@ -4393,10 +4429,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5501,
+    "pk": 5503,
     "fields": {
       "project": 3,
-      "serial_number": 5501,
+      "serial_number": 5504,
       "expense_date": "2026-02-16",
       "description": "خریدرای سنگ سیاه ( اسپیسر ) به تعمیرللندر 6",
       "remarks": "",
@@ -4411,10 +4447,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5502,
+    "pk": 5504,
     "fields": {
       "project": 3,
-      "serial_number": 5502,
+      "serial_number": 5505,
       "expense_date": "2026-02-16",
       "description": "خریداری مواد ضد نم به کانکریت ریزی بالای سنگ بولدر تعمیرللندر 6",
       "remarks": "",
@@ -4429,10 +4465,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5503,
+    "pk": 5505,
     "fields": {
       "project": 3,
-      "serial_number": 5503,
+      "serial_number": 5506,
       "expense_date": "2026-02-16",
       "description": "پیش پرداخت برای شرکت توحید مسکن بابت کانکریت ریزی فوندیشن تعمیرللندر 6 توسط صرافی خانی گل",
       "remarks": "",
@@ -4447,10 +4483,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5504,
+    "pk": 5506,
     "fields": {
       "project": 3,
-      "serial_number": 5504,
+      "serial_number": 5507,
       "expense_date": "2026-02-18",
       "description": "پرداخت پول باقیمانده علی داد مکسر کار بابت شفته ریزی چاینت A تعمیرللندر 6",
       "remarks": "",
@@ -4465,10 +4501,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5505,
+    "pk": 5507,
     "fields": {
       "project": 3,
-      "serial_number": 5505,
+      "serial_number": 5508,
       "expense_date": "2026-02-18",
       "description": "پرداخت برای نورالدین بابت مصارفات روزانه کاریگرانش از درک تعمیرللندر 6",
       "remarks": "",
@@ -4483,10 +4519,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5506,
+    "pk": 5508,
     "fields": {
       "project": 3,
-      "serial_number": 5506,
+      "serial_number": 5509,
       "expense_date": "2026-02-18",
       "description": "خریداری تیل سوپر پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -4501,10 +4537,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5507,
+    "pk": 5509,
     "fields": {
       "project": 3,
-      "serial_number": 5507,
+      "serial_number": 5510,
       "expense_date": "2026-02-19",
       "description": "پرداخت اجرت کرن کار بابت پائین نمودن 17 بندل سیخ گول به تعمیرللندر6",
       "remarks": "",
@@ -4519,10 +4555,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5508,
+    "pk": 5510,
     "fields": {
       "project": 3,
-      "serial_number": 5508,
+      "serial_number": 5511,
       "expense_date": "2026-02-19",
       "description": "پرداخت معاش باقیمانده انجنیر وحید الله ولد حبیب الله انجنیر تعمیرللندر 6",
       "remarks": "",
@@ -4537,10 +4573,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5509,
+    "pk": 5511,
     "fields": {
       "project": 3,
-      "serial_number": 5509,
+      "serial_number": 5512,
       "expense_date": "2026-02-21",
       "description": "پرداخت برای چاپ لوگو به واسکت ها بابت تعمیرللندر6",
       "remarks": "",
@@ -4555,10 +4591,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5510,
+    "pk": 5512,
     "fields": {
       "project": 3,
-      "serial_number": 5510,
+      "serial_number": 5513,
       "expense_date": "2026-02-21",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -4573,10 +4609,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5511,
+    "pk": 5513,
     "fields": {
       "project": 3,
-      "serial_number": 5511,
+      "serial_number": 5514,
       "expense_date": "2026-02-22",
       "description": "پرداخت برای انجینیر وحید الله بابت خریداری کارت مبایل به فعال نمودن انترنت بابت دوماه به تعمیرللندر 6",
       "remarks": "",
@@ -4591,10 +4627,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5512,
+    "pk": 5514,
     "fields": {
       "project": 3,
-      "serial_number": 5512,
+      "serial_number": 5515,
       "expense_date": "2026-02-22",
       "description": "پرداخت برای شرکت کانکریت ریزی توحید مسکن بابت فوندیشن تعمیرللندر 6",
       "remarks": "",
@@ -4609,10 +4645,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5513,
+    "pk": 5515,
     "fields": {
       "project": 3,
-      "serial_number": 5513,
+      "serial_number": 5516,
       "expense_date": "2026-02-23",
       "description": "پرداخت برای قربان کرن کار بابت انتقال جنراتور از تعمیرللندر2 به تعمیرللندر 6",
       "remarks": "",
@@ -4627,10 +4663,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5514,
+    "pk": 5516,
     "fields": {
       "project": 3,
-      "serial_number": 5514,
+      "serial_number": 5517,
       "expense_date": "2026-02-24",
       "description": "خریداری تیل پطرول به موترسایکل بخاطر رفتن از للندر 4 به للندر 6",
       "remarks": "",
@@ -4645,10 +4681,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5515,
+    "pk": 5517,
     "fields": {
       "project": 3,
-      "serial_number": 5515,
+      "serial_number": 5518,
       "expense_date": "2026-02-25",
       "description": "پرداخت معاش میرویس ولد عبدالبصیر کاریگر تعمیرللندر 6 بابت ماه دلو 1404",
       "remarks": "",
@@ -4663,10 +4699,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5516,
+    "pk": 5518,
     "fields": {
       "project": 3,
-      "serial_number": 5516,
+      "serial_number": 5519,
       "expense_date": "2026-02-25",
       "description": "پرداخت معاش محمد بصیر ولد محمد وکیل کاریگر تعمیرللندر 6 بابت ماه دلو 1404",
       "remarks": "",
@@ -4681,48 +4717,12 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5517,
-    "fields": {
-      "project": 3,
-      "serial_number": 5517,
-      "expense_date": "2026-02-25",
-      "description": "پرداخت معاش صبرالله ولد الله محمد کاریگر تعمیرللندر6 بابت ماه دلو 1404",
-      "remarks": "",
-      "paid_to": "",
-      "amount_afn": 10000.0,
-      "amount_usd": 0.0,
-      "exchange_rate": 63.25,
-      "expense_type": "general",
-      "created_at": "2026-02-25",
-      "updated_at": "2026-02-25"
-    }
-  },
-  {
-    "model": "expenses.expense",
-    "pk": 5518,
-    "fields": {
-      "project": 3,
-      "serial_number": 5518,
-      "expense_date": "2026-02-25",
-      "description": "پرداخت معاش سردار ولی ولد صبرالله کاریگر تعمیرللندر6 بابت ماه دلو 1404",
-      "remarks": "",
-      "paid_to": "",
-      "amount_afn": 10000.0,
-      "amount_usd": 0.0,
-      "exchange_rate": 63.25,
-      "expense_type": "general",
-      "created_at": "2026-02-25",
-      "updated_at": "2026-02-25"
-    }
-  },
-  {
-    "model": "expenses.expense",
     "pk": 5519,
     "fields": {
       "project": 3,
-      "serial_number": 5519,
+      "serial_number": 5520,
       "expense_date": "2026-02-25",
-      "description": "پرداخت معاش علی احمد ولد جمعه خان کاریگر تعمیرللندر6 بابت ماه دلو1404",
+      "description": "پرداخت معاش صبرالله ولد الله محمد کاریگر تعمیرللندر6 بابت ماه دلو 1404",
       "remarks": "",
       "paid_to": "",
       "amount_afn": 10000.0,
@@ -4738,7 +4738,43 @@
     "pk": 5520,
     "fields": {
       "project": 3,
-      "serial_number": 5520,
+      "serial_number": 5521,
+      "expense_date": "2026-02-25",
+      "description": "پرداخت معاش سردار ولی ولد صبرالله کاریگر تعمیرللندر6 بابت ماه دلو 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 10000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 63.25,
+      "expense_type": "general",
+      "created_at": "2026-02-25",
+      "updated_at": "2026-02-25"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5521,
+    "fields": {
+      "project": 3,
+      "serial_number": 5522,
+      "expense_date": "2026-02-25",
+      "description": "پرداخت معاش علی احمد ولد جمعه خان کاریگر تعمیرللندر6 بابت ماه دلو1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 10000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 63.25,
+      "expense_type": "general",
+      "created_at": "2026-02-25",
+      "updated_at": "2026-02-25"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5522,
+    "fields": {
+      "project": 3,
+      "serial_number": 5523,
       "expense_date": "2026-02-25",
       "description": "پرداخت برای مصارفات روازه  حاجی احسان به تعمیرللندر 6 از تاریخ 03 فبروری الی 25 فبروری 2026 از قبیل خرید گوشت , آب معدنی , کرای موتر انجنیر وحید الله , خرید پرزه جات به ترمیم جنراتور , رنگ لور خورد , ریگمال , لور وسط و استر , خریداری تیل پطرول و دیزل , رنگ روغنی ,برس , لور و استر پرداخت بل برق  به تعمیرللندر 6",
       "remarks": "",
@@ -4753,10 +4789,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5521,
+    "pk": 5523,
     "fields": {
       "project": 3,
-      "serial_number": 5521,
+      "serial_number": 5524,
       "expense_date": "2026-02-25",
       "description": "پرداخت برای مصارفات روازه  حاجی احسان به تعمیرللندر 6 از تاریخ 03 فبروری الی 25 فبروری 2026 از قبیل خرید تیل دیزل ,مبلایل, پیاز , پالک , سیر , کمربند ,چپلق به قومندان ساحوی , دستکش , تیل دیزل به جنراتور ,سنگ برش به تعمیرللندر 6",
       "remarks": "",
@@ -4771,10 +4807,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5522,
+    "pk": 5524,
     "fields": {
       "project": 3,
-      "serial_number": 5522,
+      "serial_number": 5525,
       "expense_date": "2026-02-25",
       "description": "پرداخت برای مصارفات روازه  حاجی احسان به تعمیرللندر 6 از تاریخ 03 فبروری الی 25 فبروری 2026 از قبیل پرداخت برای اجرت روز گلکار بابت کانکریت ریزی جاینت A , خرید گاز مایع , پل برش , گوشت ,رومی ,آب معدنی ,تخم , نمک ,روغن , روب ,کچالو ,پیاز,بادنجان سیاه , کدو , سیر , مرچ تازه به دفتر ساحوی تعمیرللندر 6",
       "remarks": "",
@@ -4789,10 +4825,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5523,
+    "pk": 5525,
     "fields": {
       "project": 3,
-      "serial_number": 5523,
+      "serial_number": 5526,
       "expense_date": "2026-02-25",
       "description": "پرداخت برای مصارفات روازه  حاجی احسان به تعمیرللندر 6 از تاریخ 03 فبروری الی 25 فبروری 2026 از قبیل خریداری قیماق , خرما, پنیرک به ماه رمضان , خرید تار رجه , میخ فولادی , تداوی زخم پای عبدالبصیر کاریگر, پرداخت برای نصرت آغا قومندان ساحوی پولیس در روز کانکریت , خریداری تیل دیزل به جنراتور , خرید سمنت و پرداخت برای علی داد مکسر کار تعمیرللندر 6",
       "remarks": "",
@@ -4807,10 +4843,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5524,
+    "pk": 5526,
     "fields": {
       "project": 3,
-      "serial_number": 5524,
+      "serial_number": 5527,
       "expense_date": "2026-02-25",
       "description": "پرداخت برای مصارفات روازه  حاجی احسان به تعمیرللندر 6 از تاریخ 03 فبروری الی 25 فبروری 2026 از قبیل خریداری تخم مرغ به سحری ماه رمضان , گاز مایع , تیل دیزل به جنراتور ,روغن , گندنه ,پالک , مرچ , سبزی,کپالو سیر و غیره , خرید فلتر هوا,فلتر تیل دیزل ,ساکت فلتر ,میخ ساده ,میخ فولادی و بطری به تعمیرللندر 6",
       "remarks": "",
@@ -4825,10 +4861,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5525,
+    "pk": 5527,
     "fields": {
       "project": 3,
-      "serial_number": 5525,
+      "serial_number": 5528,
       "expense_date": "2026-02-25",
       "description": "پرداخت برای مصارفات روازه  حاجی احسان به تعمیرللندر 6 از تاریخ 03 فبروری الی 25 فبروری 2026 از قبیل خریداری مبلایل به جنراتور, میخ ساده , میخ فولادی ,دست پناه و متر , پایپ کرمچی , کلفت و نان خشک و قفل به تعمیرللندر6",
       "remarks": "",
@@ -4843,10 +4879,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5526,
+    "pk": 5528,
     "fields": {
       "project": 3,
-      "serial_number": 5526,
+      "serial_number": 5529,
       "expense_date": "2026-02-25",
       "description": "پرداخت برای مصارفات روازه  حاجی احسان به تعمیرللندر 6 از تاریخ 03 فبروری الی 25 فبروری 2026 از قبیل خریداری تیل پطرول به موتر حاجی احسان بخاطر رفتن به شهر نو ,گاز به موتر حاجی احسان و لین و برش به تعمیرللندر 6",
       "remarks": "",
@@ -4861,10 +4897,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5527,
+    "pk": 5529,
     "fields": {
       "project": 3,
-      "serial_number": 5527,
+      "serial_number": 5530,
       "expense_date": "2026-02-25",
       "description": "پرداخت برای مصارفات روازه  حاجی احسان به تعمیرللندر 6 از تاریخ 03 فبروری الی 25 فبروری 2026 از قبیل خریداری گوشت , گندنه و تیل دیزل به جنراتور تعمیرللندر 6",
       "remarks": "",
@@ -4879,10 +4915,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5528,
+    "pk": 5530,
     "fields": {
       "project": 3,
-      "serial_number": 5528,
+      "serial_number": 5531,
       "expense_date": "2026-02-26",
       "description": "پرداخت معاش محمد نادر ولد صوفی مقبول کاریگر تعمیرللندر6 بابت ماه  ماه دلو 1404",
       "remarks": "",
@@ -4897,10 +4933,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5529,
+    "pk": 5531,
     "fields": {
       "project": 3,
-      "serial_number": 5529,
+      "serial_number": 5532,
       "expense_date": "2026-02-26",
       "description": "پرداخت برای نورالدین بابت سیم تابی تعمیرللندر6",
       "remarks": "",
@@ -4915,10 +4951,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5530,
+    "pk": 5532,
     "fields": {
       "project": 3,
-      "serial_number": 5530,
+      "serial_number": 5533,
       "expense_date": "2026-02-26",
       "description": "پرداخت برای شرکت کانکریت ریزی افغان پلانت بابت کانکریت ریزی پایل های تعمیرللندر6",
       "remarks": "",
@@ -4933,10 +4969,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5531,
+    "pk": 5533,
     "fields": {
       "project": 3,
-      "serial_number": 5531,
+      "serial_number": 5534,
       "expense_date": "2026-02-28",
       "description": "خریداری تیل پطرول برای موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -4951,10 +4987,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5532,
+    "pk": 5534,
     "fields": {
       "project": 3,
-      "serial_number": 5532,
+      "serial_number": 5535,
       "expense_date": "2026-03-01",
       "description": "پرداخت برای شرکت کانکریت ریزی توحید مسکن خریداری 271.95 تن سمنت فی تن از قرار 170$ دالر توسط حاجی قاسم و اجرا آن توسط صرافی حاجی خانی گل چک نمبر های 2362 و2364",
       "remarks": "",
@@ -4969,10 +5005,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5533,
+    "pk": 5535,
     "fields": {
       "project": 3,
-      "serial_number": 5533,
+      "serial_number": 5536,
       "expense_date": "2026-03-04",
       "description": "پرداخت مصارفات روزانه کاریگران نورالدین از تاریخ 16 دلو الی 27 دلو 1404 فی روز از قرار 3500 افغانی",
       "remarks": "",
@@ -4987,10 +5023,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5534,
+    "pk": 5536,
     "fields": {
       "project": 3,
-      "serial_number": 5534,
+      "serial_number": 5537,
       "expense_date": "2026-03-08",
       "description": "پرداخت برای ساخت لوحه تبلیغاتی تعمیرللندر 6",
       "remarks": "",
@@ -5005,10 +5041,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5535,
+    "pk": 5537,
     "fields": {
       "project": 3,
-      "serial_number": 5535,
+      "serial_number": 5538,
       "expense_date": "2026-03-10",
       "description": "پرداخت برای شرکت فراز آژمان بابت خریداری کاک سقفی به تعمیرللندر6",
       "remarks": "",
@@ -5023,10 +5059,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5536,
+    "pk": 5538,
     "fields": {
       "project": 3,
-      "serial_number": 5536,
+      "serial_number": 5539,
       "expense_date": "2026-03-11",
       "description": "خریداری سیخ ولدینگ به تعمیرللندر 6",
       "remarks": "",
@@ -5041,10 +5077,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5537,
+    "pk": 5539,
     "fields": {
       "project": 3,
-      "serial_number": 5537,
+      "serial_number": 5540,
       "expense_date": "2026-03-11",
       "description": "پرداخت برای نورالدین بابت سیم تابی تعمیرللندر 6",
       "remarks": "",
@@ -5059,10 +5095,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5538,
+    "pk": 5540,
     "fields": {
       "project": 3,
-      "serial_number": 5538,
+      "serial_number": 5541,
       "expense_date": "2026-03-11",
       "description": "پرداخت برای مصارفات بل تاریخ های مختلف در تعمیرللندر 6 توسط احسان الله سهاک",
       "remarks": "",
@@ -5077,10 +5113,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5539,
+    "pk": 5541,
     "fields": {
       "project": 3,
-      "serial_number": 5539,
+      "serial_number": 5542,
       "expense_date": "2026-03-11",
       "description": "پرداخت برای شرکت سلیمان داودزی بابت خریداری کرش به تعمیرللندر 6",
       "remarks": "",
@@ -5095,10 +5131,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5540,
+    "pk": 5542,
     "fields": {
       "project": 3,
-      "serial_number": 5540,
+      "serial_number": 5543,
       "expense_date": "2026-03-12",
       "description": "پیش پرداخت برای انجنیر وحید الله ولد حبیب الله بابت ماه حوت 1404",
       "remarks": "",
@@ -5113,10 +5149,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5541,
+    "pk": 5543,
     "fields": {
       "project": 3,
-      "serial_number": 5541,
+      "serial_number": 5544,
       "expense_date": "2026-03-12",
       "description": "پرداخت برای شرکت کانکریت ریزی توحید مسکن بابت تعمیرلللندر6",
       "remarks": "",
@@ -5131,48 +5167,12 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5542,
-    "fields": {
-      "project": 3,
-      "serial_number": 5542,
-      "expense_date": "2026-03-16",
-      "description": "پرداخت معاش محمد نادر ولد صوفی مقبول شاه بابت ماه حوت 1404",
-      "remarks": "",
-      "paid_to": "",
-      "amount_afn": 10000.0,
-      "amount_usd": 0.0,
-      "exchange_rate": 63.6,
-      "expense_type": "general",
-      "created_at": "2026-03-16",
-      "updated_at": "2026-03-16"
-    }
-  },
-  {
-    "model": "expenses.expense",
-    "pk": 5543,
-    "fields": {
-      "project": 3,
-      "serial_number": 5543,
-      "expense_date": "2026-03-16",
-      "description": "پرداخت برای معاش عبدالبصیر ولد رضا بابت ماه حوت 1404",
-      "remarks": "",
-      "paid_to": "",
-      "amount_afn": 10000.0,
-      "amount_usd": 0.0,
-      "exchange_rate": 63.6,
-      "expense_type": "general",
-      "created_at": "2026-03-16",
-      "updated_at": "2026-03-16"
-    }
-  },
-  {
-    "model": "expenses.expense",
     "pk": 5544,
     "fields": {
       "project": 3,
-      "serial_number": 5544,
+      "serial_number": 5545,
       "expense_date": "2026-03-16",
-      "description": "پرداخت معاش میرویس ولد عبدالبصیر بابت ماه حوت 1404",
+      "description": "پرداخت معاش محمد نادر ولد صوفی مقبول شاه بابت ماه حوت 1404",
       "remarks": "",
       "paid_to": "",
       "amount_afn": 10000.0,
@@ -5188,9 +5188,9 @@
     "pk": 5545,
     "fields": {
       "project": 3,
-      "serial_number": 5545,
+      "serial_number": 5546,
       "expense_date": "2026-03-16",
-      "description": "پرداخت معاش علی احمد ولد جمعه خان بابت ماه حوت 1404",
+      "description": "پرداخت برای معاش عبدالبصیر ولد رضا بابت ماه حوت 1404",
       "remarks": "",
       "paid_to": "",
       "amount_afn": 10000.0,
@@ -5206,9 +5206,9 @@
     "pk": 5546,
     "fields": {
       "project": 3,
-      "serial_number": 5546,
+      "serial_number": 5547,
       "expense_date": "2026-03-16",
-      "description": "پرداخت معاش سردارولی ولد صبرالله بابت ماه حوت 1404",
+      "description": "پرداخت معاش میرویس ولد عبدالبصیر بابت ماه حوت 1404",
       "remarks": "",
       "paid_to": "",
       "amount_afn": 10000.0,
@@ -5224,9 +5224,9 @@
     "pk": 5547,
     "fields": {
       "project": 3,
-      "serial_number": 5547,
+      "serial_number": 5548,
       "expense_date": "2026-03-16",
-      "description": "پرداخت معاش صبرالله ولد الله محمد بابت ماه حوت 1404",
+      "description": "پرداخت معاش علی احمد ولد جمعه خان بابت ماه حوت 1404",
       "remarks": "",
       "paid_to": "",
       "amount_afn": 10000.0,
@@ -5242,7 +5242,43 @@
     "pk": 5548,
     "fields": {
       "project": 3,
-      "serial_number": 5548,
+      "serial_number": 5549,
+      "expense_date": "2026-03-16",
+      "description": "پرداخت معاش سردارولی ولد صبرالله بابت ماه حوت 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 10000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 63.6,
+      "expense_type": "general",
+      "created_at": "2026-03-16",
+      "updated_at": "2026-03-16"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5549,
+    "fields": {
+      "project": 3,
+      "serial_number": 5550,
+      "expense_date": "2026-03-16",
+      "description": "پرداخت معاش صبرالله ولد الله محمد بابت ماه حوت 1404",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 10000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 63.6,
+      "expense_type": "general",
+      "created_at": "2026-03-16",
+      "updated_at": "2026-03-16"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5550,
+    "fields": {
+      "project": 3,
+      "serial_number": 5551,
       "expense_date": "2026-03-16",
       "description": "پرداخت معاش عبدالمتین ولد نیک محمد بابت ماه حوت 1404",
       "remarks": "",
@@ -5257,10 +5293,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5549,
+    "pk": 5551,
     "fields": {
       "project": 3,
-      "serial_number": 5549,
+      "serial_number": 5552,
       "expense_date": "2026-03-16",
       "description": "خریداری 20 خریطه سمنت ایرانی به تعمیرللندر6",
       "remarks": "",
@@ -5275,10 +5311,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5550,
+    "pk": 5552,
     "fields": {
       "project": 3,
-      "serial_number": 5550,
+      "serial_number": 5553,
       "expense_date": "2026-03-16",
       "description": "پیش پراخت برای انجنیر وحید الله ولد حبیب الله بابت ماه حوت 1404",
       "remarks": "",
@@ -5293,10 +5329,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5551,
+    "pk": 5553,
     "fields": {
       "project": 3,
-      "serial_number": 5551,
+      "serial_number": 5554,
       "expense_date": "2026-03-16",
       "description": "خریداری تیل پطرول به موتر هایلکس تعمیرللندر 6",
       "remarks": "",
@@ -5311,10 +5347,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5552,
+    "pk": 5554,
     "fields": {
       "project": 3,
-      "serial_number": 5552,
+      "serial_number": 5555,
       "expense_date": "2026-03-17",
       "description": "پرداخت برای کاکابادام گل بابت انتقال چوب و جک ها از گدام به تعمیرللندر 6",
       "remarks": "",
@@ -5329,10 +5365,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5553,
+    "pk": 5555,
     "fields": {
       "project": 3,
-      "serial_number": 5553,
+      "serial_number": 5556,
       "expense_date": "2026-03-17",
       "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیرللندر6",
       "remarks": "",
@@ -5347,10 +5383,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5554,
+    "pk": 5556,
     "fields": {
       "project": 3,
-      "serial_number": 5554,
+      "serial_number": 5557,
       "expense_date": "2026-03-18",
       "description": "پرداخت معاش باقیمانده انجنیر وحید الله ولد حبیب الله بابت ماه حوت 1404",
       "remarks": "",
@@ -5365,10 +5401,28 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5555,
+    "pk": 5557,
     "fields": {
       "project": 3,
-      "serial_number": 5555,
+      "serial_number": 5558,
+      "expense_date": "2026-03-24",
+      "description": "پرداخت خریداری مبلایل , فلتر مبلایل , فلتر تیل , فلتر AC و اجرت مستری موتر هایلکس",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 6000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 0.0,
+      "expense_type": "general",
+      "created_at": "2026-03-24",
+      "updated_at": "2026-03-24"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5558,
+    "fields": {
+      "project": 3,
+      "serial_number": 5559,
       "expense_date": "2026-03-31",
       "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیرللندر6",
       "remarks": "",
@@ -5383,10 +5437,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5556,
+    "pk": 5559,
     "fields": {
       "project": 3,
-      "serial_number": 5556,
+      "serial_number": 5560,
       "expense_date": "2026-03-31",
       "description": "خریداری یک قطعی گریس به تعمیرللندر6",
       "remarks": "",
@@ -5401,10 +5455,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5557,
+    "pk": 5560,
     "fields": {
       "project": 3,
-      "serial_number": 5557,
+      "serial_number": 5561,
       "expense_date": "2026-03-31",
       "description": "پرداخت برای 2 نفر کاریگر در روز کانکریت ریزی و پرداخت برای انجنیر وحید کرایه موتریش را به تعمیر للندر 6, خریداری گاز, گوشت, مبلایل برای جنراتور, تیل دیزل و پطرول برای جنراترو و موتر, دست گش, جالی, پل سنگ برش, دبل و غیره به تعمیر للندر 6, تیل دیزل و پطرول برای جنراتور و موتر به تعمیر للندر 6 , تیل دیزل برای جنراتور به تعمیر للندر 6",
       "remarks": "",
@@ -5419,10 +5473,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5558,
+    "pk": 5561,
     "fields": {
       "project": 3,
-      "serial_number": 5558,
+      "serial_number": 5562,
       "expense_date": "2026-03-31",
       "description": "خریداری گوشت گوساله به تعمیر للندر 6, خریداری تیل دیزل به جنراتور, مبلایل به جنراتور, خریداری روغن, لوبیا, دال نخود, روب, پیاز, ترکاری, مایع ظرف شویی و غیره به تعمیر للندر 6, خریداری تیل دیزلو پطرول به جنراتور و موتر , گاز, جوس به مهمانان حاجی رفیع در روزکانکریت ریزی, انرژی , کیک به کاریگر ها در روز کانکریت ریزی تعمیرللندر6",
       "remarks": "",
@@ -5437,10 +5491,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5559,
+    "pk": 5562,
     "fields": {
       "project": 3,
-      "serial_number": 5559,
+      "serial_number": 5563,
       "expense_date": "2026-03-31",
       "description": "خریداری گاز به تعمیر للندر 6, گوشت مرغ, کارت موبایل برای انترنیت انجنیر وحید, انرژی , آب, سبزی, برای انجنیران, تیل پطرول, مبلایل برای جنراتور, گوشت مرغ, تیل دیزل برای جنراتور, تار رجه, رنگ روغنی, لور کلان , لور خورد, برس و رجه و پرداخت کرایه وتری آن به تعمیر للندر 6",
       "remarks": "",
@@ -5455,10 +5509,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5560,
+    "pk": 5563,
     "fields": {
       "project": 3,
-      "serial_number": 5560,
+      "serial_number": 5564,
       "expense_date": "2026-03-31",
       "description": "خریداری تیل دیزل برای جنراتور, یک دانه لور رنگ کلان, رنگ روغنی و لور, پرداخت بل برق دارای اسم مشترک  سید فاروق, عبدالرحیم , عدهن لعل  و کرایه موتری آن,  پرداخت اضافه پولی بارگیری  تخته 250 دانه و خریداری یک پلاستیک سیب به تعمیر للندر 6, پرداخت برای ذین الله بابت آوردن جنراترو خورد به تعمیر للندر 6, خریداری ساکت, پل چرخ, قلم آهنی و غیره , پرداخت برای آوردن ویبراتور از تعمیر للندر 4 به تعمیر للندر 6 و رساندن انجنیر وحید و احسان از ساحه کار الی کمپنی و چهار قلعه و پرداخت برای 2 نفر کاریگر در روز کانکریت ریزی به تعمیر للندر 6",
       "remarks": "",
@@ -5473,10 +5527,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5561,
+    "pk": 5564,
     "fields": {
       "project": 3,
-      "serial_number": 5561,
+      "serial_number": 5565,
       "expense_date": "2026-03-31",
       "description": "خریداری تیل دیزل به جنراتور,پرداخت برای دو نفر کلگار روزدین در روز کانکریت ریزی تعمیر للندر 6, پرداخت برای دو نفر پولیس شرینی عیدی  و خریداری بادنجان خشک بابت تعمیر للندر 6, تیل دیزل به جنراتور, خریداری خامه و مربا به تعمیر للندر 6 و خریداری سر گوساله بابت تعمیر للندر 6",
       "remarks": "",
@@ -5491,10 +5545,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5562,
+    "pk": 5565,
     "fields": {
       "project": 3,
-      "serial_number": 5562,
+      "serial_number": 5566,
       "expense_date": "2026-03-31",
       "description": "خریداری تیل دیزل, گاز, مبلایل, خریداری مبلایل به جنراتوری تعمیر للندر 6, کرایه رفت و آمد ار للندر 5 به للندر 6 بخاطری مبلایل تبدیلی, خریداری تیل دیزل, متر, توش, رجه, دستکش به تعمیر للندر 6",
       "remarks": "",
@@ -5509,10 +5563,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5563,
+    "pk": 5566,
     "fields": {
       "project": 3,
-      "serial_number": 5563,
+      "serial_number": 5567,
       "expense_date": "2026-03-31",
       "description": "خریداری تار رجه, پرداخت کرای انتقال دو کاریگر از للندر 5 به للندر 6 و کرایه موتری مازدا بابت انتقال 500 دانه جک کرایی از قصبه به للندر 6, خریداری دو عدد کوک به چاشت , بالتی و انرژی در روز کانکریت ریزی چت اول تعمیر للندر 6, خریداری  650 عدد نان فی دانه 8 افغانی بابت تعمیر للندر 6, خریداری آب ترازو, پیپ و قلم تراش به تعمیر للندر 6, خریداری انرژی و کیک به انجنیران و دوکتوران در روز کانکریت ریزی, خریداری یک عدد تخم, آب و بطری به تعمیر للندر 6",
       "remarks": "",
@@ -5527,10 +5581,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5564,
+    "pk": 5567,
     "fields": {
       "project": 3,
-      "serial_number": 5564,
+      "serial_number": 5568,
       "expense_date": "2026-03-31",
       "description": "خریداری دستکش, مبلایل سوخته به جنراتور, گاز, برس رنگ, تار رجه, گوشت , انرژی در روزی کانکریت ریزی و مصارف متفرقه آب, خرما و چارجر بطری به جنراتور, تیل تیزل, خریداری یک راس گوسفند برای حاجی عبدالحق به هدایت حاجی رفیع بخاطری آمدن از حج عمره و کرایه موتری آن, آب, پالک, تخم و دیگر مصارف, پرداخت کرایه دو نفر کاریگر بابت کانکریت ریزی به تعمیر للندر 4 و کرایه تکسی دو نفر کاریگر بابت کارنکریت کرایه واپسی و کرایه دو نفر کاریگر بابت آمدن ار للندر 6 به للندر 5  به تعمیر للندر 6",
       "remarks": "",
@@ -5545,10 +5599,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5565,
+    "pk": 5568,
     "fields": {
       "project": 3,
-      "serial_number": 5565,
+      "serial_number": 5569,
       "expense_date": "2026-04-01",
       "description": "پرداخت برای ترمیم و سیم پیچی داینمو تعمیرللندر6",
       "remarks": "",
@@ -5563,10 +5617,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5566,
+    "pk": 5569,
     "fields": {
       "project": 3,
-      "serial_number": 5566,
+      "serial_number": 5570,
       "expense_date": "2026-04-02",
       "description": "پرداخت برای مواد ساختمانی سلیمان داودزی بابت خریداری ریگ شسته و جغل به تعمیرللندر 6",
       "remarks": "",
@@ -5581,10 +5635,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5567,
+    "pk": 5570,
     "fields": {
       "project": 3,
-      "serial_number": 5567,
+      "serial_number": 5571,
       "expense_date": "2026-04-02",
       "description": "پرداخت برای شرکت حاجی نادر دولت زی بابت خریداری سیخ گول به تعمیرللندر6",
       "remarks": "",
@@ -5599,10 +5653,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5568,
+    "pk": 5571,
     "fields": {
       "project": 3,
-      "serial_number": 5568,
+      "serial_number": 5572,
       "expense_date": "2026-04-04",
       "description": "پیش پرداخت برای انجنیر وحید الله ولد حبیب الله بابت ماه حمل 1405",
       "remarks": "",
@@ -5617,10 +5671,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5569,
+    "pk": 5572,
     "fields": {
       "project": 3,
-      "serial_number": 5569,
+      "serial_number": 5573,
       "expense_date": "2026-04-07",
       "description": "پرداخت برای نورالدین بابت سیم تابی  و قالبکاری تعمیر للندر 6",
       "remarks": "",
@@ -5635,10 +5689,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5570,
+    "pk": 5573,
     "fields": {
       "project": 3,
-      "serial_number": 5570,
+      "serial_number": 5574,
       "expense_date": "2026-04-07",
       "description": "خریداری پطرول به موتر هایلکس بابت تعیمرللندر 6",
       "remarks": "",
@@ -5653,10 +5707,28 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5571,
+    "pk": 5574,
     "fields": {
       "project": 3,
-      "serial_number": 5571,
+      "serial_number": 5575,
+      "expense_date": "2026-04-07",
+      "description": "پرداخت برای ترمیم موتر هایلکس",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 4500.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.0,
+      "expense_type": "general",
+      "created_at": "2026-04-07",
+      "updated_at": "2026-04-07"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5575,
+    "fields": {
+      "project": 3,
+      "serial_number": 5576,
       "expense_date": "2026-04-08",
       "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیر للندر 6",
       "remarks": "",
@@ -5671,10 +5743,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5572,
+    "pk": 5576,
     "fields": {
       "project": 3,
-      "serial_number": 5572,
+      "serial_number": 5577,
       "expense_date": "2026-04-11",
       "description": "پرداخت برای نورالدین بابت قالب کاری تعمیر للندر 6",
       "remarks": "",
@@ -5689,10 +5761,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5573,
+    "pk": 5577,
     "fields": {
       "project": 3,
-      "serial_number": 5573,
+      "serial_number": 5578,
       "expense_date": "2026-04-11",
       "description": "پیش پرداخت برای میرویس ولد عبدالبصیر بابت ماه حمل 1405",
       "remarks": "",
@@ -5707,10 +5779,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5574,
+    "pk": 5578,
     "fields": {
       "project": 3,
-      "serial_number": 5574,
+      "serial_number": 5579,
       "expense_date": "2026-04-15",
       "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیر للندر 6 بدست محمد هاشم",
       "remarks": "",
@@ -5725,10 +5797,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5575,
+    "pk": 5579,
     "fields": {
       "project": 3,
-      "serial_number": 5575,
+      "serial_number": 5580,
       "expense_date": "2026-04-15",
       "description": "پرداخت برای شرکت آهن آلات کوهدامن بابت خریداری سیخ گول 12 ملی به تعمیر للندر 6,   پرداخت برای شرکت آهن آلات کوهدامن بابت خریداری سیخ گول 10 ملی و 12 ملی به تعمیر للندر 6   ,  پرداخت هذا به نقد خریداری شده و پول آن توسط جاوید سکندری پرداخت گردیده",
       "remarks": "",
@@ -5743,10 +5815,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5576,
+    "pk": 5580,
     "fields": {
       "project": 3,
-      "serial_number": 5576,
+      "serial_number": 5581,
       "expense_date": "2026-04-16",
       "description": "پرداخت برای شرکت آهن آلات کوهدامن بابت خریداری سیخ گول 20 ملی و 25 ملی  به تعمیر للندر 6 توسط چک نمبر 2383 از صرافی خانی سرای شهزاده",
       "remarks": "",
@@ -5761,10 +5833,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5577,
+    "pk": 5581,
     "fields": {
       "project": 3,
-      "serial_number": 5577,
+      "serial_number": 5582,
       "expense_date": "2026-04-16",
       "description": "پرداخت برای شرکت کابل پن از مجموع بل نمبر 404-1606 بابت تهیه لوحه های تبلیغاتی به تعمیرللندر6",
       "remarks": "",
@@ -5779,10 +5851,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5578,
+    "pk": 5582,
     "fields": {
       "project": 3,
-      "serial_number": 5578,
+      "serial_number": 5583,
       "expense_date": "2026-04-16",
       "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیرللندر6",
       "remarks": "",
@@ -5797,10 +5869,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5579,
+    "pk": 5583,
     "fields": {
       "project": 3,
-      "serial_number": 5579,
+      "serial_number": 5584,
       "expense_date": "2026-04-18",
       "description": "پرداخت برای محمد طهماس بابت کرای جک های کرایی به تعداد 500 پایه از تاریخ 06 حمل 1405 الی  06 ثور 1405 فی ماه از قرار 25000 افغانی",
       "remarks": "",
@@ -5815,10 +5887,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5580,
+    "pk": 5584,
     "fields": {
       "project": 3,
-      "serial_number": 5580,
+      "serial_number": 5585,
       "expense_date": "2026-04-21",
       "description": "خریداری لباس ورزشی و پروتین توسط سمیر للندر",
       "remarks": "",
@@ -5833,10 +5905,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5581,
+    "pk": 5585,
     "fields": {
       "project": 3,
-      "serial_number": 5581,
+      "serial_number": 5586,
       "expense_date": "2026-04-21",
       "description": "خریداری تیل دیزل به جنراتور, رجه, گوشت مرغ, گاز,شکاستیب, پرداخت برای دو نفر گلکار بخاطری گانگریت ریزی, نان چاشت کاریگر ها, خریداری نخود , رب, روغن, پیاز و ترکاری به تعمیر للندر 6",
       "remarks": "",
@@ -5851,10 +5923,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5582,
+    "pk": 5586,
     "fields": {
       "project": 3,
-      "serial_number": 5582,
+      "serial_number": 5587,
       "expense_date": "2026-04-21",
       "description": "خریداری مبلایل, تیل دیزل , تار رجه, گاز, پل چرخ نازک و سیخ ویلدنک و پلک  به تعمیر للندر 6",
       "remarks": "",
@@ -5869,10 +5941,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5583,
+    "pk": 5587,
     "fields": {
       "project": 3,
-      "serial_number": 5583,
+      "serial_number": 5588,
       "expense_date": "2026-04-21",
       "description": "خریداری  یک دانه  گل ماله آهنی, یک دانه گل ماله پلاستیکی, گوشت, پیپ لیول, تیل دیزل, پیپ 3 فاز, پرداخت بل برق و پرداخت کرایه میرویس  و غیره به تعمیر للندر 6",
       "remarks": "",
@@ -5887,10 +5959,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5584,
+    "pk": 5588,
     "fields": {
       "project": 3,
-      "serial_number": 5584,
+      "serial_number": 5589,
       "expense_date": "2026-04-21",
       "description": "پرداخت برای آمر کنترول ساختمانی ناحیه بخاطری اخذ اجازه کانکریت در روز های بارانی شرنی داد و کرایه موتری وی,   خریداری تیل پطرول به ویبراتور ها, پرداخت برای کاریگران نوردین یک نفر گلکار دو نفر کاریگر در کانکریت ریزی پایه های جفت تعمیر للندر 6 , پرداخت نصب لوحه و ترمیم پروجکتور, پرداخت کرایه انجنیر وحید از للندر 6 به خانه , خریداری قوتی , پلک بابت صندوق برق تعمیر للندر 6, خریداری گوشت , پرداخت برای کاریگران نوردین یک نفر گلکار دو نفر کاریگر در روز کانکریت ریزی چت A تعمیر للندر 6, خریداری کاک سااختمانی به تعمیر للندر 6, خریداری نان و تیل دیزل به تعمیر للندر 6",
       "remarks": "",
@@ -5905,10 +5977,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5585,
+    "pk": 5589,
     "fields": {
       "project": 3,
-      "serial_number": 5585,
+      "serial_number": 5590,
       "expense_date": "2026-04-21",
       "description": "پرداخت معاش برای میرویس ولد عبدالبصیر بابت ماه حمل 1405 به تعمیر للندر 6",
       "remarks": "",
@@ -5923,10 +5995,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5586,
+    "pk": 5590,
     "fields": {
       "project": 3,
-      "serial_number": 5586,
+      "serial_number": 5591,
       "expense_date": "2026-04-21",
       "description": "پرداخت معاش برای عبدالبصیر ولد رضا  بابت ماه حمل 1405 به تعمیر للندر 6",
       "remarks": "",
@@ -5941,10 +6013,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5587,
+    "pk": 5591,
     "fields": {
       "project": 3,
-      "serial_number": 5587,
+      "serial_number": 5592,
       "expense_date": "2026-04-21",
       "description": "پرداخت معاش علی احمد ولد جما خان بابت حمل 1405 به تعمیر للندر 6",
       "remarks": "",
@@ -5959,10 +6031,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5588,
+    "pk": 5592,
     "fields": {
       "project": 3,
-      "serial_number": 5588,
+      "serial_number": 5593,
       "expense_date": "2026-04-21",
       "description": "پیش پرداخت برای وحید الله ولد حبیب الله انجنیر ساحوی تعمیر للندر 6",
       "remarks": "",
@@ -5977,10 +6049,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5589,
+    "pk": 5593,
     "fields": {
       "project": 3,
-      "serial_number": 5589,
+      "serial_number": 5594,
       "expense_date": "2026-04-21",
       "description": "پرداخت معاش وحیدالله صدیقی ولد حبیب الله بابت ماه حمل 1405 به تعمیر للندر 6",
       "remarks": "",
@@ -5995,10 +6067,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5590,
+    "pk": 5594,
     "fields": {
       "project": 3,
-      "serial_number": 5590,
+      "serial_number": 5595,
       "expense_date": "2026-04-22",
       "description": "پرداخت معاش محمد نادر ولد  صفی مقبول ساهی بابت ماه حمل 1405 به تعمیر للندر 6",
       "remarks": "",
@@ -6013,10 +6085,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5591,
+    "pk": 5595,
     "fields": {
       "project": 3,
-      "serial_number": 5591,
+      "serial_number": 5596,
       "expense_date": "2026-04-22",
       "description": "پرداخت معاش سردار ولی بابت ماه حمل 1405 به تعمیر للندر 6",
       "remarks": "",
@@ -6031,10 +6103,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5592,
+    "pk": 5596,
     "fields": {
       "project": 3,
-      "serial_number": 5592,
+      "serial_number": 5597,
       "expense_date": "2026-04-22",
       "description": "پرداخت و تصفیه حساب پول باقیمانده شرکت آهن فقیری بابت خریداری سیخ گول 25 میلی و 22 میلی به تعمیر للندر 6 مبلغ هذات توسط صرافی خانی گل توسط چک نمبر 2392 اجرا گریده است",
       "remarks": "",
@@ -6049,10 +6121,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5593,
+    "pk": 5597,
     "fields": {
       "project": 3,
-      "serial_number": 5593,
+      "serial_number": 5598,
       "expense_date": "2026-04-22",
       "description": "پرداخت برای شرکت آهن فقیری بابت خریداری سیخ گول 12, 16 ,25و 22 میلی به تعمیر للندر 6 مبلغ هذات توسط صرافی خانی گل توسط چک نمبر 2389 اجرا گریده است",
       "remarks": "",
@@ -6067,10 +6139,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5594,
+    "pk": 5598,
     "fields": {
       "project": 3,
-      "serial_number": 5594,
+      "serial_number": 5599,
       "expense_date": "2026-04-23",
       "description": "پرداخت برای شرکت مواد ساختمانی شیر باز بابت خریداری ریگ شسته به تعمیر للندر 6",
       "remarks": "",
@@ -6085,10 +6157,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5595,
+    "pk": 5599,
     "fields": {
       "project": 3,
-      "serial_number": 5595,
+      "serial_number": 5600,
       "expense_date": "2026-04-23",
       "description": "پرداخت برای رسول خان کرای جک ها به تعداد 500 پایه به تعمیر للندر 6 بابت ماه ثور 1405",
       "remarks": "",
@@ -6103,10 +6175,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5596,
+    "pk": 5600,
     "fields": {
       "project": 3,
-      "serial_number": 5596,
+      "serial_number": 5601,
       "expense_date": "2026-04-23",
       "description": "پرداخت برای محمد نسیم کرن کار بابت پاین کردن 8 بندل سیخ های گول خریداری شده از شرکت فقیر استیل به تعمیر للندر 6",
       "remarks": "",
@@ -6121,10 +6193,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5597,
+    "pk": 5601,
     "fields": {
       "project": 3,
-      "serial_number": 5597,
+      "serial_number": 5602,
       "expense_date": "2026-04-23",
       "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیر للندر 6",
       "remarks": "",
@@ -6139,10 +6211,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5598,
+    "pk": 5602,
     "fields": {
       "project": 3,
-      "serial_number": 5598,
+      "serial_number": 5603,
       "expense_date": "2026-04-27",
       "description": "پرداخت مصارف روزانه تعمیر للندر 6 توسط حاجی احسان از 21 آپریل الی 27 آپریل 2026 از قبیل خریداری تیل به جنراتور, کریه زرنج, سویچ, گوشت مرغ, گاز و غیره",
       "remarks": "",
@@ -6157,10 +6229,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5599,
+    "pk": 5603,
     "fields": {
       "project": 3,
-      "serial_number": 5599,
+      "serial_number": 5604,
       "expense_date": "2026-04-27",
       "description": "پرداخت مصارف روزانه تعمیر للندر 6 توسط حاجی احسان از 21 آپریل الی 27 آپریل 2026 از قبیل خریداری آب, مارکر, تیل, پل برش, فیوز و غیره",
       "remarks": "",
@@ -6175,10 +6247,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5600,
+    "pk": 5604,
     "fields": {
       "project": 3,
-      "serial_number": 5600,
+      "serial_number": 5605,
       "expense_date": "2026-04-27",
       "description": "پرداخت مصارف روزانه تعمیر للندر 6 توسط حاجی احسان از 21 آپریل الی 27 آپریل 2026 از قبیل خریداری پل, جالی, تیل دیزل, پرداخت به ترافیک, گوشت و غیره",
       "remarks": "",
@@ -6193,10 +6265,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5601,
+    "pk": 5605,
     "fields": {
       "project": 3,
-      "serial_number": 5601,
+      "serial_number": 5606,
       "expense_date": "2026-04-27",
       "description": "پرداخت مصارف روزانه تعمیر للندر 6 توسط حاجی احسان از 21 آپریل الی 27 آپریل 2026 از قبیل خریداری لور, گوشت, ویبراتور, پرداخت به گلکار و کاریگر و غیره",
       "remarks": "",
@@ -6211,10 +6283,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5602,
+    "pk": 5606,
     "fields": {
       "project": 3,
-      "serial_number": 5602,
+      "serial_number": 5607,
       "expense_date": "2026-04-27",
       "description": "پرداخت مصارف روزانه تعمیر للندر 6 توسط حاجی احسان از 21 آپریل الی 27 آپریل 2026 از قبیل خریداری مبلایل, رنگ روغنی, لور, تیل, فلتر دیزل, پرزه جنراتور و غیره",
       "remarks": "",
@@ -6229,10 +6301,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5603,
+    "pk": 5607,
     "fields": {
       "project": 3,
-      "serial_number": 5603,
+      "serial_number": 5608,
       "expense_date": "2026-04-29",
       "description": "پراخت برای مبلایل تبدیلی و فلتر مبلایل به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -6247,10 +6319,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5604,
+    "pk": 5608,
     "fields": {
       "project": 3,
-      "serial_number": 5604,
+      "serial_number": 5609,
       "expense_date": "2026-04-28",
       "description": "خریداری سمنت ایرانی و انتقال آن از تعمیر للندر 5 به تعمیر للندر 6",
       "remarks": "",
@@ -6265,10 +6337,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5605,
+    "pk": 5609,
     "fields": {
       "project": 3,
-      "serial_number": 5605,
+      "serial_number": 5610,
       "expense_date": "2026-04-30",
       "description": "پرداخت برای شرکت هرات نت و بولت بابت خریداری سیم جستی 1.5 ملی به تعمیر للندر 6",
       "remarks": "",
@@ -6283,10 +6355,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5606,
+    "pk": 5610,
     "fields": {
       "project": 3,
-      "serial_number": 5606,
+      "serial_number": 5611,
       "expense_date": "2026-05-02",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -6301,10 +6373,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5607,
+    "pk": 5611,
     "fields": {
       "project": 3,
-      "serial_number": 5607,
+      "serial_number": 5612,
       "expense_date": "2026-05-04",
       "description": "خریداری تیل پطرول به موتر سایکل توسط زین الله",
       "remarks": "",
@@ -6319,10 +6391,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5608,
+    "pk": 5612,
     "fields": {
       "project": 3,
-      "serial_number": 5608,
+      "serial_number": 5613,
       "expense_date": "2026-05-06",
       "description": "پرداخت برای نوالدین بابت سیم توی تعمیر للندر 6",
       "remarks": "",
@@ -6337,10 +6409,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5609,
+    "pk": 5613,
     "fields": {
       "project": 3,
-      "serial_number": 5609,
+      "serial_number": 5614,
       "expense_date": "2026-05-06",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -6355,10 +6427,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5610,
+    "pk": 5614,
     "fields": {
       "project": 3,
-      "serial_number": 5610,
+      "serial_number": 5615,
       "expense_date": "2026-05-07",
       "description": "پیش پرداخت برای وحیدالله ولد حبیب الله انجینیر ساحوی تعمیر للندر 6 و ثور سال 1405",
       "remarks": "",
@@ -6373,10 +6445,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5611,
+    "pk": 5615,
     "fields": {
       "project": 3,
-      "serial_number": 5611,
+      "serial_number": 5616,
       "expense_date": "2026-05-07",
       "description": "پرداخت برای خورده فروشی خوست بابت خریداری رنج 21/23 و 22 به تعمیر للندر 6",
       "remarks": "",
@@ -6391,10 +6463,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5612,
+    "pk": 5616,
     "fields": {
       "project": 3,
-      "serial_number": 5612,
+      "serial_number": 5617,
       "expense_date": "2026-05-09",
       "description": "خریداری تیل پطرول بابت موتر سایکل برای تعمیر للندر 6",
       "remarks": "",
@@ -6409,10 +6481,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5613,
+    "pk": 5617,
     "fields": {
       "project": 3,
-      "serial_number": 5613,
+      "serial_number": 5618,
       "expense_date": "2026-05-11",
       "description": "مصارف تعمیر للندر 6 از قبیل پول کردیت انجنیر, پرداخت برای کاریگران, خریداری  گاز, پرداخت برای آوردن سیخ گول, خریداری ویبراتور, تیل دیزل  برای جنراتور, گوشت و غیره",
       "remarks": "",
@@ -6427,10 +6499,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5614,
+    "pk": 5618,
     "fields": {
       "project": 3,
-      "serial_number": 5614,
+      "serial_number": 5619,
       "expense_date": "2026-05-11",
       "description": "پرداخت برای محمد نسیم کرن بابت  تخلیه 25 بندل سیخ گول خریداری از شرکت خریداری از شرکت خان ابسیل به تعمیر للندر 6",
       "remarks": "",
@@ -6445,10 +6517,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5615,
+    "pk": 5619,
     "fields": {
       "project": 3,
-      "serial_number": 5615,
+      "serial_number": 5620,
       "expense_date": "2026-05-12",
       "description": "پرداخت برای شرکت کانکریت ریزی توحید مسکن بابت تعمیر للندر 6 و اجر آن توسط چک نمبر 2421 از صرافی خانی گل",
       "remarks": "",
@@ -6463,10 +6535,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5616,
+    "pk": 5620,
     "fields": {
       "project": 3,
-      "serial_number": 5616,
+      "serial_number": 5621,
       "expense_date": "2026-05-14",
       "description": "پرداخت برای شرکت زمزم استیل بابت خریداری سیخ گول به تعمیر للندر 6",
       "remarks": "",
@@ -6481,10 +6553,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5617,
+    "pk": 5621,
     "fields": {
       "project": 3,
-      "serial_number": 5617,
+      "serial_number": 5622,
       "expense_date": "2026-05-14",
       "description": "پرداخت برای نوالدین بابت سیم تابی و قالبکاری به تعمیر للندر 6",
       "remarks": "",
@@ -6499,10 +6571,28 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5618,
+    "pk": 5622,
     "fields": {
       "project": 3,
-      "serial_number": 5618,
+      "serial_number": 5623,
+      "expense_date": "2026-05-16",
+      "description": "خریداری تیل پطرول به موتر هایلکس",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 3700.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 63.6,
+      "expense_type": "general",
+      "created_at": "2026-05-16",
+      "updated_at": "2026-05-16"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5623,
+    "fields": {
+      "project": 3,
+      "serial_number": 5624,
       "expense_date": "2026-05-20",
       "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
       "remarks": "",
@@ -6517,10 +6607,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5619,
+    "pk": 5624,
     "fields": {
       "project": 3,
-      "serial_number": 5619,
+      "serial_number": 5625,
       "expense_date": "2026-05-25",
       "description": "پرداخت معاش عبدالبصیر ولد رضا بابت ماه ثور 1405",
       "remarks": "",
@@ -6535,10 +6625,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5620,
+    "pk": 5625,
     "fields": {
       "project": 3,
-      "serial_number": 5620,
+      "serial_number": 5626,
       "expense_date": "2026-05-25",
       "description": "پرداخت معاش محمد قاهر ولد محمد رحیم بابت ماه ثور 1405",
       "remarks": "",
@@ -6553,10 +6643,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5621,
+    "pk": 5626,
     "fields": {
       "project": 3,
-      "serial_number": 5621,
+      "serial_number": 5627,
       "expense_date": "2026-05-25",
       "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیرللندر6",
       "remarks": "",
@@ -6571,10 +6661,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5622,
+    "pk": 5627,
     "fields": {
       "project": 3,
-      "serial_number": 5622,
+      "serial_number": 5628,
       "expense_date": "2026-05-25",
       "description": "پرداخت برای علی احمد ولد جمعه خان بابت ماه ثور 1405",
       "remarks": "",
@@ -6589,10 +6679,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5623,
+    "pk": 5628,
     "fields": {
       "project": 3,
-      "serial_number": 5623,
+      "serial_number": 5629,
       "expense_date": "2026-05-25",
       "description": "پرداخت برای مصارفات حاجی احسان الله از تاریخ 11 می 2026 الی 20 می 2026 از قبیل تبدیل کردن مبلایل جنراتور ,اجرت روز مزد کاریگران ,خریداری پیاز و سبزی,گاز ,تیل دیزل به جنراتور,گوشت گوسفند به تعمیرللندر6",
       "remarks": "",
@@ -6607,10 +6697,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5624,
+    "pk": 5629,
     "fields": {
       "project": 3,
-      "serial_number": 5624,
+      "serial_number": 5630,
       "expense_date": "2026-05-25",
       "description": "پرداخت برای مصارفات حاجی احسان الله از تاریخ 11 می 2026 الی 20 می 2026 از قبیل پل برش , کرای موتر بابت خریداری سیخ گول از خان استیل , کیبل ,پل چرخ ,سوچ چرخ ,نت و بولت و کرای تکسی ,تیل دیزل به جنراتور,مارکر تخم مرغ , آب آشامیدنی و مبلایل به تعمیرللندر6",
       "remarks": "",
@@ -6625,10 +6715,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5625,
+    "pk": 5630,
     "fields": {
       "project": 3,
-      "serial_number": 5625,
+      "serial_number": 5631,
       "expense_date": "2026-05-25",
       "description": "پرداخت برای مصارفات حاجی احسان الله از تاریخ 11 می 2026 الی 20 می 2026 از قبیل تیل پطرول به ویبراتور ها, پل چرخ ,تیل دیزل,تداوی عبدالبصیر,برای سرگروپ جکشن برق ,خریداری بادنجان رومی ,کرای انتقال مواد از هرات نت و بولت ,خریداری خرما و تیل دیزل به جنراتور تعمیرللندر6",
       "remarks": "",
@@ -6643,10 +6733,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5626,
+    "pk": 5631,
     "fields": {
       "project": 3,
-      "serial_number": 5626,
+      "serial_number": 5632,
       "expense_date": "2026-05-25",
       "description": "پرداخت برای مصارفات حاجی احسان الله از تاریخ 11 می 2026 الی 20 می 2026 از قبیل خریداری سیم جستی یک ملی, گلماله و ساکت برق به تعمیرللندر6",
       "remarks": "",
@@ -6661,10 +6751,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5627,
+    "pk": 5632,
     "fields": {
       "project": 3,
-      "serial_number": 5627,
+      "serial_number": 5633,
       "expense_date": "2026-05-25",
       "description": "پرداخت کرای خوازه بابت زینه برای تهکوی تعمیرللندر 6 سکشن A از تاریخ 08 جدی 1404 الی 18 حمل 1405",
       "remarks": "",
@@ -6679,10 +6769,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5628,
+    "pk": 5633,
     "fields": {
       "project": 3,
-      "serial_number": 5628,
+      "serial_number": 5634,
       "expense_date": "2026-05-25",
       "description": "پرداخت معاش باقیمانده وحید الله ولد حبیب الله بابت ماه ثور 1405",
       "remarks": "",
@@ -6697,10 +6787,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5629,
+    "pk": 5634,
     "fields": {
       "project": 3,
-      "serial_number": 5629,
+      "serial_number": 5635,
       "expense_date": "2026-05-25",
       "description": "پرداخت مصارف کرای موترماه حمل و ثور 1405 انجنیر وحید الله به تعمیرللندر6",
       "remarks": "",
@@ -6715,10 +6805,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5630,
+    "pk": 5635,
     "fields": {
       "project": 3,
-      "serial_number": 5630,
+      "serial_number": 5636,
       "expense_date": "2026-05-25",
       "description": "پرداخت معاش سردار ولی ولد صبرالله بابت ماه ثور 1405",
       "remarks": "",
@@ -6733,10 +6823,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5631,
+    "pk": 5636,
     "fields": {
       "project": 3,
-      "serial_number": 5631,
+      "serial_number": 5637,
       "expense_date": "2026-05-25",
       "description": "پرداخت برای شرکت فراز آژمان بابت خریداری (86.1) متر کاک سقفی به تعمیرللندر6",
       "remarks": "",
@@ -6751,10 +6841,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5632,
+    "pk": 5637,
     "fields": {
       "project": 3,
-      "serial_number": 5632,
+      "serial_number": 5638,
       "expense_date": "2026-06-08",
       "description": "پرداخت برای محمد نسیم بابت اجرت پائین کردن سیخ گول خریداری شده از شرکت خان استیل به تعمیرللندر6",
       "remarks": "",
@@ -6769,10 +6859,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5633,
+    "pk": 5638,
     "fields": {
       "project": 3,
-      "serial_number": 5633,
+      "serial_number": 5639,
       "expense_date": "2026-06-08",
       "description": "پرداخت برای شرکت فقیری استیل بابت خریداری سیخ گول 8 ملی به تعمیرللندر 6 به هدایت حاجی احسان الله سهاک",
       "remarks": "",
@@ -6787,10 +6877,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5634,
+    "pk": 5639,
     "fields": {
       "project": 3,
-      "serial_number": 5634,
+      "serial_number": 5640,
       "expense_date": "2026-06-10",
       "description": "پیش پرداخت برای وحید الله ولد حبیب الله بابت ماه جوزا 1405",
       "remarks": "",
@@ -6805,10 +6895,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5635,
+    "pk": 5640,
     "fields": {
       "project": 3,
-      "serial_number": 5635,
+      "serial_number": 5641,
       "expense_date": "2026-06-10",
       "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری تعمیرللندر6",
       "remarks": "",
@@ -6823,10 +6913,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5636,
+    "pk": 5641,
     "fields": {
       "project": 3,
-      "serial_number": 5636,
+      "serial_number": 5642,
       "expense_date": "2026-06-11",
       "description": "پرداخت برای رحیم داد کرن کار بابت تغیر موقعیت سنگ های استنادی و تغیر کانتینر و همچنان اجرت پاین نمودن سیخ گول خریداری شده از شرکت خان استیل به تعمیرللندر 6",
       "remarks": "",
@@ -6841,10 +6931,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5637,
+    "pk": 5642,
     "fields": {
       "project": 3,
-      "serial_number": 5637,
+      "serial_number": 5643,
       "expense_date": "2026-06-11",
       "description": "پرداخت برای دوکان خوستی بابت خریداری سیم جستی به تعمیرللندر 6 توسط احمد فرید للندر",
       "remarks": "",
@@ -6859,10 +6949,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5638,
+    "pk": 5643,
     "fields": {
       "project": 3,
-      "serial_number": 5638,
+      "serial_number": 5644,
       "expense_date": "2026-06-11",
       "description": "پرداخت برای شرکت فراز آژمان از مجموع بل نمبر 925 به تعمیرللندر 6",
       "remarks": "",
@@ -6877,10 +6967,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5639,
+    "pk": 5644,
     "fields": {
       "project": 3,
-      "serial_number": 5639,
+      "serial_number": 5645,
       "expense_date": "2026-06-13",
       "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری های تعمیرللندر6",
       "remarks": "",
@@ -6895,10 +6985,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5640,
+    "pk": 5645,
     "fields": {
       "project": 3,
-      "serial_number": 5640,
+      "serial_number": 5646,
       "expense_date": "2026-06-14",
       "description": "پرداخت برای خیاطی خان فیشن بابت تهیه لباس برای کاریگران تعمیرللندر 6",
       "remarks": "",
@@ -6913,10 +7003,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5641,
+    "pk": 5646,
     "fields": {
       "project": 3,
-      "serial_number": 5641,
+      "serial_number": 5647,
       "expense_date": "2026-06-15",
       "description": "پرداخت برای شرکت فراز آژمان بابت خریداری کاک سقی به تعمیرللندر6",
       "remarks": "",
@@ -6931,10 +7021,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5642,
+    "pk": 5647,
     "fields": {
       "project": 3,
-      "serial_number": 5642,
+      "serial_number": 5648,
       "expense_date": "2026-06-17",
       "description": "خریداری تیل پطرول به موتر هایلکس",
       "remarks": "",
@@ -6949,10 +7039,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5643,
+    "pk": 5648,
     "fields": {
       "project": 3,
-      "serial_number": 5643,
+      "serial_number": 5649,
       "expense_date": "2026-06-17",
       "description": "پرداخت برای محمد طهماس بابت کرای جک های کرا گرفته شده به تعمیرللندر6",
       "remarks": "",
@@ -6967,10 +7057,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5644,
+    "pk": 5649,
     "fields": {
       "project": 3,
-      "serial_number": 5644,
+      "serial_number": 5650,
       "expense_date": "2026-06-17",
       "description": "پرداخت برای مصارفات روزانه حاجی احسان الله سهاک در تعمیرللندر 6 از تاریخ 11 می 2026 الی 17 می 2026",
       "remarks": "",
@@ -6985,10 +7075,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5645,
+    "pk": 5650,
     "fields": {
       "project": 3,
-      "serial_number": 5645,
+      "serial_number": 5651,
       "expense_date": "2026-06-17",
       "description": "پرداخت برای شرکت زمزم استیل بابت خریداری سیخ گول به تعمیرللندر6",
       "remarks": "",
@@ -7003,10 +7093,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5646,
+    "pk": 5651,
     "fields": {
       "project": 3,
-      "serial_number": 5646,
+      "serial_number": 5652,
       "expense_date": "2026-06-21",
       "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری های تعمیرللندر6",
       "remarks": "",
@@ -7021,10 +7111,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5647,
+    "pk": 5652,
     "fields": {
       "project": 3,
-      "serial_number": 5647,
+      "serial_number": 5653,
       "expense_date": "2026-06-21",
       "description": "پرداخت برای حاجی احسان الله سهاک بابت مصارفات روزانه در تعمیرللندر6",
       "remarks": "",
@@ -7039,10 +7129,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5648,
+    "pk": 5653,
     "fields": {
       "project": 3,
-      "serial_number": 5648,
+      "serial_number": 5654,
       "expense_date": "2026-06-22",
       "description": "پرداخت نقدی برای شرکت کانکریت ریزی توحید مسکن بابت تعمیرللندر6",
       "remarks": "",
@@ -7057,10 +7147,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5649,
+    "pk": 5654,
     "fields": {
       "project": 3,
-      "serial_number": 5649,
+      "serial_number": 5655,
       "expense_date": "2026-06-23",
       "description": "پرداخت برای شرکت زمزم استیل بابت خریداری سیخ گول به تعمیرللندر6",
       "remarks": "",
@@ -7075,10 +7165,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5650,
+    "pk": 5655,
     "fields": {
       "project": 3,
-      "serial_number": 5650,
+      "serial_number": 5656,
       "expense_date": "2026-06-23",
       "description": "پرداخت برای شرکت فراز آژمان بابت خریداری کاک سقفی به سایز های مختلف به تعمیرللندر6",
       "remarks": "",
@@ -7093,10 +7183,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5651,
+    "pk": 5656,
     "fields": {
       "project": 3,
-      "serial_number": 5651,
+      "serial_number": 5657,
       "expense_date": "2026-06-26",
       "description": "پرداخت معاش وحید الله ولد حبیب الله بابت ماه جوزا 1405",
       "remarks": "",
@@ -7111,10 +7201,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5652,
+    "pk": 5657,
     "fields": {
       "project": 3,
-      "serial_number": 5652,
+      "serial_number": 5658,
       "expense_date": "2026-06-26",
       "description": "پرداخت معاش علی احمد ولد جمعه خان کاریگر تعمیرللندر 6 بابت ماه جوزا 1405",
       "remarks": "",
@@ -7129,10 +7219,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5653,
+    "pk": 5658,
     "fields": {
       "project": 3,
-      "serial_number": 5653,
+      "serial_number": 5659,
       "expense_date": "2026-06-26",
       "description": "پرداخت معاش سردار ولی ولد صبرالله کاریگر تعمیرللندر 6 بابت ماه جوزا 1405",
       "remarks": "",
@@ -7147,10 +7237,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5654,
+    "pk": 5659,
     "fields": {
       "project": 3,
-      "serial_number": 5654,
+      "serial_number": 5660,
       "expense_date": "2026-06-26",
       "description": "پرداخت معاش عبدالبصیر ولد رضا کاریگر تعمیرللندر 6 بابت ماه جوزا 1405",
       "remarks": "",
@@ -7165,10 +7255,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5655,
+    "pk": 5660,
     "fields": {
       "project": 3,
-      "serial_number": 5655,
+      "serial_number": 5661,
       "expense_date": "2026-06-26",
       "description": "پرداخت معاش میرویس ولد عبدالبصیر کاریگر تعمیرللندر6 بابت ماه جوزا 1405",
       "remarks": "",
@@ -7183,10 +7273,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5656,
+    "pk": 5661,
     "fields": {
       "project": 3,
-      "serial_number": 5656,
+      "serial_number": 5662,
       "expense_date": "2026-06-26",
       "description": "پرداخت کرای کرای موتر موتر انجنیر وحید الله ولد حبیب الله بابت ماه جوزا 1405 تعمیرللندر6",
       "remarks": "",
@@ -7201,10 +7291,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5657,
+    "pk": 5662,
     "fields": {
       "project": 3,
-      "serial_number": 5657,
+      "serial_number": 5663,
       "expense_date": "2026-06-26",
       "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری های تعمیرللندر6",
       "remarks": "",
@@ -7219,10 +7309,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5658,
+    "pk": 5663,
     "fields": {
       "project": 3,
-      "serial_number": 5658,
+      "serial_number": 5664,
       "expense_date": "2026-06-26",
       "description": "پرداخت اجرت روز مزد محمد نور خوازه کار بابت تعمیرللندر6",
       "remarks": "",
@@ -7237,10 +7327,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5659,
+    "pk": 5664,
     "fields": {
       "project": 3,
-      "serial_number": 5659,
+      "serial_number": 5665,
       "expense_date": "2026-06-26",
       "description": "پرداخت برای رسول خان بابت کرای 500 پایه جک به تعمیرللندر بابت ماه جوزا 1405",
       "remarks": "",
@@ -7255,10 +7345,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5660,
+    "pk": 5665,
     "fields": {
       "project": 3,
-      "serial_number": 5660,
+      "serial_number": 5666,
       "expense_date": "2026-06-26",
       "description": "پرداخت برای دوکان خوستی بابت خریداری جاین بکس آب بازک به تعمیرللندر 6 توسط تاج الدین",
       "remarks": "",
@@ -7273,10 +7363,10 @@
   },
   {
     "model": "expenses.expense",
-    "pk": 5661,
+    "pk": 5666,
     "fields": {
       "project": 3,
-      "serial_number": 5661,
+      "serial_number": 5667,
       "expense_date": "2026-06-28",
       "description": "پرداخت برای شرکت کابل پن بابت تهیه لوحه های تبلیغاتی تعمیرللندر6",
       "remarks": "",
@@ -7287,6 +7377,474 @@
       "expense_type": "general",
       "created_at": "2026-06-28",
       "updated_at": "2026-06-28"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5667,
+    "fields": {
+      "project": 3,
+      "serial_number": 5668,
+      "expense_date": "2026-07-01",
+      "description": "خریداری تیل پطرول به موتر هایلکس",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 2000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.3,
+      "expense_type": "general",
+      "created_at": "2026-07-01",
+      "updated_at": "2026-07-01"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5668,
+    "fields": {
+      "project": 3,
+      "serial_number": 5669,
+      "expense_date": "2026-07-01",
+      "description": "پرداخت برای شرکت هرات نت و بولت بابت خریداری سیم جستی 1.5 ملی به تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 0.0,
+      "amount_usd": 1060.0,
+      "exchange_rate": 65.3,
+      "expense_type": "general",
+      "created_at": "2026-07-01",
+      "updated_at": "2026-07-01"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5669,
+    "fields": {
+      "project": 3,
+      "serial_number": 5670,
+      "expense_date": "2026-07-02",
+      "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 200000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.5,
+      "expense_type": "general",
+      "created_at": "2026-07-02",
+      "updated_at": "2026-07-02"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5670,
+    "fields": {
+      "project": 3,
+      "serial_number": 5671,
+      "expense_date": "2026-07-02",
+      "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 5000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.5,
+      "expense_type": "general",
+      "created_at": "2026-07-02",
+      "updated_at": "2026-07-02"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5671,
+    "fields": {
+      "project": 3,
+      "serial_number": 5672,
+      "expense_date": "2026-07-02",
+      "description": "پرداخت برای شرکت زمزم استیل بابت خریداری سیخ گول به تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 0.0,
+      "amount_usd": 15000.0,
+      "exchange_rate": 65.5,
+      "expense_type": "general",
+      "created_at": "2026-07-02",
+      "updated_at": "2026-07-02"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5672,
+    "fields": {
+      "project": 3,
+      "serial_number": 5673,
+      "expense_date": "2026-07-07",
+      "description": "خریداری تیل پطرول به موتر هایلکس بابت تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 3500.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 66.2,
+      "expense_type": "general",
+      "created_at": "2026-07-07",
+      "updated_at": "2026-07-07"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5673,
+    "fields": {
+      "project": 3,
+      "serial_number": 5674,
+      "expense_date": "2026-07-15",
+      "description": "پرداخت به حساب بانکی حاجی قاسم سمنت فروش بابت خریداری 100 خریطه سمنت ایرانی به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 47700.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.7,
+      "expense_type": "general",
+      "created_at": "2026-07-15",
+      "updated_at": "2026-07-15"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5674,
+    "fields": {
+      "project": 3,
+      "serial_number": 5675,
+      "expense_date": "2026-07-15",
+      "description": "پرداخت قسط اول  خریداری سیخ گول رخدار از شرکت هرات نت و بولت به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 0.0,
+      "amount_usd": 4800.0,
+      "exchange_rate": 65.8,
+      "expense_type": "general",
+      "created_at": "2026-07-15",
+      "updated_at": "2026-07-15"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5675,
+    "fields": {
+      "project": 3,
+      "serial_number": 5676,
+      "expense_date": "2026-07-16",
+      "description": "پرداخت برای نورالدین بابت سیم تابی و قالبکاری های تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 240000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.8,
+      "expense_type": "general",
+      "created_at": "2026-07-16",
+      "updated_at": "2026-07-16"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5676,
+    "fields": {
+      "project": 3,
+      "serial_number": 5677,
+      "expense_date": "2026-07-16",
+      "description": "پرداخت برای مصارفات تاریخ های مختلف توسط حاجی احسان سهاک از قبیل خرید تیل پطرول به ویبراتور ها,اجرت گلکار بابت کانکریت ریزی, اجرت تخلیه سیخ گول هرات نت و بولت,تیل دیزل به جنراتور و خرید سیخ ولدینگ به تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 12640.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.8,
+      "expense_type": "general",
+      "created_at": "2026-07-16",
+      "updated_at": "2026-07-16"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5677,
+    "fields": {
+      "project": 3,
+      "serial_number": 5678,
+      "expense_date": "2026-07-16",
+      "description": "پرداخت برای مصارفات تاریخ های مختلف توسط حاجی احسان سهاک از قبیل مبلایل تبدیلی جنراتور,تیل دیزل به جنراتور,جالی ریگ ,دستکش, اجرت ولدینگ کاری تانکی تیل ,اجرت یک نفر گلکار,لابرتیپ و واشر,فلتر مبلایل به تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 8660.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.8,
+      "expense_type": "general",
+      "created_at": "2026-07-16",
+      "updated_at": "2026-07-16"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5678,
+    "fields": {
+      "project": 3,
+      "serial_number": 5679,
+      "expense_date": "2026-07-16",
+      "description": "پرداخت برای مصارفات تاریخ های مختلف توسط حاجی احسان سهاک از قبیل اجرت مستری و چارچ نمودن بطری,تیل دیزل به جنراتور, کرای موتر سیخ گول 22 ملی , خریداری نان خشک , دستکش به کاریگران , گاز مایع , انتقال 253 دانه خشت از للندر 6 به قصبه و خرید مواد خوراکه به کاریگران تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 20580.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.8,
+      "expense_type": "general",
+      "created_at": "2026-07-16",
+      "updated_at": "2026-07-16"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5679,
+    "fields": {
+      "project": 3,
+      "serial_number": 5680,
+      "expense_date": "2026-07-16",
+      "description": "پرداخت برای مصارفات تاریخ های مختلف توسط حاجی احسان سهاک از قبیل سامان آلات برقی , تیل پطرول به ویبراتورها,گوشت مرغ ,دستکش , رجه , لابرتیپ ,سرش , جین بکس و تیل دیزل به جنراتور تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 5020.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.8,
+      "expense_type": "general",
+      "created_at": "2026-07-16",
+      "updated_at": "2026-07-16"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5680,
+    "fields": {
+      "project": 3,
+      "serial_number": 5681,
+      "expense_date": "2026-07-16",
+      "description": "پرداخت برای مصارفات تاریخ های مختلف توسط حاجی احسان سهاک از قبیل پطرول و دیزل , سامان آلات برقی , گاز مایع ,کرای انتقال سه موتر سیخ گول از خان استیل,گوشت , پنچری دو تایر, کاپی رنگه اسناد , انرژی و آب معدنی به انجنیران , اجرت یک نفر گلکار,تیل دیزل به جنراتور و سرش به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 25190.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.8,
+      "expense_type": "general",
+      "created_at": "2026-07-16",
+      "updated_at": "2026-07-16"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5681,
+    "fields": {
+      "project": 3,
+      "serial_number": 5682,
+      "expense_date": "2026-07-16",
+      "description": "پرداخت برای مصارفات تاریخ های مختلف توسط حاجی احسان سهاک از قبیل خرید گلماله پلاستیکی ,ساکت برق,چکش و پیچکش,آب نوشیدنی , ترکاری,تیل دیزل , ساکت و لابرتیب , تیل دیزل , گاز مایع ,فیوزلین,اجرت گلکار و کرای تکسی",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 12650.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.8,
+      "expense_type": "general",
+      "created_at": "2026-07-16",
+      "updated_at": "2026-07-16"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5682,
+    "fields": {
+      "project": 3,
+      "serial_number": 5683,
+      "expense_date": "2026-07-16",
+      "description": "پرداخت برای خورده فروشی خوستی بابت خریداری پرده سبز به تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 19200.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.8,
+      "expense_type": "general",
+      "created_at": "2026-07-16",
+      "updated_at": "2026-07-16"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5683,
+    "fields": {
+      "project": 3,
+      "serial_number": 5684,
+      "expense_date": "2026-07-16",
+      "description": "پرداخت برای شرکت کاک سقفی فراز آژمان بابت تعمیرللندر6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 0.0,
+      "amount_usd": 2636.0,
+      "exchange_rate": 65.8,
+      "expense_type": "general",
+      "created_at": "2026-07-16",
+      "updated_at": "2026-07-16"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5684,
+    "fields": {
+      "project": 3,
+      "serial_number": 5685,
+      "expense_date": "2026-07-18",
+      "description": "خریداری تیل پطرول به موتر هایلکس ( بتاریخ های مختلف خریداری شده )",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 7800.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 66.0,
+      "expense_type": "general",
+      "created_at": "2026-07-18",
+      "updated_at": "2026-07-18"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5685,
+    "fields": {
+      "project": 3,
+      "serial_number": 5686,
+      "expense_date": "2026-07-18",
+      "description": "پرداخت برای مبلایل تبدیلی موتر هایلکس",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 2800.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 66.0,
+      "expense_type": "general",
+      "created_at": "2026-07-18",
+      "updated_at": "2026-07-18"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5686,
+    "fields": {
+      "project": 3,
+      "serial_number": 5687,
+      "expense_date": "2026-07-18",
+      "description": "پرداخت برای شرکت زمزم استیل بابت خریداری سیخ گول به تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 0.0,
+      "amount_usd": 10000.0,
+      "exchange_rate": 66.0,
+      "expense_type": "general",
+      "created_at": "2026-07-18",
+      "updated_at": "2026-07-18"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5687,
+    "fields": {
+      "project": 3,
+      "serial_number": 5688,
+      "expense_date": "2026-07-23",
+      "description": "خریداری تیل پطرول به موتر هایلکس",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 3000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.85,
+      "expense_type": "general",
+      "created_at": "2026-07-23",
+      "updated_at": "2026-07-23"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5688,
+    "fields": {
+      "project": 3,
+      "serial_number": 5689,
+      "expense_date": "2026-07-26",
+      "description": "پرداخت معاش عبدالبصیر ولد رضا کاریگر تعمیرللندر 6 بابت ماه سرطان 1405",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 10000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 66.0,
+      "expense_type": "general",
+      "created_at": "2026-07-26",
+      "updated_at": "2026-07-26"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5689,
+    "fields": {
+      "project": 3,
+      "serial_number": 5690,
+      "expense_date": "2026-07-28",
+      "description": "خریداری تیل پطرول به موتر هایلکس",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 3000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 66.1,
+      "expense_type": "general",
+      "created_at": "2026-07-28",
+      "updated_at": "2026-07-28"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5690,
+    "fields": {
+      "project": 3,
+      "serial_number": 5691,
+      "expense_date": "2026-07-29",
+      "description": "پرداخت برای شرکت زمزم استیل علی جان بابت خریداری سیخ گول به تعمیرللندر 6( پرداخت هذا توسط جاوید سکندری صورت گرفته است)",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 0.0,
+      "amount_usd": 5000.0,
+      "exchange_rate": 66.1,
+      "expense_type": "general",
+      "created_at": "2026-07-29",
+      "updated_at": "2026-07-29"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5691,
+    "fields": {
+      "project": 3,
+      "serial_number": 5692,
+      "expense_date": "2026-07-30",
+      "description": "پرداخت اجرت پائین نمودن سیخ گول و تغیر موقیعت سنگ های تعمیرللندر 6",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 16000.0,
+      "amount_usd": 0.0,
+      "exchange_rate": 65.7,
+      "expense_type": "general",
+      "created_at": "2026-07-30",
+      "updated_at": "2026-07-30"
+    }
+  },
+  {
+    "model": "expenses.expense",
+    "pk": 5692,
+    "fields": {
+      "project": 3,
+      "serial_number": 5693,
+      "expense_date": "2026-07-30",
+      "description": "پرداخت برای شرکت فراز آژمان بابت خریداری کاک سقفی به تعمیرللندر 6 از مجموع بل نمبر 763",
+      "remarks": "",
+      "paid_to": "",
+      "amount_afn": 0.0,
+      "amount_usd": 2000.0,
+      "exchange_rate": 65.7,
+      "expense_type": "general",
+      "created_at": "2026-07-30",
+      "updated_at": "2026-07-30"
     }
   }
 ]

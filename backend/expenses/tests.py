@@ -181,6 +181,42 @@ class ExpenseWorkflowAPITests(APITestCase):
         self.assertEqual(rejected.status_code, 200, rejected.data)
         self.assertEqual(rejected.data["approval_status"], "rejected")
 
+    def test_approval_settings_persist_and_require_settings_manage(self):
+        viewer = create_user(
+            username="approval-settings-viewer",
+            role="hr",
+            permissions=["settings.view"],
+        )
+        manager = create_user(
+            username="approval-settings-manager",
+            role="admin_ops",
+            permissions=["settings.manage"],
+        )
+
+        self.client.force_authenticate(viewer)
+        forbidden_update = self.client.put(
+            "/api/expenses/approval-settings/",
+            {"enabled": True},
+            format="json",
+        )
+
+        self.client.force_authenticate(manager)
+        enabled = self.client.put(
+            "/api/expenses/approval-settings/",
+            {"enabled": True},
+            format="json",
+        )
+        ApplicationSettings.objects.get(pk=1).refresh_from_db()
+        refreshed = self.client.get("/api/expenses/approval-settings/")
+
+        self.assertEqual(forbidden_update.status_code, 403)
+        self.assertEqual(enabled.status_code, 200, enabled.data)
+        self.assertTrue(enabled.data["enabled"])
+        self.assertTrue(refreshed.data["enabled"])
+        self.assertTrue(
+            ApplicationSettings.get_solo().app_settings["expense_approval"]["enabled"]
+        )
+
     def test_reject_requires_reason(self):
         expense = create_expense(self.project, approval_status=Expense.ApprovalStatus.PENDING)
 

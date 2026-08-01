@@ -10,10 +10,10 @@ import pandas as pd
 
 PROJECT_ID = 3
 START_PK = 5257
-START_SERIAL = 5256
+START_SERIAL = 5257
 
 BASE_DIR = Path(__file__).resolve().parent
-CSV_FILE = BASE_DIR / "Genral Expnsess Sheet LALANDER 6.csv"
+CSV_FILE = BASE_DIR / "Genral Expnsess Sheet LALANDER 6_updated.csv"
 OUTPUT_FILE = BASE_DIR / "lalander6_expenses.json"
 
 COL_REMARKS = 0

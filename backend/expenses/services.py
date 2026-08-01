@@ -58,7 +58,10 @@ def get_expense_approval_settings():
 
 def set_expense_approval_settings(enabled, user=None):
     settings = ApplicationSettings.get_solo()
-    settings.app_settings[EXPENSE_APPROVAL_SETTINGS_KEY] = {"enabled": bool(enabled)}
+    settings.app_settings = {
+        **(settings.app_settings or {}),
+        EXPENSE_APPROVAL_SETTINGS_KEY: {"enabled": bool(enabled)},
+    }
     settings.updated_by = user
     settings.save(update_fields=["app_settings", "updated_by", "updated_at"])
     return get_expense_approval_settings()

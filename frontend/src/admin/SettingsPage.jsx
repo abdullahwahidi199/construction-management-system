@@ -1163,6 +1163,26 @@ export default function SettingsPage() {
     }
   };
 
+  const saveSecuritySettings = async () => {
+    setSaving("security");
+    try {
+      const [preferencesRes, approvalRes] = await Promise.all([
+        instance.put("auth/settings/preferences/", preferences),
+        instance.put("expenses/approval-settings/", expenseApproval),
+      ]);
+      setPreferences(normalizePreferences(preferencesRes.data));
+      setExpenseApproval({ enabled: Boolean(approvalRes.data?.enabled) });
+      await loadAuditLogs();
+      toast.success("Security settings saved.");
+    } catch (err) {
+      toast.error(
+        getFriendlyErrorMessage(err, "Unable to save security settings."),
+      );
+    } finally {
+      setSaving("");
+    }
+  };
+
   async function loadAuditLogs() {
     try {
       const response = await instance.get(
@@ -2549,11 +2569,11 @@ export default function SettingsPage() {
                             : "Save Expense Approval"}
                         </Button>
                         <Button
-                          onClick={savePreferences}
-                          disabled={saving === "preferences"}
+                          onClick={saveSecuritySettings}
+                          disabled={saving === "security"}
                           leftIcon={<Save className="h-4 w-4" />}
                         >
-                          {saving === "preferences"
+                          {saving === "security"
                             ? "Saving…"
                             : "Save Security"}
                         </Button>

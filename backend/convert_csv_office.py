@@ -4,8 +4,8 @@ import math
 import re
 from pathlib import Path
 
-START_PK = 5662          # First ID after your latest expense
-LATEST_SERIAL = 5661       # Last office expense serial number
+START_PK = 5694          # First ID after your latest expense
+LATEST_SERIAL = 5693       # Last office expense serial number
 
 BASE_DIR = Path(__file__).resolve().parent
 csv_file = BASE_DIR / "office_expenses.csv"
