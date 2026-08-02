@@ -161,7 +161,7 @@
     "contracts": "contracts",
 
     "totalValue": "Total Value",
-    "totalPaid": "Total Paid",
+    "totalPaid": "Paid to Subcontractor",
     "retentionHeld": "Retention Held",
     "avgCompletion": "Avg Completion",
 
@@ -430,7 +430,7 @@
 
     "contractFinancialSummary": "Contract Financial Summary",
     "totalContractValue": "Total Contract Value",
-    "totalPayments": "Total Payments",
+    "totalPayments": "Paid to Subcontractors",
     "remainingBalance": "Remaining Balance",
 
     "timelineProgress": "Timeline Progress",
@@ -895,7 +895,7 @@
     "originalContractValue": "Original Contract Value",
     "totalVariationAmount": "Total Variation Amount",
     "adjustedContractValue": "Adjusted Contract Value",
-    "totalPaid": "Total Paid",
+    "totalPaid": "Paid to Subcontractor",
     "remainingAmount": "Remaining Amount",
     "retentionBalance": "Retention Balance",
     "totalInvoiced": "Total Invoiced"

@@ -6,6 +6,10 @@ Base URL: `http://127.0.0.1:8000`
 
 Authentication: most endpoints use `Authorization: Token <token>` unless marked public.
 
+## Financial Records Note
+
+Contract-linked expenses are stored only in `Expense` with an optional `contract` id. They are not copied into `ContractPayment` or any payment-history table. Contract financial timelines are display-only responses that merge `ContractPayment` rows with approved `Expense` rows for the selected contract.
+
 ## Documentation Endpoints
 
 - `GET /api/schema/` - built-in OpenAPI schema endpoint.
@@ -106,6 +110,7 @@ Authentication: most endpoints use `Authorization: Token <token>` unless marked 
 | `GET` | `/api/contracts/{id}/documents/` | `ContractViewSet.documents` | Token/session authenticated RBAC | `contracts.view, contracts.view_assigned` | admin |
 | `POST` | `/api/contracts/{id}/documents/` | `ContractViewSet.documents` | Token/session authenticated RBAC | `contracts.create` | admin |
 | `GET` | `/api/contracts/{id}/financial_summary/` | `ContractViewSet.financial_summary` | Token/session authenticated RBAC | `contracts.view, contracts.view_assigned` | admin |
+| `GET` | `/api/contracts/{id}/financial-timeline/` | `ContractViewSet.financial_timeline` | Token/session authenticated RBAC | `contracts.view, contracts.view_assigned` | admin |
 | `GET` | `/api/contracts/{id}/payments/` | `ContractViewSet.payments` | Token/session authenticated RBAC | `contracts.view, contracts.view_assigned` | admin |
 | `POST` | `/api/contracts/{id}/payments/` | `ContractViewSet.payments` | Token/session authenticated RBAC | `contracts.create` | admin |
 | `GET` | `/api/contracts/{id}/variations/` | `ContractViewSet.variations` | Token/session authenticated RBAC | `contracts.view, contracts.view_assigned` | admin |
@@ -168,6 +173,8 @@ Authentication: most endpoints use `Authorization: Token <token>` unless marked 
 | `PATCH` | `/api/expenses/{id}/` | `ExpenseViewSet.partial_update` | Token/session authenticated RBAC | `expenses.update, expenses.update_own` | admin, manager |
 | `PUT` | `/api/expenses/{id}/` | `ExpenseViewSet.update` | Token/session authenticated RBAC | `expenses.update, expenses.update_own` | admin, manager |
 | `GET` | `/api/expenses/export-pdf/` | `ExpensePDFExportView.get` | Authenticated | `-` | admin, manager, data_entry |
+
+Expense create/update accepts optional `contract`. Contract-linked expense lists and exports can be filtered with `contract=<id>`. Office expenses must keep `contract` empty.
 
 ### Inventory / Labour
 

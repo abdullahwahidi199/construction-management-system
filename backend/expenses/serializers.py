@@ -2,12 +2,18 @@ from rest_framework import serializers
 from common.serializers import CalendarModelSerializer
 from .models import Expense, ExpenseEditRequest
 from project.models import Project
+from subcontractor.models import Contract
 from .services import approval_history, is_expense_approval_enabled
 
 class ExpenseSerializer(CalendarModelSerializer):
     calendar_module = "expenses"
     project = serializers.PrimaryKeyRelatedField(
         queryset=Project.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+    contract = serializers.PrimaryKeyRelatedField(
+        queryset=Contract.objects.all(),
         required=False,
         allow_null=True,
     )
@@ -18,6 +24,9 @@ class ExpenseSerializer(CalendarModelSerializer):
     total_afn_equivalent = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
     # Show project name in responses while accepting project ID on create/update
     project_name = serializers.SerializerMethodField()
+    contract_label = serializers.SerializerMethodField()
+    contract_number = serializers.CharField(source="contract.contract_number", read_only=True)
+    contract_title = serializers.CharField(source="contract.title", read_only=True)
     expense_scope_display = serializers.CharField(source="get_expense_scope_display", read_only=True)
     created_by_name = serializers.CharField(source="created_by.username", read_only=True)
     approved_by_name = serializers.CharField(source="approved_by.username", read_only=True)
@@ -34,6 +43,10 @@ class ExpenseSerializer(CalendarModelSerializer):
             "expense_scope_display",
             "project",
             "project_name",
+            "contract",
+            "contract_label",
+            "contract_number",
+            "contract_title",
             "serial_number",
             "expense_date",
             "description",
@@ -66,6 +79,9 @@ class ExpenseSerializer(CalendarModelSerializer):
         read_only_fields = [
             "expense_scope_display",
             "serial_number",
+            "contract_label",
+            "contract_number",
+            "contract_title",
             "created_by",
             "created_by_name",
             "approval_status",
@@ -95,6 +111,11 @@ class ExpenseSerializer(CalendarModelSerializer):
     def get_project_name(self, obj):
         return obj.project_label
 
+    def get_contract_label(self, obj):
+        if not obj.contract_id or not obj.contract:
+            return ""
+        return f"{obj.contract.contract_number} - {obj.contract.title}"
+
     def validate(self, data):
         # API level validation matching model rules
         instance = self.instance
@@ -105,6 +126,7 @@ class ExpenseSerializer(CalendarModelSerializer):
             getattr(instance, "expense_scope", Expense.ExpenseScope.PROJECT),
         )
         project = data.get("project", getattr(instance, "project", None))
+        contract = data.get("contract", getattr(instance, "contract", None))
 
         if amount_afn <= 0 and amount_usd <=0:
             raise serializers.ValidationError("Expense must have at least one amount (AFN or USD) greater than 0")
@@ -112,8 +134,14 @@ class ExpenseSerializer(CalendarModelSerializer):
             raise serializers.ValidationError("Expense cannot contain both AFN and USD amounts")
         if expense_scope == Expense.ExpenseScope.OFFICE and project:
             raise serializers.ValidationError("Office expenses cannot be linked to a project")
+        if expense_scope == Expense.ExpenseScope.OFFICE and contract:
+            raise serializers.ValidationError("Office expenses cannot be linked to a contract")
         if expense_scope == Expense.ExpenseScope.PROJECT and not project:
             raise serializers.ValidationError("Project expenses must be linked to a project")
+        if contract and project and contract.project_id != project.id:
+            raise serializers.ValidationError({
+                "contract": "Selected contract must belong to the selected project."
+            })
         return data
     
 
@@ -150,6 +178,7 @@ class ExpenseApprovalSettingsSerializer(serializers.Serializer):
 EXPENSE_EDIT_FIELD_LABELS = {
     "expense_scope": "Expense scope",
     "project": "Project",
+    "contract": "Contract",
     "expense_date": "Expense date",
     "description": "Description",
     "remarks": "Remarks",
@@ -168,6 +197,10 @@ class ExpenseEditRequestSerializer(serializers.ModelSerializer):
     expense_id = serializers.IntegerField(read_only=True)
     project = serializers.SerializerMethodField()
     project_name = serializers.SerializerMethodField()
+    contract = serializers.SerializerMethodField()
+    contract_label = serializers.SerializerMethodField()
+    contract_number = serializers.SerializerMethodField()
+    contract_title = serializers.SerializerMethodField()
     serial_number = serializers.IntegerField(source="expense.serial_number", read_only=True)
     expense_date = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
@@ -205,6 +238,10 @@ class ExpenseEditRequestSerializer(serializers.ModelSerializer):
             "expense_id",
             "project",
             "project_name",
+            "contract",
+            "contract_label",
+            "contract_number",
+            "contract_title",
             "serial_number",
             "expense_date",
             "description",
@@ -259,6 +296,33 @@ class ExpenseEditRequestSerializer(serializers.ModelSerializer):
             return obj.expense.project_label
         project = Project.objects.filter(pk=project_id).only("name").first()
         return project.name if project else obj.expense.project_label
+
+    def get_contract(self, obj):
+        return self._proposed(obj, "contract", obj.expense.contract_id)
+
+    def _contract_for_value(self, obj, contract_id):
+        if not contract_id:
+            return None
+        if contract_id == obj.expense.contract_id:
+            return obj.expense.contract
+        return Contract.objects.filter(pk=contract_id).only(
+            "contract_number",
+            "title",
+        ).first()
+
+    def get_contract_label(self, obj):
+        contract = self._contract_for_value(obj, self.get_contract(obj))
+        if not contract:
+            return ""
+        return f"{contract.contract_number} - {contract.title}"
+
+    def get_contract_number(self, obj):
+        contract = self._contract_for_value(obj, self.get_contract(obj))
+        return contract.contract_number if contract else ""
+
+    def get_contract_title(self, obj):
+        contract = self._contract_for_value(obj, self.get_contract(obj))
+        return contract.title if contract else ""
 
     def get_expense_date(self, obj):
         return self._proposed(obj, "expense_date", obj.expense.expense_date.isoformat())
@@ -334,6 +398,13 @@ class ExpenseEditRequestSerializer(serializers.ModelSerializer):
                 Project.objects.filter(pk=value).values_list("name", flat=True).first()
                 or "Office"
             )
+        if field == "contract":
+            row = (
+                Contract.objects.filter(pk=value)
+                .values_list("contract_number", "title")
+                .first()
+            )
+            return f"{row[0]} - {row[1]}" if row else "-"
         if field == "expense_scope":
             return "Office expense" if value == Expense.ExpenseScope.OFFICE else "Project expense"
         return str(value)

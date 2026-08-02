@@ -6,12 +6,14 @@ from rest_framework.test import APITestCase
 from accounts.models import ApplicationSettings
 from common.test_helpers import (
     create_admin,
+    create_contract,
     create_expense,
     create_project,
     create_user,
     expense_payload,
 )
 from expenses.models import Expense, ExpenseEditRequest
+from subcontractor.models import ContractPayment
 
 
 class ExpenseWorkflowAPITests(APITestCase):
@@ -52,6 +54,52 @@ class ExpenseWorkflowAPITests(APITestCase):
         self.assertEqual(response.data["project_name"], "Office")
         self.assertEqual(response.data["expense_scope"], "office")
         self.assertEqual(response.data["expense_type"], "office_rent")
+
+    def test_expense_can_link_to_contract_without_creating_payment(self):
+        contract = create_contract(project=self.project)
+        response = self.client.post(
+            "/api/expenses/",
+            expense_payload(self.project, contract=contract.id),
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(response.data["contract"], contract.id)
+        self.assertEqual(
+            response.data["contract_label"],
+            f"{contract.contract_number} - {contract.title}",
+        )
+        self.assertFalse(ContractPayment.objects.exists())
+
+        filtered = self.client.get(f"/api/expenses/?contract={contract.id}")
+        self.assertEqual(filtered.status_code, 200, filtered.data)
+        self.assertEqual(len(filtered.data["results"]["results"]), 1)
+
+    def test_expense_contract_validation_keeps_office_and_project_context_clean(self):
+        contract = create_contract(project=self.project)
+        other_project = create_project(name="Other Project")
+        other_contract = create_contract(project=other_project, title="Other Contract")
+
+        office_with_contract = self.client.post(
+            "/api/expenses/",
+            expense_payload(
+                expense_scope=Expense.ExpenseScope.OFFICE,
+                project=None,
+                contract=contract.id,
+                expense_type="office_rent",
+            ),
+            format="json",
+        )
+        wrong_project_contract = self.client.post(
+            "/api/expenses/",
+            expense_payload(self.project, contract=other_contract.id),
+            format="json",
+        )
+
+        self.assertEqual(office_with_contract.status_code, 400)
+        self.assertEqual(wrong_project_contract.status_code, 400)
+        self.assertIn("Office expenses cannot be linked to a contract", str(office_with_contract.data))
+        self.assertIn("Selected contract must belong", str(wrong_project_contract.data))
 
     def test_expense_validation_rejects_empty_and_mixed_amounts(self):
         empty = self.client.post(

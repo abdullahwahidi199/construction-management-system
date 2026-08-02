@@ -69,6 +69,7 @@ export default function ExpenseList({
   onRefresh,
   canDelete = true,
   projects = [],
+  contracts = [],
 }) {
   const [sortField, setSortField] = useState("expense_date");
   const [sortDirection, setSortDirection] = useState("desc");
@@ -122,6 +123,9 @@ export default function ExpenseList({
           exp.expense_type?.toLowerCase().includes(term) ||
           exp.expense_scope?.toLowerCase().includes(term) ||
           getProjectLabel(exp).toLowerCase().includes(term) ||
+          exp.contract_label?.toLowerCase().includes(term) ||
+          exp.contract_number?.toLowerCase().includes(term) ||
+          exp.contract_title?.toLowerCase().includes(term) ||
           exp.paid_to?.toLowerCase().includes(term),
       );
     }
@@ -340,6 +344,11 @@ export default function ExpenseList({
                               t("ExpenseList.noVendor")}{" "}
                             • {expense.expense_type || t("ExpenseList.general")}
                           </p>
+                          {expense.contract_label && (
+                            <p className="text-xs text-[var(--muted)] mt-0.5">
+                              Contract: {expense.contract_label}
+                            </p>
+                          )}
                           {expense.created_by_name && (
                             <p className="text-xs text-[var(--muted)] mt-0.5">
                               Created by {expense.created_by_name}
@@ -519,6 +528,16 @@ export default function ExpenseList({
                       {equivalentTotals.afn.toLocaleString()}
                     </dd>
                   </div>
+                  {expense.contract_label && (
+                    <div>
+                      <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                        Contract
+                      </dt>
+                      <dd className="mt-1 break-words text-sm font-medium text-[var(--text)]">
+                        {expense.contract_label}
+                      </dd>
+                    </div>
+                  )}
                   {expense.created_by_name && (
                     <div>
                       <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
@@ -610,6 +629,7 @@ export default function ExpenseList({
         expense={selectedExpense}
         isOpen={showEdit}
         projects={projects}
+        contracts={contracts}
         onClose={() => {
           setShowEdit(false);
           setSelectedExpense(null);

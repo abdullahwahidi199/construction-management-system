@@ -60,6 +60,8 @@ class ExpensePagination(PageNumberPagination):
 class ExpenseViewSet(viewsets.ModelViewSet):
     queryset = Expense.objects.select_related(
         "project",
+        "contract",
+        "contract__subcontractor",
         "created_by",
         "approved_by",
         "rejected_by",
@@ -92,6 +94,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     filterset_fields = {
         "project": ["exact"],
+        "contract": ["exact"],
         "expense_scope": ["exact"],
         "expense_type": ["exact"],
         "expense_date": ["gte", "lte", "exact"],
@@ -104,6 +107,9 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         "remarks",
         "paid_to",
         "project__name",
+        "contract__contract_number",
+        "contract__title",
+        "contract__subcontractor__name",
     ]
 
     ordering_fields = [
@@ -123,6 +129,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         calendar_type = get_module_calendar("expenses", request=self.request)
         project = self.request.query_params.get("project")
+        contract = self.request.query_params.get("contract")
         expense_scope = self.request.query_params.get("expense_scope")
         expense_type = self.request.query_params.get("expense_type")
         expense_exact = self.request.query_params.get("expense_date")
@@ -132,6 +139,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
         if project:
             queryset = queryset.filter(project=project)
+        if contract:
+            queryset = queryset.filter(contract=contract)
         if expense_scope:
             queryset = queryset.filter(expense_scope=expense_scope)
         if expense_type:
@@ -232,6 +241,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             ExpenseEditRequest.objects.select_related(
                 "expense",
                 "expense__project",
+                "expense__contract",
                 "requested_by",
                 "reviewed_by",
             ),
@@ -257,6 +267,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             ExpenseEditRequest.objects.select_related(
                 "expense",
                 "expense__project",
+                "expense__contract",
                 "requested_by",
                 "reviewed_by",
             ),
@@ -277,6 +288,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             ExpenseEditRequest.objects.select_related(
                 "expense",
                 "expense__project",
+                "expense__contract",
                 "requested_by",
                 "reviewed_by",
             ),
@@ -422,6 +434,7 @@ from bidi.algorithm import get_display
 
 from expenses.models import Expense
 from project.models import Project
+from subcontractor.models import Contract
 from reports.branding import build_pdf_branding_elements, draw_pdf_branding_footer
 
 
@@ -459,10 +472,15 @@ class ExpensePDFExportView(APIView):
         if status_filter and status_filter != Expense.ApprovalStatus.APPROVED:
             raise PermissionDenied("Only approved expenses can be exported.")
 
-        qs = Expense.objects.approved().select_related("project")
+        qs = Expense.objects.approved().select_related(
+            "project",
+            "contract",
+            "contract__subcontractor",
+        )
 
         search = self.request.GET.get("search")
         project = self.request.GET.get("project")
+        contract = self.request.GET.get("contract")
         expense_scope = self.request.GET.get("expense_scope")
         expense_type = self.request.GET.get("expense_type")
         date_from = self.request.GET.get("expense_date__gte")
@@ -481,6 +499,9 @@ class ExpensePDFExportView(APIView):
 
         if project:
             qs = qs.filter(project_id=project)
+
+        if contract:
+            qs = qs.filter(contract_id=contract)
 
         if expense_scope:
             qs = qs.filter(expense_scope=expense_scope)
@@ -566,6 +587,7 @@ class ExpensePDFExportView(APIView):
 
         search = request.GET.get("search")
         project_id = request.GET.get("project")
+        contract_id = request.GET.get("contract")
         expense_scope = request.GET.get("expense_scope")
         expense_type = request.GET.get("expense_type")
         date_from = request.GET.get("expense_date__gte")
@@ -576,6 +598,7 @@ class ExpensePDFExportView(APIView):
         )
 
         project_name = "All Projects"
+        contract_name = "All Contracts"
 
         if project_id:
             project_name = (
@@ -584,6 +607,14 @@ class ExpensePDFExportView(APIView):
                 .first()
                 or "Unknown"
             )
+
+        if contract_id:
+            row = (
+                Contract.objects.filter(id=contract_id)
+                .values_list("contract_number", "title")
+                .first()
+            )
+            contract_name = f"{row[0]} - {row[1]}" if row else "Unknown"
 
         ordering_labels = {
             "-expense_date": "Date (Newest First)",
@@ -622,6 +653,7 @@ class ExpensePDFExportView(APIView):
 
         filter_data = [
             ["Project", project_name],
+            ["Contract", contract_name],
             ["Expense Scope", expense_scope or "All"],
             ["Expense Type", expense_type or "All"],
             ["Search", search or "None"],
@@ -681,6 +713,7 @@ class ExpensePDFExportView(APIView):
             Paragraph("Serial #", header_style),
             Paragraph("Date", header_style),
             Paragraph("Project", header_style),
+            Paragraph("Contract", header_style),
             Paragraph("Type", header_style),
             Paragraph("Paid To", header_style),
             Paragraph("Description", header_style),
@@ -703,6 +736,14 @@ class ExpensePDFExportView(APIView):
                 ),
                 Paragraph(
                     rtl(expense.project_label),
+                    normal_style,
+                ),
+                Paragraph(
+                    rtl(
+                        f"{expense.contract.contract_number} - {expense.contract.title}"
+                        if expense.contract_id and expense.contract
+                        else ""
+                    ),
                     normal_style,
                 ),
                 Paragraph(
@@ -739,6 +780,7 @@ class ExpensePDFExportView(APIView):
             "",
             "",
             "",
+            "",
             Paragraph(
                 "TOTAL",
                 normal_style,
@@ -759,12 +801,13 @@ class ExpensePDFExportView(APIView):
             colWidths=[
                 45,   # serial
                 60,   # date
-                90,   # project
-                70,   # type
-                100,  # paid to
-                280,  # description
-                60,   # usd
-                70,   # afn
+                80,   # project
+                90,   # contract
+                65,   # type
+                90,   # paid to
+                220,  # description
+                55,   # usd
+                60,   # afn
             ],
         )
 

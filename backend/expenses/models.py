@@ -5,6 +5,7 @@ from django.db import transaction
 from django.db.models import Max, Q
 from django.utils import timezone
 from decimal import Decimal, ROUND_HALF_UP
+from subcontractor.models import Contract
 
 
 from django.core.exceptions import ValidationError
@@ -96,6 +97,14 @@ class Expense(models.Model):
         blank=True,
         on_delete=models.PROTECT, # Prevents accidental deletion of projects with expenses
         related_name="expenses"
+    )
+    contract = models.ForeignKey(
+        Contract,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="expenses",
+        help_text="Optional contract this expense belongs to.",
     )
 
     # Matches your S/N / شماره column, keeps your original numbering from Excel
@@ -199,6 +208,13 @@ class Expense(models.Model):
                 ),
                 name="expense_scope_matches_project",
             ),
+            models.CheckConstraint(
+                check=(
+                    Q(expense_scope="project")
+                    | Q(expense_scope="office", contract__isnull=True)
+                ),
+                name="office_expenses_do_not_link_contract",
+            ),
         ]
 
     def __str__(self):
@@ -277,8 +293,12 @@ class Expense(models.Model):
         # Add database level validation matching your business rules
         if self.expense_scope == self.ExpenseScope.OFFICE and self.project_id:
             raise ValidationError("Office expenses cannot be linked to a project")
+        if self.expense_scope == self.ExpenseScope.OFFICE and self.contract_id:
+            raise ValidationError("Office expenses cannot be linked to a contract")
         if self.expense_scope == self.ExpenseScope.PROJECT and not self.project_id:
             raise ValidationError("Project expenses must be linked to a project")
+        if self.contract_id and self.project_id and self.contract.project_id != self.project_id:
+            raise ValidationError("Expense contract must belong to the selected project")
         if self.amount_afn <=0 and self.amount_usd <=0:
             raise ValidationError("Expense must have at least one amount (AFN or USD) greater than 0")
         if self.amount_afn > 0 and self.amount_usd > 0:

@@ -58,6 +58,7 @@ export const REPORTS = {
     description: "Expense totals, category mix, and monthly spending trend",
     filters: [
       { name: "project_id", label: "Project ID", type: "number" },
+      { name: "contract_id", label: "Contract ID", type: "number" },
       {
         name: "expense_scope",
         label: "Expense Type",
@@ -114,6 +115,7 @@ export const REPORTS = {
     columns: [
       { key: "serial_number", label: "S/N" },
       { key: "project_id", label: "Project ID", type: "number" },
+      { key: "contract", label: "Contract" },
       { key: "expense_scope", label: "Scope", type: "badge" },
       { key: "expense_date", label: "Date", type: "date" },
       { key: "expense_type", label: "Type", type: "badge" },
@@ -338,8 +340,12 @@ export const REPORTS = {
       { key: "currency", label: "Cur" },
       { key: "contract_value", label: "Value", type: "number" },
       { key: "completion_percentage", label: "Complete %", type: "number" },
-      { key: "total_paid", label: "Paid", type: "number" },
+      { key: "total_paid", label: "Paid to Sub", type: "number" },
       { key: "total_invoiced", label: "Invoiced", type: "number" },
+      { key: "contract_expenses_usd", label: "Expenses USD", type: "number" },
+      { key: "contract_expenses_afn", label: "Expenses AFN", type: "number" },
+      { key: "cash_outflow_usd", label: "Outflow USD", type: "number" },
+      { key: "cash_outflow_afn", label: "Outflow AFN", type: "number" },
       { key: "remaining_amount", label: "Remaining", type: "number" },
       { key: "status", label: "Status", type: "badge" },
     ],

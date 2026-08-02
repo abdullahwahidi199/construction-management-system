@@ -5,6 +5,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 const state = vi.hoisted(() => ({
   expenses: null,
   projects: [],
+  contracts: [],
   loading: false,
   lang: "en",
   refetch: vi.fn(),
@@ -29,6 +30,9 @@ vi.mock("../../hooks/useFetch", () => ({
     state.endpoints.push(endpoint);
     if (endpoint === "projects/") {
       return { data: state.projects, loading: false, refetch: vi.fn() };
+    }
+    if (String(endpoint).startsWith("contracts/")) {
+      return { data: state.contracts, loading: false, refetch: vi.fn() };
     }
     return { data: state.expenses, loading: state.loading, refetch: state.refetch };
   },
@@ -159,10 +163,11 @@ vi.mock("./ExpenseList", () => ({
 }));
 
 vi.mock("./ExpenseCreateModal", () => ({
-  default: ({ isOpen, onClose, onCreate, projects }) =>
+  default: ({ isOpen, onClose, onCreate, projects, contracts }) =>
     isOpen ? (
       <div role="dialog" aria-label="create-expense">
         <div>Modal projects: {projects.length}</div>
+        <div>Modal contracts: {contracts.length}</div>
         <button type="button" onClick={() => onCreate({ description: "Concrete" })}>
           Submit modal
         </button>
@@ -194,6 +199,12 @@ function renderPage(props) {
   return render(<ExpensesMain {...props} />);
 }
 
+function latestExpenseEndpoint() {
+  return [...state.endpoints]
+    .reverse()
+    .find((endpoint) => String(endpoint).startsWith("expenses/?"));
+}
+
 describe("ExpensesMain", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -202,6 +213,9 @@ describe("ExpensesMain", () => {
     state.projects = [
       { id: 1, name: "Tower" },
       { id: 2, name: "Bridge" },
+    ];
+    state.contracts = [
+      { id: 7, project: 1, contract_number: "CNT-000007", title: "Foundation" },
     ];
     state.loading = false;
     state.lang = "en";
@@ -271,7 +285,7 @@ describe("ExpensesMain", () => {
       target: { value: "cement" },
     });
     act(() => vi.advanceTimersByTime(400));
-    expect(state.endpoints.at(-2)).toContain("search=cement");
+    expect(latestExpenseEndpoint()).toContain("search=cement");
 
     fireEvent.click(screen.getByRole("button", { name: /filters/i }));
     fireEvent.change(screen.getByDisplayValue("All Projects"), { target: { value: "1" } });
@@ -282,7 +296,7 @@ describe("ExpensesMain", () => {
     fireEvent.change(screen.getAllByDisplayValue("")[0], { target: { value: "2026-01-31" } });
     fireEvent.change(screen.getByDisplayValue("Newest"), { target: { value: "expense_date" } });
 
-    const latestEndpoint = state.endpoints.at(-2);
+    const latestEndpoint = latestExpenseEndpoint();
     expect(latestEndpoint).toContain("project=1");
     expect(latestEndpoint).toContain("expense_scope=project");
     expect(latestEndpoint).toContain("expense_type=material");

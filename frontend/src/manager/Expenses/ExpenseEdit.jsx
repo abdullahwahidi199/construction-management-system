@@ -14,6 +14,7 @@ import {
   RequiredMark,
   textareaControlClass,
 } from "../../components/ui/formStyles.jsx";
+import ExpenseContractSelector from "./ExpenseContractSelector";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -51,6 +52,7 @@ export default function ExpenseEdit({
   onClose,
   onSave,
   projects = [],
+  contracts = [],
 }) {
   const { t, lang } = useLanguage();
   const isRTL = RTL_LANGS.includes(lang);
@@ -65,6 +67,7 @@ export default function ExpenseEdit({
     expense_scope: "project",
     expense_type: "general",
     project: "",
+    contract: "",
     remarks: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -83,6 +86,7 @@ export default function ExpenseEdit({
         expense_scope: expense.expense_scope || "project",
         expense_type: expense.expense_type || "general",
         project: expense.project || "",
+        contract: expense.contract || "",
         remarks: expense.remarks || "",
       });
       setErrors({});
@@ -101,18 +105,20 @@ export default function ExpenseEdit({
       ...prev,
       [field]: value,
       ...(field === "expense_scope" && value === "office"
-        ? { project: "", expense_type: "office_rent" }
+        ? { project: "", contract: "", expense_type: "office_rent" }
         : {}),
       ...(field === "expense_scope" && value === "project"
         ? { expense_type: "general" }
         : {}),
+      ...(field === "project" ? { contract: "" } : {}),
     }));
     // Clear error for this field
     if (errors[field]) {
       setErrors((prev) => ({
         ...prev,
         [field]: null,
-        ...(field === "expense_scope" ? { project: null } : {}),
+        ...(field === "expense_scope" ? { project: null, contract: null } : {}),
+        ...(field === "project" ? { contract: null } : {}),
       }));
     }
   };
@@ -162,6 +168,10 @@ export default function ExpenseEdit({
         ...expense,
         ...formData,
         project: formData.expense_scope === "office" ? null : formData.project,
+        contract:
+          formData.expense_scope === "office"
+            ? null
+            : formData.contract || null,
         amount_usd: usd.toFixed(2),
         amount_afn: afn.toFixed(2),
         exchange_rate: rate.toFixed(4),
@@ -394,6 +404,26 @@ export default function ExpenseEdit({
                   <p className={fieldErrorClass}>{errors.project}</p>
                 )}
               </div>
+            )}
+
+            {formData.expense_scope === "project" && (
+              <ExpenseContractSelector
+                contracts={contracts}
+                value={formData.contract}
+                projectId={formData.project}
+                onChange={(value) => handleChange("contract", value)}
+                error={errors.contract}
+                selectedFallback={
+                  expense.contract
+                    ? {
+                        id: expense.contract,
+                        contract_number: expense.contract_number,
+                        title: expense.contract_title || expense.contract_label,
+                        project: expense.project,
+                      }
+                    : null
+                }
+              />
             )}
 
             {/* Remarks */}

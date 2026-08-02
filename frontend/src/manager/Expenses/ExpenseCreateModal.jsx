@@ -15,6 +15,7 @@ import {
 import CalendarDatePicker from "../../components/common/CalendarDatePicker";
 import { todayIso } from "../../utils/calendar";
 import InlineAlert from "../../components/common/InlineAlert";
+import ExpenseContractSelector from "./ExpenseContractSelector";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
@@ -49,6 +50,7 @@ export default function ExpenseCreateModal({
   onClose,
   onCreate,
   projects = [],
+  contracts = [],
 }) {
   const { t, lang } = useLanguage();
   const isRTL = RTL_LANGS.includes(lang);
@@ -62,6 +64,8 @@ export default function ExpenseCreateModal({
     paid_to: "",
     expense_scope: "project",
     expense_type: "general",
+    project: "",
+    contract: "",
     remarks: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,6 +84,7 @@ export default function ExpenseCreateModal({
         expense_type: "general",
         remarks: "",
         project: "",
+        contract: "",
       });
 
       setErrors({});
@@ -96,18 +101,20 @@ export default function ExpenseCreateModal({
       ...prev,
       [field]: value,
       ...(field === "expense_scope" && value === "office"
-        ? { project: "", expense_type: "office_rent" }
+        ? { project: "", contract: "", expense_type: "office_rent" }
         : {}),
       ...(field === "expense_scope" && value === "project"
         ? { expense_type: "general" }
         : {}),
+      ...(field === "project" ? { contract: "" } : {}),
     }));
     // Clear error for this field
     if (errors[field]) {
       setErrors((prev) => ({
         ...prev,
         [field]: null,
-        ...(field === "expense_scope" ? { project: null } : {}),
+        ...(field === "expense_scope" ? { project: null, contract: null } : {}),
+        ...(field === "project" ? { contract: null } : {}),
       }));
     }
   };
@@ -152,6 +159,10 @@ export default function ExpenseCreateModal({
       const payload = {
         ...formData,
         project: formData.expense_scope === "office" ? null : formData.project,
+        contract:
+          formData.expense_scope === "office"
+            ? null
+            : formData.contract || null,
         amount_usd: usd,
         amount_afn: afn,
         exchange_rate: rate,
@@ -402,6 +413,16 @@ export default function ExpenseCreateModal({
                     <p className={fieldErrorClass}>{errors.project}</p>
                   )}
                 </div>
+              )}
+
+              {formData.expense_scope === "project" && (
+                <ExpenseContractSelector
+                  contracts={contracts}
+                  value={formData.contract}
+                  projectId={formData.project}
+                  onChange={(value) => handleChange("contract", value)}
+                  error={errors.contract}
+                />
               )}
 
               {/* Remarks */}

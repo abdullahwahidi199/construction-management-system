@@ -37,6 +37,7 @@ class ProjectReportFilterSerializer(BaseReportFilterSerializer):
 
 class ExpenseReportFilterSerializer(BaseReportFilterSerializer):
     project_id = serializers.IntegerField(required=False)
+    contract_id = serializers.IntegerField(required=False)
     expense_scope = serializers.ChoiceField(
         choices=["project", "office"],
         required=False,

@@ -109,6 +109,9 @@ export default function ExpensesMain({ dataEntryMode = false }) {
   const { data: projects } = useFetch("projects/", {
     skipGlobalErrorToast: true,
   });
+  const { data: contractsData } = useFetch("contracts/?status=active&page_size=100", {
+    skipGlobalErrorToast: true,
+  });
 
   const createExpense = async (formData) => {
     try {
@@ -207,6 +210,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
   ].filter(Boolean).length;
 
   const expenseList = expenses?.results?.results || [];
+  const contracts = contractsData?.results || contractsData || [];
   const count = expenses?.count || 0;
   const nextUrl = expenses?.next;
   const previousUrl = expenses?.previous;
@@ -965,6 +969,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
           onRefresh={handleRefresh}
           canDelete={!dataEntryMode}
           projects={projects || []}
+          contracts={contracts}
         />
       )}
 
@@ -1012,6 +1017,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
         onClose={() => setOpen(false)}
         onCreate={createExpense}
         projects={projects || []}
+        contracts={contracts}
       />
     </div>
   );

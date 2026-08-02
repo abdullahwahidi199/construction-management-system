@@ -1,17 +1,24 @@
 // src/pages/contracts/ContractDetailsPage.jsx
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
+  ArrowDownLeft,
+  ArrowUpRight,
+  CalendarDays,
   DollarSign,
   FileText,
+  Filter,
   GitBranch,
   TrendingUp,
   Download,
+  Loader2,
   Pencil,
   Plus,
+  Receipt,
   Save,
+  Search,
   X,
 } from "lucide-react";
 import useFetch from "../../../hooks/useFetch";
@@ -40,6 +47,12 @@ export default function ContractDetailsPage() {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("info");
+  const [timelineFilters, setTimelineFilters] = useState({
+    type: "",
+    search: "",
+    date_from: "",
+    date_to: "",
+  });
   const [showProgressForm, setShowProgressForm] = useState(false);
   const [progressValue, setProgressValue] = useState("");
   const [progressError, setProgressError] = useState("");
@@ -101,6 +114,19 @@ export default function ContractDetailsPage() {
     error,
     refetch,
   } = useFetch(`contracts/${id}/`);
+  const timelineEndpoint = useMemo(() => {
+    const params = new URLSearchParams();
+    Object.entries(timelineFilters).forEach(([key, value]) => {
+      if (value) params.set(key, value);
+    });
+    const query = params.toString();
+    return `contracts/${id}/financial-timeline/${query ? `?${query}` : ""}`;
+  }, [id, timelineFilters]);
+  const {
+    data: timelineData,
+    loading: timelineLoading,
+    refetch: refetchTimeline,
+  } = useFetch(timelineEndpoint, { skipGlobalErrorToast: true });
   const { postData, loading: posting } = usePost();
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -163,6 +189,7 @@ export default function ContractDetailsPage() {
       await instance.post(`contracts/${id}/payments/`, payload);
       setShowPaymentForm(false);
       refetch();
+      refetchTimeline();
       toast.success("Payment added.");
     } catch (err) {
       // Central axios handling shows the user-facing error.
@@ -175,6 +202,7 @@ export default function ContractDetailsPage() {
       setEditingPayment(null);
       setShowPaymentForm(false);
       refetch();
+      refetchTimeline();
       toast.success("Payment updated.");
     } catch (err) {
       // Central axios handling shows the user-facing error.
@@ -187,6 +215,7 @@ export default function ContractDetailsPage() {
       await instance.delete(`contract-payments/${deletePayment.id}/`);
       setDeletePayment(null);
       refetch();
+      refetchTimeline();
       toast.success("Payment deleted.");
     } catch (err) {
       // Central axios handling shows the user-facing error.
@@ -322,6 +351,28 @@ export default function ContractDetailsPage() {
   }
 
   const canCreatePayment = ["active", "draft"].includes(contract.status);
+  const timelinePayload =
+    timelineData?.results?.summary || timelineData?.results?.results
+      ? timelineData.results
+      : timelineData;
+  const timelineRows = Array.isArray(timelinePayload?.results)
+    ? timelinePayload.results
+    : [];
+  const timelineSummary =
+    timelinePayload?.summary || contract.financial_summary || {};
+
+  const updateTimelineFilter = (field, value) => {
+    setTimelineFilters((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const clearTimelineFilters = () => {
+    setTimelineFilters({
+      type: "",
+      search: "",
+      date_from: "",
+      date_to: "",
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -475,6 +526,11 @@ export default function ContractDetailsPage() {
             summary={contract.financial_summary}
             currency={contract.currency}
           />
+          <ContractFinancialSnapshot
+            summary={timelineSummary}
+            currency={contract.currency}
+            fmt={fmt}
+          />
           <Card className="p-6">
             <h3 className="text-lg font-semibold text-[var(--text)] mb-4">
               {t("ContractDetailsPage.financialBreakdown")}
@@ -503,6 +559,15 @@ export default function ContractDetailsPage() {
               />
             </div>
           </Card>
+          <ContractFinancialTimeline
+            rows={timelineRows}
+            loading={timelineLoading}
+            filters={timelineFilters}
+            onFilterChange={updateTimelineFilter}
+            onClearFilters={clearTimelineFilters}
+            displayDate={displayDate}
+            fmt={fmt}
+          />
         </div>
       )}
       {activeTab === "invoices" && (
@@ -668,6 +733,245 @@ export default function ContractDetailsPage() {
         t={t}
       />
     </div>
+  );
+}
+
+function formatCurrency(value, currency, fmt) {
+  const numericValue = Number(value || 0);
+  return `${currency} ${fmt.format(numericValue)}`;
+}
+
+function formatDualCurrency(usdValue, afnValue, fmt) {
+  return `USD ${fmt.format(Number(usdValue || 0))} / AFN ${fmt.format(
+    Number(afnValue || 0),
+  )}`;
+}
+
+function SnapshotMetric({ icon: Icon, label, value, detail, tone = "primary" }) {
+  const tones = {
+    primary: "bg-[var(--primary)]/10 text-[var(--primary)]",
+    success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
+    danger: "bg-red-500/10 text-red-600 dark:text-red-300",
+  };
+
+  return (
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-sm">
+      <div className="flex items-start gap-3">
+        <div
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+            tones[tone] || tones.primary
+          }`}
+        >
+          <Icon className="h-5 w-5" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-[var(--muted)]">{label}</p>
+          <p className="mt-1 break-words text-xl font-bold text-[var(--text)]">
+            {value}
+          </p>
+          {detail && (
+            <p className="mt-1 break-words text-xs text-[var(--muted)]">
+              {detail}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ContractFinancialSnapshot({ summary, currency, fmt }) {
+  const paymentValue =
+    currency === "USD"
+      ? summary.payments_made_usd ?? summary.total_paid
+      : summary.payments_made_afn ?? summary.total_paid;
+  const cashOutflowUsd =
+    summary.total_cash_outflow_usd ??
+    Math.abs(Number(summary.net_position_usd || 0));
+  const cashOutflowAfn =
+    summary.total_cash_outflow_afn ??
+    Math.abs(Number(summary.net_position_afn || 0));
+
+  return (
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <SnapshotMetric
+        icon={ArrowUpRight}
+        label="Paid to Subcontractor"
+        value={formatCurrency(paymentValue, currency, fmt)}
+        detail="Contract payment records"
+        tone="danger"
+      />
+      <SnapshotMetric
+        icon={Receipt}
+        label="Total Contract Expenses"
+        value={formatDualCurrency(
+          summary.total_contract_expenses_usd,
+          summary.total_contract_expenses_afn,
+          fmt,
+        )}
+        detail="Linked approved expenses only"
+        tone="danger"
+      />
+      <SnapshotMetric
+        icon={DollarSign}
+        label="Total Cash Outflow"
+        value={formatDualCurrency(cashOutflowUsd, cashOutflowAfn, fmt)}
+        detail="Payments plus linked approved expenses"
+        tone="primary"
+      />
+    </div>
+  );
+}
+
+function ContractFinancialTimeline({
+  rows,
+  loading,
+  filters,
+  onFilterChange,
+  onClearFilters,
+  displayDate,
+  fmt,
+}) {
+  const hasFilters = Boolean(
+    filters.type || filters.search || filters.date_from || filters.date_to,
+  );
+
+  return (
+    <Card className="p-0" contentClassName="p-0">
+      <div className="border-b border-[var(--border)] p-4 sm:p-5">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-[var(--text)]">
+              Financial Timeline
+            </h3>
+          </div>
+          {hasFilters && (
+            <button
+              type="button"
+              onClick={onClearFilters}
+              className="inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--border)] px-3 text-sm font-medium text-[var(--text)] hover:bg-[var(--hover)]"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-4">
+          <div className="relative md:col-span-2">
+            <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
+            <input
+              type="search"
+              value={filters.search}
+              onChange={(event) => onFilterChange("search", event.target.value)}
+              className="min-h-11 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-2.5 ps-10 text-sm text-[var(--text)] placeholder:text-[var(--muted)] focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+              placeholder="Search timeline"
+            />
+          </div>
+          <div className="relative">
+            <Filter className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
+            <select
+              value={filters.type}
+              onChange={(event) => onFilterChange("type", event.target.value)}
+              className="min-h-11 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-2.5 ps-10 text-sm text-[var(--text)] focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+            >
+              <option value="">All types</option>
+              <option value="payment">Payments</option>
+              <option value="expense">Expenses</option>
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="date"
+              value={filters.date_from}
+              onChange={(event) =>
+                onFilterChange("date_from", event.target.value)
+              }
+              className="min-h-11 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-sm text-[var(--text)] focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+              title="From date"
+            />
+            <input
+              type="date"
+              value={filters.date_to}
+              onChange={(event) => onFilterChange("date_to", event.target.value)}
+              className="min-h-11 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-sm text-[var(--text)] focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+              title="To date"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="divide-y divide-[var(--border)]">
+        {loading && (
+          <div className="flex items-center justify-center gap-2 p-8 text-sm text-[var(--muted)]">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading timeline...
+          </div>
+        )}
+
+        {!loading && rows.length === 0 && (
+          <div className="flex flex-col items-center justify-center p-10 text-center">
+            <Receipt className="mb-3 h-8 w-8 text-[var(--muted)]" />
+            <p className="text-sm font-medium text-[var(--text)]">
+              No financial activity found.
+            </p>
+          </div>
+        )}
+
+        {!loading &&
+          rows.map((item) => {
+            const isPayment = item.transaction_type === "payment";
+            const isOutflow =
+              item.direction === "out" || Number(item.signed_amount || 0) < 0;
+            const Icon = isOutflow ? ArrowUpRight : ArrowDownLeft;
+            const amountPrefix = isOutflow ? "-" : "+";
+            const tone = isOutflow
+              ? "bg-red-500/10 text-red-600 dark:text-red-300"
+              : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300";
+            const amountTone = isOutflow
+              ? "text-red-600 dark:text-red-300"
+              : "text-emerald-600 dark:text-emerald-300";
+
+            return (
+              <article
+                key={item.id}
+                className="grid gap-3 p-4 sm:grid-cols-[140px_1fr_auto] sm:items-start sm:p-5"
+              >
+                <div className="flex items-center gap-2 text-sm text-[var(--muted)]">
+                  <CalendarDays className="h-4 w-4" />
+                  <span>{displayDate(item.date)}</span>
+                </div>
+                <div className="min-w-0">
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${tone}`}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      {isPayment ? "Payment to Subcontractor" : "Expense"}
+                    </span>
+                    <span className="text-xs text-[var(--muted)]">
+                      {item.reference}
+                    </span>
+                  </div>
+                  <h4 className="break-words text-sm font-semibold text-[var(--text)]">
+                    {item.description || item.title || item.reference}
+                  </h4>
+                  {item.counterparty && (
+                    <p className="mt-1 break-words text-xs text-[var(--muted)]">
+                      {item.counterparty}
+                    </p>
+                  )}
+                </div>
+                <div
+                  className={`text-start text-base font-bold tabular-nums sm:text-end ${amountTone}`}
+                >
+                  {amountPrefix}
+                  {item.currency} {fmt.format(Number(item.amount || 0))}
+                </div>
+              </article>
+            );
+          })}
+      </div>
+    </Card>
   );
 }
 

@@ -212,6 +212,18 @@ export default function ExpenseDetail({ expense, isOpen, onClose, onEdit }) {
                   </div>
                 </div>
 
+                {expense.contract_label && (
+                  <div className="flex items-center gap-3 text-sm">
+                    <FileText className="h-4 w-4 text-[var(--muted)]" />
+                    <div>
+                      <p className="text-[var(--muted)]">Contract</p>
+                      <p className="text-[var(--text)] font-medium">
+                        {expense.contract_label}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-3 text-sm">
                   <RefreshCw className="h-4 w-4 text-[var(--muted)]" />
                   <div>

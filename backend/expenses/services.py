@@ -18,6 +18,7 @@ EXPENSE_APPROVAL_SETTINGS_KEY = "expense_approval"
 EXPENSE_EDIT_FIELDS = [
     "expense_scope",
     "project",
+    "contract",
     "expense_date",
     "description",
     "remarks",
@@ -30,6 +31,7 @@ EXPENSE_EDIT_FIELDS = [
 FINANCIAL_EDIT_FIELDS = {
     "expense_scope",
     "project",
+    "contract",
     "expense_date",
     "paid_to",
     "amount_afn",
@@ -153,6 +155,7 @@ def expense_value_snapshot(expense):
     return {
         "expense_scope": expense.expense_scope,
         "project": expense.project_id,
+        "contract": expense.contract_id,
         "expense_date": expense.expense_date.isoformat() if expense.expense_date else "",
         "description": expense.description,
         "remarks": expense.remarks,
@@ -188,6 +191,7 @@ def _changed_field_payload(edit_request):
     labels = {
         "expense_scope": "Expense scope",
         "project": "Project",
+        "contract": "Contract",
         "expense_date": "Expense date",
         "description": "Description",
         "remarks": "Remarks",
@@ -210,6 +214,15 @@ def _changed_field_payload(edit_request):
                 Project.objects.filter(pk=value).values_list("name", flat=True).first()
                 or "Office"
             )
+        if field == "contract":
+            from subcontractor.models import Contract
+
+            row = (
+                Contract.objects.filter(pk=value)
+                .values_list("contract_number", "title")
+                .first()
+            )
+            return f"{row[0]} - {row[1]}" if row else "-"
         if field == "expense_scope":
             return "Office expense" if value == Expense.ExpenseScope.OFFICE else "Project expense"
         return str(value)
@@ -243,6 +256,29 @@ def _project_name_for_values(values, fallback_expense):
     )
 
 
+def _contract_label(contract):
+    if not contract:
+        return ""
+    return f"{contract.contract_number} - {contract.title}"
+
+
+def _contract_label_for_values(values, fallback_expense):
+    contract_id = values.get("contract")
+    if not contract_id:
+        return ""
+    if contract_id == fallback_expense.contract_id:
+        return _contract_label(fallback_expense.contract)
+
+    from subcontractor.models import Contract
+
+    contract = (
+        Contract.objects.filter(pk=contract_id)
+        .only("contract_number", "title")
+        .first()
+    )
+    return _contract_label(contract)
+
+
 def _apply_expense_values(expense, values):
     for field in EXPENSE_EDIT_FIELDS:
         if field not in values:
@@ -250,6 +286,8 @@ def _apply_expense_values(expense, values):
         value = values[field]
         if field == "project":
             expense.project_id = value or None
+        elif field == "contract":
+            expense.contract_id = value or None
         elif field == "expense_date":
             expense.expense_date = date.fromisoformat(value)
         elif field in {"amount_afn", "amount_usd", "exchange_rate"}:
@@ -305,6 +343,8 @@ def _expense_event_payload(event, expense, actor=None, notes=""):
         "approval_status": expense.approval_status,
         "project_id": expense.project_id,
         "project_name": expense.project_label,
+        "contract_id": expense.contract_id,
+        "contract_label": _contract_label(expense.contract),
         "created_by": expense.created_by_id,
         "created_by_name": _user_display_name(expense.created_by),
         "actor": getattr(actor, "id", None),
@@ -341,6 +381,8 @@ def _edit_request_event_payload(event, edit_request, actor=None, notes=""):
             "expense_id": expense.id,
             "project_id": proposed.get("project", expense.project_id),
             "project_name": _project_name_for_values(proposed, expense),
+            "contract_id": proposed.get("contract", expense.contract_id),
+            "contract_label": _contract_label_for_values(proposed, expense),
             "expense_date": proposed.get("expense_date", payload["expense_date"]),
             "description": proposed.get("description", expense.description),
             "remarks": proposed.get("remarks", expense.remarks),
@@ -456,6 +498,8 @@ def notify_expense_submitted(expense, request=None):
         "expense_scope": expense.expense_scope,
         "project_id": expense.project_id,
         "project_name": expense.project_label,
+        "contract_id": expense.contract_id,
+        "contract_label": _contract_label(expense.contract),
         "created_by": expense.created_by_id,
         "created_by_name": _user_display_name(expense.created_by),
         "created_at": expense.created_at.isoformat() if expense.created_at else "",
@@ -881,6 +925,7 @@ def apply_edit_request_filters(queryset, params):
     creator = params.get("creator") or params.get("created_by")
     approver = params.get("approver") or params.get("approved_by")
     project = params.get("project")
+    contract = params.get("contract")
     expense_scope = params.get("expense_scope")
     expense_type = params.get("expense_type")
     search = params.get("search")
@@ -895,6 +940,8 @@ def apply_edit_request_filters(queryset, params):
         queryset = queryset.filter(reviewed_by_id=approver)
     if project:
         queryset = queryset.filter(expense__project_id=project)
+    if contract:
+        queryset = queryset.filter(expense__contract_id=contract)
     if expense_scope:
         queryset = queryset.filter(expense__expense_scope=expense_scope)
     if expense_type:
@@ -909,6 +956,8 @@ def apply_edit_request_filters(queryset, params):
             | Q(expense__remarks__icontains=search)
             | Q(expense__paid_to__icontains=search)
             | Q(expense__project__name__icontains=search)
+            | Q(expense__contract__contract_number__icontains=search)
+            | Q(expense__contract__title__icontains=search)
             | Q(requested_by__username__icontains=search)
         )
 

@@ -1,6 +1,5 @@
 from decimal import Decimal
-from django.db.models import Sum, Count, Value, DecimalField
-from django.db.models.functions import Coalesce
+from django.db.models import Count, Prefetch
 
 from subcontractor.models import Contract
 from .base import BaseReport
@@ -37,28 +36,40 @@ class ContractReport(BaseReport):
     def generate(self):
         base_qs = self._base_queryset()
 
-        # =====================================================
-        # ROW DATA (SAFE ANNOTATION PER CONTRACT)
-        # =====================================================
-        qs = base_qs.annotate(
-            total_paid_db=Coalesce(
-                Sum("payments__amount"),
-                Value(Decimal("0")),
-                output_field=DecimalField(max_digits=18, decimal_places=2),
-            ),
-            total_invoiced_db=Coalesce(
-                Sum("invoices__amount"),
-                Value(Decimal("0")),
-                output_field=DecimalField(max_digits=18, decimal_places=2),
+        from expenses.models import Expense
+
+        rows = []
+        total_contracts = base_qs.count()
+        qs = base_qs.prefetch_related(
+            "payments",
+            "invoices",
+            Prefetch(
+                "expenses",
+                queryset=Expense.objects.approved().only(
+                    "id",
+                    "contract",
+                    "amount_usd",
+                    "amount_afn",
+                ),
+                to_attr="approved_expenses",
             ),
         )
 
-        rows = []
-        total_contracts = qs.count()
-
         for c in qs:
-            paid = c.total_paid_db or Decimal("0")
-            invoiced = c.total_invoiced_db or Decimal("0")
+            paid = sum((payment.amount or Decimal("0")) for payment in c.payments.all())
+            invoiced = sum((invoice.amount or Decimal("0")) for invoice in c.invoices.all())
+            contract_expenses_usd = sum(
+                (expense.amount_usd or Decimal("0"))
+                for expense in getattr(c, "approved_expenses", [])
+            )
+            contract_expenses_afn = sum(
+                (expense.amount_afn or Decimal("0"))
+                for expense in getattr(c, "approved_expenses", [])
+            )
+            payment_usd = paid if c.currency == "USD" else Decimal("0")
+            payment_afn = paid if c.currency == "AFN" else Decimal("0")
+            cash_outflow_usd = payment_usd + contract_expenses_usd
+            cash_outflow_afn = payment_afn + contract_expenses_afn
 
             rows.append({
                 "id": c.id,
@@ -78,8 +89,14 @@ class ContractReport(BaseReport):
 
                 "total_paid": paid,
                 "total_invoiced": invoiced,
+                "contract_expenses_usd": contract_expenses_usd,
+                "contract_expenses_afn": contract_expenses_afn,
+                "cash_outflow_usd": cash_outflow_usd,
+                "cash_outflow_afn": cash_outflow_afn,
+                "net_position_usd": -cash_outflow_usd,
+                "net_position_afn": -cash_outflow_afn,
 
-                "remaining_amount": c.contract_value - paid,
+                "remaining_amount": c.adjusted_contract_value - paid,
             })
 
         # =====================================================
@@ -89,7 +106,7 @@ class ContractReport(BaseReport):
         # We rebuild clean aggregation in Python to avoid SQL duplication
         currency_map = {}
 
-        for c in base_qs.prefetch_related("payments"):
+        for c in qs:
             cur = c.currency
 
             if cur not in currency_map:
@@ -98,13 +115,23 @@ class ContractReport(BaseReport):
                     "count": 0,
                     "total_value": Decimal("0"),
                     "total_paid": Decimal("0"),
+                    "contract_expenses_usd": Decimal("0"),
+                    "contract_expenses_afn": Decimal("0"),
                 }
 
             currency_map[cur]["count"] += 1
             currency_map[cur]["total_value"] += c.adjusted_contract_value
 
-            paid = sum(p.amount for p in c.payments.all())
+            paid = sum((p.amount or Decimal("0")) for p in c.payments.all())
             currency_map[cur]["total_paid"] += paid
+            currency_map[cur]["contract_expenses_usd"] += sum(
+                (expense.amount_usd or Decimal("0"))
+                for expense in getattr(c, "approved_expenses", [])
+            )
+            currency_map[cur]["contract_expenses_afn"] += sum(
+                (expense.amount_afn or Decimal("0"))
+                for expense in getattr(c, "approved_expenses", [])
+            )
 
         currency_summary = list(currency_map.values())
 

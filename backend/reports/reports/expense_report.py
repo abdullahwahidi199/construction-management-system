@@ -15,19 +15,22 @@ class ExpenseReport(BaseReport):
     # ---------------------------------------------------------
     def _base_queryset(self):
         requested_status = self.filters.get("status") or self.filters.get("approval_status")
-        qs = Expense.objects.select_related("project")
+        qs = Expense.objects.select_related("project", "contract")
         if requested_status:
             qs = qs.filter(approval_status=requested_status)
         else:
             qs = qs.approved()
 
         project_id = self.filters.get("project_id")
+        contract_id = self.filters.get("contract_id")
         expense_scope = self.filters.get("expense_scope")
         expense_type = self.filters.get("expense_type")
         start, end = self.get_date_range()
 
         if project_id:
             qs = qs.filter(project_id=project_id)
+        if contract_id:
+            qs = qs.filter(contract_id=contract_id)
         if expense_scope:
             qs = qs.filter(expense_scope=expense_scope)
         if expense_type:
@@ -131,6 +134,9 @@ class ExpenseReport(BaseReport):
             "amount_usd",
             "project_id",
             "project__name",
+            "contract_id",
+            "contract__contract_number",
+            "contract__title",
             "approval_status",
         )
         for row in preview_values:
@@ -139,6 +145,11 @@ class ExpenseReport(BaseReport):
             if row["expense_scope"] == Expense.ExpenseScope.OFFICE:
                 row["project__name"] = "Office"
             row["project"] = row["project__name"] or ""
+            row["contract"] = (
+                f"{row['contract__contract_number']} - {row['contract__title']}"
+                if row["contract_id"]
+                else ""
+            )
             preview_rows.append(row)
 
         # =====================================================

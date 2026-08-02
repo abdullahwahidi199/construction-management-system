@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 # Create your views here.
 from decimal import Decimal
@@ -31,6 +31,7 @@ from .serializers import (
     ContractDocumentCreateSerializer,
     ContractPaymentSerializer,
     ContractPaymentCreateSerializer,
+    ContractFinancialTimelineItemSerializer,
     ContractVariationSerializer,
     ContractVariationCreateSerializer,
     FinancialSummarySerializer,
@@ -51,6 +52,7 @@ from .pagination import StandardPagination
 from .services import ContractService
 from accounts.permissions import RBACPermission
 from reports.branding import build_pdf_branding_elements, draw_pdf_branding_footer
+from common.calendar_utils import get_module_calendar, parse_calendar_date
 
 
 # ──────────────────────────────────────────────
@@ -130,6 +132,7 @@ class ContractViewSet(viewsets.ModelViewSet):
     rbac_resource       = "contracts"
     rbac_action_permissions = {
         "financial_summary": ("contracts.view", "contracts.view_assigned"),
+        "financial_timeline": ("contracts.view", "contracts.view_assigned"),
         "payments": {
             "GET": ("contract_payments.view",),
             "POST": ("contract_payments.create",),
@@ -188,6 +191,47 @@ class ContractViewSet(viewsets.ModelViewSet):
         summary = ContractService.get_financial_summary(contract)
         serializer = FinancialSummarySerializer(summary)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], url_path='financial-timeline')
+    def financial_timeline(self, request, pk=None):
+        contract = get_object_or_404(self.get_queryset(), pk=pk)
+        self.check_object_permissions(request, contract)
+        calendar_type = get_module_calendar("contracts", request=request)
+        date_from = (
+            request.query_params.get("date_from")
+            or request.query_params.get("start_date")
+        )
+        date_to = (
+            request.query_params.get("date_to")
+            or request.query_params.get("end_date")
+        )
+
+        try:
+            parsed_from = parse_calendar_date(date_from, calendar_type) if date_from else None
+            parsed_to = parse_calendar_date(date_to, calendar_type) if date_to else None
+        except ValueError as exc:
+            return Response({"date": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+        timeline = ContractService.get_financial_timeline(
+            contract,
+            transaction_type=request.query_params.get("type")
+            or request.query_params.get("transaction_type"),
+            search=request.query_params.get("search"),
+            date_from=parsed_from,
+            date_to=parsed_to,
+        )
+        page = self.paginate_queryset(timeline["results"])
+        serializer = ContractFinancialTimelineItemSerializer(
+            page if page is not None else timeline["results"],
+            many=True,
+        )
+        payload = {
+            "summary": FinancialSummarySerializer(timeline["summary"]).data,
+            "results": serializer.data,
+        }
+        if page is not None:
+            return self.get_paginated_response(payload)
+        return Response(payload)
 
     @action(detail=True, methods=['get', 'post'])
     def payments(self, request, pk=None):
@@ -791,6 +835,7 @@ class ContractDetailPDFView(APIView):
         elements = []
 
         currency_symbol = self.get_currency(contract.currency)
+        summary = ContractService.get_financial_summary(contract)
 
         company, branding = build_pdf_branding_elements(
             title="Contract Detail Report",
@@ -832,7 +877,21 @@ class ContractDetailPDFView(APIView):
             [rtl("Variation"), f"{currency_symbol}{contract.total_variation_amount:,.2f}"],
             [rtl("Adjusted Value"), f"{currency_symbol}{contract.adjusted_contract_value:,.2f}"],
             [rtl("Total Invoiced"), f"{currency_symbol}{contract.total_invoiced:,.2f}"],
-            [rtl("Total Paid"), f"{currency_symbol}{contract.total_paid:,.2f}"],
+            [rtl("Paid to Subcontractor"), f"{currency_symbol}{contract.total_paid:,.2f}"],
+            [
+                rtl("Contract Expenses"),
+                (
+                    f"USD {summary['total_contract_expenses_usd']:,.2f} / "
+                    f"AFN {summary['total_contract_expenses_afn']:,.2f}"
+                ),
+            ],
+            [
+                rtl("Total Cash Outflow"),
+                (
+                    f"USD {summary['total_cash_outflow_usd']:,.2f} / "
+                    f"AFN {summary['total_cash_outflow_afn']:,.2f}"
+                ),
+            ],
             [rtl("Remaining"), f"{currency_symbol}{contract.remaining_amount:,.2f}"],
             [rtl("Retention"), f"{currency_symbol}{contract.retention_amount:,.2f}"],
             [rtl("Retention Balance"), f"{currency_symbol}{contract.retention_balance:,.2f}"],
@@ -897,6 +956,48 @@ class ContractDetailPDFView(APIView):
 
         elements.append(Paragraph(rtl("Payments"), title_style))
         elements.append(payments_table)
+        elements.append(Spacer(1, 12))
+
+        # ---------------------------------------------------
+        # COMBINED FINANCIAL TIMELINE (display only)
+        # ---------------------------------------------------
+        timeline = ContractService.get_financial_timeline(contract)["results"]
+        timeline_data = [[
+            rtl("Date"),
+            rtl("Type"),
+            rtl("Reference"),
+            rtl("Description"),
+            rtl("Amount"),
+        ]]
+
+        for item in timeline:
+            sign = "+" if item["direction"] == "in" else "-"
+            label = "Payment" if item["transaction_type"] == "payment" else "Expense"
+            timeline_data.append([
+                str(item["date"]),
+                rtl(label),
+                rtl(item["reference"]),
+                rtl(item["description"] or item["title"]),
+                f"{sign}{item['currency']} {item['amount']:,.2f}",
+            ])
+
+        timeline_table = Table(
+            timeline_data,
+            repeatRows=1,
+            colWidths=[80, 80, 110, 170, 100],
+        )
+
+        timeline_table.setStyle(TableStyle([
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#111827")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("FONTNAME", (0, 0), (-1, -1), "NotoArabic"),
+            ("FONTSIZE", (0, 0), (-1, -1), 8),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ]))
+
+        elements.append(Paragraph(rtl("Financial Timeline"), title_style))
+        elements.append(timeline_table)
 
         # ---------------------------------------------------
         # BUILD PDF

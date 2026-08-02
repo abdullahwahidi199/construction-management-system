@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 from unittest.mock import patch
 
@@ -9,6 +10,7 @@ from common.test_helpers import (
     create_contract,
     create_contract_payment,
     create_contract_variation,
+    create_expense,
     create_project,
     create_subcontractor,
     create_user,
@@ -116,6 +118,87 @@ class SubcontractorAndContractAPITests(APITestCase):
         contract.refresh_from_db()
         self.assertEqual(contract.adjusted_contract_value, Decimal("150.00"))
         self.assertEqual(contract.remaining_amount, Decimal("30.00"))
+
+    def test_contract_financial_timeline_treats_payments_and_expenses_as_outflows(self):
+        contract = create_contract(project=self.project, contract_value=Decimal("1000.00"))
+        payment = create_contract_payment(
+            contract=contract,
+            amount=Decimal("500.00"),
+            payment_date=date(2026, 1, 1),
+            reference_number="ADV-001",
+        )
+        expense = create_expense(
+            self.project,
+            contract=contract,
+            description="Purchased cement",
+            amount_usd=Decimal("120.00"),
+            expense_date=date(2026, 1, 5),
+        )
+        create_expense(
+            self.project,
+            contract=contract,
+            description="Pending steel",
+            amount_usd=Decimal("80.00"),
+            approval_status="pending",
+            expense_date=date(2026, 1, 6),
+        )
+
+        response = self.client.get(f"/api/contracts/{contract.id}/financial-timeline/")
+
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data["count"], 2)
+        rows = response.data["results"]["results"]
+        self.assertEqual([row["transaction_type"] for row in rows], ["payment", "expense"])
+        self.assertEqual(rows[0]["payment_id"], payment.id)
+        self.assertEqual(rows[1]["expense_id"], expense.id)
+        self.assertEqual(rows[0]["direction"], "out")
+        self.assertEqual(rows[1]["direction"], "out")
+        self.assertEqual(Decimal(rows[0]["signed_amount"]), Decimal("-500.00"))
+        self.assertEqual(Decimal(rows[1]["signed_amount"]), Decimal("-120.00"))
+        self.assertEqual(
+            Decimal(response.data["results"]["summary"]["payments_made_usd"]),
+            Decimal("500.00"),
+        )
+        self.assertEqual(
+            Decimal(response.data["results"]["summary"]["total_contract_expenses_usd"]),
+            Decimal("120.00"),
+        )
+        self.assertEqual(
+            Decimal(response.data["results"]["summary"]["total_cash_outflow_usd"]),
+            Decimal("620.00"),
+        )
+        self.assertEqual(
+            Decimal(response.data["results"]["summary"]["net_position_usd"]),
+            Decimal("-620.00"),
+        )
+        self.assertEqual(ContractPayment.objects.count(), 1)
+
+    def test_contract_financial_timeline_filters_by_type_date_and_search(self):
+        contract = create_contract(project=self.project)
+        create_contract_payment(
+            contract=contract,
+            amount=Decimal("250.00"),
+            payment_date=date(2026, 1, 1),
+            reference_number="ADV-001",
+        )
+        create_expense(
+            self.project,
+            contract=contract,
+            description="Steel purchase",
+            amount_usd=Decimal("75.00"),
+            expense_date=date(2026, 1, 10),
+        )
+
+        response = self.client.get(
+            f"/api/contracts/{contract.id}/financial-timeline/"
+            "?type=expense&date_from=2026-01-05&search=Steel"
+        )
+
+        self.assertEqual(response.status_code, 200, response.data)
+        rows = response.data["results"]["results"]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["transaction_type"], "expense")
+        self.assertEqual(rows[0]["description"], "Steel purchase")
 
     def test_nested_payment_create_uses_contract_payment_permission(self):
         contract = create_contract(project=self.project, contract_value=Decimal("100.00"))

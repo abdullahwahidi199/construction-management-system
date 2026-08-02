@@ -88,6 +88,7 @@ class ExpenseReportView(BaseReportView):
     pdf_columns = [
         ("serial_number", "S/N"),
         ("project", "Project"),
+        ("contract", "Contract"),
         ("expense_scope", "Scope"),
         ("expense_date", "Date"),
         ("description", "Description"),
@@ -173,7 +174,11 @@ class ContractReportView(BaseReportView):
         ("subcontractor", "Subcontractor"),
         ("currency", "Cur"),
         ("contract_value", "Value"),
-        ("total_paid", "Paid"),
+        ("total_paid", "Paid to Sub"),
+        ("contract_expenses_usd", "Expenses USD"),
+        ("contract_expenses_afn", "Expenses AFN"),
+        ("cash_outflow_usd", "Outflow USD"),
+        ("cash_outflow_afn", "Outflow AFN"),
         ("remaining_amount", "Remaining"),
         ("status", "Status"),
     ]

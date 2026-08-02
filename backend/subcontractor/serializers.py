@@ -87,6 +87,38 @@ class FinancialSummarySerializer(serializers.Serializer):
         decimal_places=2,
         read_only=True,
     )
+    payments_made_usd = serializers.DecimalField(max_digits=15, decimal_places=2)
+    payments_made_afn = serializers.DecimalField(max_digits=15, decimal_places=2)
+    total_contract_expenses_usd = serializers.DecimalField(max_digits=15, decimal_places=2)
+    total_contract_expenses_afn = serializers.DecimalField(max_digits=15, decimal_places=2)
+    total_contract_expenses_usd_equivalent = serializers.DecimalField(max_digits=15, decimal_places=2)
+    total_contract_expenses_afn_equivalent = serializers.DecimalField(max_digits=15, decimal_places=2)
+    total_cash_outflow_usd = serializers.DecimalField(max_digits=15, decimal_places=2)
+    total_cash_outflow_afn = serializers.DecimalField(max_digits=15, decimal_places=2)
+    net_position_usd = serializers.DecimalField(max_digits=15, decimal_places=2)
+    net_position_afn = serializers.DecimalField(max_digits=15, decimal_places=2)
+
+
+class ContractFinancialTimelineItemSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    source = serializers.CharField()
+    transaction_type = serializers.ChoiceField(choices=("payment", "expense"))
+    direction = serializers.ChoiceField(choices=("in", "out"))
+    date = serializers.DateField()
+    title = serializers.CharField(allow_blank=True)
+    description = serializers.CharField(allow_blank=True)
+    reference = serializers.CharField(allow_blank=True)
+    amount = serializers.DecimalField(max_digits=15, decimal_places=2)
+    signed_amount = serializers.DecimalField(max_digits=15, decimal_places=2)
+    amount_usd = serializers.DecimalField(max_digits=15, decimal_places=2)
+    amount_afn = serializers.DecimalField(max_digits=15, decimal_places=2)
+    usd_equivalent = serializers.DecimalField(max_digits=15, decimal_places=2)
+    afn_equivalent = serializers.DecimalField(max_digits=15, decimal_places=2)
+    currency = serializers.CharField()
+    expense_id = serializers.IntegerField(allow_null=True)
+    payment_id = serializers.IntegerField(allow_null=True)
+    status = serializers.CharField(allow_blank=True)
+    counterparty = serializers.CharField(allow_blank=True)
 
 
 class SubcontractorFinancialSummarySerializer(serializers.Serializer):
