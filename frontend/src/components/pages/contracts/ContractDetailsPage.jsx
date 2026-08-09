@@ -17,6 +17,7 @@ import {
   Pencil,
   Plus,
   Receipt,
+  Wallet,
   Save,
   Search,
   X,
@@ -162,7 +163,12 @@ export default function ContractDetailsPage() {
     const rawValue = String(progressValue).trim();
     const parsedValue = Number(rawValue);
 
-    if (!rawValue || !Number.isFinite(parsedValue) || parsedValue < 0 || parsedValue > 100) {
+    if (
+      !rawValue ||
+      !Number.isFinite(parsedValue) ||
+      parsedValue < 0 ||
+      parsedValue > 100
+    ) {
       setProgressError(t("ContractDetailsPage.progressRange"));
       return;
     }
@@ -475,7 +481,10 @@ export default function ContractDetailsPage() {
               />
               <Row
                 label={t("ContractDetailsPage.subcontractor")}
-                value={contract.subcontractor?.name || t("ContractDetailsPage.noData")}
+                value={
+                  contract.subcontractor?.name ||
+                  t("ContractDetailsPage.noData")
+                }
               />
               <Row
                 label={t("ContractDetailsPage.scopeOfWork")}
@@ -747,7 +756,13 @@ function formatDualCurrency(usdValue, afnValue, fmt) {
   )}`;
 }
 
-function SnapshotMetric({ icon: Icon, label, value, detail, tone = "primary" }) {
+function SnapshotMetric({
+  icon: Icon,
+  label,
+  value,
+  detail,
+  tone = "primary",
+}) {
   const tones = {
     primary: "bg-[var(--primary)]/10 text-[var(--primary)]",
     success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
@@ -783,17 +798,24 @@ function SnapshotMetric({ icon: Icon, label, value, detail, tone = "primary" }) 
 function ContractFinancialSnapshot({ summary, currency, fmt }) {
   const paymentValue =
     currency === "USD"
-      ? summary.payments_made_usd ?? summary.total_paid
-      : summary.payments_made_afn ?? summary.total_paid;
+      ? (summary.payments_made_usd ?? summary.total_paid)
+      : (summary.payments_made_afn ?? summary.total_paid);
+
   const cashOutflowUsd =
     summary.total_cash_outflow_usd ??
     Math.abs(Number(summary.net_position_usd || 0));
+
   const cashOutflowAfn =
     summary.total_cash_outflow_afn ??
     Math.abs(Number(summary.net_position_afn || 0));
 
+  const totalInvoiced = Number(summary.total_invoiced);
+
+  const remainingMoney =
+    totalInvoiced - (currency === "USD" ? cashOutflowUsd : cashOutflowAfn);
+
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
       <SnapshotMetric
         icon={ArrowUpRight}
         label="Paid to Subcontractor"
@@ -801,6 +823,7 @@ function ContractFinancialSnapshot({ summary, currency, fmt }) {
         detail="Contract payment records"
         tone="danger"
       />
+
       <SnapshotMetric
         icon={Receipt}
         label="Total Contract Expenses"
@@ -812,12 +835,21 @@ function ContractFinancialSnapshot({ summary, currency, fmt }) {
         detail="Linked approved expenses only"
         tone="danger"
       />
+
       <SnapshotMetric
         icon={DollarSign}
         label="Total Cash Outflow"
         value={formatDualCurrency(cashOutflowUsd, cashOutflowAfn, fmt)}
         detail="Payments plus linked approved expenses"
         tone="primary"
+      />
+
+      <SnapshotMetric
+        icon={Wallet}
+        label="Remaining Money"
+        value={formatCurrency(remainingMoney, currency, fmt)}
+        detail="Total invoiced minus total cash outflow"
+        tone={remainingMoney >= 0 ? "success" : "danger"}
       />
     </div>
   );
@@ -892,7 +924,9 @@ function ContractFinancialTimeline({
             <input
               type="date"
               value={filters.date_to}
-              onChange={(event) => onFilterChange("date_to", event.target.value)}
+              onChange={(event) =>
+                onFilterChange("date_to", event.target.value)
+              }
               className="min-h-11 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-sm text-[var(--text)] focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
               title="To date"
             />
@@ -1081,9 +1115,7 @@ function ProgressUpdateModal({
                   }`}
                 />
                 {error ? (
-                  <p className="mt-1.5 text-xs text-[var(--danger)]">
-                    {error}
-                  </p>
+                  <p className="mt-1.5 text-xs text-[var(--danger)]">{error}</p>
                 ) : (
                   <p className="mt-1.5 text-xs text-[var(--muted)]">
                     {t("ContractDetailsPage.progressHelp")}

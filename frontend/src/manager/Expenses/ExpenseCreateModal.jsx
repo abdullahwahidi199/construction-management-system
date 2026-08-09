@@ -26,7 +26,10 @@ const PROJECT_EXPENSE_CATEGORIES = [
   ["staff_salary", "staffSalary"],
   ["daily_wage", "dailyWage"],
   ["equipment", "equipment"],
+  ["repairing", "Repairing"],
   ["utility", "utility"],
+  ["food_costs", "foodCosts"],
+  ["fuel", "fuel"],
   ["contract_payment", "contractPayment"],
   ["other", "other"],
 ];
@@ -36,7 +39,8 @@ const OFFICE_EXPENSE_CATEGORIES = [
   ["utilities", "utilities"],
   ["internet", "internet"],
   ["office_supplies", "officeSupplies"],
-  ["staff_meals", "staffMeals"],
+  ["food_costs", "foodCosts"],
+  ["repairing", "Repairing"],
   ["transportation", "transportation"],
   ["fuel", "fuel"],
   ["cleaning", "cleaning"],
@@ -78,7 +82,7 @@ export default function ExpenseCreateModal({
         expense_date: todayIso(),
         amount_usd: "",
         amount_afn: "",
-        exchange_rate: "68.2",
+        exchange_rate: "0",
         paid_to: "",
         expense_scope: "project",
         expense_type: "general",
@@ -320,7 +324,7 @@ export default function ExpenseCreateModal({
                     handleChange("exchange_rate", e.target.value)
                   }
                   className={fieldControlClass}
-                  placeholder="68.2000"
+                  placeholder="0"
                 />
               </div>
 

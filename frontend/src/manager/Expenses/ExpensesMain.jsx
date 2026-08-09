@@ -109,9 +109,12 @@ export default function ExpensesMain({ dataEntryMode = false }) {
   const { data: projects } = useFetch("projects/", {
     skipGlobalErrorToast: true,
   });
-  const { data: contractsData } = useFetch("contracts/?status=active&page_size=100", {
-    skipGlobalErrorToast: true,
-  });
+  const { data: contractsData } = useFetch(
+    "contracts/?status=active&page_size=100",
+    {
+      skipGlobalErrorToast: true,
+    },
+  );
 
   const createExpense = async (formData) => {
     try {
@@ -300,6 +303,9 @@ export default function ExpensesMain({ dataEntryMode = false }) {
     { value: "material", label: t("ExpensesMain.types.material") },
     { value: "staff_salary", label: t("ExpensesMain.types.staffSalary") },
     { value: "daily_wage", label: t("ExpensesMain.types.dailyWage") },
+    { value: "fuel", label: t("ExpensesMain.types.fuel") },
+    { value: "food_costs", label: t("ExpensesMain.types.food_costs") },
+    { value: "repairing", label: t("ExpensesMain.types.repairing") },
     {
       value: "contract_payment",
       label: t("ExpensesMain.types.contractPayment"),
@@ -311,10 +317,13 @@ export default function ExpensesMain({ dataEntryMode = false }) {
 
   const officeExpenseTypes = [
     { value: "office_rent", label: t("ExpensesMain.types.officeRent") },
+    { value: "fuel", label: t("ExpensesMain.types.fuel") },
+    { value: "food_costs", label: t("ExpensesMain.types.food_costs") },
     { value: "utilities", label: t("ExpensesMain.types.utilities") },
     { value: "internet", label: t("ExpensesMain.types.internet") },
     { value: "office_supplies", label: t("ExpensesMain.types.officeSupplies") },
     { value: "staff_meals", label: t("ExpensesMain.types.staffMeals") },
+    { value: "repairing", label: t("ExpensesMain.types.repairing") },
     { value: "transportation", label: t("ExpensesMain.types.transportation") },
     { value: "fuel", label: t("ExpensesMain.types.fuel") },
     { value: "cleaning", label: t("ExpensesMain.types.cleaning") },
@@ -391,7 +400,9 @@ export default function ExpensesMain({ dataEntryMode = false }) {
             variant="secondary"
             onClick={handleExportPdf}
             disabled={exportBlocked}
-            title={exportBlocked ? "Only approved expenses can be exported." : ""}
+            title={
+              exportBlocked ? "Only approved expenses can be exported." : ""
+            }
             leftIcon={<Download className="h-4 w-4" />}
           >
             {t("ProjectDetails.downloadPdf")}
@@ -813,8 +824,8 @@ export default function ExpensesMain({ dataEntryMode = false }) {
             {filterType && (
               <span className="inline-flex items-center gap-1 rounded-lg bg-[var(--primary)]/10 px-2.5 py-1 text-xs font-medium text-[var(--primary)]">
                 {t("ExpensesMain.activeFilters.type")}{" "}
-                {visibleExpenseTypes.find((t) => t.value === filterType)?.label ||
-                  filterType}
+                {visibleExpenseTypes.find((t) => t.value === filterType)
+                  ?.label || filterType}
                 <button
                   onClick={() => setFilterType("")}
                   className="ms-1 hover:text-[var(--primary)]/70"

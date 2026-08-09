@@ -264,7 +264,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
             metaHtml: `
               <div class="receipt-title">Receipt No.</div>
               <div class="serial">#${expense.serial_number || "—"}</div>
-              <div class="date">${displayDate(expense.expense_date, expense.formatted_expense_date)}</div>
+              
             `,
           })}
 
@@ -369,7 +369,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
 
           ${renderPrintBrandFooter(
             company,
-            `This is a system-generated document. ${displayDateTime(new Date().toISOString())}`,
+            `This is a system-generated document.}`,
           )}
         </div>
       </body>

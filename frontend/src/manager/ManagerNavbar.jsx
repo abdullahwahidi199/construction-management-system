@@ -88,7 +88,9 @@ function DesktopNavItem({ item, active, onClick }) {
     >
       <Icon
         className={`h-4 w-4 shrink-0 transition duration-200 ${
-          active ? "text-(--primary)" : "text-(--muted) group-hover:text-(--text)"
+          active
+            ? "text-(--primary)"
+            : "text-(--muted) group-hover:text-(--text)"
         }`}
         strokeWidth={1.9}
       />
@@ -321,7 +323,9 @@ function SearchPanel({
                         <Icon className="h-4 w-4" strokeWidth={1.9} />
                       </span>
                       <span className="min-w-0">
-                        <span className="block truncate font-medium">{item.name}</span>
+                        <span className="block truncate font-medium">
+                          {item.name}
+                        </span>
                         <span className="block truncate text-xs text-(--muted)">
                           {item.path}
                         </span>
@@ -388,8 +392,12 @@ function ProfileDropdown({ open, onToggle, onClose, user, logout, t }) {
             className="absolute right-0 z-50 mt-3 w-64 overflow-hidden rounded-xl border border-(--border) bg-(--card) p-1.5 shadow-2xl shadow-black/10 ring-1 ring-black/5 transition duration-200 dark:shadow-black/30"
           >
             <div className="border-b border-(--border) px-3 py-3">
-              <p className="truncate text-sm font-semibold text-(--text)">{username}</p>
-              <p className="truncate text-xs capitalize text-(--muted)">{role}</p>
+              <p className="truncate text-sm font-semibold text-(--text)">
+                {username}
+              </p>
+              <p className="truncate text-xs capitalize text-(--muted)">
+                {role}
+              </p>
             </div>
             {isAdmin && (
               <NavLink
@@ -399,7 +407,9 @@ function ProfileDropdown({ open, onToggle, onClose, user, logout, t }) {
                 className="mt-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-(--muted) transition duration-200 hover:bg-(--hover) hover:text-(--text) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35"
               >
                 <ShieldCheck className="h-4 w-4" />
-                <span>{labelOr(t, "managerNavbar.adminHome", "Admin home")}</span>
+                <span>
+                  {labelOr(t, "managerNavbar.adminHome", "Admin home")}
+                </span>
               </NavLink>
             )}
             <NavLink
@@ -458,7 +468,9 @@ function MobileDrawerLink({ item, pathname, onClose }) {
 
 function MobileDrawerSection({ group, pathname, onClose }) {
   if (group.type !== "group") {
-    return <MobileDrawerLink item={group} pathname={pathname} onClose={onClose} />;
+    return (
+      <MobileDrawerLink item={group} pathname={pathname} onClose={onClose} />
+    );
   }
 
   const GroupIcon = group.icon;
@@ -505,12 +517,16 @@ export default function ManagerNavbar() {
   const username = user?.username || "Manager";
   const role = user?.role || "manager";
   const isAdmin = role === "admin";
-  const canOpenSettings = hasAnyPermission(permissions, ["settings.view", "settings.manage"]);
+  const canOpenSettings = hasAnyPermission(permissions, [
+    "settings.view",
+    "settings.manage",
+  ]);
   const companyName = company.company_name || t("managerNavbar.brand");
 
   const navGroups = (() => {
     const canView = (requiredPermissions) =>
-      !requiredPermissions || hasAnyPermission(permissions, requiredPermissions);
+      !requiredPermissions ||
+      hasAnyPermission(permissions, requiredPermissions);
 
     const pages = {
       adminHome: {
@@ -639,8 +655,16 @@ export default function ManagerNavbar() {
     return [
       ...(isAdmin ? [{ type: "link", ...pages.adminHome }] : []),
       { type: "link", ...pages.dashboard },
-      { type: "link", ...pages.projects, hidden: !canView(pages.projects.permissions) },
-      { type: "link", ...pages.contracts, hidden: !canView(pages.contracts.permissions) },
+      {
+        type: "link",
+        ...pages.projects,
+        hidden: !canView(pages.projects.permissions),
+      },
+      {
+        type: "link",
+        ...pages.contracts,
+        hidden: !canView(pages.contracts.permissions),
+      },
       {
         type: "group",
         key: "people",
@@ -648,12 +672,16 @@ export default function ManagerNavbar() {
         icon: Users,
         items: visible(["employees", "dailyWorkers", "subcontractors"]),
       },
+      ...(canView(pages.expenses.permissions)
+        ? [{ type: "link", ...pages.expenses }]
+        : []),
+
       {
         type: "group",
         key: "finance",
         name: t("managerNavbar.finance"),
         icon: CircleDollarSign,
-        items: visible(["expenses", "expenseApprovals", "payrolls"]),
+        items: visible(["expenseApprovals", "payrolls"]),
       },
       {
         type: "group",
@@ -662,8 +690,15 @@ export default function ManagerNavbar() {
         icon: BriefcaseBusiness,
         items: visible(["attendance"]),
       },
-      { type: "link", ...pages.reports, hidden: !canView(pages.reports.permissions) },
-    ].filter((group) => !group.hidden && (group.type !== "group" || group.items.length));
+      {
+        type: "link",
+        ...pages.reports,
+        hidden: !canView(pages.reports.permissions),
+      },
+    ].filter(
+      (group) =>
+        !group.hidden && (group.type !== "group" || group.items.length),
+    );
   })();
 
   const allPages = navGroups.flatMap((group) =>
@@ -676,7 +711,7 @@ export default function ManagerNavbar() {
     "/manager/dashboard",
     "/manager/projects",
     "/manager/contracts",
-    "/manager/reports",
+    "/manager/expenses",
   ]);
   const desktopPrimaryGroups = navGroups.filter(
     (group) => group.type !== "group" && primaryDesktopPaths.has(group.path),
@@ -785,7 +820,9 @@ export default function ManagerNavbar() {
               pathname={location.pathname}
               open={openDropdown === "more"}
               onToggle={() =>
-                setOpenDropdown((current) => (current === "more" ? null : "more"))
+                setOpenDropdown((current) =>
+                  current === "more" ? null : "more",
+                )
               }
               onClose={() => setOpenDropdown(null)}
               t={t}
@@ -856,7 +893,11 @@ export default function ManagerNavbar() {
               aria-expanded={mobileOpen}
               aria-controls="manager-mobile-drawer"
             >
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {mobileOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </IconButton>
           </div>
         </div>
@@ -932,7 +973,10 @@ export default function ManagerNavbar() {
                   </span>
                 </span>
               </div>
-              <IconButton label={t("managerNavbar.closeMenu")} onClick={closeMobileMenu}>
+              <IconButton
+                label={t("managerNavbar.closeMenu")}
+                onClick={closeMobileMenu}
+              >
                 <X className="h-5 w-5" />
               </IconButton>
             </div>
@@ -945,7 +989,9 @@ export default function ManagerNavbar() {
               >
                 <span className="flex min-w-0 items-center gap-3">
                   <Search className="h-4 w-4 shrink-0" />
-                  <span className="truncate">{t("managerNavbar.searchPlaceholder")}</span>
+                  <span className="truncate">
+                    {t("managerNavbar.searchPlaceholder")}
+                  </span>
                 </span>
                 <kbd className="hidden shrink-0 rounded-md border border-(--border) bg-(--bg) px-1.5 py-0.5 text-[11px] sm:inline-flex">
                   Ctrl K
