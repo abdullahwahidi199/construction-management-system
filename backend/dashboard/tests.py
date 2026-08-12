@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 from django.test import TestCase
@@ -20,6 +20,7 @@ from common.test_helpers import (
     create_user,
 )
 from dashboard.services import DashboardService
+from Employees.models import Employee, PayrollPayment
 from expenses.models import Expense
 
 
@@ -267,6 +268,90 @@ class DashboardAPITests(APITestCase):
             after_payroll["grand_total_outflow"]["afn"],
             baseline + Decimal("30000.00"),
         )
+
+    def test_dashboard_payroll_summary_splits_project_and_office_payroll(self):
+        project_employee = create_employee(
+            email="dashboard.project.payroll@example.com",
+            employment_type=Employee.EmploymentType.PROJECT,
+            project=self.project,
+            salary=Decimal("1200.00"),
+        )
+        office_employee = create_employee(
+            email="dashboard.office.payroll@example.com",
+            employment_type=Employee.EmploymentType.OFFICE,
+            project=None,
+            salary=Decimal("800.00"),
+        )
+        start = date.today().replace(day=1)
+        project_payroll = create_payroll(
+            employee=project_employee,
+            payroll_period_start=start,
+            payroll_period_end=date.today(),
+            basic_salary=Decimal("1200.00"),
+            currency="USD",
+        )
+        office_payroll = create_payroll(
+            employee=office_employee,
+            payroll_period_start=start,
+            payroll_period_end=date.today(),
+            basic_salary=Decimal("800.00"),
+            currency="USD",
+        )
+        PayrollPayment.objects.create(
+            payroll=project_payroll,
+            amount=Decimal("1200.00"),
+            payment_date=date.today(),
+            payment_method="cash",
+        )
+        PayrollPayment.objects.create(
+            payroll=office_payroll,
+            amount=Decimal("800.00"),
+            payment_date=date.today(),
+            payment_method="cash",
+        )
+        project_payroll.refresh_payment_totals(save=True)
+        office_payroll.refresh_payment_totals(save=True)
+
+        response = self.client.get("/api/dashboard/payroll/")
+
+        self.assertEqual(response.status_code, 200, response.data)
+        current = response.data["current_month"]
+        self.assertEqual(Decimal(current["project_payroll_paid_usd"]), Decimal("1200.00"))
+        self.assertEqual(Decimal(current["office_payroll_paid_usd"]), Decimal("800.00"))
+
+    def test_dashboard_payroll_summary_uses_payment_date_not_period_start(self):
+        project_employee = create_employee(
+            email="dashboard.shamsi.period@example.com",
+            employment_type=Employee.EmploymentType.PROJECT,
+            project=self.project,
+            salary=Decimal("999.99"),
+        )
+        first_of_month = date.today().replace(day=1)
+        previous_month_start = (first_of_month - timedelta(days=1)).replace(day=1)
+        payroll = create_payroll(
+            employee=project_employee,
+            payroll_period_start=previous_month_start,
+            payroll_period_end=date.today(),
+            basic_salary=Decimal("999.99"),
+            currency="AFN",
+            payment_date=date.today(),
+        )
+        PayrollPayment.objects.create(
+            payroll=payroll,
+            amount=Decimal("999.99"),
+            payment_date=date.today(),
+            payment_method="cash",
+        )
+        payroll.refresh_payment_totals(save=True)
+
+        response = self.client.get("/api/dashboard/payroll/")
+
+        self.assertEqual(response.status_code, 200, response.data)
+        current = response.data["current_month"]
+        previous = response.data["previous_month"]
+        self.assertEqual(Decimal(current["project_payroll_paid_afn"]), Decimal("999.99"))
+        self.assertEqual(Decimal(current["cash_outflow_afn"]), Decimal("999.99"))
+        self.assertEqual(Decimal(previous["project_payroll_paid_afn"]), Decimal("0.00"))
 
 
 class DashboardPerformanceTests(TestCase):

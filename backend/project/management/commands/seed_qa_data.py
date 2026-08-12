@@ -57,7 +57,8 @@ class Command(BaseCommand):
                 address="Generated address",
                 department=choice(["engineering", "construction", "finance", "procurement", "administration"]),
                 position=choice(["Engineer", "Foreman", "Accountant", "Officer"]),
-                employment_type=choice(["full_time", "part_time", "contract"]),
+                employment_type=Employee.EmploymentType.OFFICE,
+                job_type=choice(["full_time", "part_time", "contract"]),
                 hire_date=date(2024, 1, 1) + timedelta(days=index),
                 salary=Decimal(randint(300, 2500)),
             ))

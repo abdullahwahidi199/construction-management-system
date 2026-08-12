@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APITestCase
 
-from Employees.models import Employee, Payroll, SalaryAdvance
+from Employees.models import Employee, Payroll, PayrollPayment, SalaryAdvance
 from dashboard.services import DashboardService
 from expenses.models import Expense
 from expenses.serializers import ExpenseSerializer
@@ -178,7 +178,7 @@ class PayrollAPITests(APITestCase):
             address="Kabul",
             department="engineering",
             position="Engineer",
-            employment_type="full_time",
+            employment_type="OFFICE",
             hire_date=date(2026, 1, 1),
             salary=Decimal("1000.00"),
         )
@@ -282,7 +282,7 @@ class ReportEndpointTests(APITestCase):
             address="Kabul",
             department="finance",
             position="Accountant",
-            employment_type="full_time",
+            employment_type="OFFICE",
             hire_date=date(2026, 1, 1),
             salary=Decimal("1000.00"),
         )
@@ -392,6 +392,59 @@ class ReportEndpointTests(APITestCase):
             Decimal("30.00"),
         )
 
+    def test_payroll_report_splits_project_and_office_employee_payroll(self):
+        project_employee = Employee.objects.create(
+            first_name="Project",
+            last_name="Payroll",
+            email="project.payroll.report@example.com",
+            phone="0700000001",
+            address="Kabul",
+            department="engineering",
+            position="Engineer",
+            employment_type=Employee.EmploymentType.PROJECT,
+            project=self.project,
+            hire_date=date(2026, 1, 1),
+            salary=Decimal("700.00"),
+        )
+        project_payroll = Payroll.objects.create(
+            employee=project_employee,
+            payroll_period_start=date(2026, 3, 1),
+            payroll_period_end=date(2026, 3, 31),
+            basic_salary=Decimal("700.00"),
+            gross_pay=Decimal("700.00"),
+            net_pay=Decimal("700.00"),
+            currency="USD",
+        )
+        PayrollPayment.objects.create(
+            payroll=project_payroll,
+            amount=Decimal("700.00"),
+            payment_date=date(2026, 3, 31),
+            payment_method="cash",
+        )
+        project_payroll.refresh_payment_totals(save=True)
+
+        response = self.client.get("/api/reports/payroll/")
+        project_filtered = self.client.get(f"/api/reports/payroll/?employment_type=PROJECT&project_id={self.project.id}")
+        office_filtered = self.client.get("/api/reports/payroll/?employment_type=OFFICE")
+
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(
+            response.data["summary"]["project_payroll"][0]["project"],
+            self.project.name,
+        )
+        self.assertEqual(
+            response.data["summary"]["project_payroll"][0]["total_paid"],
+            Decimal("700.00"),
+        )
+        self.assertEqual(project_filtered.status_code, 200, project_filtered.data)
+        self.assertTrue(
+            all(row["payroll_classification"] == "Project Payroll" for row in project_filtered.data["rows"])
+        )
+        self.assertEqual(office_filtered.status_code, 200, office_filtered.data)
+        self.assertTrue(
+            all(row["payroll_classification"] == "Office Payroll" for row in office_filtered.data["rows"])
+        )
+
     def test_reports_include_salary_advances_without_double_counting_payroll_settlement(self):
         scenario_employee = Employee.objects.create(
             first_name="Advance",
@@ -401,7 +454,7 @@ class ReportEndpointTests(APITestCase):
             address="Kabul",
             department="finance",
             position="Accountant",
-            employment_type="full_time",
+            employment_type="OFFICE",
             hire_date=date(2026, 1, 1),
             salary=Decimal("30000.00"),
         )

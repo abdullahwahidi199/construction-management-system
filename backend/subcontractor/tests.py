@@ -1,9 +1,11 @@
 from datetime import date
 from decimal import Decimal
+from io import BytesIO
 from unittest.mock import patch
 
 from django.core.files.base import ContentFile
 from rest_framework.test import APITestCase
+from pypdf import PdfReader
 
 from common.test_helpers import (
     create_admin,
@@ -69,7 +71,25 @@ class SubcontractorAndContractAPITests(APITestCase):
         self.assertEqual(summary.status_code, 200, summary.data)
         self.assertEqual(Decimal(summary.data["retention_amount"]), Decimal("100.00"))
 
-    def test_contract_payments_do_not_exceed_adjusted_value_and_cannot_be_deleted(self):
+    def test_contract_value_is_optional_and_remaining_amount_stays_unknown(self):
+        subcontractor = create_subcontractor()
+        payload = contract_payload(self.project, subcontractor)
+        payload["contract_value"] = None
+
+        created = self.client.post("/api/contracts/", payload, format="json")
+
+        self.assertEqual(created.status_code, 201, created.data)
+        contract = Contract.objects.get(title=payload["title"])
+        self.assertIsNone(contract.contract_value)
+        self.assertIsNone(contract.remaining_amount)
+
+        summary = self.client.get(f"/api/contracts/{contract.id}/financial_summary/")
+        self.assertEqual(summary.status_code, 200, summary.data)
+        self.assertIsNone(summary.data["original_contract_value"])
+        self.assertIsNone(summary.data["adjusted_contract_value"])
+        self.assertIsNone(summary.data["remaining_amount"])
+
+    def test_contract_payments_do_not_exceed_adjusted_value_and_can_be_deleted(self):
         contract = create_contract(project=self.project, contract_value=Decimal("100.00"))
         create_contract_payment(contract=contract, amount=Decimal("75.00"))
 
@@ -87,7 +107,8 @@ class SubcontractorAndContractAPITests(APITestCase):
 
         payment = ContractPayment.objects.get(contract=contract)
         delete = self.client.delete(f"/api/contract-payments/{payment.id}/")
-        self.assertEqual(delete.status_code, 405)
+        self.assertEqual(delete.status_code, 204)
+        self.assertFalse(ContractPayment.objects.filter(id=payment.id).exists())
 
     def test_nested_contract_payment_and_variation_update_balance(self):
         contract = create_contract(project=self.project, contract_value=Decimal("100.00"))
@@ -199,6 +220,33 @@ class SubcontractorAndContractAPITests(APITestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["transaction_type"], "expense")
         self.assertEqual(rows[0]["description"], "Steel purchase")
+
+    def test_contract_detail_pdf_handles_long_dari_timeline_text(self):
+        subcontractor = create_subcontractor(name="شرکت ساختمانی بسیار طولانی")
+        contract = create_contract(
+            project=self.project,
+            subcontractor=subcontractor,
+            title="قرارداد کانکریت ریزی ساختمان اداری با توضیحات طولانی",
+            scope_of_work="اجرای کارهای ساختمانی و کانکریت ریزی با جزئیات کامل",
+        )
+        long_description = (
+            "پرداخت بابت خریداری مواد ساختمانی برای پروژه با توضیحات بسیار طولانی "
+            "که باید داخل خانه جدول شکسته شود و از صفحه بیرون نرود"
+        )
+        create_expense(
+            self.project,
+            contract=contract,
+            description=long_description,
+            amount_usd=Decimal("120.00"),
+            expense_date=date(2026, 1, 5),
+        )
+
+        response = self.client.get(f"/api/contracts/{contract.id}/export-pdf/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+        pdf = PdfReader(BytesIO(response.content))
+        self.assertGreaterEqual(len(pdf.pages), 1)
 
     def test_nested_payment_create_uses_contract_payment_permission(self):
         contract = create_contract(project=self.project, contract_value=Decimal("100.00"))

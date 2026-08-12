@@ -66,13 +66,19 @@ def compress_upload_before_size_check(value):
 
 class FinancialSummarySerializer(serializers.Serializer):
     """Typed schema for a single contract's financial summary."""
-    original_contract_value = serializers.DecimalField(max_digits=15, decimal_places=2)
+    original_contract_value = serializers.DecimalField(
+        max_digits=15, decimal_places=2, allow_null=True,
+    )
     retention_percentage    = serializers.DecimalField(max_digits=5,  decimal_places=2)
     retention_amount        = serializers.DecimalField(max_digits=15, decimal_places=2)
     total_variation_amount  = serializers.DecimalField(max_digits=15, decimal_places=2)
-    adjusted_contract_value = serializers.DecimalField(max_digits=15, decimal_places=2)
+    adjusted_contract_value = serializers.DecimalField(
+        max_digits=15, decimal_places=2, allow_null=True,
+    )
     total_paid              = serializers.DecimalField(max_digits=15, decimal_places=2)
-    remaining_amount        = serializers.DecimalField(max_digits=15, decimal_places=2)
+    remaining_amount        = serializers.DecimalField(
+        max_digits=15, decimal_places=2, allow_null=True,
+    )
     retention_balance       = serializers.DecimalField(max_digits=15, decimal_places=2)
     adjusted_end_date       = serializers.DateField()
     completion_percentage   = serializers.DecimalField(max_digits=5,  decimal_places=2)
@@ -85,6 +91,7 @@ class FinancialSummarySerializer(serializers.Serializer):
     invoice_balance = serializers.DecimalField(
         max_digits=15,
         decimal_places=2,
+        allow_null=True,
         read_only=True,
     )
     payments_made_usd = serializers.DecimalField(max_digits=15, decimal_places=2)
@@ -368,11 +375,12 @@ class ContractPaymentSerializer(CalendarModelSerializer):
                 pk=getattr(self.instance, 'pk', None),
             ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
 
-            if existing + amount > contract.adjusted_contract_value:
+            adjusted_value = contract.adjusted_contract_value
+            if adjusted_value is not None and existing + amount > adjusted_value:
                 raise serializers.ValidationError({
                     'amount': (
                         f'Total payments ({existing + amount}) would exceed '
-                        f'adjusted contract value ({contract.adjusted_contract_value}).'
+                        f'adjusted contract value ({adjusted_value}).'
                     ),
                 })
         return data

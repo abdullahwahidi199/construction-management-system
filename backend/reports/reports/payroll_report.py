@@ -71,15 +71,21 @@ class PayrollReport(BaseReport):
         if self.filters.get("source_type") == "daily_worker":
             return Payroll.objects.none()
 
-        qs = Payroll.objects.select_related("employee")
+        qs = Payroll.objects.select_related("employee", "project")
 
         employee_id = self.filters.get("employee_id")
+        project_id = self.filters.get("project_id")
+        employment_type = self.filters.get("employment_type")
         currency = self.filters.get("currency")
         payment_method = self.filters.get("payment_method")
         start, end = self.get_date_range()
 
         if employee_id:
             qs = qs.filter(employee_id=employee_id)
+        if project_id:
+            qs = qs.filter(project_id=project_id)
+        if employment_type:
+            qs = qs.filter(allocation_type=employment_type)
         if currency:
             qs = qs.filter(currency=currency)
         if payment_method:
@@ -176,7 +182,13 @@ class PayrollReport(BaseReport):
             "source_type": "Employee",
             "employee": payroll.employee.full_name,
             "employee_id": payroll.employee.employee_id,
-            "project": "",
+            "employment_type": payroll.get_allocation_type_display(),
+            "project": payroll.project.name if payroll.project else "",
+            "project_id": payroll.project_id,
+            "payroll_classification": (
+                "Project Payroll" if payroll.allocation_type == Payroll.AllocationType.PROJECT
+                else "Office Payroll"
+            ),
             "department": payroll.employee.get_department_display(),
             "period_start": payroll.payroll_period_start,
             "period_end": payroll.payroll_period_end,
@@ -215,7 +227,10 @@ class PayrollReport(BaseReport):
             "source_type": "Daily Worker",
             "employee": payroll.worker.full_name,
             "employee_id": payroll.worker.worker_id,
+            "employment_type": "Project Worker",
             "project": payroll.project.name if payroll.project else "",
+            "project_id": payroll.project_id,
+            "payroll_classification": "Project Payroll",
             "department": payroll.worker.get_skill_type_display(),
             "period_start": payroll.period_start,
             "period_end": payroll.period_end,
@@ -250,7 +265,10 @@ class PayrollReport(BaseReport):
             "source_type": "Salary Advance",
             "employee": advance.employee.full_name,
             "employee_id": advance.employee.employee_id,
+            "employment_type": "Salary Advance",
             "project": "",
+            "project_id": None,
+            "payroll_classification": "Salary Advance",
             "department": advance.employee.get_department_display(),
             "period_start": advance.date,
             "period_end": advance.date,
@@ -294,9 +312,21 @@ class PayrollReport(BaseReport):
 
         by_currency = defaultdict(dict)
         by_source = defaultdict(dict)
+        by_project = defaultdict(lambda: {"project": "", "count": 0, "total_paid": ZERO, "total_net": ZERO})
+        office_payroll = {"count": 0, "total_paid": ZERO, "total_net": ZERO}
 
         for row in rows:
             self._add_summary(by_currency, by_source, row)
+            if row.get("payroll_classification") == "Project Payroll" and row.get("project"):
+                project_key = row.get("project_id") or row["project"]
+                by_project[project_key]["project"] = row["project"]
+                by_project[project_key]["count"] += 1
+                by_project[project_key]["total_paid"] += money(row.get("amount_paid"))
+                by_project[project_key]["total_net"] += money(row.get("net_pay"))
+            elif row.get("payroll_classification") == "Office Payroll":
+                office_payroll["count"] += 1
+                office_payroll["total_paid"] += money(row.get("amount_paid"))
+                office_payroll["total_net"] += money(row.get("net_pay"))
 
         total_gross = sum((money(row["gross"]) for row in rows), ZERO)
         total_net = sum((money(row["net"]) for row in rows), ZERO)
@@ -331,6 +361,8 @@ class PayrollReport(BaseReport):
                 "total_cash_outflow": total_cash_outflow,
                 "by_currency": list(by_currency.values()),
                 "by_source": list(by_source.values()),
+                "project_payroll": list(by_project.values()),
+                "office_payroll": office_payroll,
                 "calendar_summary": calendar_summary,
             },
             "rows": rows,

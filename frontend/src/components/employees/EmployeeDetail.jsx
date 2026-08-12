@@ -179,7 +179,18 @@ export default function EmployeeDetail({ employeeId, onClose }) {
                 },
                 {
                   label: t("EmployeeDetail.employmentType"),
-                  value: employee.employment_type,
+                  value:
+                    employee.employment_type_display ||
+                    (employee.employment_type === "PROJECT"
+                      ? "Project Employee"
+                      : "Office Employee"),
+                },
+                {
+                  label: "Project",
+                  value:
+                    employee.employment_type === "PROJECT"
+                      ? employee.project_name || t("EmployeeDetail.emptyValue")
+                      : "Office / Company",
                 },
                 {
                   label: t("EmployeeDetail.hireDate"),
@@ -252,6 +263,12 @@ export default function EmployeeDetail({ employeeId, onClose }) {
                       </p>
                       <p className="text-xs" style={{ color: "var(--muted)" }}>
                         {t("EmployeeDetail.status")}: {payroll.payment_status}
+                      </p>
+                      <p className="text-xs" style={{ color: "var(--muted)" }}>
+                        {payroll.employment_type_display ||
+                          payroll.allocation_type_display ||
+                          payroll.allocation_type}
+                        {payroll.project_name ? ` - ${payroll.project_name}` : ""}
                       </p>
                     </div>
                     <div className={isRTL ? "text-left" : "text-right"}>

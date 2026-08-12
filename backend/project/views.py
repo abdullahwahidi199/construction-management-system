@@ -41,7 +41,13 @@ def project_list_create(request):
 class ProjectDetailView(
     RetrieveUpdateDestroyAPIView
 ):
-    queryset = Project.objects.all()
+    queryset = Project.objects.prefetch_related(
+        "expenses",
+        "subcontractor_contracts__payments",
+        "subcontractor_contracts__variations",
+        "employee_payrolls__employee",
+        "assigned_employees",
+    )
     serializer_class = ProjectSerializer
     permission_classes = [RBACPermission]
     rbac_resource = "projects"
@@ -79,6 +85,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from project.models import Project
 from expenses.models import Expense
 from reports.branding import build_pdf_branding_elements, draw_pdf_branding_footer
+from reports.pdf_utils import fit_col_widths
 
 
 # Optional but strongly recommended for correct Dari/Pashto/Arabic shaping.
@@ -212,6 +219,8 @@ class ProjectPDFExportView(APIView):
                 leading=12,
                 alignment=TA_CENTER,
                 textColor=colors.HexColor("#4B5563"),
+                wordWrap="CJK",
+                splitLongWords=True,
             ),
             "section": ParagraphStyle(
                 "SectionHeading",
@@ -231,6 +240,8 @@ class ProjectPDFExportView(APIView):
                 leading=10,
                 alignment=TA_CENTER,
                 textColor=colors.white,
+                wordWrap="CJK",
+                splitLongWords=True,
             ),
             "label": ParagraphStyle(
                 "TableLabel",
@@ -240,6 +251,8 @@ class ProjectPDFExportView(APIView):
                 leading=10,
                 alignment=TA_LEFT,
                 textColor=colors.HexColor("#111827"),
+                wordWrap="CJK",
+                splitLongWords=True,
             ),
             "cell": ParagraphStyle(
                 "TableCell",
@@ -249,6 +262,8 @@ class ProjectPDFExportView(APIView):
                 leading=10,
                 alignment=TA_LEFT,
                 textColor=colors.HexColor("#111827"),
+                wordWrap="CJK",
+                splitLongWords=True,
             ),
             "cell_center": ParagraphStyle(
                 "TableCellCenter",
@@ -258,6 +273,8 @@ class ProjectPDFExportView(APIView):
                 leading=10,
                 alignment=TA_CENTER,
                 textColor=colors.HexColor("#111827"),
+                wordWrap="CJK",
+                splitLongWords=True,
             ),
             "cell_right": ParagraphStyle(
                 "TableCellRight",
@@ -267,6 +284,8 @@ class ProjectPDFExportView(APIView):
                 leading=10,
                 alignment=TA_RIGHT,
                 textColor=colors.HexColor("#111827"),
+                wordWrap="CJK",
+                splitLongWords=True,
             ),
             "footer": ParagraphStyle(
                 "Footer",
@@ -296,9 +315,13 @@ class ProjectPDFExportView(APIView):
 
         table = table_class(
             data,
-            colWidths=col_widths,
+            colWidths=fit_col_widths(
+                col_widths,
+                getattr(self, "_doc_width", sum(col_widths)),
+            ),
             repeatRows=repeat_rows,
             hAlign="LEFT",
+            splitByRow=True,
         )
 
         style_commands = [
@@ -394,6 +417,7 @@ class ProjectPDFExportView(APIView):
             topMargin=24,
             bottomMargin=24,
         )
+        self._doc_width = doc.width
 
         elements = []
 

@@ -86,12 +86,15 @@ function groupAdvancesByMonth(advances, calendar) {
 export default function PayrollPage() {
   // const { data: payrolls, loading, refetch } = useFetch("/payrolls/");
   const { data: employees } = useFetch("/employees/");
+  const { data: projects } = useFetch("/projects/");
   const { deleteData } = useDelete();
   const [showForm, setShowForm] = useState(false);
   const [selectedPayroll, setSelectedPayroll] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [employeeFilter, setEmployeeFilter] = useState("");
+  const [allocationFilter, setAllocationFilter] = useState("");
+  const [projectFilter, setProjectFilter] = useState("");
   const [startDateFilter, setStartDateFilter] = useState("");
   const [endDateFilter, setEndDateFilter] = useState("");
   const [showPrintModal, setShowPrintModal] = useState(false);
@@ -110,6 +113,8 @@ export default function PayrollPage() {
 
   // if (statusFilter) query.append("status", statusFilter);
   if (employeeFilter) query.append("employee_id", employeeFilter);
+  if (allocationFilter) query.append("employment_type", allocationFilter);
+  if (projectFilter) query.append("project_id", projectFilter);
   if (startDateFilter) query.append("start_date", startDateFilter);
   if (endDateFilter) query.append("end_date", endDateFilter);
 
@@ -271,6 +276,13 @@ export default function PayrollPage() {
         if (p.payment_status === "fully_paid" || p.payment_status === "paid") {
           acc[currency].paid += 1;
         }
+        if (p.allocation_type === "PROJECT") {
+          acc[currency].projectPayroll =
+            (acc[currency].projectPayroll || 0) + numeric(p.amount_paid);
+        } else {
+          acc[currency].officePayroll =
+            (acc[currency].officePayroll || 0) + numeric(p.amount_paid);
+        }
 
         return acc;
       }, {})
@@ -394,6 +406,38 @@ export default function PayrollPage() {
               </option>
             ))}
         </select>
+        <select
+          value={allocationFilter}
+          onChange={(e) => setAllocationFilter(e.target.value)}
+          className="px-4 py-2 rounded-lg border text-sm"
+          style={{
+            backgroundColor: "var(--card)",
+            color: "var(--text)",
+            borderColor: "var(--border)",
+          }}
+        >
+          <option value="">All Payroll Types</option>
+          <option value="PROJECT">Project Payroll</option>
+          <option value="OFFICE">Office Payroll</option>
+        </select>
+        <select
+          value={projectFilter}
+          onChange={(e) => setProjectFilter(e.target.value)}
+          className="px-4 py-2 rounded-lg border text-sm"
+          style={{
+            backgroundColor: "var(--card)",
+            color: "var(--text)",
+            borderColor: "var(--border)",
+          }}
+        >
+          <option value="">All Projects</option>
+          {Array.isArray(projects) &&
+            projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.name}
+              </option>
+            ))}
+        </select>
         <div className="min-w-0 lg:min-w-[160px]">
           <CalendarDatePicker
           value={startDateFilter}
@@ -426,6 +470,8 @@ export default function PayrollPage() {
           onClick={() => {
             setStatusFilter("");
             setEmployeeFilter("");
+            setAllocationFilter("");
+            setProjectFilter("");
             setStartDateFilter("");
             setEndDateFilter("");
           }}
@@ -527,6 +573,18 @@ export default function PayrollPage() {
                   </span>
                   <span style={{ color: "var(--success)" }}>{data.paid}</span>
                 </div>
+                <div className="flex justify-between text-sm">
+                  <span style={{ color: "var(--muted)" }}>Project Payroll</span>
+                  <span style={{ color: "var(--text)" }}>
+                    {currency} {(data.projectPayroll || 0).toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span style={{ color: "var(--muted)" }}>Office Payroll</span>
+                  <span style={{ color: "var(--text)" }}>
+                    {currency} {(data.officePayroll || 0).toLocaleString()}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
@@ -558,11 +616,12 @@ export default function PayrollPage() {
           style={{ borderColor: "var(--border)" }}
         >
           <div className="hidden overflow-x-auto md:block mobile-scrollbar">
-          <table className="w-full min-w-[920px]">
+          <table className="w-full min-w-[1040px]">
             <thead style={{ backgroundColor: "var(--hover)" }}>
               <tr>
                 {[
                   t("PayrollPage.table.employee"),
+                  "Allocation",
                   t("PayrollPage.table.period"),
                   t("PayrollPage.table.paymentDate"),
                   t("PayrollPage.table.grossPay"),
@@ -614,6 +673,18 @@ export default function PayrollPage() {
                       {t("PayrollPage.table.to")}{" "}
                       {formatDate(payroll.payroll_period_end) || "-"}
                     </p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="rounded-full bg-[var(--hover)] px-2.5 py-1 text-xs font-semibold">
+                      {payroll.allocation_type_display ||
+                        payroll.employment_type_display ||
+                        payroll.allocation_type}
+                    </span>
+                    {payroll.project_name && (
+                      <p className="mt-1 text-xs text-[var(--muted)]">
+                        {payroll.project_name}
+                      </p>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-sm" style={{ color: "var(--text)" }}>
@@ -727,6 +798,17 @@ export default function PayrollPage() {
                 </div>
 
                 <dl className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                      Allocation
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium text-[var(--text)]">
+                      {payroll.allocation_type_display ||
+                        payroll.employment_type_display ||
+                        payroll.allocation_type}
+                      {payroll.project_name ? ` - ${payroll.project_name}` : ""}
+                    </dd>
+                  </div>
                   <div>
                     <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
                       {t("PayrollPage.table.period")}

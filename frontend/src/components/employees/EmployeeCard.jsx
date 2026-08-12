@@ -75,6 +75,23 @@ export default function EmployeeCard({ employee, onEdit, onView, onDelete }) {
           </span>
           <span style={{ color: "var(--text)" }}>{employee.position}</span>
         </div>
+        <div className="flex justify-between gap-3 text-sm">
+          <span style={{ color: "var(--muted)" }}>Type</span>
+          <span className="text-right" style={{ color: "var(--text)" }}>
+            {employee.employment_type_display ||
+              (employee.employment_type === "PROJECT"
+                ? "Project Employee"
+                : "Office Employee")}
+          </span>
+        </div>
+        {employee.employment_type === "PROJECT" && (
+          <div className="flex justify-between gap-3 text-sm">
+            <span style={{ color: "var(--muted)" }}>Project</span>
+            <span className="text-right" style={{ color: "var(--text)" }}>
+              {employee.project_name || "-"}
+            </span>
+          </div>
+        )}
         <div className="flex justify-between text-sm">
           <span style={{ color: "var(--muted)" }}>
             {t("EmployeeCard.salary")}

@@ -59,6 +59,11 @@ class PayrollReportFilterSerializer(BaseReportFilterSerializer):
         required=False,
     )
     employee_id = serializers.IntegerField(required=False)
+    project_id = serializers.IntegerField(required=False)
+    employment_type = serializers.ChoiceField(
+        choices=["PROJECT", "OFFICE"],
+        required=False,
+    )
     currency = serializers.CharField(required=False)
     payment_method = serializers.CharField(required=False)
 

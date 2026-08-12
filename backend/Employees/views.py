@@ -53,6 +53,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         search = self.request.query_params.get('search', None)
         department = self.request.query_params.get('department', None)
         employment_type = self.request.query_params.get('employment_type', None)
+        project_id = self.request.query_params.get('project', None) or self.request.query_params.get('project_id', None)
         is_active = self.request.query_params.get('is_active', None)
         
         if search:
@@ -69,12 +70,15 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         
         if employment_type:
             queryset = queryset.filter(employment_type=employment_type)
+
+        if project_id:
+            queryset = queryset.filter(project_id=project_id)
         
         if is_active is not None:
             is_active_bool = is_active.lower() == 'true'
             queryset = queryset.filter(is_active=is_active_bool)
         
-        return queryset.select_related()
+        return queryset.select_related("project")
 
     @action(detail=True, methods=['get'])
     def payroll_history(self, request, pk=None):
@@ -251,7 +255,7 @@ class PayrollViewSet(viewsets.ModelViewSet):
     Provides standard CRUD operations plus additional actions for
     bulk creation, payment status updates, and reporting.
     """
-    queryset = Payroll.objects.select_related("employee").prefetch_related(
+    queryset = Payroll.objects.select_related("employee", "project").prefetch_related(
         "payments",
         "advance_deduction_records__advance",
     )
@@ -270,6 +274,8 @@ class PayrollViewSet(viewsets.ModelViewSet):
         
         # Filtering options
         employee_id = self.request.query_params.get('employee_id', None)
+        employment_type = self.request.query_params.get('employment_type', None) or self.request.query_params.get('allocation_type', None)
+        project_id = self.request.query_params.get('project', None) or self.request.query_params.get('project_id', None)
         # status = self.request.query_params.get('status', None)
         payment_method = self.request.query_params.get('payment_method', None)
         start_date = self.request.query_params.get('start_date', None)
@@ -278,6 +284,12 @@ class PayrollViewSet(viewsets.ModelViewSet):
         
         if employee_id:
             queryset = queryset.filter(employee_id=employee_id)
+
+        if employment_type:
+            queryset = queryset.filter(allocation_type=employment_type)
+
+        if project_id:
+            queryset = queryset.filter(project_id=project_id)
         
         # if status:
         #     queryset = queryset.filter(payment_status=status)
@@ -293,7 +305,7 @@ class PayrollViewSet(viewsets.ModelViewSet):
             end_date = parse_calendar_date(end_date, calendar_type)
             queryset = queryset.filter(payment_date__lte=end_date)
         
-        return queryset.select_related('employee').prefetch_related("payments", "advance_deduction_records__advance")
+        return queryset.select_related('employee', 'project').prefetch_related("payments", "advance_deduction_records__advance")
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -352,7 +364,7 @@ class PayrollViewSet(viewsets.ModelViewSet):
         
         for employee_id in data['employee_ids']:
             try:
-                employee = Employee.objects.get(id=employee_id, is_active=True)
+                employee = Employee.objects.select_related("project").get(id=employee_id, is_active=True)
                 
                 # Check for duplicate payroll period
                 if Payroll.objects.filter(
@@ -859,11 +871,13 @@ from reportlab.platypus import (
     PageBreak,
 )
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 from .models import Payroll, Employee
 from accounts.permissions import RBACPermission
 from reports.branding import build_pdf_branding_elements, draw_pdf_branding_footer
+from reports.pdf_utils import fit_col_widths, safe_paragraph
 
 
 class PayrollPDFExportView(APIView):
@@ -920,6 +934,7 @@ class PayrollPDFExportView(APIView):
 
         doc = SimpleDocTemplate(
             response,
+            pagesize=landscape(A4),
             leftMargin=20,
             rightMargin=20,
             topMargin=20,
@@ -927,6 +942,20 @@ class PayrollPDFExportView(APIView):
         )
 
         styles = getSampleStyleSheet()
+        table_cell = ParagraphStyle(
+            "PayrollExportCell",
+            parent=styles["BodyText"],
+            fontSize=7,
+            leading=9,
+            wordWrap="CJK",
+            splitLongWords=True,
+        )
+        table_header = ParagraphStyle(
+            "PayrollExportHeader",
+            parent=table_cell,
+            fontName="Helvetica-Bold",
+            alignment=1,
+        )
         elements = []
 
         company, branding = build_pdf_branding_elements(
@@ -939,13 +968,14 @@ class PayrollPDFExportView(APIView):
 
         filter_table = Table(
             [
-                ["Employee", employee_name],
-                ["Payment Method", payment_method or "All"],
-                ["Start Date", start_date or "Any"],
-                ["End Date", end_date or "Any"],
-                ["Total Records", str(queryset.count())],
+                [safe_paragraph("Employee", table_cell), safe_paragraph(employee_name, table_cell)],
+                [safe_paragraph("Payment Method", table_cell), safe_paragraph(payment_method or "All", table_cell)],
+                [safe_paragraph("Start Date", table_cell), safe_paragraph(start_date or "Any", table_cell)],
+                [safe_paragraph("End Date", table_cell), safe_paragraph(end_date or "Any", table_cell)],
+                [safe_paragraph("Total Records", table_cell), safe_paragraph(str(queryset.count()), table_cell)],
             ],
-            colWidths=[130, 320],
+            colWidths=fit_col_widths([130, 500], doc.width),
+            splitByRow=True,
         )
 
         filter_table.setStyle(
@@ -1151,42 +1181,44 @@ class PayrollPDFExportView(APIView):
 
         payroll_data = [
             [
-                "Employee",
-                "Employee ID",
-                "Period",
-                "Gross",
-                "Advances",
-                "Net",
-                "Paid",
-                "Balance",
-                "Currency",
-                "Method",
+                safe_paragraph("Employee", table_header),
+                safe_paragraph("Employee ID", table_header),
+                safe_paragraph("Period", table_header),
+                safe_paragraph("Gross", table_header),
+                safe_paragraph("Advances", table_header),
+                safe_paragraph("Net", table_header),
+                safe_paragraph("Paid", table_header),
+                safe_paragraph("Balance", table_header),
+                safe_paragraph("Currency", table_header),
+                safe_paragraph("Method", table_header),
             ]
         ]
 
         for payroll in queryset:
             payroll_data.append(
                 [
-                    payroll.employee.full_name,
-                    payroll.employee.employee_id,
-                    (
+                    safe_paragraph(payroll.employee.full_name, table_cell),
+                    safe_paragraph(payroll.employee.employee_id, table_cell),
+                    safe_paragraph(
                         f"{payroll.payroll_period_start}"
                         f"\n{payroll.payroll_period_end}"
+                        ,
+                        table_cell,
                     ),
-                    f"{float(payroll.gross_pay):,.2f}",
-                    f"{float(payroll.advance_deductions):,.2f}",
-                    f"{float(payroll.net_pay):,.2f}",
-                    f"{float(payroll.amount_paid):,.2f}",
-                    f"{float(payroll.balance_due):,.2f}",
-                    payroll.currency,
-                    payroll.get_payment_method_display(),
+                    safe_paragraph(f"{float(payroll.gross_pay):,.2f}", table_cell),
+                    safe_paragraph(f"{float(payroll.advance_deductions):,.2f}", table_cell),
+                    safe_paragraph(f"{float(payroll.net_pay):,.2f}", table_cell),
+                    safe_paragraph(f"{float(payroll.amount_paid):,.2f}", table_cell),
+                    safe_paragraph(f"{float(payroll.balance_due):,.2f}", table_cell),
+                    safe_paragraph(payroll.currency, table_cell),
+                    safe_paragraph(payroll.get_payment_method_display(), table_cell),
                 ]
             )
 
         details_table = Table(
             payroll_data,
             repeatRows=1,
-            colWidths=[
+            colWidths=fit_col_widths([
                 105,
                 60,
                 82,
@@ -1197,7 +1229,8 @@ class PayrollPDFExportView(APIView):
                 55,
                 40,
                 62,
-            ],
+            ], doc.width),
+            splitByRow=True,
         )
 
         details_table.setStyle(
@@ -1307,6 +1340,20 @@ class AttendancePDFExportView(APIView):
             bottomMargin=32,
         )
         styles = getSampleStyleSheet()
+        table_cell = ParagraphStyle(
+            "AttendanceExportCell",
+            parent=styles["BodyText"],
+            fontSize=8,
+            leading=10,
+            wordWrap="CJK",
+            splitLongWords=True,
+        )
+        table_header = ParagraphStyle(
+            "AttendanceExportHeader",
+            parent=table_cell,
+            fontName="Helvetica-Bold",
+            alignment=1,
+        )
 
         elements = []
 
@@ -1329,7 +1376,17 @@ class AttendancePDFExportView(APIView):
             ["Search", search or "All"],
         ]
 
-        filter_table = Table(filter_data, colWidths=[120, 250])
+        filter_table = Table(
+            [
+                [
+                    safe_paragraph(cell, table_header if row_index == 0 else table_cell)
+                    for cell in row
+                ]
+                for row_index, row in enumerate(filter_data)
+            ],
+            colWidths=fit_col_widths([120, 250], doc.width),
+            splitByRow=True,
+        )
         filter_table.setStyle(
             TableStyle(
                 [
@@ -1366,7 +1423,17 @@ class AttendancePDFExportView(APIView):
             ["Total Overtime Hours", summary["overtime"] or 0],
         ]
 
-        summary_table = Table(summary_data, colWidths=[200, 150])
+        summary_table = Table(
+            [
+                [
+                    safe_paragraph(cell, table_header if row_index == 0 else table_cell)
+                    for cell in row
+                ]
+                for row_index, row in enumerate(summary_data)
+            ],
+            colWidths=fit_col_widths([200, 150], doc.width),
+            splitByRow=True,
+        )
 
         summary_table.setStyle(
             TableStyle(
@@ -1387,32 +1454,33 @@ class AttendancePDFExportView(APIView):
         # Attendance Records
         data = [
             [
-                "Employee",
-                "Employee ID",
-                "Date",
-                "Status",
-                "Check In",
-                "Check Out",
-                "OT Hours",
+                safe_paragraph("Employee", table_header),
+                safe_paragraph("Employee ID", table_header),
+                safe_paragraph("Date", table_header),
+                safe_paragraph("Status", table_header),
+                safe_paragraph("Check In", table_header),
+                safe_paragraph("Check Out", table_header),
+                safe_paragraph("OT Hours", table_header),
             ]
         ]
 
         for record in queryset.order_by("-date"):
             data.append(
                 [
-                    record.employee.full_name,
-                    record.employee.employee_id,
-                    str(record.date),
-                    record.status,
-                    str(record.check_in or "-"),
-                    str(record.check_out or "-"),
-                    str(record.overtime_hours),
+                    safe_paragraph(record.employee.full_name, table_cell),
+                    safe_paragraph(record.employee.employee_id, table_cell),
+                    safe_paragraph(str(record.date), table_cell),
+                    safe_paragraph(record.status, table_cell),
+                    safe_paragraph(str(record.check_in or "-"), table_cell),
+                    safe_paragraph(str(record.check_out or "-"), table_cell),
+                    safe_paragraph(str(record.overtime_hours), table_cell),
                 ]
             )
 
         attendance_table = Table(
             data,
-            colWidths=[110, 70, 70, 60, 60, 60, 50],
+            colWidths=fit_col_widths([110, 70, 70, 60, 60, 60, 50], doc.width),
+            splitByRow=True,
         )
 
         attendance_table.setStyle(

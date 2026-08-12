@@ -10,11 +10,6 @@ import {
 } from "lucide-react";
 import { useLanguage } from "../../hooks/useLanguage";
 
-const formatter = new Intl.NumberFormat("en-US", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-
 function SummaryItem({
   icon: Icon,
   label,
@@ -22,6 +17,7 @@ function SummaryItem({
   currency,
   color = "var(--primary)",
 }) {
+  const hasValue = value !== null && value !== undefined && value !== "";
   const formatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currency,
@@ -39,7 +35,7 @@ function SummaryItem({
       <div className="min-w-0">
         <p className="text-xs text-[var(--muted)] truncate">{label}</p>
         <p className="text-lg font-bold text-[var(--text)] mt-0.5">
-          {formatter.format(value || 0)}
+          {hasValue ? formatter.format(value) : "-"}
         </p>
       </div>
     </Card>
@@ -50,6 +46,12 @@ export default function FinancialSummaryCard({ summary, currency }) {
   const { t } = useLanguage();
 
   if (!summary) return null;
+
+  const hasContractValue =
+    summary.original_contract_value !== null &&
+    summary.original_contract_value !== undefined &&
+    summary.original_contract_value !== "";
+  const variationAmount = Number(summary.total_variation_amount || 0);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -66,7 +68,7 @@ export default function FinancialSummaryCard({ summary, currency }) {
         value={summary.total_variation_amount}
         currency={currency}
         color={
-          summary.total_variation_amount >= 0
+          variationAmount >= 0
             ? "var(--success)"
             : "var(--danger)"
         }
@@ -85,13 +87,15 @@ export default function FinancialSummaryCard({ summary, currency }) {
         currency={currency}
         color="var(--success)"
       />
-      <SummaryItem
-        icon={TrendingDown}
-        label={t("FinancialSummaryCard.remainingAmount")}
-        value={summary.remaining_amount}
-        color="var(--danger)"
-        currency={currency}
-      />
+      {hasContractValue && (
+        <SummaryItem
+          icon={TrendingDown}
+          label={t("FinancialSummaryCard.remainingAmount")}
+          value={summary.remaining_amount}
+          color="var(--danger)"
+          currency={currency}
+        />
+      )}
       <SummaryItem
         icon={Shield}
         label={t("FinancialSummaryCard.retentionBalance")}

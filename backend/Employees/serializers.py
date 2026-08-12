@@ -16,6 +16,8 @@ def decimal_value(value, default="0.00"):
 class EmployeeSerializer(CalendarModelSerializer):
     calendar_module = "employees"
     full_name = serializers.ReadOnlyField()
+    employment_type_display = serializers.CharField(source="get_employment_type_display", read_only=True)
+    project_name = serializers.CharField(source="project.name", read_only=True)
     total_payrolls = serializers.SerializerMethodField()
     latest_payroll = serializers.SerializerMethodField()
 
@@ -24,7 +26,8 @@ class EmployeeSerializer(CalendarModelSerializer):
         fields = [
             'id', 'employee_id', 'first_name', 'last_name', 'full_name',
             'email', 'phone', 'address', 'department', 'position',
-            'employment_type', 'hire_date', 'termination_date',
+            'employment_type', 'employment_type_display', 'project', 'project_name',
+            'job_type', 'hire_date', 'termination_date',
             'salary', 'hourly_rate', 'emergency_contact_name',
             'emergency_contact_phone', 'is_active', 'notes',
             'total_payrolls', 'latest_payroll',
@@ -56,17 +59,34 @@ class EmployeeSerializer(CalendarModelSerializer):
             raise serializers.ValidationError("An employee with this ID already exists.")
         return value
 
+    def validate(self, data):
+        data = super().validate(data)
+        employment_type = data.get("employment_type", getattr(self.instance, "employment_type", Employee.EmploymentType.OFFICE))
+        project = data.get("project", getattr(self.instance, "project", None))
+
+        if employment_type == Employee.EmploymentType.PROJECT and not project:
+            raise serializers.ValidationError({"project": "Project employees must be assigned to a project."})
+        if employment_type == Employee.EmploymentType.OFFICE:
+            incoming_project = getattr(self, "initial_data", {}).get("project")
+            if incoming_project not in [None, "", "null"]:
+                raise serializers.ValidationError({"project": "Office employees cannot be assigned to a project."})
+            data["project"] = None
+        return data
+
 
 class EmployeeListSerializer(CalendarModelSerializer):
     calendar_module = "employees"
     """Simplified serializer for list views"""
     full_name = serializers.ReadOnlyField()
+    employment_type_display = serializers.CharField(source="get_employment_type_display", read_only=True)
+    project_name = serializers.CharField(source="project.name", read_only=True)
 
     class Meta:
         model = Employee
         fields = [
             'id', 'employee_id', 'first_name', 'last_name', 'full_name',
-            'department', 'position', 'employment_type', 'is_active',
+            'department', 'position', 'employment_type', 'employment_type_display',
+            'project', 'project_name', 'job_type', 'is_active',
             'salary', 'hire_date',
         ]
         read_only_fields = ["employee_id"]
@@ -224,6 +244,12 @@ class PayrollSerializer(CalendarModelSerializer):
     calendar_module = "payroll"
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_id = serializers.CharField(source='employee.employee_id', read_only=True)
+    allocation_type = serializers.CharField(read_only=True)
+    allocation_type_display = serializers.CharField(source="get_allocation_type_display", read_only=True)
+    employment_type = serializers.CharField(source="allocation_type", read_only=True)
+    employment_type_display = serializers.CharField(source="get_allocation_type_display", read_only=True)
+    project = serializers.PrimaryKeyRelatedField(read_only=True)
+    project_name = serializers.CharField(source="project.name", read_only=True)
     payments = PayrollPaymentSerializer(many=True, read_only=True)
     applied_advances = PayrollAdvanceDeductionSerializer(
         source="advance_deduction_records",
@@ -266,6 +292,8 @@ class PayrollSerializer(CalendarModelSerializer):
         model = Payroll
         fields = [
             'id', 'employee', 'employee_name', 'employee_id',
+            'allocation_type', 'allocation_type_display',
+            'employment_type', 'employment_type_display', 'project', 'project_name',
             'payroll_period_start', 'payroll_period_end',
             'basic_salary', 'overtime_hours', 'overtime_rate',
             'overtime_amount', 'bonus', 'allowances',
@@ -482,6 +510,9 @@ class PayrollSerializer(CalendarModelSerializer):
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
 
+            if "employee" in validated_data:
+                instance.snapshot_employee_allocation()
+
             instance.calculate_totals()
 
             if mode != "keep":
@@ -517,11 +548,19 @@ class PayrollListSerializer(CalendarModelSerializer):
     """Simplified serializer for list views"""
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_id = serializers.CharField(source='employee.employee_id', read_only=True)
+    allocation_type = serializers.CharField(read_only=True)
+    allocation_type_display = serializers.CharField(source="get_allocation_type_display", read_only=True)
+    employment_type = serializers.CharField(source="allocation_type", read_only=True)
+    employment_type_display = serializers.CharField(source="get_allocation_type_display", read_only=True)
+    project = serializers.PrimaryKeyRelatedField(read_only=True)
+    project_name = serializers.CharField(source="project.name", read_only=True)
 
     class Meta:
         model = Payroll
         fields = [
             'id', 'employee', 'employee_name', 'employee_id',
+            'allocation_type', 'allocation_type_display',
+            'employment_type', 'employment_type_display', 'project', 'project_name',
             'payroll_period_start', 'payroll_period_end','currency',
             'gross_pay', 'net_pay', 'advance_deductions',
             'amount_paid', 'balance_due', 'payment_status', 'payment_date'

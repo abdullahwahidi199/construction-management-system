@@ -560,6 +560,8 @@ class ExpensePDFExportView(APIView):
             fontName="NotoArabic",
             fontSize=7,
             leading=10,
+            wordWrap="CJK",
+            splitLongWords=True,
         )
 
         header_style = ParagraphStyle(
@@ -569,6 +571,8 @@ class ExpensePDFExportView(APIView):
             fontSize=7,
             leading=10,
             alignment=1,
+            wordWrap="CJK",
+            splitLongWords=True,
         )
 
         title_style = ParagraphStyle(
@@ -672,8 +676,15 @@ class ExpensePDFExportView(APIView):
         ]
 
         filter_table = Table(
-            filter_data,
+            [
+                [
+                    Paragraph(rtl(str(cell)), normal_style)
+                    for cell in row
+                ]
+                for row in filter_data
+            ],
             colWidths=[120, 350],
+            splitByRow=True,
         )
 
         filter_table.setStyle(

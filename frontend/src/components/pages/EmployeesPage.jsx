@@ -20,6 +20,7 @@ export default function EmployeesPage() {
   const isRTL = RTL_LANGS.includes(lang);
 
   const { data: employees, loading, refetch } = useFetch("/employees/");
+  const { data: projects } = useFetch("/projects/");
   const { deleteData } = useDelete();
   const [showForm, setShowForm] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
@@ -28,6 +29,8 @@ export default function EmployeesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [deptFilter, setDeptFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [allocationFilter, setAllocationFilter] = useState("");
+  const [projectFilter, setProjectFilter] = useState("");
 
   const handleEdit = (employee) => {
     setSelectedEmployee(employee);
@@ -71,8 +74,18 @@ export default function EmployeesPage() {
         const matchesStatus =
           !statusFilter ||
           (statusFilter === "active" ? emp.is_active : !emp.is_active);
+        const matchesAllocation =
+          !allocationFilter || emp.employment_type === allocationFilter;
+        const matchesProject =
+          !projectFilter || String(emp.project || "") === String(projectFilter);
 
-        return matchesSearch && matchesDept && matchesStatus;
+        return (
+          matchesSearch &&
+          matchesDept &&
+          matchesStatus &&
+          matchesAllocation &&
+          matchesProject
+        );
       })
     : [];
 
@@ -83,12 +96,14 @@ export default function EmployeesPage() {
         .filter(Boolean),
     ),
   ];
-  const hasActiveFilters = Boolean(searchQuery || deptFilter || statusFilter);
+  const hasActiveFilters = Boolean(searchQuery || deptFilter || statusFilter || allocationFilter || projectFilter);
 
   const clearFilters = () => {
     setSearchQuery("");
     setDeptFilter("");
     setStatusFilter("");
+    setAllocationFilter("");
+    setProjectFilter("");
   };
 
   return (
@@ -129,7 +144,7 @@ export default function EmployeesPage() {
             </button>
           )}
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(14rem,1fr)_minmax(11rem,auto)_minmax(10rem,auto)_auto] sm:items-center">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(14rem,1fr)_repeat(4,minmax(10rem,auto))_auto] lg:items-center">
           <div className="relative min-w-0">
             <Search
               className={`absolute top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)] ${
@@ -166,6 +181,28 @@ export default function EmployeesPage() {
             <option value="">{t("EmployeesPage.allStatus")}</option>
             <option value="active">{t("EmployeesPage.active")}</option>
             <option value="inactive">{t("EmployeesPage.inactive")}</option>
+          </select>
+          <select
+            value={allocationFilter}
+            onChange={(e) => setAllocationFilter(e.target.value)}
+            className="min-h-12 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-base text-[var(--text)] outline-none focus:border-[var(--primary)] sm:min-h-10 sm:py-2 sm:text-sm"
+          >
+            <option value="">All Employee Types</option>
+            <option value="PROJECT">Project Employees</option>
+            <option value="OFFICE">Office Employees</option>
+          </select>
+          <select
+            value={projectFilter}
+            onChange={(e) => setProjectFilter(e.target.value)}
+            className="min-h-12 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-base text-[var(--text)] outline-none focus:border-[var(--primary)] sm:min-h-10 sm:py-2 sm:text-sm"
+          >
+            <option value="">All Projects</option>
+            {Array.isArray(projects) &&
+              projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
           </select>
           {hasActiveFilters && (
             <button

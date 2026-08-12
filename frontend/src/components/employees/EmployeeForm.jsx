@@ -20,7 +20,9 @@ const initialFormData = {
   address: "",
   department: "construction",
   position: "",
-  employment_type: "full_time",
+  employment_type: "OFFICE",
+  project: "",
+  job_type: "full_time",
   hire_date: "",
   salary: "",
   hourly_rate: "",
@@ -41,6 +43,7 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
   const [fetchloading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [localError, setLocalError] = useState("");
+  const [projects, setProjects] = useState([]);
 
   const fetchEmployeeDetails = async () => {
     setLoading(true);
@@ -68,12 +71,25 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
   }, [employee?.id, effectiveEmployeeId]);
 
   useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await instance.get("/projects/");
+        setProjects(Array.isArray(response.data) ? response.data : []);
+      } catch {
+        setProjects([]);
+      }
+    };
+    fetchProjects();
+  }, []);
+
+  useEffect(() => {
     if (currentEmployee && currentEmployee.id) {
       setFormData({
         ...initialFormData,
         ...currentEmployee,
         salary: currentEmployee.salary ?? "",
         hourly_rate: currentEmployee.hourly_rate ?? "",
+        project: currentEmployee.project ?? "",
         hire_date: currentEmployee.hire_date ? currentEmployee.hire_date.split("T")[0] : "",
       });
     }
@@ -84,6 +100,7 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
+      ...(name === "employment_type" && value === "OFFICE" ? { project: "" } : {}),
     }));
   };
 
@@ -101,6 +118,7 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
       hourly_rate: formData.hourly_rate
         ? parseFloat(formData.hourly_rate)
         : null,
+      project: formData.employment_type === "PROJECT" ? formData.project || null : null,
     };
 
     try {
@@ -314,21 +332,38 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
               color: "var(--text)",
               borderColor: "var(--border)",
             }}
+            required
           >
-            <option value="full_time">
-              {t("EmployeeForm.employmentTypes.fullTime")}
-            </option>
-            <option value="part_time">
-              {t("EmployeeForm.employmentTypes.partTime")}
-            </option>
-            <option value="contract">
-              {t("EmployeeForm.employmentTypes.contract")}
-            </option>
-            <option value="temporary">
-              {t("EmployeeForm.employmentTypes.temporary")}
-            </option>
+            <option value="PROJECT">Project Employee</option>
+            <option value="OFFICE">Office Employee</option>
           </select>
         </div>
+        {formData.employment_type === "PROJECT" && (
+          <div>
+            <label className={labelClass} style={{ color: "var(--text)" }}>
+              Project <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="project"
+              value={formData.project || ""}
+              onChange={handleChange}
+              className={inputClass}
+              style={{
+                backgroundColor: "var(--bg)",
+                color: "var(--text)",
+                borderColor: "var(--border)",
+              }}
+              required
+            >
+              <option value="">Select Project</option>
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Hire Date / Salary / Hourly Rate */}

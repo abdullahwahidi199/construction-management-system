@@ -10,6 +10,11 @@ const formatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 });
 
+function formatContractValue(value, currency) {
+  if (value === null || value === undefined || value === "") return "-";
+  return `${formatter.format(value)}${currency}`;
+}
+
 export default function ContractTable({
   contracts = [],
   onView,
@@ -90,8 +95,10 @@ export default function ContractTable({
                   {contract.project_name}
                 </td>
                 <td className="px-4 py-3 text-end text-[var(--text)] font-medium">
-                  {formatter.format(contract.adjusted_contract_value)}
-                  {contract.currency}
+                  {formatContractValue(
+                    contract.adjusted_contract_value,
+                    contract.currency,
+                  )}
                 </td>
                 <td className="px-4 py-3 text-start">
                   <ContractStatusBadge status={contract.status} />
@@ -142,8 +149,7 @@ export default function ContractTable({
             </p>
             <div className="flex items-center justify-between">
               <span className="text-[var(--text)] font-semibold">
-                {formatter.format(contract.contract_value)}
-                {contract.currency}
+                {formatContractValue(contract.contract_value, contract.currency)}
               </span>
               <span className="text-sm text-[var(--muted)]">
                 {contract.completion_percentage}%

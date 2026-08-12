@@ -132,4 +132,37 @@ describe("ContractFormModal", () => {
       }),
     );
   });
+
+  it("submits a null contract value when the value is left blank", async () => {
+    render(
+      <ContractFormModal
+        isOpen
+        onClose={vi.fn()}
+        onSubmit={onSubmit}
+        loading={false}
+      />,
+    );
+
+    fireEvent.change(screen.getByRole("combobox", { name: /Project/ }), {
+      target: { value: "1" },
+    });
+    fireEvent.change(screen.getByRole("combobox", { name: /Subcontractor/ }), {
+      target: { value: "7" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Short title"), {
+      target: { value: "Foundation package" },
+    });
+    fireEvent.change(screen.getByLabelText("start_date"), {
+      target: { value: "2026-07-01" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Create" }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contract_value: null,
+      }),
+    );
+  });
 });

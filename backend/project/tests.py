@@ -3,7 +3,8 @@ from decimal import Decimal
 
 from rest_framework.test import APITestCase
 
-from common.test_helpers import create_admin, create_project, create_user
+from common.test_helpers import create_admin, create_employee, create_payroll, create_project, create_user
+from Employees.models import Employee, PayrollPayment
 from project.models import Project
 
 
@@ -103,3 +104,65 @@ class ProjectAPITests(APITestCase):
         self.assertEqual(response.data["budget_currency"], "USD")
         self.assertIn("total_expenses_usd", response.data)
         self.assertIn("total_contract_value", response.data)
+
+    def test_project_detail_includes_only_allocated_employee_payroll(self):
+        project = create_project(name="Payroll Project", estimated_budget=Decimal("100000.00"), budget_currency="AFN")
+        other_project = create_project(name="Other Payroll Project")
+        project_employee = create_employee(
+            email="project.payroll@example.com",
+            employment_type=Employee.EmploymentType.PROJECT,
+            project=project,
+            salary=Decimal("40000.00"),
+        )
+        other_employee = create_employee(
+            email="other.payroll@example.com",
+            employment_type=Employee.EmploymentType.PROJECT,
+            project=other_project,
+            salary=Decimal("30000.00"),
+        )
+        office_employee = create_employee(
+            email="office.payroll@example.com",
+            employment_type=Employee.EmploymentType.OFFICE,
+            project=None,
+            salary=Decimal("50000.00"),
+        )
+
+        project_payroll = create_payroll(
+            employee=project_employee,
+            payroll_period_start=date(2026, 7, 1),
+            payroll_period_end=date(2026, 7, 31),
+            basic_salary=Decimal("40000.00"),
+            currency="AFN",
+        )
+        PayrollPayment.objects.create(
+            payroll=project_payroll,
+            amount=Decimal("40000.00"),
+            payment_date=date(2026, 7, 31),
+            payment_method="cash",
+        )
+        project_payroll.refresh_payment_totals(save=True)
+        create_payroll(
+            employee=other_employee,
+            payroll_period_start=date(2026, 7, 1),
+            payroll_period_end=date(2026, 7, 31),
+            basic_salary=Decimal("30000.00"),
+            currency="AFN",
+        )
+        create_payroll(
+            employee=office_employee,
+            payroll_period_start=date(2026, 7, 1),
+            payroll_period_end=date(2026, 7, 31),
+            basic_salary=Decimal("50000.00"),
+            currency="AFN",
+        )
+
+        response = self.client.get(f"/api/projects/{project.id}/")
+
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data["assigned_employee_count"], 1)
+        self.assertEqual(
+            Decimal(response.data["employee_payroll_summary"]["AFN"]["paid"]),
+            Decimal("40000.00"),
+        )
+        self.assertEqual(len(response.data["payroll_records"]), 1)
+        self.assertEqual(response.data["payroll_records"][0]["employee"], project_employee.full_name)

@@ -144,6 +144,7 @@ class Contract(models.Model):
 )
     contract_value        = models.DecimalField(
         max_digits=15, decimal_places=2,
+        null=True, blank=True,
         validators=[MinValueValidator(Decimal('0.01'))],
     )
     retention_percentage  = models.DecimalField(
@@ -229,11 +230,14 @@ class Contract(models.Model):
 
                 self.contract_number = f"CNT-{next_number:06d}"
 
-        self.retention_amount = (
-            self.contract_value *
-            self.retention_percentage /
-            Decimal("100")
-        )
+        if self.contract_value is None:
+            self.retention_amount = Decimal("0.00")
+        else:
+            self.retention_amount = (
+                self.contract_value *
+                self.retention_percentage /
+                Decimal("100")
+            )
 
         if (
             self.completion_percentage == Decimal("100")
@@ -277,6 +281,8 @@ class Contract(models.Model):
     @property
     def adjusted_contract_value(self):
         """Original value + approved variation amounts."""
+        if self.contract_value is None:
+            return None
         return self.contract_value + self.total_variation_amount
 
     @property
@@ -308,7 +314,10 @@ class Contract(models.Model):
     @property
     def remaining_amount(self):
         """Adjusted value minus total paid."""
-        return self.adjusted_contract_value - self.total_paid
+        adjusted_value = self.adjusted_contract_value
+        if adjusted_value is None:
+            return None
+        return adjusted_value - self.total_paid
 
     @property
     def retention_balance(self):

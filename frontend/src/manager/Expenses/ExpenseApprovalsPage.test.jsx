@@ -195,8 +195,8 @@ describe("ExpenseApprovalsPage", () => {
         search: "concrete",
         project: "4",
         creator: "3",
-        expense_date__gte: "2647-03-21",
-        expense_date__lte: "2647-04-20",
+        expense_date__gte: "2026-01-01",
+        expense_date__lte: "2026-01-31",
       },
     });
 

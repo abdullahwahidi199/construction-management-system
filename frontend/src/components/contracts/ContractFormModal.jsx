@@ -141,7 +141,7 @@ export default function ContractFormModal({
       newErrors.title = t("ContractFormModal.validation.titleRequired");
     if (!values.currency)
       newErrors.currency = t("ContractFormModal.validation.currencyRequired");
-    if (!values.contract_value || Number(values.contract_value) <= 0)
+    if (values.contract_value !== "" && Number(values.contract_value) <= 0)
       newErrors.contract_value = t(
         "ContractFormModal.validation.contractValuePositive",
       );
@@ -173,9 +173,10 @@ export default function ContractFormModal({
     }
 
     const values = normalizedForm();
+    const hasContractValue = values.contract_value !== "";
     const payload = {
       ...values,
-      contract_value: Number(values.contract_value),
+      contract_value: hasContractValue ? Number(values.contract_value) : null,
       retention_percentage: Number(values.retention_percentage),
       completion_percentage: Number(values.completion_percentage),
     };
@@ -299,7 +300,6 @@ export default function ContractFormModal({
                   min="0"
                   step="0.01"
                   error={errors.contract_value}
-                  required
                 />
                 <Input
                   label={t("ContractFormModal.fields.retentionPercentage")}

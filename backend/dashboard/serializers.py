@@ -110,6 +110,14 @@ class CurrencySummarySerializer(serializers.Serializer):
     total_overtime_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
     employee_net_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
     employee_net_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    project_payroll_net_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    project_payroll_net_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    project_payroll_paid_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    project_payroll_paid_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    office_payroll_net_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    office_payroll_net_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    office_payroll_paid_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
+    office_payroll_paid_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
     daily_worker_net_usd = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
     daily_worker_net_afn = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
 
@@ -135,6 +143,8 @@ class RecentPayrollSerializer(serializers.Serializer):
 
     currency = serializers.CharField()
     payment_date = serializers.DateField(allow_null=True)
+    allocation_type = serializers.CharField(required=False, allow_null=True)
+    project_name = serializers.CharField(required=False, allow_null=True)
 
 class PayrollSummarySerializer(serializers.Serializer):
     current_month = CurrencySummarySerializer()

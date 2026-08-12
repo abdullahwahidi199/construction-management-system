@@ -71,13 +71,20 @@ class FinancialOverviewReport(BaseReport):
         return qs
 
     def _employee_payroll_queryset(self):
-        qs = Payroll.objects.select_related("employee")
+        qs = Payroll.objects.select_related("employee", "project")
         start, end = self.get_date_range()
+        project_id = self.filters.get("project_id")
+        expense_scope = self.filters.get("expense_scope")
 
-        # Employee payroll is not assigned to projects in the current model.
-        # When a project filter is active, keep the overview project-scoped.
-        if self.filters.get("project_id"):
-            return Payroll.objects.none()
+        if project_id:
+            qs = qs.filter(
+                allocation_type=Payroll.AllocationType.PROJECT,
+                project_id=project_id,
+            )
+        elif expense_scope == "project":
+            qs = qs.filter(allocation_type=Payroll.AllocationType.PROJECT)
+        elif expense_scope == "office":
+            qs = qs.filter(allocation_type=Payroll.AllocationType.OFFICE)
 
         if start:
             qs = qs.filter(payroll_period_start__gte=start)
@@ -269,7 +276,7 @@ class FinancialOverviewReport(BaseReport):
 
         return [months[key] for key in sorted(months.keys())]
 
-    def _project_rows(self, projects, expenses, worker_payrolls, contracts):
+    def _project_rows(self, projects, expenses, employee_payrolls, worker_payrolls, contracts):
         by_project = {
             project.id: {
                 "id": project.id,
@@ -278,6 +285,8 @@ class FinancialOverviewReport(BaseReport):
                 "budget": money(project.estimated_budget),
                 "expenses_usd": ZERO,
                 "expenses_afn": ZERO,
+                "employee_payroll_usd": ZERO,
+                "employee_payroll_afn": ZERO,
                 "worker_payroll_usd": ZERO,
                 "worker_payroll_afn": ZERO,
                 "contract_value_usd": ZERO,
@@ -308,6 +317,15 @@ class FinancialOverviewReport(BaseReport):
             else:
                 row["worker_payroll_afn"] += money(payroll.net_amount)
 
+        for payroll in employee_payrolls:
+            row = by_project.get(payroll.project_id)
+            if not row:
+                continue
+            if payroll.currency == "USD":
+                row["employee_payroll_usd"] += money(payroll.amount_paid)
+            else:
+                row["employee_payroll_afn"] += money(payroll.amount_paid)
+
         for contract in contracts:
             row = by_project.get(contract.project_id)
             if not row:
@@ -322,11 +340,13 @@ class FinancialOverviewReport(BaseReport):
         for row in by_project.values():
             row["total_cost_usd"] = (
                 row["expenses_usd"]
+                + row["employee_payroll_usd"]
                 + row["worker_payroll_usd"]
                 + row["contract_paid_usd"]
             )
             row["total_cost_afn"] = (
                 row["expenses_afn"]
+                + row["employee_payroll_afn"]
                 + row["worker_payroll_afn"]
                 + row["contract_paid_afn"]
             )
@@ -370,6 +390,24 @@ class FinancialOverviewReport(BaseReport):
             gross_field="gross_amount",
             net_field="net_amount",
         )
+        project_employee_payroll = self._payroll_totals(
+            [
+                payroll
+                for payroll in employee_payrolls
+                if payroll.allocation_type == Payroll.AllocationType.PROJECT
+            ],
+            gross_field="gross_pay",
+            net_field="net_pay",
+        )
+        office_employee_payroll = self._payroll_totals(
+            [
+                payroll
+                for payroll in employee_payrolls
+                if payroll.allocation_type == Payroll.AllocationType.OFFICE
+            ],
+            gross_field="gross_pay",
+            net_field="net_pay",
+        )
         employee_advances = salary_advance_totals(
             self._salary_advance_queryset()
         )
@@ -391,6 +429,8 @@ class FinancialOverviewReport(BaseReport):
                 "budget": budget_totals[currency],
                 "expenses": expenses_value,
                 "employee_payroll": employee_net,
+                "project_employee_payroll": project_employee_payroll["net"][currency],
+                "office_employee_payroll": office_employee_payroll["net"][currency],
                 "employee_advances": employee_advance_paid,
                 "employee_payroll_cash_outflow": employee_cash_outflow,
                 "worker_payroll": worker_net,
@@ -447,6 +487,8 @@ class FinancialOverviewReport(BaseReport):
             "office_expenses_usd": office_expenses["total_usd"],
             "office_expenses_afn": office_expenses["total_afn"],
             "employee_payroll_records": employee_payroll["count"],
+            "project_employee_payroll_records": project_employee_payroll["count"],
+            "office_employee_payroll_records": office_employee_payroll["count"],
             "daily_worker_payroll_records": worker_payroll["count"],
             "payroll_net_usd": employee_payroll["net"]["USD"] + worker_payroll["net"]["USD"],
             "payroll_net_afn": employee_payroll["net"]["AFN"] + worker_payroll["net"]["AFN"],
@@ -484,6 +526,8 @@ class FinancialOverviewReport(BaseReport):
             "payroll": {
                 "count": employee_payroll["count"] + worker_payroll["count"],
                 "employee": employee_payroll,
+                "project_employee": project_employee_payroll,
+                "office_employee": office_employee_payroll,
                 "daily_worker": worker_payroll,
                 "net_usd": summary["payroll_net_usd"],
                 "net_afn": summary["payroll_net_afn"],
@@ -504,5 +548,5 @@ class FinancialOverviewReport(BaseReport):
                 worker_payrolls,
                 contracts,
             ),
-            "rows": self._project_rows(projects, expenses, worker_payrolls, contracts),
+            "rows": self._project_rows(projects, expenses, employee_payrolls, worker_payrolls, contracts),
         }

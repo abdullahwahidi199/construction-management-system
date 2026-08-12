@@ -81,6 +81,14 @@ export default function PayrollSummary({ data }) {
                 <div className="text-right">{renderDual(current.employee_net_usd, current.employee_net_afn)}</div>
               </div>
               <div className="flex justify-between gap-3">
+                <span>Project Payroll</span>
+                <div className="text-right">{renderDual(current.project_payroll_paid_usd, current.project_payroll_paid_afn)}</div>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>Office Payroll</span>
+                <div className="text-right">{renderDual(current.office_payroll_paid_usd, current.office_payroll_paid_afn)}</div>
+              </div>
+              <div className="flex justify-between gap-3">
                 <span>Advances paid</span>
                 <div className="text-right">{renderDual(current.total_advances_paid_usd, current.total_advances_paid_afn)}</div>
               </div>
@@ -231,6 +239,10 @@ export default function PayrollSummary({ data }) {
                     </p>
                     <p className="text-xs text-[var(--muted)]">
                       {pr.employee__employee_id} · {pr.currency}
+                    </p>
+                    <p className="text-xs text-[var(--muted)]">
+                      {pr.allocation_type || "Payroll"}
+                      {pr.project_name ? ` · ${pr.project_name}` : ""}
                     </p>
                   </div>
 

@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.db.models import Count, Prefetch
 
 from expenses.models import Expense
+from Employees.models import Payroll
 from project.models import Project
 from .base import BaseReport
 
@@ -43,6 +44,7 @@ class ProjectSummaryReport(BaseReport):
             "subcontractor_contracts__payments",
             "subcontractor_contracts__variations",
             "worker_payrolls",
+            "employee_payrolls",
         )
 
         status = self.filters.get("status")
@@ -114,6 +116,27 @@ class ProjectSummaryReport(BaseReport):
 
         return totals
 
+    def _employee_payroll_totals(self, payrolls):
+        totals = {
+            "count": 0,
+            "gross": currency_totals(),
+            "net": currency_totals(),
+            "paid": currency_totals(),
+            "balance": currency_totals(),
+        }
+
+        for payroll in payrolls:
+            if payroll.allocation_type != Payroll.AllocationType.PROJECT:
+                continue
+            currency = (payroll.currency or "AFN").upper()
+            totals["count"] += 1
+            add_currency_total(totals["gross"], currency, payroll.gross_pay)
+            add_currency_total(totals["net"], currency, payroll.net_pay)
+            add_currency_total(totals["paid"], currency, payroll.amount_paid)
+            add_currency_total(totals["balance"], currency, payroll.balance_due)
+
+        return totals
+
     def _budget_remaining(self, budget, budget_currency, total_spent_usd, total_spent_afn):
         budget_currency = (budget_currency or "AFN").upper()
         if budget_currency == "USD":
@@ -145,15 +168,18 @@ class ProjectSummaryReport(BaseReport):
             expenses = self._expense_totals(getattr(project, "approved_expenses", []))
             contracts = self._contract_totals(project.subcontractor_contracts.all())
             worker_payroll = self._worker_payroll_totals(project.worker_payrolls.all())
+            employee_payroll = self._employee_payroll_totals(project.employee_payrolls.all())
 
             total_spent_usd = (
                 expenses["equivalent_usd"]
                 + contracts["paid"]["USD"]
+                + employee_payroll["paid"]["USD"]
                 + worker_payroll["net"]["USD"]
             )
             total_spent_afn = (
                 expenses["equivalent_afn"]
                 + contracts["paid"]["AFN"]
+                + employee_payroll["paid"]["AFN"]
                 + worker_payroll["net"]["AFN"]
             )
             remaining_usd, remaining_afn = self._budget_remaining(
@@ -173,6 +199,10 @@ class ProjectSummaryReport(BaseReport):
             summary["total_expenses_afn"] += expenses["equivalent_afn"]
             summary["total_contract_payments_usd"] += contracts["paid"]["USD"]
             summary["total_contract_payments_afn"] += contracts["paid"]["AFN"]
+            summary.setdefault("total_employee_payroll_usd", ZERO)
+            summary.setdefault("total_employee_payroll_afn", ZERO)
+            summary["total_employee_payroll_usd"] += employee_payroll["paid"]["USD"]
+            summary["total_employee_payroll_afn"] += employee_payroll["paid"]["AFN"]
             summary["total_worker_payroll_usd"] += worker_payroll["net"]["USD"]
             summary["total_worker_payroll_afn"] += worker_payroll["net"]["AFN"]
             summary["total_spent_usd"] += total_spent_usd
@@ -205,6 +235,13 @@ class ProjectSummaryReport(BaseReport):
                 "contracts_afn": contracts["paid"]["AFN"],
                 "contracts_remaining_usd": contracts["remaining"]["USD"],
                 "contracts_remaining_afn": contracts["remaining"]["AFN"],
+                "employee_payroll_count": employee_payroll["count"],
+                "employee_payroll_gross_usd": employee_payroll["gross"]["USD"],
+                "employee_payroll_gross_afn": employee_payroll["gross"]["AFN"],
+                "employee_payroll_net_usd": employee_payroll["net"]["USD"],
+                "employee_payroll_net_afn": employee_payroll["net"]["AFN"],
+                "employee_payroll_usd": employee_payroll["paid"]["USD"],
+                "employee_payroll_afn": employee_payroll["paid"]["AFN"],
                 "worker_payroll_count": worker_payroll["count"],
                 "worker_payroll_gross_usd": worker_payroll["gross"]["USD"],
                 "worker_payroll_gross_afn": worker_payroll["gross"]["AFN"],

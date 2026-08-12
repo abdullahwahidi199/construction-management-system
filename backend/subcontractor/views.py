@@ -52,6 +52,7 @@ from .pagination import StandardPagination
 from .services import ContractService
 from accounts.permissions import RBACPermission
 from reports.branding import build_pdf_branding_elements, draw_pdf_branding_footer
+from reports.pdf_utils import fit_col_widths, safe_paragraph
 from common.calendar_utils import get_module_calendar, parse_calendar_date
 
 
@@ -344,14 +345,6 @@ class ContractPaymentViewSet(viewsets.ModelViewSet):
             return ContractPaymentSerializer
         return ContractPaymentSerializer
 
-    def destroy(self, request, *args, **kwargs):
-        """Payments are permanent audit records — disallow deletion."""
-        return Response(
-            {'detail': 'Payments cannot be deleted. They are permanent records.'},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED,
-        )
-
-
 class ContractVariationViewSet(viewsets.ModelViewSet):
     queryset = ContractVariation.objects.select_related('contract')
     permission_classes  = [RBACPermission]
@@ -566,6 +559,15 @@ class ContractPDFExportView(APIView):
             fontName="NotoArabic",
             fontSize=7,
             leading=10,
+            wordWrap="CJK",
+            splitLongWords=True,
+        )
+
+        header = ParagraphStyle(
+            "contractListHeader",
+            parent=normal,
+            alignment=1,
+            textColor=colors.white,
         )
 
         qs = self.get_queryset()
@@ -612,14 +614,15 @@ class ContractPDFExportView(APIView):
         # ---------------------------------------------------
         filter_table = Table(
             [
-                ["Search", search],
-                ["Status", status],
-                ["Project", project_name],
-                ["Subcontractor", subcontractor_name],
-                ["Ordering", request.GET.get("ordering", "-created_at")],
-                ["Total Results", str(qs.count())],
+                [safe_paragraph("Search", normal), safe_paragraph(search, normal, transform=rtl)],
+                [safe_paragraph("Status", normal), safe_paragraph(status, normal, transform=rtl)],
+                [safe_paragraph("Project", normal), safe_paragraph(project_name, normal, transform=rtl)],
+                [safe_paragraph("Subcontractor", normal), safe_paragraph(subcontractor_name, normal, transform=rtl)],
+                [safe_paragraph("Ordering", normal), safe_paragraph(request.GET.get("ordering", "-created_at"), normal)],
+                [safe_paragraph("Total Results", normal), safe_paragraph(str(qs.count()), normal)],
             ],
-            colWidths=[140, 300],
+            colWidths=fit_col_widths([140, 300], doc.width),
+            splitByRow=True,
         )
 
         filter_table.setStyle(
@@ -639,16 +642,16 @@ class ContractPDFExportView(APIView):
         # TABLE HEADER
         # ---------------------------------------------------
         data = [[
-            "Contract #",
-            "Title",
-            "Project",
-            "Subcontractor",
-            "Status",
-            "Currency",
-            "Value",
-            "Paid",
-            "Remaining",
-            "%",
+            safe_paragraph("Contract #", header),
+            safe_paragraph("Title", header),
+            safe_paragraph("Project", header),
+            safe_paragraph("Subcontractor", header),
+            safe_paragraph("Status", header),
+            safe_paragraph("Currency", header),
+            safe_paragraph("Value", header),
+            safe_paragraph("Paid", header),
+            safe_paragraph("Remaining", header),
+            safe_paragraph("%", header),
         ]]
 
         totals = {}
@@ -672,16 +675,16 @@ class ContractPDFExportView(APIView):
             totals[currency]["r"] += remaining
 
             data.append([
-                c.contract_number,
-                rtl(c.title),
-                rtl(getattr(c.project, "name", "")),
-                rtl(getattr(c.subcontractor, "name", "")),
-                rtl(c.status),
-                currency,
-                f"{symbol}{value:,.2f}",
-                f"{symbol}{paid:,.2f}",
-                f"{symbol}{remaining:,.2f}",
-                f"{c.completion_percentage}%",
+                safe_paragraph(c.contract_number, normal),
+                safe_paragraph(c.title, normal, transform=rtl),
+                safe_paragraph(getattr(c.project, "name", ""), normal, transform=rtl),
+                safe_paragraph(getattr(c.subcontractor, "name", ""), normal, transform=rtl),
+                safe_paragraph(c.status, normal, transform=rtl),
+                safe_paragraph(currency, normal),
+                safe_paragraph(f"{symbol}{value:,.2f}", normal),
+                safe_paragraph(f"{symbol}{paid:,.2f}", normal),
+                safe_paragraph(f"{symbol}{remaining:,.2f}", normal),
+                safe_paragraph(f"{c.completion_percentage}%", normal),
             ])
 
         # ---------------------------------------------------
@@ -697,11 +700,11 @@ class ContractPDFExportView(APIView):
                 "",
                 "",
                 "",
-                rtl(f"TOTAL ({cur})"),
+                safe_paragraph(f"TOTAL ({cur})", normal, transform=rtl),
                 "",
-                f"{symbol}{t['v']:,.2f}",
-                f"{symbol}{t['p']:,.2f}",
-                f"{symbol}{t['r']:,.2f}",
+                safe_paragraph(f"{symbol}{t['v']:,.2f}", normal),
+                safe_paragraph(f"{symbol}{t['p']:,.2f}", normal),
+                safe_paragraph(f"{symbol}{t['r']:,.2f}", normal),
                 "",
             ])
 
@@ -711,7 +714,8 @@ class ContractPDFExportView(APIView):
         table = Table(
             data,
             repeatRows=1,
-            colWidths=[70, 120, 90, 110, 60, 60, 80, 80, 80, 40],
+            colWidths=fit_col_widths([70, 120, 90, 110, 60, 60, 80, 80, 80, 40], doc.width),
+            splitByRow=True,
         )
 
         table.setStyle(TableStyle([
@@ -822,6 +826,8 @@ class ContractDetailPDFView(APIView):
             parent=styles["Title"],
             fontName="NotoArabic",
             fontSize=14,
+            wordWrap="CJK",
+            splitLongWords=True,
         )
 
         normal = ParagraphStyle(
@@ -830,12 +836,35 @@ class ContractDetailPDFView(APIView):
             fontName="NotoArabic",
             fontSize=9,
             leading=12,
+            wordWrap="CJK",
+            splitLongWords=True,
+        )
+
+        table_header = ParagraphStyle(
+            "contractDetailHeader",
+            parent=normal,
+            fontSize=7,
+            leading=9,
+            alignment=1,
+            textColor=colors.white,
+        )
+
+        table_cell = ParagraphStyle(
+            "contractDetailCell",
+            parent=normal,
+            fontSize=7,
+            leading=9,
         )
 
         elements = []
 
         currency_symbol = self.get_currency(contract.currency)
         summary = ContractService.get_financial_summary(contract)
+
+        def money(value):
+            if value is None:
+                return "-"
+            return f"{currency_symbol}{value:,.2f}"
 
         company, branding = build_pdf_branding_elements(
             title="Contract Detail Report",
@@ -849,15 +878,15 @@ class ContractDetailPDFView(APIView):
         # BASIC INFO
         # ---------------------------------------------------
         info_table = Table([
-            [rtl("Contract No"), contract.contract_number],
-            [rtl("Title"), rtl(contract.title)],
-            [rtl("Status"), rtl(contract.status)],
-            [rtl("Project"), rtl(contract.project.name)],
-            [rtl("Subcontractor"), rtl(contract.subcontractor.name)],
-            [rtl("Start Date"), str(contract.start_date)],
-            [rtl("End Date"), str(contract.end_date)],
-            [rtl("Adjusted End"), str(contract.adjusted_end_date)],
-        ], colWidths=[140, 340])
+            [safe_paragraph("Contract No", table_cell, transform=rtl), safe_paragraph(contract.contract_number, table_cell)],
+            [safe_paragraph("Title", table_cell, transform=rtl), safe_paragraph(contract.title, table_cell, transform=rtl)],
+            [safe_paragraph("Status", table_cell, transform=rtl), safe_paragraph(contract.status, table_cell, transform=rtl)],
+            [safe_paragraph("Project", table_cell, transform=rtl), safe_paragraph(contract.project.name, table_cell, transform=rtl)],
+            [safe_paragraph("Subcontractor", table_cell, transform=rtl), safe_paragraph(contract.subcontractor.name, table_cell, transform=rtl)],
+            [safe_paragraph("Start Date", table_cell, transform=rtl), safe_paragraph(str(contract.start_date), table_cell)],
+            [safe_paragraph("End Date", table_cell, transform=rtl), safe_paragraph(str(contract.end_date), table_cell)],
+            [safe_paragraph("Adjusted End", table_cell, transform=rtl), safe_paragraph(str(contract.adjusted_end_date), table_cell)],
+        ], colWidths=fit_col_widths([140, 340], doc.width), splitByRow=True)
 
         info_table.setStyle(TableStyle([
             ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
@@ -873,29 +902,31 @@ class ContractDetailPDFView(APIView):
         # FINANCIAL SUMMARY
         # ---------------------------------------------------
         financial_table = Table([
-            [rtl("Contract Value"), f"{currency_symbol}{contract.contract_value:,.2f}"],
-            [rtl("Variation"), f"{currency_symbol}{contract.total_variation_amount:,.2f}"],
-            [rtl("Adjusted Value"), f"{currency_symbol}{contract.adjusted_contract_value:,.2f}"],
-            [rtl("Total Invoiced"), f"{currency_symbol}{contract.total_invoiced:,.2f}"],
-            [rtl("Paid to Subcontractor"), f"{currency_symbol}{contract.total_paid:,.2f}"],
+            [safe_paragraph("Contract Value", table_cell, transform=rtl), safe_paragraph(money(contract.contract_value), table_cell)],
+            [safe_paragraph("Variation", table_cell, transform=rtl), safe_paragraph(money(contract.total_variation_amount), table_cell)],
+            [safe_paragraph("Adjusted Value", table_cell, transform=rtl), safe_paragraph(money(contract.adjusted_contract_value), table_cell)],
+            [safe_paragraph("Total Invoiced", table_cell, transform=rtl), safe_paragraph(money(contract.total_invoiced), table_cell)],
+            [safe_paragraph("Paid to Subcontractor", table_cell, transform=rtl), safe_paragraph(money(contract.total_paid), table_cell)],
             [
-                rtl("Contract Expenses"),
-                (
+                safe_paragraph("Contract Expenses", table_cell, transform=rtl),
+                safe_paragraph(
                     f"USD {summary['total_contract_expenses_usd']:,.2f} / "
-                    f"AFN {summary['total_contract_expenses_afn']:,.2f}"
+                    f"AFN {summary['total_contract_expenses_afn']:,.2f}",
+                    table_cell,
                 ),
             ],
             [
-                rtl("Total Cash Outflow"),
-                (
+                safe_paragraph("Total Cash Outflow", table_cell, transform=rtl),
+                safe_paragraph(
                     f"USD {summary['total_cash_outflow_usd']:,.2f} / "
-                    f"AFN {summary['total_cash_outflow_afn']:,.2f}"
+                    f"AFN {summary['total_cash_outflow_afn']:,.2f}",
+                    table_cell,
                 ),
             ],
-            [rtl("Remaining"), f"{currency_symbol}{contract.remaining_amount:,.2f}"],
-            [rtl("Retention"), f"{currency_symbol}{contract.retention_amount:,.2f}"],
-            [rtl("Retention Balance"), f"{currency_symbol}{contract.retention_balance:,.2f}"],
-        ], colWidths=[200, 280])
+            [safe_paragraph("Remaining", table_cell, transform=rtl), safe_paragraph(money(contract.remaining_amount), table_cell)],
+            [safe_paragraph("Retention", table_cell, transform=rtl), safe_paragraph(money(contract.retention_amount), table_cell)],
+            [safe_paragraph("Retention Balance", table_cell, transform=rtl), safe_paragraph(money(contract.retention_balance), table_cell)],
+        ], colWidths=fit_col_widths([200, 280], doc.width), splitByRow=True)
 
         financial_table.setStyle(TableStyle([
             ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
@@ -926,24 +957,25 @@ class ContractDetailPDFView(APIView):
         # PAYMENTS (simple)
         # ---------------------------------------------------
         payments_data = [[
-            rtl("Date"),
-            rtl("Type"),
-            rtl("Amount"),
-            rtl("Reference"),
+            safe_paragraph("Date", table_header, transform=rtl),
+            safe_paragraph("Type", table_header, transform=rtl),
+            safe_paragraph("Amount", table_header, transform=rtl),
+            safe_paragraph("Reference", table_header, transform=rtl),
         ]]
 
         for p in contract.payments.all().order_by("-payment_date"):
             payments_data.append([
-                str(p.payment_date),
-                rtl(p.payment_type),
-                f"{currency_symbol}{p.amount:,.2f}",
-                p.reference_number,
+                safe_paragraph(str(p.payment_date), table_cell),
+                safe_paragraph(p.payment_type, table_cell, transform=rtl),
+                safe_paragraph(f"{currency_symbol}{p.amount:,.2f}", table_cell),
+                safe_paragraph(p.reference_number, table_cell),
             ])
 
         payments_table = Table(
             payments_data,
             repeatRows=1,
-            colWidths=[100, 120, 120, 200],
+            colWidths=fit_col_widths([80, 110, 110, 240], doc.width),
+            splitByRow=True,
         )
 
         payments_table.setStyle(TableStyle([
@@ -963,28 +995,29 @@ class ContractDetailPDFView(APIView):
         # ---------------------------------------------------
         timeline = ContractService.get_financial_timeline(contract)["results"]
         timeline_data = [[
-            rtl("Date"),
-            rtl("Type"),
-            rtl("Reference"),
-            rtl("Description"),
-            rtl("Amount"),
+            safe_paragraph("Date", table_header, transform=rtl),
+            safe_paragraph("Type", table_header, transform=rtl),
+            safe_paragraph("Reference", table_header, transform=rtl),
+            safe_paragraph("Description", table_header, transform=rtl),
+            safe_paragraph("Amount", table_header, transform=rtl),
         ]]
 
         for item in timeline:
             sign = "+" if item["direction"] == "in" else "-"
             label = "Payment" if item["transaction_type"] == "payment" else "Expense"
             timeline_data.append([
-                str(item["date"]),
-                rtl(label),
-                rtl(item["reference"]),
-                rtl(item["description"] or item["title"]),
-                f"{sign}{item['currency']} {item['amount']:,.2f}",
+                safe_paragraph(str(item["date"]), table_cell),
+                safe_paragraph(label, table_cell, transform=rtl),
+                safe_paragraph(item["reference"], table_cell, transform=rtl),
+                safe_paragraph(item["description"] or item["title"], table_cell, transform=rtl),
+                safe_paragraph(f"{sign}{item['currency']} {item['amount']:,.2f}", table_cell),
             ])
 
         timeline_table = Table(
             timeline_data,
             repeatRows=1,
-            colWidths=[80, 80, 110, 170, 100],
+            colWidths=fit_col_widths([70, 70, 90, 240, 85], doc.width),
+            splitByRow=True,
         )
 
         timeline_table.setStyle(TableStyle([

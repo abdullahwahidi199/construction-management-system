@@ -355,6 +355,9 @@ export default function PayrollForm({
     }
     return "Outstanding";
   };
+  const selectedEmployee = employees?.find(
+    (emp) => emp.id === parseInt(formData.employee),
+  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -391,6 +394,17 @@ export default function PayrollForm({
               </option>
             ))}
           </select>
+          {selectedEmployee && (
+            <p className="mt-1 text-xs text-[var(--muted)]">
+              {selectedEmployee.employment_type_display ||
+                (selectedEmployee.employment_type === "PROJECT"
+                  ? "Project Employee"
+                  : "Office Employee")}
+              {selectedEmployee.project_name
+                ? ` - ${selectedEmployee.project_name}`
+                : ""}
+            </p>
+          )}
         </div>
         <div>
           <label className={labelClass} style={{ color: "var(--text)" }}>

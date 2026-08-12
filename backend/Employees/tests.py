@@ -1,7 +1,9 @@
 from datetime import date, timedelta
 from decimal import Decimal
+from io import BytesIO
 
 from rest_framework.test import APITestCase
+from pypdf import PdfReader
 
 from common.calendar_utils import to_shamsi
 from common.test_helpers import (
@@ -9,6 +11,7 @@ from common.test_helpers import (
     create_attendance,
     create_employee,
     create_payroll,
+    create_project,
     create_salary_advance,
     employee_payload,
 )
@@ -50,6 +53,114 @@ class EmployeeAndPayrollAPITests(APITestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn("email", response.data["errors"])
+
+    def test_employee_project_office_allocation_validation(self):
+        project = create_project(name="Employee Allocation Project")
+
+        project_employee = self.client.post(
+            "/api/employees/",
+            employee_payload(
+                email="project.employee@example.com",
+                employment_type="PROJECT",
+                project=project.id,
+            ),
+            format="json",
+        )
+        self.assertEqual(project_employee.status_code, 201, project_employee.data)
+        self.assertEqual(project_employee.data["employment_type"], "PROJECT")
+        self.assertEqual(project_employee.data["project"], project.id)
+        self.assertEqual(project_employee.data["project_name"], project.name)
+
+        office_employee = self.client.post(
+            "/api/employees/",
+            employee_payload(
+                email="office.employee@example.com",
+                employment_type="OFFICE",
+                project=None,
+            ),
+            format="json",
+        )
+        self.assertEqual(office_employee.status_code, 201, office_employee.data)
+        self.assertIsNone(office_employee.data["project"])
+
+        missing_project = self.client.post(
+            "/api/employees/",
+            employee_payload(
+                email="missing.project@example.com",
+                employment_type="PROJECT",
+                project=None,
+            ),
+            format="json",
+        )
+        self.assertEqual(missing_project.status_code, 400)
+        self.assertIn("project", missing_project.data["errors"])
+
+        office_with_project = self.client.post(
+            "/api/employees/",
+            employee_payload(
+                email="office.project@example.com",
+                employment_type="OFFICE",
+                project=project.id,
+            ),
+            format="json",
+        )
+        self.assertEqual(office_with_project.status_code, 400)
+        self.assertIn("project", office_with_project.data["errors"])
+
+    def test_payroll_snapshots_project_allocation_history(self):
+        project_one = create_project(name="June Project")
+        project_two = create_project(name="July Project")
+        employee = create_employee(
+            email="history.employee@example.com",
+            employment_type=Employee.EmploymentType.PROJECT,
+            project=project_one,
+            salary=Decimal("40000.00"),
+        )
+
+        june = create_payroll(
+            employee=employee,
+            payroll_period_start=date(2026, 6, 1),
+            payroll_period_end=date(2026, 6, 30),
+            basic_salary=Decimal("40000.00"),
+            currency="AFN",
+        )
+        PayrollPayment.objects.create(
+            payroll=june,
+            amount=june.balance_due,
+            payment_date=date(2026, 6, 30),
+            payment_method="cash",
+        )
+        june.refresh_payment_totals(save=True)
+
+        employee.project = project_two
+        employee.save(update_fields=["project", "updated_at"])
+        july = create_payroll(
+            employee=employee,
+            payroll_period_start=date(2026, 7, 1),
+            payroll_period_end=date(2026, 7, 31),
+            basic_salary=Decimal("40000.00"),
+            currency="AFN",
+        )
+
+        self.assertEqual(june.allocation_type, Payroll.AllocationType.PROJECT)
+        self.assertEqual(june.project_id, project_one.id)
+        self.assertEqual(july.project_id, project_two.id)
+
+        employee.employment_type = Employee.EmploymentType.OFFICE
+        employee.project = None
+        employee.save(update_fields=["employment_type", "project", "updated_at"])
+        august = create_payroll(
+            employee=employee,
+            payroll_period_start=date(2026, 8, 1),
+            payroll_period_end=date(2026, 8, 31),
+            basic_salary=Decimal("40000.00"),
+            currency="AFN",
+        )
+
+        self.assertEqual(august.allocation_type, Payroll.AllocationType.OFFICE)
+        self.assertIsNone(august.project_id)
+        june.refresh_from_db()
+        self.assertEqual(june.project_id, project_one.id)
 
     def test_attendance_validation_bulk_mark_daily_and_summary(self):
         employee = create_employee()
@@ -352,3 +463,27 @@ class EmployeeAndPayrollAPITests(APITestCase):
         self.assertEqual(len(listed.data), 1)
         self.assertEqual(summary.status_code, 200, summary.data)
         self.assertEqual(summary.data["summary"]["total_records"], 2)
+
+    def test_payroll_pdf_export_uses_landscape_wrapped_table(self):
+        employee = create_employee(
+            first_name="عبدالرحمانعبدالرحمانعبدالرحمان",
+            last_name="کارمندبسیارطویلبرایگزارش",
+            email="long.payroll.pdf@example.com",
+        )
+        create_payroll(
+            employee=employee,
+            payment_method="bank_transfer",
+            payment_date=date(2026, 8, 11),
+            payroll_period_start=date(2026, 7, 23),
+            payroll_period_end=date(2026, 8, 22),
+            basic_salary=Decimal("999.99"),
+            currency="AFN",
+        )
+
+        response = self.client.get("/api/employees/payrolls/export-pdf/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+        pdf = PdfReader(BytesIO(response.content))
+        page = pdf.pages[0]
+        self.assertGreater(float(page.mediabox.width), float(page.mediabox.height))

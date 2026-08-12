@@ -547,7 +547,11 @@ export default function ContractDetailsPage() {
             <div className="space-y-3 text-sm">
               <Row
                 label={t("ContractDetailsPage.originalContractValue")}
-                value={`${contract.currency}${fmt.format(contract.contract_value)}`}
+                value={formatOptionalCurrency(
+                  contract.contract_value,
+                  contract.currency,
+                  fmt,
+                )}
               />
               <Row
                 label={t("ContractDetailsPage.retentionPercentage")}
@@ -563,7 +567,11 @@ export default function ContractDetailsPage() {
               />
               <Row
                 label={t("ContractDetailsPage.adjustedContractValue")}
-                value={`${contract.currency}${fmt.format(contract.adjusted_contract_value || 0)}`}
+                value={formatOptionalCurrency(
+                  contract.adjusted_contract_value,
+                  contract.currency,
+                  fmt,
+                )}
                 highlight
               />
             </div>
@@ -748,6 +756,15 @@ export default function ContractDetailsPage() {
 function formatCurrency(value, currency, fmt) {
   const numericValue = Number(value || 0);
   return `${currency} ${fmt.format(numericValue)}`;
+}
+
+function hasMoneyValue(value) {
+  return value !== null && value !== undefined && value !== "";
+}
+
+function formatOptionalCurrency(value, currency, fmt) {
+  if (!hasMoneyValue(value)) return "-";
+  return `${currency}${fmt.format(Number(value))}`;
 }
 
 function formatDualCurrency(usdValue, afnValue, fmt) {

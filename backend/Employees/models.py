@@ -1,11 +1,17 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import Max, Sum
+from django.db.models import Max, Q, Sum
 from decimal import Decimal
+from project.models import Project
 
 class Employee(models.Model):
-    EMPLOYMENT_TYPE_CHOICES = [
+    class EmploymentType(models.TextChoices):
+        PROJECT = "PROJECT", "Project Employee"
+        OFFICE = "OFFICE", "Office Employee"
+
+    JOB_TYPE_CHOICES = [
         ("full_time", "Full Time"),
         ("part_time", "Part Time"),
         ("contract", "Contract"),
@@ -44,7 +50,19 @@ class Employee(models.Model):
     
     employment_type = models.CharField(
         max_length=20,
-        choices=EMPLOYMENT_TYPE_CHOICES,
+        choices=EmploymentType.choices,
+        default=EmploymentType.OFFICE,
+    )
+    project = models.ForeignKey(
+        Project,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="assigned_employees",
+    )
+    job_type = models.CharField(
+        max_length=20,
+        choices=JOB_TYPE_CHOICES,
         default="full_time",
     )
     
@@ -74,6 +92,15 @@ class Employee(models.Model):
         ordering = ["-hire_date"]
         verbose_name = "Employee"
         verbose_name_plural = "Employees"
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    Q(employment_type="PROJECT", project__isnull=False)
+                    | Q(employment_type="OFFICE", project__isnull=True)
+                ),
+                name="employee_employment_type_matches_project",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.employee_id})"
@@ -81,6 +108,12 @@ class Employee(models.Model):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+    def clean(self):
+        if self.employment_type == self.EmploymentType.PROJECT and not self.project_id:
+            raise ValidationError({"project": "Project employees must be assigned to a project."})
+        if self.employment_type == self.EmploymentType.OFFICE and self.project_id:
+            raise ValidationError({"project": "Office employees cannot be assigned to a project."})
     
     def save(self, *args, **kwargs):
         if not self.employee_id:
@@ -98,6 +131,10 @@ class Employee(models.Model):
 
 
 class Payroll(models.Model):
+    class AllocationType(models.TextChoices):
+        PROJECT = "PROJECT", "Project Payroll"
+        OFFICE = "OFFICE", "Office Payroll"
+
     PAYMENT_STATUS_CHOICES = [
         ("pending", "Pending"),
         ("partially_paid", "Partially Paid"),
@@ -124,6 +161,19 @@ class Payroll(models.Model):
         Employee,
         on_delete=models.PROTECT,
         related_name="payrolls"
+    )
+    allocation_type = models.CharField(
+        max_length=20,
+        choices=AllocationType.choices,
+        default=AllocationType.OFFICE,
+        db_index=True,
+    )
+    project = models.ForeignKey(
+        Project,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="employee_payrolls",
     )
     
     payroll_period_start = models.DateField()
@@ -189,6 +239,15 @@ class Payroll(models.Model):
         verbose_name = "Payroll"
         verbose_name_plural = "Payrolls"
         unique_together = ["employee", "payroll_period_start", "payroll_period_end"]
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    Q(allocation_type="PROJECT", project__isnull=False)
+                    | Q(allocation_type="OFFICE", project__isnull=True)
+                ),
+                name="payroll_allocation_matches_project",
+            ),
+        ]
 
     def __str__(self):
         return f"Payroll: {self.employee.full_name} - {self.payroll_period_start} to {self.payroll_period_end}"
@@ -210,6 +269,26 @@ class Payroll(models.Model):
         self.balance_due = max(self.net_pay - self.amount_paid, Decimal("0.00"))
         
         return self
+
+    def snapshot_employee_allocation(self):
+        if self.employee.employment_type == Employee.EmploymentType.PROJECT:
+            self.allocation_type = self.AllocationType.PROJECT
+            self.project_id = self.employee.project_id
+        else:
+            self.allocation_type = self.AllocationType.OFFICE
+            self.project = None
+        return self
+
+    def clean(self):
+        if self.allocation_type == self.AllocationType.PROJECT and not self.project_id:
+            raise ValidationError({"project": "Project payroll must be linked to a project."})
+        if self.allocation_type == self.AllocationType.OFFICE and self.project_id:
+            raise ValidationError({"project": "Office payroll cannot be linked to a project."})
+
+    def save(self, *args, **kwargs):
+        if not self.pk and self.employee_id:
+            self.snapshot_employee_allocation()
+        super().save(*args, **kwargs)
 
     @property
     def total_deductions(self):

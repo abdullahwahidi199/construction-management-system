@@ -14,10 +14,16 @@ from django.db.models.functions import (
 )
 from django.utils import timezone
 
+from common.calendar_utils import (
+    CALENDAR_SHAMSI,
+    calendar_month_bounds,
+    get_module_calendar,
+    to_shamsi,
+)
 from project.models import Project
 from expenses.models import Expense
 from Employees.finance import salary_advance_queryset, salary_advance_totals
-from Employees.models import Employee, Payroll, Attendance
+from Employees.models import Employee, Payroll, PayrollPayment, Attendance
 from labour.models import WorkerPayroll
 from subcontractor.models import (
     Subcontractor, Contract, ContractPayment,
@@ -140,6 +146,27 @@ class DashboardService:
         """
         projects = Project.objects.filter(
             status__in=["planning", "ongoing"]
+        ).annotate(
+            employee_payroll_paid_usd=Coalesce(
+                Sum(
+                    "employee_payrolls__amount_paid",
+                    filter=Q(
+                        employee_payrolls__allocation_type=Payroll.AllocationType.PROJECT,
+                        employee_payrolls__currency="USD",
+                    ),
+                ),
+                Decimal("0.00"),
+            ),
+            employee_payroll_paid_afn=Coalesce(
+                Sum(
+                    "employee_payrolls__amount_paid",
+                    filter=Q(
+                        employee_payrolls__allocation_type=Payroll.AllocationType.PROJECT,
+                        employee_payrolls__currency="AFN",
+                    ),
+                ),
+                Decimal("0.00"),
+            ),
         ).prefetch_related(
             Prefetch(
                 "expenses",
@@ -159,6 +186,8 @@ class DashboardService:
             total_expense_afn = sum(
                 float(exp.total_afn) for exp in expenses
             )
+            total_expense_usd += float(project.employee_payroll_paid_usd or 0)
+            total_expense_afn += float(project.employee_payroll_paid_afn or 0)
             estimated = float(project.estimated_budget)
             budget_currency = project.budget_currency
             comparable_spent = (
@@ -1238,6 +1267,22 @@ class DashboardService:
                 Decimal("0.00"),
             ),
         )
+        project_payroll = Payroll.objects.filter(
+            allocation_type=Payroll.AllocationType.PROJECT,
+        ).aggregate(
+            paid_usd=Coalesce(Sum("amount_paid", filter=Q(currency="USD")), Decimal("0.00")),
+            paid_afn=Coalesce(Sum("amount_paid", filter=Q(currency="AFN")), Decimal("0.00")),
+            net_usd=Coalesce(Sum("net_pay", filter=Q(currency="USD")), Decimal("0.00")),
+            net_afn=Coalesce(Sum("net_pay", filter=Q(currency="AFN")), Decimal("0.00")),
+        )
+        office_payroll = Payroll.objects.filter(
+            allocation_type=Payroll.AllocationType.OFFICE,
+        ).aggregate(
+            paid_usd=Coalesce(Sum("amount_paid", filter=Q(currency="USD")), Decimal("0.00")),
+            paid_afn=Coalesce(Sum("amount_paid", filter=Q(currency="AFN")), Decimal("0.00")),
+            net_usd=Coalesce(Sum("net_pay", filter=Q(currency="USD")), Decimal("0.00")),
+            net_afn=Coalesce(Sum("net_pay", filter=Q(currency="AFN")), Decimal("0.00")),
+        )
         worker_payroll = WorkerPayroll.objects.aggregate(
             gross_usd=Coalesce(
                 Sum("gross_amount", filter=Q(currency="USD")),
@@ -1337,6 +1382,14 @@ class DashboardService:
                 "cash_outflow_afn": payroll_outflow_afn,
                 "employee_net_usd": payroll["net_usd"],
                 "employee_net_afn": payroll["net_afn"],
+                "project_payroll_paid_usd": project_payroll["paid_usd"],
+                "project_payroll_paid_afn": project_payroll["paid_afn"],
+                "project_payroll_net_usd": project_payroll["net_usd"],
+                "project_payroll_net_afn": project_payroll["net_afn"],
+                "office_payroll_paid_usd": office_payroll["paid_usd"],
+                "office_payroll_paid_afn": office_payroll["paid_afn"],
+                "office_payroll_net_usd": office_payroll["net_usd"],
+                "office_payroll_net_afn": office_payroll["net_afn"],
                 "daily_worker_net_usd": worker_payroll["net_usd"],
                 "daily_worker_net_afn": worker_payroll["net_afn"],
                 "salary_advances_usd": salary_advances["total_usd"],
@@ -1386,8 +1439,27 @@ class DashboardService:
     @staticmethod
     def get_payroll_summary():
         today = date.today()
-        first_of_month = today.replace(day=1)
-        prev_month_start = (first_of_month - timedelta(days=1)).replace(day=1)
+        calendar_type = get_module_calendar("payroll")
+        if calendar_type == CALENDAR_SHAMSI:
+            current_year, current_month, _ = to_shamsi(today)
+        else:
+            current_year, current_month = today.year, today.month
+        first_of_month, current_month_end = calendar_month_bounds(
+            current_year,
+            current_month,
+            calendar_type,
+        )
+        next_month_start = current_month_end + timedelta(days=1)
+        previous_month_ref = first_of_month - timedelta(days=1)
+        if calendar_type == CALENDAR_SHAMSI:
+            previous_year, previous_month, _ = to_shamsi(previous_month_ref)
+        else:
+            previous_year, previous_month = previous_month_ref.year, previous_month_ref.month
+        prev_month_start, _ = calendar_month_bounds(
+            previous_year,
+            previous_month,
+            calendar_type,
+        )
 
         def employee_totals(queryset):
             return queryset.aggregate(
@@ -1412,6 +1484,13 @@ class DashboardService:
                 count=Count("id"),
             )
 
+        def employee_payment_totals(queryset):
+            return queryset.aggregate(
+                paid_usd=Coalesce(Sum("amount", filter=Q(payroll__currency="USD")), Decimal("0.00")),
+                paid_afn=Coalesce(Sum("amount", filter=Q(payroll__currency="AFN")), Decimal("0.00")),
+                count=Count("id"),
+            )
+
         overtime_amount = ExpressionWrapper(
             F("overtime_hours") * F("overtime_rate_applied"),
             output_field=DecimalField(max_digits=15, decimal_places=2),
@@ -1432,12 +1511,49 @@ class DashboardService:
                 count=Count("id"),
             )
 
-        employee_current = employee_totals(Payroll.objects.filter(payroll_period_start__gte=first_of_month))
-        employee_previous = employee_totals(Payroll.objects.filter(payroll_period_start__gte=prev_month_start, payroll_period_start__lt=first_of_month))
-        worker_current = worker_totals(WorkerPayroll.objects.filter(period_start__gte=first_of_month))
-        worker_previous = worker_totals(WorkerPayroll.objects.filter(period_start__gte=prev_month_start, period_start__lt=first_of_month))
+        current_employee_payrolls = Payroll.objects.filter(
+            payment_date__gte=first_of_month,
+            payment_date__lt=next_month_start,
+        )
+        previous_employee_payrolls = Payroll.objects.filter(
+            payment_date__gte=prev_month_start,
+            payment_date__lt=first_of_month,
+        )
+        current_employee_payments = PayrollPayment.objects.filter(
+            payment_date__gte=first_of_month,
+            payment_date__lt=next_month_start,
+        )
+        previous_employee_payments = PayrollPayment.objects.filter(
+            payment_date__gte=prev_month_start,
+            payment_date__lt=first_of_month,
+        )
+
+        employee_current = employee_totals(current_employee_payrolls)
+        employee_previous = employee_totals(previous_employee_payrolls)
+        project_current = employee_payment_totals(current_employee_payments.filter(
+            payroll__allocation_type=Payroll.AllocationType.PROJECT,
+        ))
+        office_current = employee_payment_totals(current_employee_payments.filter(
+            payroll__allocation_type=Payroll.AllocationType.OFFICE,
+        ))
+        project_previous = employee_payment_totals(previous_employee_payments.filter(
+            payroll__allocation_type=Payroll.AllocationType.PROJECT,
+        ))
+        office_previous = employee_payment_totals(previous_employee_payments.filter(
+            payroll__allocation_type=Payroll.AllocationType.OFFICE,
+        ))
+        employee_current_paid = employee_payment_totals(current_employee_payments)
+        employee_previous_paid = employee_payment_totals(previous_employee_payments)
+        worker_current = worker_totals(WorkerPayroll.objects.filter(
+            payment_date__gte=first_of_month,
+            payment_date__lt=next_month_start,
+        ))
+        worker_previous = worker_totals(WorkerPayroll.objects.filter(
+            payment_date__gte=prev_month_start,
+            payment_date__lt=first_of_month,
+        ))
         advance_current = salary_advance_totals(
-            salary_advance_queryset(start=first_of_month)
+            salary_advance_queryset(start=first_of_month, end=current_month_end)
         )
         advance_previous = salary_advance_totals(
             salary_advance_queryset(
@@ -1451,16 +1567,16 @@ class DashboardService:
             "gross_afn": employee_current["gross_afn"] + worker_current["gross_afn"],
             "net_usd": employee_current["net_usd"] + worker_current["net_usd"],
             "net_afn": employee_current["net_afn"] + worker_current["net_afn"],
-            "cash_outflow_usd": employee_current["net_usd"] + worker_current["net_usd"] + advance_current["total_usd"],
-            "cash_outflow_afn": employee_current["net_afn"] + worker_current["net_afn"] + advance_current["total_afn"],
+            "cash_outflow_usd": employee_current_paid["paid_usd"] + worker_current["net_usd"] + advance_current["total_usd"],
+            "cash_outflow_afn": employee_current_paid["paid_afn"] + worker_current["net_afn"] + advance_current["total_afn"],
             "total_deductions_usd": employee_current["deductions_usd"] + employee_current["advance_deductions_usd"] + worker_current["deductions_usd"] + worker_current["advances_usd"],
             "total_deductions_afn": employee_current["deductions_afn"] + employee_current["advance_deductions_afn"] + worker_current["deductions_afn"] + worker_current["advances_afn"],
             "total_advances_paid_usd": advance_current["total_usd"],
             "total_advances_paid_afn": advance_current["total_afn"],
             "total_advance_deductions_usd": employee_current["advance_deductions_usd"] + worker_current["advances_usd"],
             "total_advance_deductions_afn": employee_current["advance_deductions_afn"] + worker_current["advances_afn"],
-            "amount_already_paid_usd": employee_current["paid_usd"],
-            "amount_already_paid_afn": employee_current["paid_afn"],
+            "amount_already_paid_usd": employee_current_paid["paid_usd"],
+            "amount_already_paid_afn": employee_current_paid["paid_afn"],
             "outstanding_salary_usd": employee_current["balance_due_usd"],
             "outstanding_salary_afn": employee_current["balance_due_afn"],
             "total_tax_usd": employee_current["tax_usd"],
@@ -1471,6 +1587,14 @@ class DashboardService:
             "total_overtime_afn": employee_current["overtime_afn"] + worker_current["overtime_afn"],
             "employee_net_usd": employee_current["net_usd"],
             "employee_net_afn": employee_current["net_afn"],
+            "project_payroll_net_usd": project_current["paid_usd"],
+            "project_payroll_net_afn": project_current["paid_afn"],
+            "project_payroll_paid_usd": project_current["paid_usd"],
+            "project_payroll_paid_afn": project_current["paid_afn"],
+            "office_payroll_net_usd": office_current["paid_usd"],
+            "office_payroll_net_afn": office_current["paid_afn"],
+            "office_payroll_paid_usd": office_current["paid_usd"],
+            "office_payroll_paid_afn": office_current["paid_afn"],
             "daily_worker_net_usd": worker_current["net_usd"],
             "daily_worker_net_afn": worker_current["net_afn"],
             "count": employee_current["count"] + worker_current["count"],
@@ -1480,10 +1604,18 @@ class DashboardService:
             "gross_afn": employee_previous["gross_afn"] + worker_previous["gross_afn"],
             "net_usd": employee_previous["net_usd"] + worker_previous["net_usd"],
             "net_afn": employee_previous["net_afn"] + worker_previous["net_afn"],
-            "cash_outflow_usd": employee_previous["net_usd"] + worker_previous["net_usd"] + advance_previous["total_usd"],
-            "cash_outflow_afn": employee_previous["net_afn"] + worker_previous["net_afn"] + advance_previous["total_afn"],
+            "cash_outflow_usd": employee_previous_paid["paid_usd"] + worker_previous["net_usd"] + advance_previous["total_usd"],
+            "cash_outflow_afn": employee_previous_paid["paid_afn"] + worker_previous["net_afn"] + advance_previous["total_afn"],
             "total_advances_paid_usd": advance_previous["total_usd"],
             "total_advances_paid_afn": advance_previous["total_afn"],
+            "project_payroll_net_usd": project_previous["paid_usd"],
+            "project_payroll_net_afn": project_previous["paid_afn"],
+            "project_payroll_paid_usd": project_previous["paid_usd"],
+            "project_payroll_paid_afn": project_previous["paid_afn"],
+            "office_payroll_net_usd": office_previous["paid_usd"],
+            "office_payroll_net_afn": office_previous["paid_afn"],
+            "office_payroll_paid_usd": office_previous["paid_usd"],
+            "office_payroll_paid_afn": office_previous["paid_afn"],
             "count": employee_previous["count"] + worker_previous["count"],
         }
 
@@ -1515,7 +1647,7 @@ class DashboardService:
             methods["salary_advance"]["total_afn"] += advance_all_time["total_afn"]
 
         recent_payrolls = []
-        for payroll in Payroll.objects.select_related("employee").order_by("-created_at")[:5]:
+        for payroll in Payroll.objects.select_related("employee", "project").order_by("-created_at")[:5]:
             recent_payrolls.append({
                 "id": payroll.id,
                 "employee__first_name": payroll.employee.first_name,
@@ -1527,6 +1659,8 @@ class DashboardService:
                 "net_pay": payroll.net_pay,
                 "currency": payroll.currency,
                 "payment_date": payroll.payment_date,
+                "allocation_type": payroll.allocation_type,
+                "project_name": payroll.project.name if payroll.project else None,
                 "created_at": payroll.created_at,
             })
         for payroll in WorkerPayroll.objects.select_related("worker").order_by("-created_at")[:5]:

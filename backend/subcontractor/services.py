@@ -41,10 +41,11 @@ class ContractService:
             total=Sum('amount'),
         )['total'] or Decimal('0.00')
 
-        if existing_paid + amount > contract.adjusted_contract_value:
+        adjusted_value = contract.adjusted_contract_value
+        if adjusted_value is not None and existing_paid + amount > adjusted_value:
             raise ValueError(
                 f"Total payments ({existing_paid + amount}) would exceed "
-                f"adjusted contract value ({contract.adjusted_contract_value})."
+                f"adjusted contract value ({adjusted_value})."
             )
 
         return ContractPayment.objects.create(contract=contract, **validated_data)
@@ -62,12 +63,19 @@ class ContractService:
             raise ValueError("Variation is already approved.")
 
         contract = variation.contract
+        adjusted_value = contract.adjusted_contract_value
         prospective_adjusted = (
-            contract.adjusted_contract_value + variation.amount_change
+            adjusted_value + variation.amount_change
+            if adjusted_value is not None
+            else None
         )
         total_paid = contract.total_paid
 
-        if prospective_adjusted < total_paid and variation.amount_change < 0:
+        if (
+            prospective_adjusted is not None
+            and prospective_adjusted < total_paid
+            and variation.amount_change < 0
+        ):
             raise ValueError(
                 f"Cannot approve: adjusted value ({prospective_adjusted}) "
                 f"would fall below total paid ({total_paid})."
@@ -94,7 +102,11 @@ class ContractService:
 
         adjusted_contract_value = summary["adjusted_contract_value"]
 
-        invoice_balance = adjusted_contract_value - total_invoiced
+        invoice_balance = (
+            adjusted_contract_value - total_invoiced
+            if adjusted_contract_value is not None
+            else None
+        )
 
         summary["total_invoiced"] = total_invoiced
         summary["invoice_balance"] = invoice_balance
@@ -321,6 +333,7 @@ class ContractService:
                 }
 
             # contract-level values
+            has_contract_value = contract.contract_value is not None
             contract_value = contract.contract_value or Decimal('0.00')
 
             variation_total = ContractVariation.objects.filter(
@@ -342,7 +355,7 @@ class ContractService:
             ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
 
             # remaining
-            remaining = adjusted_value - paid
+            remaining = adjusted_value - paid if has_contract_value else Decimal('0.00')
             retention_balance = retention - retention_released
 
             # accumulate per currency

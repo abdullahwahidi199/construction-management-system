@@ -579,6 +579,109 @@ export default function ProjectDetails() {
           </div>
         </div>
 
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
+          <h3 className="mb-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
+            <DollarSign className="h-4 w-4" />
+            Project Employee Payroll
+          </h3>
+
+          <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="rounded-xl border border-[var(--border)] p-4">
+              <p className="text-xs font-semibold uppercase text-[var(--muted)]">
+                Assigned Employees
+              </p>
+              <p className="mt-2 text-2xl font-bold text-[var(--text)]">
+                {project.assigned_employee_count || 0}
+              </p>
+            </div>
+            <div className="rounded-xl border border-[var(--border)] p-4">
+              <p className="text-xs font-semibold uppercase text-[var(--muted)]">
+                Payroll Paid AFN
+              </p>
+              <p className="mt-2 text-xl font-bold text-emerald-600">
+                AFN {formatAmount(project.employee_payroll_summary?.AFN?.paid)}
+              </p>
+            </div>
+            <div className="rounded-xl border border-[var(--border)] p-4">
+              <p className="text-xs font-semibold uppercase text-[var(--muted)]">
+                Payroll Paid USD
+              </p>
+              <p className="mt-2 text-xl font-bold text-emerald-600">
+                USD {formatAmount(project.employee_payroll_summary?.USD?.paid)}
+              </p>
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-[var(--border)]">
+            <div className="hidden overflow-x-auto md:block">
+              <table className="w-full min-w-[760px]">
+                <thead className="bg-[var(--hover)]">
+                  <tr>
+                    {["Employee", "Period", "Paid", "Payment Date", "Status"].map((header) => (
+                      <th
+                        key={header}
+                        className="px-4 py-3 text-start text-xs font-semibold uppercase text-[var(--muted)]"
+                      >
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(project.payroll_records || []).map((payroll) => (
+                    <tr key={payroll.id} className="border-t border-[var(--border)]">
+                      <td className="px-4 py-3 text-sm font-medium">
+                        {payroll.employee}
+                        <p className="text-xs text-[var(--muted)]">
+                          {payroll.employee_id}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        {formatDate(payroll.period_start)} - {formatDate(payroll.period_end)}
+                      </td>
+                      <td className="px-4 py-3 text-sm font-semibold">
+                        {payroll.currency} {formatAmount(payroll.amount_paid)}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        {formatDate(payroll.payment_date) || "-"}
+                      </td>
+                      <td className="px-4 py-3 text-sm capitalize">
+                        {String(payroll.payment_status || "").replace("_", " ")}
+                      </td>
+                    </tr>
+                  ))}
+                  {(project.payroll_records || []).length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-6 text-center text-sm text-[var(--muted)]">
+                        No project employee payroll recorded yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div className="divide-y divide-[var(--border)] md:hidden">
+              {(project.payroll_records || []).map((payroll) => (
+                <article key={payroll.id} className="grid gap-2 p-4 text-sm">
+                  <div className="font-semibold">{payroll.employee}</div>
+                  <div className="text-[var(--muted)]">
+                    {formatDate(payroll.period_start)} - {formatDate(payroll.period_end)}
+                  </div>
+                  <div>
+                    {payroll.currency} {formatAmount(payroll.amount_paid)} ·{" "}
+                    {String(payroll.payment_status || "").replace("_", " ")}
+                  </div>
+                </article>
+              ))}
+              {(project.payroll_records || []).length === 0 && (
+                <p className="p-4 text-sm text-[var(--muted)]">
+                  No project employee payroll recorded yet.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* ── Timeline Progress ────────────────────── */}
         <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
           <h3 className="mb-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">

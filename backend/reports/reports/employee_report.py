@@ -10,7 +10,7 @@ class EmployeeReport(BaseReport):
     report_name = "Employee Report"
 
     def generate(self):
-        qs = Employee.objects.all()
+        qs = Employee.objects.select_related("project")
 
         department = self.filters.get("department")
         employment_type = self.filters.get("employment_type")
@@ -34,6 +34,9 @@ class EmployeeReport(BaseReport):
                 "department": e.get_department_display(),
                 "position": e.position,
                 "employment_type": e.get_employment_type_display(),
+                "project": e.project.name if e.project else "",
+                "project_id": e.project_id,
+                "job_type": e.get_job_type_display(),
                 "hire_date": e.hire_date,
                 "salary": e.salary,
                 "is_active": e.is_active,
