@@ -1416,7 +1416,8 @@
     "salary": "Salary",
     "hired": "Hired",
     "edit": "Edit",
-    "currency": "AFN"
+    "currency": "AFN",
+    "delete": "Delete"
   },
 
   "EmployeeForm": {

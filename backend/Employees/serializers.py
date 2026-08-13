@@ -27,13 +27,24 @@ class EmployeeSerializer(CalendarModelSerializer):
             'id', 'employee_id', 'first_name', 'last_name', 'full_name',
             'email', 'phone', 'address', 'department', 'position',
             'employment_type', 'employment_type_display', 'project', 'project_name',
-            'job_type', 'hire_date', 'termination_date',
+            'job_type', 'hire_date',
             'salary', 'hourly_rate', 'emergency_contact_name',
             'emergency_contact_phone', 'is_active', 'notes',
             'total_payrolls', 'latest_payroll',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at',"employee_id"]
+        extra_kwargs = {
+            'email': {
+                'required': False,
+                'allow_null': True,
+                'allow_blank': True,
+            },
+            'address': {
+                'required': False,
+                'allow_blank': True,
+            },
+        }
 
     def get_total_payrolls(self, obj):
         return obj.payrolls.count()
@@ -50,10 +61,17 @@ class EmployeeSerializer(CalendarModelSerializer):
         return None
 
     def validate_email(self, value):
-        if Employee.objects.filter(email=value).exclude(id=self.instance.id if self.instance else None).exists():
-            raise serializers.ValidationError("An employee with this email already exists.")
-        return value
+        if not value:
+            return None
 
+        if Employee.objects.filter(email=value).exclude(
+            id=self.instance.id if self.instance else None
+        ).exists():
+            raise serializers.ValidationError(
+                "An employee with this email already exists."
+            )
+
+        return value
     def validate_employee_id(self, value):
         if Employee.objects.filter(employee_id=value).exclude(id=self.instance.id if self.instance else None).exists():
             raise serializers.ValidationError("An employee with this ID already exists.")

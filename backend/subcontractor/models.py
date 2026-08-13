@@ -160,7 +160,7 @@ class Contract(models.Model):
 
     # ── schedule ───────────────────────────────
     start_date = models.DateField()
-    end_date   = models.DateField()
+    end_date   = models.DateField(blank=True, null=True)
 
     # ── progress ───────────────────────────────
     completion_percentage = models.DecimalField(

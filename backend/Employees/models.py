@@ -39,7 +39,7 @@ class Employee(models.Model):
     last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True,null=True,blank=True)
     phone = models.CharField(max_length=20)
-    address = models.TextField()
+    address = models.TextField(null=True,blank=True)
     
     department = models.CharField(
         max_length=50,
@@ -67,7 +67,7 @@ class Employee(models.Model):
     )
     
     hire_date = models.DateField()
-    termination_date = models.DateField(null=True, blank=True)
+    # termination_date = models.DateField(null=True, blank=True)
     
     salary = models.DecimalField(max_digits=12, decimal_places=2)
     hourly_rate = models.DecimalField(

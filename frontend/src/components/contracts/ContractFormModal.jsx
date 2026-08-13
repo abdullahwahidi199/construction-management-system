@@ -150,7 +150,11 @@ export default function ContractFormModal({
         "ContractFormModal.validation.startDateRequired",
       );
     // if (!form.end_date) newErrors.end_date = "End date is required";
-    if (values.start_date && values.end_date && values.start_date > values.end_date)
+    if (
+      values.start_date &&
+      values.end_date &&
+      values.start_date > values.end_date
+    )
       newErrors.end_date = t("ContractFormModal.validation.endDateInvalid");
     if (
       values.completion_percentage !== "" &&
@@ -173,9 +177,11 @@ export default function ContractFormModal({
     }
 
     const values = normalizedForm();
+
     const hasContractValue = values.contract_value !== "";
     const payload = {
       ...values,
+      end_date: values.end_date || null,
       contract_value: hasContractValue ? Number(values.contract_value) : null,
       retention_percentage: Number(values.retention_percentage),
       completion_percentage: Number(values.completion_percentage),
@@ -213,7 +219,10 @@ export default function ContractFormModal({
           className="flex h-full min-h-0 flex-col p-0"
           contentClassName="flex min-h-0 flex-1 flex-col p-0"
         >
-          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <form
+            onSubmit={handleSubmit}
+            className="flex min-h-0 flex-1 flex-col"
+          >
             {/* Header */}
             <div className="mobile-modal-header flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
               <h2 className="text-lg font-semibold text-[var(--text)]">

@@ -1413,7 +1413,8 @@
     "salary": "معاش",
     "hired": "تاریخ استخدام",
     "edit": "ویرایش",
-    "currency": "افغانی"
+    "currency": "افغانی",
+    "delete": "حذف"
   },
 
   "EmployeeForm": {

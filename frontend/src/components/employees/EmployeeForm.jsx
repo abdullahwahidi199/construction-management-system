@@ -32,7 +32,12 @@ const initialFormData = {
   notes: "",
 };
 
-export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel }) {
+export default function EmployeeForm({
+  employee,
+  employeeId,
+  onSuccess,
+  onCancel,
+}) {
   const { t, lang } = useLanguage();
   const isRTL = RTL_LANGS.includes(lang);
   const effectiveEmployeeId = employeeId || employee?.id;
@@ -53,7 +58,10 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
       setCurrentEmployee(response.data);
     } catch (error) {
       setLocalError(
-        getFriendlyErrorMessage(error, "The requested item could not be found."),
+        getFriendlyErrorMessage(
+          error,
+          "The requested item could not be found.",
+        ),
       );
     } finally {
       setLoading(false);
@@ -90,7 +98,9 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
         salary: currentEmployee.salary ?? "",
         hourly_rate: currentEmployee.hourly_rate ?? "",
         project: currentEmployee.project ?? "",
-        hire_date: currentEmployee.hire_date ? currentEmployee.hire_date.split("T")[0] : "",
+        hire_date: currentEmployee.hire_date
+          ? currentEmployee.hire_date.split("T")[0]
+          : "",
       });
     }
   }, [currentEmployee]);
@@ -100,7 +110,9 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
-      ...(name === "employment_type" && value === "OFFICE" ? { project: "" } : {}),
+      ...(name === "employment_type" && value === "OFFICE"
+        ? { project: "" }
+        : {}),
     }));
   };
 
@@ -118,7 +130,10 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
       hourly_rate: formData.hourly_rate
         ? parseFloat(formData.hourly_rate)
         : null,
-      project: formData.employment_type === "PROJECT" ? formData.project || null : null,
+      project:
+        formData.employment_type === "PROJECT"
+          ? formData.project || null
+          : null,
     };
 
     try {
@@ -505,7 +520,9 @@ export default function EmployeeForm({ employee, employeeId, onSuccess, onCancel
           {t("EmployeeForm.cancel")}
         </Button>
         <PermissionWrapper
-          permissions={[effectiveEmployeeId ? "employees.update" : "employees.create"]}
+          permissions={[
+            effectiveEmployeeId ? "employees.update" : "employees.create",
+          ]}
           fallback={
             <Button
               type="submit"

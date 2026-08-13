@@ -3,7 +3,7 @@ import instance from "../../api/axiosInstance";
 import Loading from "../common/Loading";
 import { useLanguage } from "../../hooks/useLanguage";
 import { useCalendar } from "../../hooks/useCalendar";
-
+import { Trash2 } from "lucide-react";
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
 
 export default function EmployeeCard({ employee, onEdit, onView, onDelete }) {
@@ -118,7 +118,9 @@ export default function EmployeeCard({ employee, onEdit, onView, onDelete }) {
         style={{ borderColor: "var(--border)" }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Edit */}
         <button
+          type="button"
           onClick={() => onEdit(employee)}
           className="flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
           style={{
@@ -127,6 +129,20 @@ export default function EmployeeCard({ employee, onEdit, onView, onDelete }) {
           }}
         >
           {t("EmployeeCard.edit")}
+        </button>
+
+        {/* Delete */}
+        <button
+          type="button"
+          onClick={() => onDelete(employee)}
+          className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+          style={{
+            backgroundColor: "var(--danger)",
+            color: "#fff",
+          }}
+        >
+          <Trash2 size={16} />
+          {t("EmployeeCard.delete") || "Delete"}
         </button>
       </div>
     </div>

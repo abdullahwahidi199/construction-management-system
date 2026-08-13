@@ -262,7 +262,7 @@ class ContractWriteSerializer(CalendarModelSerializer):
     Serializer for creating/updating contracts.
     Separates write concerns from the read-heavy detail serializer.
     """
-
+    
     class Meta:
         model  = Contract
         fields = [
@@ -271,6 +271,12 @@ class ContractWriteSerializer(CalendarModelSerializer):
             'retention_percentage', 'start_date', 'end_date',
             'completion_percentage', 'status', 'notes',
         ]
+        extra_kwargs = {
+            'end_date': {
+                'required': False,
+                'allow_null': True,
+            },
+        }
 
     def validate(self, data):
         start = data.get('start_date')
