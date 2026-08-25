@@ -89,6 +89,18 @@ class SubcontractorAndContractAPITests(APITestCase):
         self.assertIsNone(summary.data["adjusted_contract_value"])
         self.assertIsNone(summary.data["remaining_amount"])
 
+    def test_contract_without_end_date_can_load_details_and_timeline(self):
+        contract = create_contract(project=self.project, end_date=None)
+
+        detail = self.client.get(f"/api/contracts/{contract.id}/")
+        timeline = self.client.get(f"/api/contracts/{contract.id}/financial-timeline/")
+
+        self.assertEqual(detail.status_code, 200, detail.data)
+        self.assertEqual(detail.data["end_date"], "")
+        self.assertIsNone(detail.data["financial_summary"]["adjusted_end_date"])
+        self.assertEqual(timeline.status_code, 200, timeline.data)
+        self.assertIsNone(timeline.data["results"]["summary"]["adjusted_end_date"])
+
     def test_contract_payments_do_not_exceed_adjusted_value_and_can_be_deleted(self):
         contract = create_contract(project=self.project, contract_value=Decimal("100.00"))
         create_contract_payment(contract=contract, amount=Decimal("75.00"))

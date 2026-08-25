@@ -288,6 +288,8 @@ class Contract(models.Model):
     @property
     def adjusted_end_date(self):
         """Original end date + approved variation days."""
+        if self.end_date is None:
+            return None
         return self.end_date + timedelta(days=self.total_variation_days)
 
     @property

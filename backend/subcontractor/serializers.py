@@ -80,7 +80,7 @@ class FinancialSummarySerializer(serializers.Serializer):
         max_digits=15, decimal_places=2, allow_null=True,
     )
     retention_balance       = serializers.DecimalField(max_digits=15, decimal_places=2)
-    adjusted_end_date       = serializers.DateField()
+    adjusted_end_date       = serializers.DateField(allow_null=True)
     completion_percentage   = serializers.DecimalField(max_digits=5,  decimal_places=2)
     total_invoiced = serializers.DecimalField(
         max_digits=15,
