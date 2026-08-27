@@ -11,6 +11,12 @@ from labour.models import WorkerPayroll
 from Employees.models import Employee, Payroll
 
 
+ZERO = Decimal("0.00")
+SUPPORTED_CURRENCIES = ("AFN", "USD")
+
+
+def _empty_currency_totals():
+    return {currency: ZERO for currency in SUPPORTED_CURRENCIES}
 
 
 class ProjectSerializer(CalendarModelSerializer):
@@ -59,42 +65,56 @@ class ProjectSerializer(CalendarModelSerializer):
     # def get_contracts(self, obj):
     #     contracts = obj.subcontractor_contracts.all()
     #     return ContractListSerializer(contracts, many=True).data
+    def _contract_currency(self, contract, obj):
+        currency = (contract.currency or "").upper()
+        if currency in SUPPORTED_CURRENCIES:
+            return currency
+
+        budget_currency = (obj.budget_currency or "").upper()
+        if budget_currency in SUPPORTED_CURRENCIES:
+            return budget_currency
+
+        return "AFN"
+
+    def _contract_value(self, contract):
+        return contract.adjusted_contract_value or ZERO
+
+    def _contract_payments_total(self, contract):
+        return (
+            contract.payments.aggregate(total=Sum("amount"))["total"]
+            or ZERO
+        )
+
     def get_total_contract_value(self, obj):
-        totals = {
-            "AFN": Decimal("0.00"),
-            "USD": Decimal("0.00"),
-        }
+        totals = _empty_currency_totals()
 
         for contract in obj.subcontractor_contracts.all():
-            totals[contract.currency] += contract.adjusted_contract_value
+            currency = self._contract_currency(contract, obj)
+            totals[currency] += self._contract_value(contract)
 
         return totals
 
     def get_total_contract_payments(self, obj):
-        totals = {
-            "AFN": Decimal("0.00"),
-            "USD": Decimal("0.00"),
-        }
+        totals = _empty_currency_totals()
 
         for contract in obj.subcontractor_contracts.all():
-            paid = (
-                contract.payments.aggregate(
-                    total=Sum("amount")
-                )["total"]
-                or Decimal("0.00")
-            )
-
-            totals[contract.currency] += paid
+            currency = self._contract_currency(contract, obj)
+            totals[currency] += self._contract_payments_total(contract)
 
         return totals
-    def get_remaining_contract_balance(self, obj):
-        contract_values = self.get_total_contract_value(obj)
-        payments = self.get_total_contract_payments(obj)
 
-        return {
-            "AFN": contract_values["AFN"] - payments["AFN"],
-            "USD": contract_values["USD"] - payments["USD"],
-        }
+    def get_remaining_contract_balance(self, obj):
+        totals = _empty_currency_totals()
+
+        for contract in obj.subcontractor_contracts.all():
+            adjusted_value = contract.adjusted_contract_value
+            if adjusted_value is None:
+                continue
+
+            currency = self._contract_currency(contract, obj)
+            totals[currency] += adjusted_value - self._contract_payments_total(contract)
+
+        return totals
 
     def get_worker_payroll_summary(self, obj):
         summary = {

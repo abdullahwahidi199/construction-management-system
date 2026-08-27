@@ -3,7 +3,15 @@ from decimal import Decimal
 
 from rest_framework.test import APITestCase
 
-from common.test_helpers import create_admin, create_employee, create_payroll, create_project, create_user
+from common.test_helpers import (
+    create_admin,
+    create_contract,
+    create_contract_payment,
+    create_employee,
+    create_payroll,
+    create_project,
+    create_user,
+)
 from Employees.models import Employee, PayrollPayment
 from project.models import Project
 
@@ -104,6 +112,18 @@ class ProjectAPITests(APITestCase):
         self.assertEqual(response.data["budget_currency"], "USD")
         self.assertIn("total_expenses_usd", response.data)
         self.assertIn("total_contract_value", response.data)
+
+    def test_project_detail_handles_contract_without_value(self):
+        project = create_project(estimated_budget=Decimal("1000.00"), budget_currency="USD")
+        contract = create_contract(project=project, contract_value=None, currency="USD")
+        create_contract_payment(contract=contract, amount=Decimal("250.00"))
+
+        response = self.client.get(f"/api/projects/{project.id}/")
+
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(Decimal(response.data["total_contract_value"]["USD"]), Decimal("0.00"))
+        self.assertEqual(Decimal(response.data["total_contract_payments"]["USD"]), Decimal("250.00"))
+        self.assertEqual(Decimal(response.data["remaining_contract_balance"]["USD"]), Decimal("0.00"))
 
     def test_project_detail_includes_only_allocated_employee_payroll(self):
         project = create_project(name="Payroll Project", estimated_budget=Decimal("100000.00"), budget_currency="AFN")
