@@ -4,6 +4,7 @@ import { useLanguage } from "../../hooks/useLanguage";
 import { useCalendar } from "../../hooks/useCalendar";
 import PermissionWrapper from "../../auth/PermissionWrapper";
 import PrintableReceiptModal from "../common/PrintableReceiptModal";
+import instance from "../../api/axiosInstance";
 
 const formatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -21,6 +22,8 @@ export default function PaymentTable({
   const { t } = useLanguage();
   const { formatDate, formatDateTime } = useCalendar("contract_payments");
   const [receiptPayment, setReceiptPayment] = useState(null);
+  const [receiptHistory, setReceiptHistory] = useState([]);
+  const [receiptLoading, setReceiptLoading] = useState(false);
 
   const displayDate = (payment) =>
     formatDate(payment.payment_date) || payment.formatted_payment_date || "-";
@@ -53,7 +56,102 @@ export default function PaymentTable({
     payment.payment_type ||
     "-";
 
-  const buildReceipt = (payment) => {
+  const paymentSortValue = (payment) => {
+    const timestamp = Date.parse(payment.payment_date || payment.created_at || "");
+    return Number.isNaN(timestamp) ? 0 : timestamp;
+  };
+
+  const paymentMatchesContract = (payment, contractId) => {
+    if (!contractId) return true;
+    return String(payment.contract) === String(contractId);
+  };
+
+  const contractPaymentsFromList = (contractId) =>
+    payments.filter((payment) => paymentMatchesContract(payment, contractId));
+
+  const sortedPayments = (items) =>
+    [...items].sort((a, b) => {
+      const dateDiff = paymentSortValue(a) - paymentSortValue(b);
+      if (dateDiff !== 0) return dateDiff;
+      return Number(a.id || 0) - Number(b.id || 0);
+    });
+
+  const paginatedResults = (payload) => {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.results)) return payload.results;
+    return [];
+  };
+
+  const fetchAllContractPayments = async (contractId) => {
+    let url = `contract-payments/?contract=${contractId}&ordering=payment_date&page_size=100`;
+    const allPayments = [];
+
+    while (url) {
+      const response = await instance.get(url, { skipGlobalErrorToast: true });
+      allPayments.push(...paginatedResults(response.data));
+      url = response.data?.next || "";
+    }
+
+    return allPayments;
+  };
+
+  const openReceipt = async (payment) => {
+    const contractId = contractContext?.id || payment.contract;
+    const localHistory = contractPaymentsFromList(contractId);
+
+    setReceiptPayment(payment);
+    setReceiptHistory(localHistory.length ? localHistory : [payment]);
+
+    if (!contractId || contractContext?.id) return;
+
+    setReceiptLoading(true);
+    try {
+      const fetchedHistory = await fetchAllContractPayments(contractId);
+      setReceiptHistory(fetchedHistory.length ? fetchedHistory : [payment]);
+    } catch {
+      setReceiptHistory(localHistory.length ? localHistory : [payment]);
+    } finally {
+      setReceiptLoading(false);
+    }
+  };
+
+  const closeReceipt = () => {
+    setReceiptPayment(null);
+    setReceiptHistory([]);
+    setReceiptLoading(false);
+  };
+
+  const buildPaymentHistoryRows = (history, selectedPayment, currencyCode) => {
+    let runningTotal = 0;
+    const rows = sortedPayments(history).map((historyPayment) => {
+      const isReceiptPayment =
+        selectedPayment?.id &&
+        String(historyPayment.id) === String(selectedPayment.id);
+      const reference = historyPayment.reference_number || "-";
+      runningTotal += Number(historyPayment.amount || 0);
+
+      return {
+        date: displayDate(historyPayment),
+        type: paymentTypeLabel(historyPayment),
+        reference: isReceiptPayment ? `${reference} (this receipt)` : reference,
+        amount: formatAmount(historyPayment.amount, paymentCurrency(historyPayment)),
+        running_total: formatAmount(runningTotal, currencyCode),
+      };
+    });
+
+    rows.push({
+      isSummary: true,
+      date: "",
+      type: "",
+      reference: "Total Paid",
+      amount: "",
+      running_total: formatAmount(runningTotal, currencyCode),
+    });
+
+    return rows;
+  };
+
+  const buildReceipt = (payment, paymentHistory) => {
     const currencyCode = paymentCurrency(payment);
     const contractNumber =
       contractContext?.contract_number ||
@@ -68,6 +166,16 @@ export default function PaymentTable({
       contractContext?.subcontractor?.name ||
       payment.subcontractor_name ||
       "-";
+    const contractId = contractContext?.id || payment.contract;
+    const history =
+      paymentHistory.length > 0
+        ? paymentHistory
+        : contractPaymentsFromList(contractId);
+    const historyRows = buildPaymentHistoryRows(
+      history.length ? history : [payment],
+      payment,
+      currencyCode,
+    );
 
     return {
       title: "Contract Payment Receipt",
@@ -101,12 +209,27 @@ export default function PaymentTable({
           ],
         },
       ],
+      tables: [
+        {
+          title: "Contract Payment History",
+          columns: [
+            { key: "date", label: "Date" },
+            { key: "type", label: "Type" },
+            { key: "reference", label: "Reference" },
+            { key: "amount", label: "Amount", align: "right" },
+            { key: "running_total", label: "Running Total", align: "right" },
+          ],
+          rows: historyRows,
+        },
+      ],
       notes: payment.notes,
       signatures: ["Prepared By", "Approved By", "Paid By", "Received By"],
     };
   };
 
-  const receipt = receiptPayment ? buildReceipt(receiptPayment) : null;
+  const receipt = receiptPayment
+    ? buildReceipt(receiptPayment, receiptHistory)
+    : null;
 
   if (loading) {
     return (
@@ -186,9 +309,12 @@ export default function PaymentTable({
                 <td className="px-4 py-3 text-end">
                   <div className="flex items-center justify-end gap-1">
                     <button
-                      onClick={() => setReceiptPayment(payment)}
+                      onClick={() => openReceipt(payment)}
+                      disabled={receiptLoading}
                       className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)] transition-colors"
-                      title="Print receipt"
+                      title={
+                        receiptLoading ? "Loading receipt" : "Print receipt"
+                      }
                       aria-label="Print payment receipt"
                     >
                       <Printer size={16} />
@@ -243,9 +369,10 @@ export default function PaymentTable({
             )}
             <div className="flex items-center justify-end gap-2">
               <button
-                onClick={() => setReceiptPayment(payment)}
+                onClick={() => openReceipt(payment)}
+                disabled={receiptLoading}
                 className="p-2 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)]"
-                title="Print receipt"
+                title={receiptLoading ? "Loading receipt" : "Print receipt"}
                 aria-label="Print payment receipt"
               >
                 <Printer size={16} />
@@ -272,7 +399,7 @@ export default function PaymentTable({
       {receipt && (
         <PrintableReceiptModal
           isOpen={Boolean(receiptPayment)}
-          onClose={() => setReceiptPayment(null)}
+          onClose={closeReceipt}
           {...receipt}
         />
       )}

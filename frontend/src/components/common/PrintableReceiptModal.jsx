@@ -74,6 +74,63 @@ function renderPrintSections(sections = []) {
     .join("");
 }
 
+function normalizedTableColumns(columns = []) {
+  return columns.map((column) => ({
+    key: text(column.key),
+    label: text(column.label),
+    align: column.align || "left",
+  }));
+}
+
+function normalizedTableRows(rows = []) {
+  return rows.map((row) => ({
+    ...row,
+    cells: row.cells || row,
+  }));
+}
+
+function renderPrintTables(tables = []) {
+  return tables
+    .map((table) => {
+      const columns = normalizedTableColumns(table.columns);
+      const rows = normalizedTableRows(table.rows);
+      const header = columns
+        .map(
+          (column) => `
+            <th class="${column.align === "right" ? "numeric" : ""}">
+              ${escapeHtml(column.label)}
+            </th>
+          `,
+        )
+        .join("");
+      const body = rows
+        .map((row) => {
+          const cells = columns
+            .map(
+              (column) => `
+                <td class="${column.align === "right" ? "numeric" : ""}">
+                  ${escapeHtml(row.cells[column.key])}
+                </td>
+              `,
+            )
+            .join("");
+          return `<tr class="${row.isSummary ? "summary-row" : ""}">${cells}</tr>`;
+        })
+        .join("");
+
+      return `
+        <section class="section">
+          <h2>${escapeHtml(table.title)}</h2>
+          <table class="data-table">
+            <thead><tr>${header}</tr></thead>
+            <tbody>${body}</tbody>
+          </table>
+        </section>
+      `;
+    })
+    .join("");
+}
+
 function renderPrintSignatures(signatures = []) {
   return signatures
     .map(
@@ -100,6 +157,7 @@ export default function PrintableReceiptModal({
   currency,
   details = [],
   sections = [],
+  tables = [],
   notes,
   signatures = [],
   footer = "This is a system-generated receipt. Keep it with the payment records.",
@@ -256,6 +314,32 @@ export default function PrintableReceiptModal({
             background: #f9fafb;
           }
           tr:last-child td { border-bottom: 0; }
+          .data-table th {
+            border-bottom: 1px solid #d1d5db;
+            padding: 8px 10px;
+            background: #f3f4f6;
+            color: #374151;
+            font-size: 10px;
+            font-weight: 800;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          .data-table td {
+            color: #111827;
+            font-weight: 650;
+            background: #ffffff;
+          }
+          .data-table td:first-child {
+            width: auto;
+            color: #111827;
+            background: #ffffff;
+          }
+          .data-table .numeric { text-align: right; }
+          .data-table .summary-row td {
+            background: #f9fafb;
+            font-weight: 850;
+          }
           .notes {
             border: 1px solid #d1d5db;
             border-radius: 8px;
@@ -316,6 +400,7 @@ export default function PrintableReceiptModal({
           </section>
           <section class="info-grid">${renderPrintRows(details)}</section>
           ${renderPrintSections(sections)}
+          ${renderPrintTables(tables)}
           ${notes ? `<section class="notes">${escapeHtml(notes)}</section>` : ""}
           <section class="signatures">${renderPrintSignatures(signatures)}</section>
           ${renderPrintBrandFooter(company, footer)}
@@ -440,6 +525,58 @@ export default function PrintableReceiptModal({
                   </div>
                 </div>
               ))}
+
+              {tables.map((table) => {
+                const columns = normalizedTableColumns(table.columns);
+                const rows = normalizedTableRows(table.rows);
+
+                return (
+                  <div key={table.title} className="mb-5">
+                    <h3 className="mb-2 border-b border-slate-300 pb-1 text-xs font-extrabold uppercase tracking-wide text-slate-700">
+                      {table.title}
+                    </h3>
+                    <div className="overflow-x-auto rounded-lg border border-slate-200">
+                      <table className="w-full min-w-[620px] border-collapse text-sm">
+                        <thead>
+                          <tr className="bg-slate-100 text-left text-[10px] font-extrabold uppercase tracking-wide text-slate-600">
+                            {columns.map((column) => (
+                              <th
+                                key={column.key}
+                                className={`px-3 py-2 ${
+                                  column.align === "right" ? "text-right" : ""
+                                }`}
+                              >
+                                {column.label}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {rows.map((row, rowIndex) => (
+                            <tr
+                              key={`${table.title}-${rowIndex}`}
+                              className={`border-t border-slate-200 ${
+                                row.isSummary ? "bg-slate-50 font-extrabold" : ""
+                              }`}
+                            >
+                              {columns.map((column) => (
+                                <td
+                                  key={`${table.title}-${rowIndex}-${column.key}`}
+                                  className={`px-3 py-2 ${
+                                    column.align === "right" ? "text-right" : ""
+                                  }`}
+                                >
+                                  {text(row.cells[column.key])}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                );
+              })}
 
               {notes && (
                 <div className="mb-8 rounded-lg border border-slate-200 p-3 text-sm text-slate-700">
