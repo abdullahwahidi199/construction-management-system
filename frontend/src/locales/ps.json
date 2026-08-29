@@ -924,6 +924,10 @@
     "actions": "عملیات",
     "view": "لیدل",
     "edit": "سمول",
+    "delete": "ړنګول",
+    "deleteInvoice": "د بل ړنګول",
+    "deleteConfirmation": "ایا ډاډه یاست چې بل «{{invoiceNumber}}» ړنګول غواړئ؟ دا عمل بېرته نه راګرځي.",
+    "deleted": "بل ړنګ شو.",
     "noMatchingInvoices": "د ټاکل شوو معیارونو مطابق هېڅ بل ونه موندل شو.",
     "noInvoicesForContract": "د دې قرارداد لپاره هېڅ بل ونه موندل شو.",
     "error": "تېروتنه"

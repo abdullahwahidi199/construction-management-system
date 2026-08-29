@@ -1,5 +1,4 @@
 import { Eye, Edit, Trash2 } from "lucide-react";
-import Button from "../ui/Button";
 import ContractStatusBadge from "./ContractStatusBadge";
 import ProgressBar from "./ProgressBar";
 import PermissionWrapper from "../../auth/PermissionWrapper";
@@ -111,20 +110,40 @@ export default function ContractTable({
                 </td>
                 <td className="px-4 py-3 text-end">
                   <div className="flex items-center justify-end gap-1">
-                    <button
-                      onClick={() => onView(contract)}
-                      className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)] transition-colors"
-                      title={t("ContractTable.actions.view")}
-                    >
-                      <Eye size={16} />
-                    </button>
-                    <button
-                      onClick={() => onEdit(contract)}
-                      className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)] transition-colors"
-                      title={t("ContractTable.actions.edit")}
-                    >
-                      <Edit size={16} />
-                    </button>
+                    {onView && (
+                      <button
+                        onClick={() => onView(contract)}
+                        className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)] transition-colors"
+                        title={t("ContractTable.actions.view")}
+                        aria-label={t("ContractTable.actions.view")}
+                      >
+                        <Eye size={16} />
+                      </button>
+                    )}
+                    {onEdit && (
+                      <PermissionWrapper permissions={["contracts.update"]}>
+                        <button
+                          onClick={() => onEdit(contract)}
+                          className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)] transition-colors"
+                          title={t("ContractTable.actions.edit")}
+                          aria-label={t("ContractTable.actions.edit")}
+                        >
+                          <Edit size={16} />
+                        </button>
+                      </PermissionWrapper>
+                    )}
+                    {onDelete && (
+                      <PermissionWrapper permissions={["contracts.delete"]}>
+                        <button
+                          onClick={() => onDelete(contract)}
+                          className="p-1.5 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--danger)] transition-colors"
+                          title={t("ContractTable.actions.delete")}
+                          aria-label={t("ContractTable.actions.delete")}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </PermissionWrapper>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -157,24 +176,40 @@ export default function ContractTable({
             </div>
             <ProgressBar value={contract.completion_percentage} size="sm" />
             <div className="flex items-center justify-end gap-2 pt-1">
-              <button
-                onClick={() => onView(contract)}
-                className="p-2 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)]"
-              >
-                <Eye size={16} />
-              </button>
-              <button
-                onClick={() => onEdit(contract)}
-                className="p-2 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)]"
-              >
-                <Edit size={16} />
-              </button>
-              <button
-                onClick={() => onDelete(contract)}
-                className="p-2 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--danger)]"
-              >
-                <Trash2 size={16} />
-              </button>
+              {onView && (
+                <button
+                  onClick={() => onView(contract)}
+                  className="p-2 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)]"
+                  title={t("ContractTable.actions.view")}
+                  aria-label={t("ContractTable.actions.view")}
+                >
+                  <Eye size={16} />
+                </button>
+              )}
+              {onEdit && (
+                <PermissionWrapper permissions={["contracts.update"]}>
+                  <button
+                    onClick={() => onEdit(contract)}
+                    className="p-2 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--primary)]"
+                    title={t("ContractTable.actions.edit")}
+                    aria-label={t("ContractTable.actions.edit")}
+                  >
+                    <Edit size={16} />
+                  </button>
+                </PermissionWrapper>
+              )}
+              {onDelete && (
+                <PermissionWrapper permissions={["contracts.delete"]}>
+                  <button
+                    onClick={() => onDelete(contract)}
+                    className="p-2 rounded-lg hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--danger)]"
+                    title={t("ContractTable.actions.delete")}
+                    aria-label={t("ContractTable.actions.delete")}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </PermissionWrapper>
+              )}
             </div>
           </div>
         ))}

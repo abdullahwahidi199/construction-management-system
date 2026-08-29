@@ -19,7 +19,13 @@ from common.test_helpers import (
     contract_payload,
     uploaded_file,
 )
-from subcontractor.models import Contract, ContractDocument, ContractPayment, Subcontractor
+from subcontractor.models import (
+    Contract,
+    ContractDocument,
+    ContractInvoice,
+    ContractPayment,
+    Subcontractor,
+)
 
 
 class SubcontractorAndContractAPITests(APITestCase):
@@ -70,6 +76,51 @@ class SubcontractorAndContractAPITests(APITestCase):
         summary = self.client.get(f"/api/contracts/{contract.id}/financial_summary/")
         self.assertEqual(summary.status_code, 200, summary.data)
         self.assertEqual(Decimal(summary.data["retention_amount"]), Decimal("100.00"))
+
+    def test_contract_and_invoice_deletion_require_their_respective_permissions(self):
+        contract = create_contract(project=self.project)
+        invoice = ContractInvoice.objects.create(
+            contract=contract,
+            invoice_date=date(2026, 3, 1),
+            amount=Decimal("250.00"),
+        )
+        viewer = create_user(
+            username="contract-viewer",
+            role="contract_viewer",
+            permissions=["contracts.view", "contract_invoices.view"],
+        )
+        self.client.force_authenticate(viewer)
+
+        contract_forbidden = self.client.delete(f"/api/contracts/{contract.id}/")
+        invoice_forbidden = self.client.delete(f"/api/invoices/{invoice.id}/")
+
+        self.assertEqual(contract_forbidden.status_code, 403)
+        self.assertEqual(invoice_forbidden.status_code, 403)
+        self.assertTrue(Contract.objects.filter(id=contract.id).exists())
+        self.assertTrue(ContractInvoice.objects.filter(id=invoice.id).exists())
+
+        invoice_deleter = create_user(
+            username="invoice-deleter",
+            role="invoice_deleter",
+            permissions=["contract_invoices.delete"],
+        )
+        self.client.force_authenticate(invoice_deleter)
+        invoice_deleted = self.client.delete(f"/api/invoices/{invoice.id}/")
+
+        self.assertEqual(invoice_deleted.status_code, 204)
+        self.assertFalse(ContractInvoice.objects.filter(id=invoice.id).exists())
+        self.assertTrue(Contract.objects.filter(id=contract.id).exists())
+
+        contract_deleter = create_user(
+            username="contract-deleter",
+            role="contract_deleter",
+            permissions=["contracts.delete"],
+        )
+        self.client.force_authenticate(contract_deleter)
+        contract_deleted = self.client.delete(f"/api/contracts/{contract.id}/")
+
+        self.assertEqual(contract_deleted.status_code, 204)
+        self.assertFalse(Contract.objects.filter(id=contract.id).exists())
 
     def test_contract_value_is_optional_and_remaining_amount_stays_unknown(self):
         subcontractor = create_subcontractor()

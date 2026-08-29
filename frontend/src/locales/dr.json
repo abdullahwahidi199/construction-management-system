@@ -924,6 +924,10 @@
     "actions": "عملیات",
     "view": "مشاهده",
     "edit": "ویرایش",
+    "delete": "حذف",
+    "deleteInvoice": "حذف فاکتور",
+    "deleteConfirmation": "آیا مطمئن هستید که می‌خواهید فاکتور «{{invoiceNumber}}» را حذف کنید؟ این عمل قابل بازگشت نیست.",
+    "deleted": "فاکتور حذف شد.",
     "noMatchingInvoices": "هیچ فاکتوری مطابق معیارهای انتخاب‌شده یافت نشد.",
     "noInvoicesForContract": "هیچ فاکتوری برای این قرارداد یافت نشد.",
     "error": "خطا"

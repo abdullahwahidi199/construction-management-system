@@ -927,6 +927,10 @@
     "actions": "Actions",
     "view": "View",
     "edit": "Edit",
+    "delete": "Delete",
+    "deleteInvoice": "Delete Invoice",
+    "deleteConfirmation": "Are you sure you want to delete invoice \"{{invoiceNumber}}\"? This action cannot be undone.",
+    "deleted": "Invoice deleted.",
     "noMatchingInvoices": "No matching invoices found for the selected criteria.",
     "noInvoicesForContract": "No invoices found for this contract.",
     "error": "Error"

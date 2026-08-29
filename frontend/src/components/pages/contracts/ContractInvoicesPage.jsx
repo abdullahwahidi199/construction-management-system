@@ -1,11 +1,16 @@
 // src/pages/contracts/ContractInvoicesPage.jsx
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import useFetch from "../../../hooks/useFetch";
 import InvoiceFormModal from "./InvoiceFormModal";
 import ContractInvoiceDetails from "../../contracts/ContractInvoiceDetails";
 import { useLanguage } from "../../../hooks/useLanguage";
 import CalendarDatePicker from "../../common/CalendarDatePicker";
 import { useCalendar } from "../../../hooks/useCalendar";
+import { Eye, Pencil, Trash2 } from "lucide-react";
+import instance from "../../../api/axiosInstance";
+import DeleteConfirmModal from "../../ui/DeleteConfirmModal";
+import PermissionWrapper from "../../../auth/PermissionWrapper";
+import toast from "react-hot-toast";
 
 const STATUS_COLORS = {
   pending: "var(--warning)",
@@ -49,16 +54,22 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
     error,
     refetch,
   } = useFetch(`invoices/?contract=${contractID}`);
-  const invoiceList = Array.isArray(invoices)
-    ? invoices
-    : Array.isArray(invoices?.results)
-      ? invoices.results
-      : [];
+  const invoiceList = useMemo(
+    () =>
+      Array.isArray(invoices)
+        ? invoices
+        : Array.isArray(invoices?.results)
+          ? invoices.results
+          : [],
+    [invoices],
+  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [viewInvoiceId, setViewInvoiceId] = useState(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
+  const [deletingInvoice, setDeletingInvoice] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // --- Filter State ---
   const [searchQuery, setSearchQuery] = useState("");
@@ -84,6 +95,22 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
   const handleSuccess = () => {
     refetch();
     handleCloseModal();
+  };
+
+  const handleDelete = async () => {
+    if (!deletingInvoice) return;
+
+    setDeleteLoading(true);
+    try {
+      await instance.delete(`invoices/${deletingInvoice.id}/`);
+      setDeletingInvoice(null);
+      refetch();
+      toast.success(t("ContractInvoicesPage.deleted"));
+    } catch {
+      // Central axios handling shows the user-facing error.
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   const handleClearFilters = () => {
@@ -417,38 +444,46 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
                     </span>
                   </td>
                   <td style={{ padding: "1rem" }}>
-                    <button
-                      onClick={() => {
-                        setViewInvoiceId(inv.id);
-                        setIsViewOpen(true);
-                      }}
-                      style={{
-                        background: "transparent",
-                        border: "1px solid var(--border)",
-                        padding: "0.3rem 0.6rem",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                        color: "var(--text)",
-                        fontSize: "0.8rem",
-                        marginRight: "0.5rem",
-                      }}
-                    >
-                      {t("ContractInvoicesPage.view")}
-                    </button>
-                    <button
-                      onClick={() => handleOpenEdit(inv)}
-                      style={{
-                        background: "transparent",
-                        border: "1px solid var(--border)",
-                        padding: "0.3rem 0.6rem",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                        color: "var(--text)",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      {t("ContractInvoicesPage.edit")}
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setViewInvoiceId(inv.id);
+                          setIsViewOpen(true);
+                        }}
+                        className="rounded-lg p-1.5 text-[var(--muted)] transition-colors hover:bg-[var(--hover)] hover:text-[var(--primary)]"
+                        title={t("ContractInvoicesPage.view")}
+                        aria-label={t("ContractInvoicesPage.view")}
+                      >
+                        <Eye size={16} />
+                      </button>
+                      <PermissionWrapper
+                        permissions={["contract_invoices.update"]}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEdit(inv)}
+                          className="rounded-lg p-1.5 text-[var(--muted)] transition-colors hover:bg-[var(--hover)] hover:text-[var(--primary)]"
+                          title={t("ContractInvoicesPage.edit")}
+                          aria-label={t("ContractInvoicesPage.edit")}
+                        >
+                          <Pencil size={16} />
+                        </button>
+                      </PermissionWrapper>
+                      <PermissionWrapper
+                        permissions={["contract_invoices.delete"]}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => setDeletingInvoice(inv)}
+                          className="rounded-lg p-1.5 text-[var(--muted)] transition-colors hover:bg-[var(--hover)] hover:text-[var(--danger)]"
+                          title={t("ContractInvoicesPage.delete")}
+                          aria-label={t("ContractInvoicesPage.delete")}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </PermissionWrapper>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -534,17 +569,38 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
                       setViewInvoiceId(inv.id);
                       setIsViewOpen(true);
                     }}
-                    className="h-12 rounded-xl border border-[var(--border)] px-4 text-sm font-medium text-[var(--text)]"
+                    className="grid h-12 w-12 place-items-center rounded-xl border border-[var(--border)] text-[var(--muted)] hover:text-[var(--primary)]"
+                    title={t("ContractInvoicesPage.view")}
+                    aria-label={t("ContractInvoicesPage.view")}
                   >
-                    {t("ContractInvoicesPage.view")}
+                    <Eye size={18} />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleOpenEdit(inv)}
-                    className="h-12 rounded-xl border border-[var(--border)] px-4 text-sm font-medium text-[var(--text)]"
+                  <PermissionWrapper
+                    permissions={["contract_invoices.update"]}
                   >
-                    {t("ContractInvoicesPage.edit")}
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEdit(inv)}
+                      className="grid h-12 w-12 place-items-center rounded-xl border border-[var(--border)] text-[var(--muted)] hover:text-[var(--primary)]"
+                      title={t("ContractInvoicesPage.edit")}
+                      aria-label={t("ContractInvoicesPage.edit")}
+                    >
+                      <Pencil size={18} />
+                    </button>
+                  </PermissionWrapper>
+                  <PermissionWrapper
+                    permissions={["contract_invoices.delete"]}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setDeletingInvoice(inv)}
+                      className="grid h-12 w-12 place-items-center rounded-xl border border-[var(--border)] text-[var(--muted)] hover:text-[var(--danger)]"
+                      title={t("ContractInvoicesPage.delete")}
+                      aria-label={t("ContractInvoicesPage.delete")}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </PermissionWrapper>
                 </div>
               </article>
             ))}
@@ -571,6 +627,17 @@ export default function ContractInvoicesPage({ contractID, contractCurrency }) {
           }}
         />
       )}
+
+      <DeleteConfirmModal
+        isOpen={!!deletingInvoice}
+        onClose={() => setDeletingInvoice(null)}
+        onConfirm={handleDelete}
+        loading={deleteLoading}
+        title={t("ContractInvoicesPage.deleteInvoice")}
+        message={t("ContractInvoicesPage.deleteConfirmation", {
+          invoiceNumber: deletingInvoice?.invoice_number || "",
+        })}
+      />
     </div>
   );
 }
