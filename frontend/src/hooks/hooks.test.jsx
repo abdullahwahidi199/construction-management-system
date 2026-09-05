@@ -47,6 +47,36 @@ describe("API hooks", () => {
     expect(result.current.error).toBe("Something went wrong. Please try again in a moment.");
   });
 
+  it("useFetch can combine every page of a paginated endpoint", async () => {
+    api.get
+      .mockResolvedValueOnce({
+        data: {
+          results: [{ id: 1 }],
+          next: "subcontractors/?page=2&page_size=100",
+        },
+      })
+      .mockResolvedValueOnce({
+        data: { results: [{ id: 2 }], next: null },
+      });
+
+    const { result } = renderHook(() =>
+      useFetch("subcontractors/", { fetchAllPages: true }),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toEqual([{ id: 1 }, { id: 2 }]);
+    expect(api.get).toHaveBeenNthCalledWith(
+      1,
+      "subcontractors/?page_size=100",
+      undefined,
+    );
+    expect(api.get).toHaveBeenNthCalledWith(
+      2,
+      "subcontractors/?page=2&page_size=100",
+      undefined,
+    );
+  });
+
   it("usePost toggles loading and returns response data", async () => {
     api.post.mockResolvedValueOnce({ data: { id: 10 } });
     const { result } = renderHook(() => usePost());

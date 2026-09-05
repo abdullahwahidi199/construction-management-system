@@ -5,6 +5,7 @@ import Card from "../ui/Card";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
+import SearchableSelect from "../ui/SearchableSelect";
 import { fieldLabelClass, textareaControlClass } from "../ui/formStyles.jsx";
 import useFetch from "../../hooks/useFetch";
 import PermissionWrapper from "../../auth/PermissionWrapper";
@@ -55,7 +56,9 @@ export default function ContractFormModal({
   ];
 
   const { data: projectsData } = useFetch("projects/");
-  const { data: subcontractorsData } = useFetch("subcontractors/");
+  const { data: subcontractorsData } = useFetch("subcontractors/", {
+    fetchAllPages: true,
+  });
 
   const projects = projectsData?.results || projectsData || [];
   const subcontractors =
@@ -253,7 +256,7 @@ export default function ContractFormModal({
                   error={errors.project}
                   required
                 />
-                <Select
+                <SearchableSelect
                   label={t("ContractFormModal.fields.subcontractor")}
                   value={form.subcontractor}
                   onChange={(val) => handleChange("subcontractor", val)}

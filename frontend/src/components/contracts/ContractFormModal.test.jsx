@@ -104,9 +104,10 @@ describe("ContractFormModal", () => {
     fireEvent.change(screen.getByRole("combobox", { name: /Project/ }), {
       target: { value: "1" },
     });
-    fireEvent.change(screen.getByRole("combobox", { name: /Subcontractor/ }), {
-      target: { value: "7" },
-    });
+    fireEvent.mouseDown(
+      screen.getByRole("combobox", { name: /Subcontractor/ }),
+    );
+    fireEvent.click(screen.getByText("Kabul Concrete"));
     fireEvent.change(screen.getByPlaceholderText("Short title"), {
       target: { value: "Foundation package" },
     });
@@ -146,9 +147,10 @@ describe("ContractFormModal", () => {
     fireEvent.change(screen.getByRole("combobox", { name: /Project/ }), {
       target: { value: "1" },
     });
-    fireEvent.change(screen.getByRole("combobox", { name: /Subcontractor/ }), {
-      target: { value: "7" },
-    });
+    fireEvent.mouseDown(
+      screen.getByRole("combobox", { name: /Subcontractor/ }),
+    );
+    fireEvent.click(screen.getByText("Kabul Concrete"));
     fireEvent.change(screen.getByPlaceholderText("Short title"), {
       target: { value: "Foundation package" },
     });
@@ -164,5 +166,26 @@ describe("ContractFormModal", () => {
         contract_value: null,
       }),
     );
+  });
+
+  it("lets users search for a subcontractor in the dropdown", () => {
+    render(
+      <ContractFormModal
+        isOpen
+        onClose={vi.fn()}
+        onSubmit={onSubmit}
+        loading={false}
+      />,
+    );
+
+    const subcontractorSelect = screen.getByRole("combobox", {
+      name: /Subcontractor/,
+    });
+    expect(subcontractorSelect).toHaveAttribute("type", "text");
+
+    fireEvent.change(subcontractorSelect, {
+      target: { value: "Kabul" },
+    });
+    expect(screen.getByText("Kabul Concrete")).toBeInTheDocument();
   });
 });
