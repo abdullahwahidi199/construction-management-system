@@ -9,9 +9,12 @@ import {
   BarChart3,
   ClipboardList,
   HardHat,
+  Building2,
+  CreditCard,
 } from "lucide-react";
 
 import { useAuth } from "../auth/AuthContext";
+import { APARTMENT_MANAGEMENT_PERMISSIONS } from "../auth/roles";
 import NotificationBell from "../components/notifications/NotificationBell";
 import { useLanguage } from "../hooks/useLanguage";
 import { hasAnyPermission } from "../../utils/permissions";
@@ -43,6 +46,27 @@ export default function DataEntryRootLayout() {
         "projects.update",
         "projects.delete",
       ]),
+    },
+
+    {
+      label: t("dataEntry.nav.apartmentManagement") || "Apartment Management",
+      to: "/data-entry/apartment-management",
+      icon: Building2,
+      visible: hasAnyPermission(permissions, APARTMENT_MANAGEMENT_PERMISSIONS),
+    },
+
+    {
+      label: t("dataEntry.nav.apartmentSales") || "Apartment Sales",
+      to: "/data-entry/apartment-sales",
+      icon: Building2,
+      visible: hasAnyPermission(permissions, ["apartment_sales.view"]),
+    },
+
+    {
+      label: t("dataEntry.nav.outstandingPayments") || "Outstanding Payments",
+      to: "/data-entry/outstanding-apartment-payments",
+      icon: CreditCard,
+      visible: hasAnyPermission(permissions, ["apartment_sales.view"]),
     },
 
     {
@@ -143,6 +167,9 @@ export default function DataEntryRootLayout() {
       visible: hasAnyPermission(permissions, [
         "reports.view",
         "reports.export",
+        "apartment_sales_reports.view",
+        "apartment_payment_reports.view",
+        "apartment_outstanding_reports.view",
       ]),
     },
   ].filter((link) => link.visible);

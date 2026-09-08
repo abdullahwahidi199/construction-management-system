@@ -33,6 +33,35 @@ PERMISSIONS = [
     ("projects.update", "Update Projects", "Projects"),
     ("projects.delete", "Delete Projects", "Projects"),
 
+    # Apartment Management
+    ("buildings.view", "View Buildings", "Apartment Management"),
+    ("buildings.create", "Create Building", "Apartment Management"),
+    ("buildings.update", "Edit Building", "Apartment Management"),
+    ("buildings.delete", "Delete Building", "Apartment Management"),
+    ("floors.view", "View Floors", "Apartment Management"),
+    ("floors.create", "Create Floor", "Apartment Management"),
+    ("floors.update", "Edit Floor", "Apartment Management"),
+    ("floors.delete", "Delete Floor", "Apartment Management"),
+    ("floors.bulk_create", "Bulk Create Floors", "Apartment Management"),
+    ("apartments.view", "View Apartments", "Apartment Management"),
+    ("apartments.create", "Create Apartment", "Apartment Management"),
+    ("apartments.update", "Edit Apartment", "Apartment Management"),
+    ("apartments.delete", "Delete Apartment", "Apartment Management"),
+    ("apartments.bulk_create", "Bulk Create Apartments", "Apartment Management"),
+
+    # Apartment Sales and Payments
+    ("apartment_sales.view", "View Apartment Sales", "Apartment Sales"),
+    ("apartment_sales.create", "Record Apartment Sales", "Apartment Sales"),
+    ("apartment_sales.update", "Edit Apartment Sales", "Apartment Sales"),
+    ("apartment_sales.cancel", "Cancel Apartment Sales", "Apartment Sales"),
+    ("apartment_payments.view", "View Apartment Payments", "Apartment Sales"),
+    ("apartment_payments.create", "Record Apartment Payments", "Apartment Sales"),
+
+    # Apartment Reports
+    ("apartment_sales_reports.view", "View Apartment Sales Reports", "Apartment Reports"),
+    ("apartment_payment_reports.view", "View Apartment Payment Reports", "Apartment Reports"),
+    ("apartment_outstanding_reports.view", "View Apartment Outstanding Reports", "Apartment Reports"),
+
     # Expenses
     ("expenses.view", "View Expenses", "Expenses"),
     ("expenses.create", "Create Expenses", "Expenses"),
@@ -145,6 +174,29 @@ ROLE_PERMISSIONS = {
         "projects.view",
         "projects.create",
 
+        "buildings.view",
+        "buildings.create",
+        "buildings.update",
+        "floors.view",
+        "floors.create",
+        "floors.update",
+        "floors.bulk_create",
+        "apartments.view",
+        "apartments.create",
+        "apartments.update",
+        "apartments.bulk_create",
+
+        "apartment_sales.view",
+        "apartment_sales.create",
+        "apartment_sales.update",
+        "apartment_sales.cancel",
+        "apartment_payments.view",
+        "apartment_payments.create",
+        "reports.view",
+        "apartment_sales_reports.view",
+        "apartment_payment_reports.view",
+        "apartment_outstanding_reports.view",
+
         "expenses.view",
         "expenses.create",
         "expenses.update",
@@ -170,6 +222,22 @@ ROLE_PERMISSIONS = {
 
     Role.DATA_ENTRY: [
         "projects.view",
+
+        "buildings.view",
+        "buildings.create",
+        "floors.view",
+        "floors.create",
+        "floors.bulk_create",
+        "apartments.view",
+        "apartments.create",
+        "apartments.bulk_create",
+
+        "apartment_sales.view",
+        "apartment_sales.create",
+        "apartment_sales.update",
+        "apartment_sales.cancel",
+        "apartment_payments.view",
+        "apartment_payments.create",
 
         "expenses.view",
         "expenses.create",

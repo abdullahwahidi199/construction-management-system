@@ -25,6 +25,10 @@ describe("role and permission helpers", () => {
   it("routes custom roles by first allowed permission", () => {
     expect(homeForUser("accountant", ["reports.view"])).toBe("/manager/reports");
     expect(homeForUser("hr", ["users.view"])).toBe("/admin/users");
+    expect(homeForUser("sales-reader", ["apartment_sales.view"]))
+      .toBe("/manager/apartment-sales");
+    expect(homeForUser("property-editor", ["apartments.update"]))
+      .toBe("/manager/apartment-management");
     expect(homeForUser("laborer", [])).toBe("/login");
   });
 });

@@ -13,6 +13,8 @@ import AlertsPanel from "../dashboard/AlertsPanel";
 import RecentActivity from "../dashboard/RecentActivity";
 import PayrollSummary from "../dashboard/PayrollSummary";
 import DashboardSkeleton from "../dashboard/DashboardSkeleton";
+import ApartmentSummary from "../dashboard/ApartmentSummary";
+import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
 import useRealtimeEvents from "../../hooks/useRealtimeEvents";
 
@@ -122,6 +124,10 @@ export default function Dashboard() {
         contracts={data.contract_summary}
         expenseMonth={data.expense_this_month}
       />
+
+      <PermissionWrapper permissions={["apartments.view", "apartment_sales.view"]}>
+        <ApartmentSummary data={data.apartment_summary} />
+      </PermissionWrapper>
 
       {/* ── Row 1: Financial + Budget ────────────── */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">

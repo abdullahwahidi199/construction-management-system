@@ -21,11 +21,14 @@ const ICONS = {
   employees: Users,
   contracts: FileText,
   financial: BarChart3,
+  apartment_sales: Building2,
+  apartment_payments: ReceiptText,
+  apartment_outstanding: BriefcaseBusiness,
 };
 
-export default function ReportSidebar({ activeKey, onSelect }) {
+export default function ReportSidebar({ activeKey, onSelect, reports = REPORT_LIST }) {
   const { t } = useLanguage();
-  const activeReport = REPORT_LIST.find((report) => report.key === activeKey);
+  const activeReport = reports.find((report) => report.key === activeKey);
   const activeLabel = activeReport
     ? translateOrFallback(
         t,
@@ -58,7 +61,7 @@ export default function ReportSidebar({ activeKey, onSelect }) {
             className="h-11 w-full appearance-none rounded-md border border-[color:color-mix(in_srgb,var(--border)_72%,transparent)] bg-bg px-3 pr-10 text-sm font-medium text-text outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
             aria-label={translateOrFallback(t, "reports.selectReport", "Select report")}
           >
-            {REPORT_LIST.map((report) => (
+            {reports.map((report) => (
               <option key={report.key} value={report.key}>
                 {translateOrFallback(
                   t,
@@ -78,7 +81,7 @@ export default function ReportSidebar({ activeKey, onSelect }) {
           className="hidden min-w-0 flex-wrap gap-1 rounded-md bg-bg p-1 lg:flex"
           aria-label="Report navigation"
         >
-          {REPORT_LIST.map((report) => {
+          {reports.map((report) => {
             const active = activeKey === report.key;
             const Icon = ICONS[report.key] || BarChart3;
             return (

@@ -1,4 +1,3 @@
-import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
@@ -82,5 +81,31 @@ describe("modal and permission components", () => {
     );
 
     expect(screen.getByText("Denied")).toBeInTheDocument();
+  });
+
+  it("can require every permission for dependent workflows", () => {
+    authState.permissions = ["buildings.view", "floors.view"];
+    const { rerender } = render(
+      <PermissionWrapper
+        permissions={["buildings.view", "floors.view", "apartments.view"]}
+        requireAll
+        fallback={<span>Workflow denied</span>}
+      >
+        <span>Workflow allowed</span>
+      </PermissionWrapper>,
+    );
+    expect(screen.getByText("Workflow denied")).toBeInTheDocument();
+
+    authState.permissions = ["buildings.view", "floors.view", "apartments.view"];
+    rerender(
+      <PermissionWrapper
+        permissions={["buildings.view", "floors.view", "apartments.view"]}
+        requireAll
+        fallback={<span>Workflow denied</span>}
+      >
+        <span>Workflow allowed</span>
+      </PermissionWrapper>,
+    );
+    expect(screen.getByText("Workflow allowed")).toBeInTheDocument();
   });
 });

@@ -33,6 +33,16 @@ class FinancialOverviewSerializer(serializers.Serializer):
 
     grand_total_outflow = GrandTotalOutflowSerializer()
 
+
+class ApartmentSummarySerializer(serializers.Serializer):
+    inventory = serializers.DictField()
+    sale_count = serializers.IntegerField()
+    cancelled_sale_count = serializers.IntegerField()
+    payment_status = serializers.DictField()
+    currencies = serializers.DictField()
+    can_view_inventory = serializers.BooleanField()
+    can_view_sales = serializers.BooleanField()
+
 class ExpenseSummarySerializer(serializers.Serializer):
     total_expenses_afn = serializers.DecimalField(
         max_digits=15, decimal_places=2
@@ -247,6 +257,7 @@ class ActivitySerializer(serializers.Serializer):
 # ════════════════════════════════════════════
 
 class FullDashboardSerializer(serializers.Serializer):
+    apartment_summary = ApartmentSummarySerializer()
     project_overview = ProjectOverviewSerializer()
     financial_overview = FinancialOverviewSerializer()
     expense_summary = ExpenseSummarySerializer()

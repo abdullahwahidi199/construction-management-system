@@ -22,6 +22,8 @@ from common.test_helpers import (
 from dashboard.services import DashboardService
 from Employees.models import Employee, PayrollPayment
 from expenses.models import Expense
+from accounts.models import ProjectAssignment
+from project.models import Apartment, ApartmentPayment, ApartmentSale, Building, Customer, Floor
 
 
 class DashboardAPITests(APITestCase):
@@ -61,6 +63,84 @@ class DashboardAPITests(APITestCase):
         ]:
             self.assertIn(key, response.data)
         self.assertEqual(response.data["project_overview"]["total_projects"], 1)
+
+    def test_dashboard_apartment_metrics_are_real_and_currency_separated(self):
+        building = Building.objects.create(project=self.project, name="Dashboard Tower")
+        floor = Floor.objects.create(building=building, floor_number=1)
+        customer = Customer.objects.create(project=self.project, name="Dashboard Buyer")
+        usd_apartment = Apartment.objects.create(
+            project=self.project,
+            building=building,
+            floor=floor,
+            apartment_number="101",
+            status=Apartment.Status.SOLD,
+        )
+        Apartment.objects.create(
+            project=self.project,
+            building=building,
+            floor=floor,
+            apartment_number="102",
+        )
+        sale = ApartmentSale.objects.create(
+            apartment=usd_apartment,
+            customer=customer,
+            reference_number="DASH-SALE-101",
+            sale_date=date.today(),
+            sale_price=Decimal("100000.00"),
+            currency="USD",
+            created_by=self.admin,
+        )
+        ApartmentPayment.objects.create(
+            sale=sale,
+            customer=customer,
+            receipt_number="DASH-RCPT-101",
+            amount=Decimal("40000.00"),
+            currency="USD",
+            payment_date=date.today(),
+            payment_method=ApartmentPayment.Method.CASH,
+            recorded_by=self.admin,
+        )
+
+        response = self.client.get("/api/dashboard/")
+        self.assertEqual(response.status_code, 200, response.data)
+        summary = response.data["apartment_summary"]
+        self.assertEqual(summary["inventory"], {"total": 2, "available": 1, "sold": 1})
+        self.assertEqual(summary["sale_count"], 1)
+        self.assertEqual(summary["payment_status"]["partially_paid"], 1)
+        self.assertEqual(summary["currencies"]["USD"]["sales"], Decimal("100000.00"))
+        self.assertEqual(summary["currencies"]["USD"]["received"], Decimal("40000.00"))
+        self.assertEqual(summary["currencies"]["USD"]["outstanding"], Decimal("60000.00"))
+        self.assertEqual(summary["currencies"]["AFN"]["sales"], Decimal("0.00"))
+
+    def test_dashboard_apartment_metrics_follow_assigned_projects(self):
+        building = Building.objects.create(project=self.project, name="Scoped Tower")
+        floor = Floor.objects.create(building=building, floor_number=1)
+        Apartment.objects.create(
+            project=self.project,
+            building=building,
+            floor=floor,
+            apartment_number="A-1",
+        )
+        other_project = create_project(name="Hidden Dashboard Project")
+        other_building = Building.objects.create(project=other_project, name="Hidden Tower")
+        other_floor = Floor.objects.create(building=other_building, floor_number=1)
+        Apartment.objects.create(
+            project=other_project,
+            building=other_building,
+            floor=other_floor,
+            apartment_number="H-1",
+        )
+        user = create_user(
+            username="scoped-dashboard-user",
+            role="scoped_dashboard",
+            permissions=["dashboard.view", "projects.view_assigned", "apartments.view", "apartment_sales.view"],
+        )
+        ProjectAssignment.objects.create(user=user, project=self.project, assigned_by=self.admin)
+        self.client.force_authenticate(user)
+
+        response = self.client.get("/api/dashboard/apartments/")
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data["inventory"]["total"], 1)
 
     def test_dashboard_section_endpoints_are_authenticated_and_schema_stable(self):
         endpoints = {

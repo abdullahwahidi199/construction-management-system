@@ -14,6 +14,11 @@ from .reports.attendance_report import AttendanceReport
 from .reports.employee_report import EmployeeReport
 from .reports.contract_report import ContractReport
 from .reports.financial_report import FinancialOverviewReport
+from .reports.apartment_report import (
+    ApartmentOutstandingReport,
+    ApartmentPaymentsReport,
+    ApartmentSalesReport,
+)
 from .serializers import (
     ProjectReportFilterSerializer,
     ExpenseReportFilterSerializer,
@@ -22,6 +27,8 @@ from .serializers import (
     EmployeeReportFilterSerializer,
     ContractReportFilterSerializer,
     FinancialReportFilterSerializer,
+    ApartmentPaymentReportFilterSerializer,
+    ApartmentSalesReportFilterSerializer,
 )
 
 
@@ -38,13 +45,16 @@ class BaseReportView(APIView):
     filename = "report.pdf"
 
     def get(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.query_params)
+        serializer = self.serializer_class(
+            data=request.query_params,
+            context={"request": request},
+        )
         serializer.is_valid(raise_exception=True)
         filters = serializer.validated_data
 
         export = filters.pop("export", "json")
 
-        report = self.report_class(filters=filters)
+        report = self.report_class(filters=filters, user=request.user)
         data = report.generate()
 
         if export == "pdf":
@@ -80,6 +90,17 @@ class ProjectReportView(BaseReportView):
         ("worker_payroll_afn", "Worker Payroll AFN"),
         ("total_spent_usd", "Total USD"),
         ("total_spent_afn", "Total AFN"),
+        ("apartments", "Apartments"),
+        ("sold_apartments", "Sold Apartments"),
+        ("cancelled_apartment_sales", "Cancelled Sales"),
+        ("apartment_sales_usd", "Apartment Sales USD"),
+        ("apartment_sales_afn", "Apartment Sales AFN"),
+        ("cancelled_apartment_sales_usd", "Cancelled Sales USD"),
+        ("cancelled_apartment_sales_afn", "Cancelled Sales AFN"),
+        ("apartment_received_usd", "Apartment Received USD"),
+        ("apartment_received_afn", "Apartment Received AFN"),
+        ("apartment_outstanding_usd", "Apartment Outstanding USD"),
+        ("apartment_outstanding_afn", "Apartment Outstanding AFN"),
     ]
 
 
@@ -194,3 +215,39 @@ class FinancialReportView(BaseReportView):
     filename = "financial_report.pdf"
     # No "rows" in this report — PDF will show summary only
     pdf_columns = None
+
+
+class ApartmentSalesReportView(BaseReportView):
+    rbac_resource = "apartment_sales_reports"
+    report_class = ApartmentSalesReport
+    serializer_class = ApartmentSalesReportFilterSerializer
+    filename = "apartment_sales_report.pdf"
+    pdf_columns = [
+        ("project", "Project"), ("building", "Building"), ("floor", "Floor"),
+        ("apartment", "Apartment"), ("customer", "Customer"),
+        ("sale_reference", "Sale #"), ("sale_date", "Sale Date"),
+        ("sale_price", "Sale Price"), ("currency", "Currency"),
+        ("total_paid", "Paid"), ("remaining", "Outstanding"),
+        ("payment_status", "Status"),
+    ]
+
+
+class ApartmentPaymentsReportView(BaseReportView):
+    rbac_resource = "apartment_payment_reports"
+    report_class = ApartmentPaymentsReport
+    serializer_class = ApartmentPaymentReportFilterSerializer
+    filename = "apartment_payments_report.pdf"
+    pdf_columns = [
+        ("payment_date", "Payment Date"), ("customer", "Customer"),
+        ("project", "Project"), ("building", "Building"),
+        ("apartment", "Apartment"), ("sale_reference", "Sale #"),
+        ("receipt_number", "Receipt #"), ("amount", "Amount"),
+        ("currency", "Currency"), ("payment_method", "Method"),
+        ("reference", "Reference"),
+    ]
+
+
+class ApartmentOutstandingReportView(ApartmentSalesReportView):
+    rbac_resource = "apartment_outstanding_reports"
+    report_class = ApartmentOutstandingReport
+    filename = "apartment_outstanding_report.pdf"

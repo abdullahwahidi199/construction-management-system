@@ -20,6 +20,8 @@ import DataEntryDashboard from "./dataEntry/DataEntryDashboard";
 import ManagerRootLayout from "./manager/ManagerRootLayout";
 import ProjectsBase from "./manager/Projects/ProjectsBase";
 import ProjectDetails from "./manager/Projects/ProjectDetails";
+import ApartmentManagementPage from "./manager/Projects/ApartmentManagementPage";
+import ApartmentSalesPage from "./manager/Projects/ApartmentSalesPage";
 import ExpensesMain from "./manager/Expenses/ExpensesMain";
 import ExpenseApprovalsPage from "./manager/Expenses/ExpenseApprovalsPage";
 import EmployeesPage from "./components/pages/EmployeesPage";
@@ -75,6 +77,12 @@ const router = createBrowserRouter(
 
           <Route path="projects" element={<ProjectsBase />} />
           <Route path="projects/:id" element={<ProjectDetails />} />
+          <Route path="apartment-management" element={<ApartmentManagementPage />} />
+          <Route path="apartment-sales" element={<ApartmentSalesPage />} />
+          <Route
+            path="outstanding-apartment-payments"
+            element={<ApartmentSalesPage outstandingOnly />}
+          />
 
           <Route path="expenses" element={<ExpensesMain />} />
           <Route path="expense-approvals" element={<ExpenseApprovalsPage />} />
@@ -110,6 +118,12 @@ const router = createBrowserRouter(
 
           <Route path="projects" element={<ProjectsBase />} />
           <Route path="projects/:id" element={<ProjectDetails />} />
+          <Route path="apartment-management" element={<ApartmentManagementPage />} />
+          <Route path="apartment-sales" element={<ApartmentSalesPage />} />
+          <Route
+            path="outstanding-apartment-payments"
+            element={<ApartmentSalesPage outstandingOnly />}
+          />
 
           <Route path="expenses" element={<ExpensesMain dataEntryMode />} />
 

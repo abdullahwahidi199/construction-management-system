@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { REPORTS } from "../../../config/reportConfig";
+import { useMemo } from "react";
+
+import { REPORTS, REPORT_LIST } from "../../../config/reportConfig";
+import { useAuth } from "../../../auth/AuthContext";
+import { hasAnyPermission } from "../../../auth/roles";
 import useReport from "../../../hooks/useReport";
 import { useLanguage } from "../../../hooks/useLanguage";
 import useRealtimeEvents from "../../../hooks/useRealtimeEvents";
@@ -87,8 +91,16 @@ export default function ReportsPage() {
   const [activeKey, setActiveKey] = useState("projects");
   const [filterValues, setFilterValues] = useState({});
   const { t } = useLanguage();
+  const { permissions = [] } = useAuth();
 
-  const report = REPORTS[activeKey];
+  const availableReports = useMemo(() => REPORT_LIST.filter((item) => (
+    item.permission
+      ? hasAnyPermission(permissions, [item.permission])
+      : hasAnyPermission(permissions, ["reports.view"])
+  )), [permissions]);
+  const report = availableReports.find((item) => item.key === activeKey)
+    || availableReports[0]
+    || REPORTS.projects;
   const { data, loading, exporting, error, fetchReport, exportPdf } = useReport(
     report.endpoint,
   );
@@ -96,7 +108,7 @@ export default function ReportsPage() {
   useEffect(() => {
     fetchReport({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeKey]);
+  }, [report.endpoint]);
 
   useRealtimeEvents((message) => {
     if (message.event?.startsWith("expense.")) {
@@ -130,7 +142,11 @@ export default function ReportsPage() {
           generatedAt={data?.generated_at}
         />
 
-        <ReportSidebar activeKey={activeKey} onSelect={handleSelectReport} />
+        <ReportSidebar
+          activeKey={report.key}
+          onSelect={handleSelectReport}
+          reports={availableReports}
+        />
 
         <ReportFilters
           filters={report.filters}

@@ -7,9 +7,19 @@ from rest_framework.test import APITestCase
 
 from Employees.models import Employee, Payroll, PayrollPayment, SalaryAdvance
 from dashboard.services import DashboardService
+from accounts.models import ProjectAssignment
+from common.test_helpers import create_user
 from expenses.models import Expense
 from expenses.serializers import ExpenseSerializer
-from project.models import Project
+from project.models import (
+    Apartment,
+    ApartmentPayment,
+    ApartmentSale,
+    Building,
+    Customer,
+    Floor,
+    Project,
+)
 from subcontractor.models import (
     Contract,
     ContractPayment,
@@ -510,3 +520,126 @@ class ReportEndpointTests(APITestCase):
             expenses.data["summary"]["overall_total_outflow_afn"],
             Decimal("5000.00"),
         )
+
+
+class ApartmentReportEndpointTests(APITestCase):
+    def setUp(self):
+        self.admin = get_user_model().objects.create_superuser(
+            username="apartment-report-admin",
+            password="pass",
+            email="apartment-report-admin@example.com",
+        )
+        self.client.force_authenticate(self.admin)
+        self.project = Project.objects.create(
+            name="Apartment Report Project",
+            property_type="residential",
+            location="Kabul",
+            total_floors=2,
+            start_date=date(2026, 1, 1),
+            estimated_budget=Decimal("100000.00"),
+            budget_currency="USD",
+            status="ongoing",
+        )
+        self.building = Building.objects.create(project=self.project, name="Tower A")
+        self.floor = Floor.objects.create(building=self.building, floor_number=1)
+        self.apartment = Apartment.objects.create(
+            project=self.project,
+            building=self.building,
+            floor=self.floor,
+            apartment_number="101",
+            status=Apartment.Status.SOLD,
+        )
+        self.customer = Customer.objects.create(project=self.project, name="Report Customer")
+        self.sale = ApartmentSale.objects.create(
+            apartment=self.apartment,
+            customer=self.customer,
+            reference_number="REPORT-SALE-101",
+            sale_date=date(2026, 9, 1),
+            sale_price=Decimal("100000.00"),
+            currency="USD",
+            created_by=self.admin,
+        )
+        self.payment = ApartmentPayment.objects.create(
+            sale=self.sale,
+            customer=self.customer,
+            receipt_number="REPORT-RCPT-101",
+            amount=Decimal("40000.00"),
+            currency="USD",
+            payment_date=date(2026, 9, 2),
+            payment_method=ApartmentPayment.Method.BANK_TRANSFER,
+            recorded_by=self.admin,
+        )
+
+    def test_apartment_reports_use_real_data_filters_and_project_summary(self):
+        sales = self.client.get(
+            f"/api/reports/apartment-sales/?project_id={self.project.id}&currency=USD&payment_status=PARTIALLY_PAID"
+        )
+        payments = self.client.get(
+            "/api/reports/apartment-payments/?payment_method=BANK_TRANSFER&start_date=2026-09-02"
+        )
+        outstanding = self.client.get("/api/reports/apartment-outstanding/")
+        projects = self.client.get("/api/reports/projects/")
+
+        self.assertEqual(sales.status_code, 200, sales.data)
+        self.assertEqual(len(sales.data["rows"]), 1)
+        self.assertEqual(sales.data["rows"][0]["customer"], self.customer.name)
+        self.assertEqual(sales.data["rows"][0]["total_paid"], Decimal("40000.00"))
+        self.assertEqual(sales.data["rows"][0]["remaining"], Decimal("60000.00"))
+        self.assertEqual(payments.status_code, 200, payments.data)
+        self.assertEqual(payments.data["rows"][0]["receipt_number"], self.payment.receipt_number)
+        self.assertEqual(outstanding.status_code, 200, outstanding.data)
+        self.assertEqual(len(outstanding.data["rows"]), 1)
+        self.assertEqual(projects.status_code, 200, projects.data)
+        project_row = projects.data["rows"][0]
+        self.assertEqual(project_row["apartments"], 1)
+        self.assertEqual(project_row["sold_apartments"], 1)
+        self.assertEqual(project_row["apartment_sales_usd"], Decimal("100000.00"))
+        self.assertEqual(project_row["apartment_received_usd"], Decimal("40000.00"))
+        self.assertEqual(project_row["apartment_outstanding_usd"], Decimal("60000.00"))
+
+    def test_apartment_report_permissions_and_project_scoping(self):
+        other_project = Project.objects.create(
+            name="Hidden Apartment Project",
+            property_type="residential",
+            location="Herat",
+            total_floors=1,
+            start_date=date(2026, 1, 1),
+            estimated_budget=Decimal("50000.00"),
+            budget_currency="AFN",
+            status="ongoing",
+        )
+        other_building = Building.objects.create(project=other_project, name="Hidden Tower")
+        other_floor = Floor.objects.create(building=other_building, floor_number=1)
+        other_apartment = Apartment.objects.create(
+            project=other_project,
+            building=other_building,
+            floor=other_floor,
+            apartment_number="201",
+            status=Apartment.Status.SOLD,
+        )
+        other_customer = Customer.objects.create(project=other_project, name="Hidden Customer")
+        ApartmentSale.objects.create(
+            apartment=other_apartment,
+            customer=other_customer,
+            reference_number="HIDDEN-SALE-201",
+            sale_date=date(2026, 9, 1),
+            sale_price=Decimal("50000.00"),
+            currency="AFN",
+            created_by=self.admin,
+        )
+
+        reporter = create_user(
+            username="apartment-reporter",
+            role="apartment_reporter",
+            permissions=["projects.view_assigned", "apartment_sales_reports.view"],
+        )
+        ProjectAssignment.objects.create(user=reporter, project=self.project, assigned_by=self.admin)
+        self.client.force_authenticate(reporter)
+
+        sales = self.client.get("/api/reports/apartment-sales/")
+        payments = self.client.get("/api/reports/apartment-payments/")
+        outstanding = self.client.get("/api/reports/apartment-outstanding/")
+        self.assertEqual(sales.status_code, 200, sales.data)
+        self.assertEqual([row["sale_reference"] for row in sales.data["rows"]], ["REPORT-SALE-101"])
+        self.assertEqual(payments.status_code, 403)
+        self.assertEqual(outstanding.status_code, 403)

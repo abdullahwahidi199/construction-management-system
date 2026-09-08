@@ -99,3 +99,24 @@ class FinancialReportFilterSerializer(BaseReportFilterSerializer):
         choices=["project", "office"],
         required=False,
     )
+
+
+class ApartmentSalesReportFilterSerializer(BaseReportFilterSerializer):
+    project_id = serializers.IntegerField(required=False)
+    building_id = serializers.IntegerField(required=False)
+    customer_id = serializers.IntegerField(required=False)
+    currency = serializers.ChoiceField(choices=["AFN", "USD"], required=False)
+    payment_status = serializers.ChoiceField(
+        choices=["UNPAID", "PARTIALLY_PAID", "PAID"],
+        required=False,
+    )
+
+
+class ApartmentPaymentReportFilterSerializer(BaseReportFilterSerializer):
+    project_id = serializers.IntegerField(required=False)
+    customer_id = serializers.IntegerField(required=False)
+    currency = serializers.ChoiceField(choices=["AFN", "USD"], required=False)
+    payment_method = serializers.ChoiceField(
+        choices=["CASH", "BANK_TRANSFER", "CHEQUE", "OTHER"],
+        required=False,
+    )

@@ -4,7 +4,8 @@ from django.db.models import Count, Prefetch
 
 from expenses.models import Expense
 from Employees.models import Payroll
-from project.models import Project
+from accounts.services import has_permission
+from project.models import ApartmentSale, Project
 from .base import BaseReport
 
 
@@ -45,7 +46,11 @@ class ProjectSummaryReport(BaseReport):
             "subcontractor_contracts__variations",
             "worker_payrolls",
             "employee_payrolls",
+            "apartments__sales__payments",
         )
+
+        if self.user and not has_permission(self.user, "projects.view"):
+            qs = qs.filter(id__in=self.user.project_assignments.values("project_id"))
 
         status = self.filters.get("status")
         property_type = self.filters.get("property_type")
@@ -147,6 +152,10 @@ class ProjectSummaryReport(BaseReport):
 
     def generate(self):
         qs = self._base_queryset()
+        can_view_apartment_data = (
+            self.user is None
+            or has_permission(self.user, "apartment_sales_reports.view")
+        )
         rows = []
         summary = {
             "total_projects": 0,
@@ -160,6 +169,17 @@ class ProjectSummaryReport(BaseReport):
             "total_worker_payroll_afn": ZERO,
             "total_spent_usd": ZERO,
             "total_spent_afn": ZERO,
+            "total_apartments": 0,
+            "total_sold_apartments": 0,
+            "total_cancelled_apartment_sales": 0,
+            "apartment_sales_usd": ZERO,
+            "apartment_sales_afn": ZERO,
+            "cancelled_apartment_sales_usd": ZERO,
+            "cancelled_apartment_sales_afn": ZERO,
+            "apartment_received_usd": ZERO,
+            "apartment_received_afn": ZERO,
+            "apartment_outstanding_usd": ZERO,
+            "apartment_outstanding_afn": ZERO,
         }
 
         for project in qs:
@@ -169,6 +189,25 @@ class ProjectSummaryReport(BaseReport):
             contracts = self._contract_totals(project.subcontractor_contracts.all())
             worker_payroll = self._worker_payroll_totals(project.worker_payrolls.all())
             employee_payroll = self._employee_payroll_totals(project.employee_payrolls.all())
+            apartment_totals = {
+                currency: {"sales": ZERO, "received": ZERO, "outstanding": ZERO}
+                for currency in CURRENCIES
+            }
+            apartments = list(project.apartments.all()) if can_view_apartment_data else []
+            sold_apartments = 0
+            cancelled_apartment_sales = 0
+            cancelled_apartment_totals = {currency: ZERO for currency in CURRENCIES}
+            for apartment in apartments:
+                for sale in apartment.sales.all():
+                    if sale.status == ApartmentSale.Status.CANCELLED:
+                        cancelled_apartment_sales += 1
+                        cancelled_apartment_totals[sale.currency] += sale.sale_price
+                        continue
+                    sold_apartments += 1
+                    paid = sale.total_paid
+                    apartment_totals[sale.currency]["sales"] += sale.sale_price
+                    apartment_totals[sale.currency]["received"] += paid
+                    apartment_totals[sale.currency]["outstanding"] += sale.sale_price - paid
 
             total_spent_usd = (
                 expenses["equivalent_usd"]
@@ -207,6 +246,14 @@ class ProjectSummaryReport(BaseReport):
             summary["total_worker_payroll_afn"] += worker_payroll["net"]["AFN"]
             summary["total_spent_usd"] += total_spent_usd
             summary["total_spent_afn"] += total_spent_afn
+            summary["total_apartments"] += len(apartments)
+            summary["total_sold_apartments"] += sold_apartments
+            summary["total_cancelled_apartment_sales"] += cancelled_apartment_sales
+            for currency, suffix in (("USD", "usd"), ("AFN", "afn")):
+                summary[f"apartment_sales_{suffix}"] += apartment_totals[currency]["sales"]
+                summary[f"cancelled_apartment_sales_{suffix}"] += cancelled_apartment_totals[currency]
+                summary[f"apartment_received_{suffix}"] += apartment_totals[currency]["received"]
+                summary[f"apartment_outstanding_{suffix}"] += apartment_totals[currency]["outstanding"]
 
             rows.append({
                 "id": project.id,
@@ -253,6 +300,17 @@ class ProjectSummaryReport(BaseReport):
                 "worker_payroll_afn": worker_payroll["net"]["AFN"],
                 "total_spent_usd": total_spent_usd,
                 "total_spent_afn": total_spent_afn,
+                "apartments": len(apartments),
+                "sold_apartments": sold_apartments,
+                "cancelled_apartment_sales": cancelled_apartment_sales,
+                "apartment_sales_usd": apartment_totals["USD"]["sales"],
+                "apartment_sales_afn": apartment_totals["AFN"]["sales"],
+                "cancelled_apartment_sales_usd": cancelled_apartment_totals["USD"],
+                "cancelled_apartment_sales_afn": cancelled_apartment_totals["AFN"],
+                "apartment_received_usd": apartment_totals["USD"]["received"],
+                "apartment_received_afn": apartment_totals["AFN"]["received"],
+                "apartment_outstanding_usd": apartment_totals["USD"]["outstanding"],
+                "apartment_outstanding_afn": apartment_totals["AFN"]["outstanding"],
             })
 
         status_breakdown = list(

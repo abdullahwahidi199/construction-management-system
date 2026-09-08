@@ -20,7 +20,8 @@ from common.calendar_utils import (
     get_module_calendar,
     to_shamsi,
 )
-from project.models import Project
+from accounts.services import has_permission
+from project.models import Apartment, ApartmentSale, Project
 from expenses.models import Expense
 from Employees.finance import salary_advance_queryset, salary_advance_totals
 from Employees.models import Employee, Payroll, PayrollPayment, Attendance
@@ -41,6 +42,68 @@ class DashboardService:
     # ════════════════════════════════════════════
     # 1. PROJECT METRICS
     # ════════════════════════════════════════════
+
+    @staticmethod
+    def get_apartment_summary(user=None):
+        can_view_inventory = user is None or has_permission(user, "apartments.view")
+        can_view_sales = user is None or has_permission(user, "apartment_sales.view")
+        project_ids = None
+        if user is not None and not has_permission(user, "projects.view"):
+            project_ids = user.project_assignments.values("project_id")
+
+        apartments = Apartment.objects.all()
+        sales = ApartmentSale.objects.all()
+        if project_ids is not None:
+            apartments = apartments.filter(project_id__in=project_ids)
+            sales = sales.filter(apartment__project_id__in=project_ids)
+
+        inventory = {"total": 0, "available": 0, "sold": 0}
+        if can_view_inventory:
+            inventory = apartments.aggregate(
+                total=Count("id"),
+                available=Count("id", filter=Q(status=Apartment.Status.AVAILABLE)),
+                sold=Count("id", filter=Q(status=Apartment.Status.SOLD)),
+            )
+
+        currencies = {
+            currency: {"sales": Decimal("0.00"), "received": Decimal("0.00"), "outstanding": Decimal("0.00")}
+            for currency in ("AFN", "USD")
+        }
+        status_counts = {"unpaid": 0, "partially_paid": 0, "paid": 0}
+        sale_count = 0
+        cancelled_sale_count = 0
+        if can_view_sales:
+            cancelled_sales = sales.filter(status=ApartmentSale.Status.CANCELLED)
+            cancelled_sale_count = cancelled_sales.count()
+            for row in cancelled_sales.values("currency").annotate(total=Sum("sale_price")):
+                currencies[row["currency"]]["cancelled"] = row["total"] or Decimal("0.00")
+            paid_field = DecimalField(max_digits=15, decimal_places=2)
+            for sale in sales.filter(status=ApartmentSale.Status.ACTIVE).annotate(
+                _paid_total=Coalesce(
+                    Sum("payments__amount"),
+                    Value(Decimal("0.00")),
+                    output_field=paid_field,
+                )
+            ):
+                sale_count += 1
+                paid = sale.total_paid
+                currencies[sale.currency]["sales"] += sale.sale_price
+                currencies[sale.currency]["received"] += paid
+                currencies[sale.currency]["outstanding"] += sale.sale_price - paid
+                status_counts[sale.payment_status.lower()] += 1
+
+        for totals in currencies.values():
+            totals.setdefault("cancelled", Decimal("0.00"))
+
+        return {
+            "inventory": inventory,
+            "sale_count": sale_count,
+            "cancelled_sale_count": cancelled_sale_count,
+            "payment_status": status_counts,
+            "currencies": currencies,
+            "can_view_inventory": can_view_inventory,
+            "can_view_sales": can_view_sales,
+        }
 
     @staticmethod
     def _expense_usd_equivalent(queryset):
@@ -1689,12 +1752,13 @@ class DashboardService:
         }
 
     @staticmethod
-    def get_full_dashboard():
+    def get_full_dashboard(user=None):
         """
         Returns the complete dashboard payload.
         This is what the main dashboard endpoint calls.
         """
         return {
+            "apartment_summary": DashboardService.get_apartment_summary(user=user),
             "project_overview": (
                 DashboardService.get_project_overview()
             ),

@@ -25,12 +25,47 @@ export const ADMIN_PANEL_PERMISSIONS = [
   "settings.manage",
 ];
 
+export const APARTMENT_MANAGEMENT_PERMISSIONS = [
+  "buildings.view",
+  "buildings.create",
+  "buildings.update",
+  "buildings.delete",
+  "floors.view",
+  "floors.create",
+  "floors.update",
+  "floors.delete",
+  "floors.bulk_create",
+  "apartments.view",
+  "apartments.create",
+  "apartments.update",
+  "apartments.delete",
+  "apartments.bulk_create",
+];
+
+export const APARTMENT_SALES_PERMISSIONS = [
+  "apartment_sales.view",
+  "apartment_sales.create",
+  "apartment_sales.update",
+  "apartment_sales.cancel",
+  "apartment_payments.view",
+  "apartment_payments.create",
+];
+
+export const APARTMENT_WORKSPACE_PERMISSIONS = [
+  ...APARTMENT_MANAGEMENT_PERMISSIONS,
+  ...APARTMENT_SALES_PERMISSIONS,
+];
+
 export const OPERATIONAL_PERMISSIONS = [
   "dashboard.view",
   "projects.view",
   "projects.create",
   "projects.update",
   "projects.delete",
+  ...APARTMENT_WORKSPACE_PERMISSIONS,
+  "apartment_sales_reports.view",
+  "apartment_payment_reports.view",
+  "apartment_outstanding_reports.view",
   "expenses.view",
   "expenses.create",
   "expenses.update",
@@ -123,7 +158,17 @@ const OPERATIONAL_ROUTE_RULES = [
   { path: "/manager/dashboard", permissions: ["dashboard.view"] },
   {
     path: "/manager/projects",
-    permissions: ["projects.view", "projects.create", "projects.update", "projects.delete"],
+    permissions: [
+      "projects.view", "projects.create", "projects.update", "projects.delete",
+    ],
+  },
+  {
+    path: "/manager/apartment-management",
+    permissions: APARTMENT_MANAGEMENT_PERMISSIONS,
+  },
+  {
+    path: "/manager/apartment-sales",
+    permissions: ["apartment_sales.view"],
   },
   {
     path: "/manager/contracts",
@@ -207,7 +252,13 @@ const OPERATIONAL_ROUTE_RULES = [
     path: "/manager/attendance",
     permissions: ["attendance.view", "attendance.create", "attendance.update", "attendance.delete"],
   },
-  { path: "/manager/reports", permissions: ["reports.view", "reports.export"] },
+  {
+    path: "/manager/reports",
+    permissions: [
+      "reports.view", "reports.export", "apartment_sales_reports.view",
+      "apartment_payment_reports.view", "apartment_outstanding_reports.view",
+    ],
+  },
   { path: "/manager/settings", permissions: ["settings.view", "settings.manage"] },
 ];
 

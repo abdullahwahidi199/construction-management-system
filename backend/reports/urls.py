@@ -7,6 +7,9 @@ from .views import (
     EmployeeReportView,
     ContractReportView,
     FinancialReportView,
+    ApartmentOutstandingReportView,
+    ApartmentPaymentsReportView,
+    ApartmentSalesReportView,
 )
 
 app_name = "reports"
@@ -19,4 +22,7 @@ urlpatterns = [
     path("employees/", EmployeeReportView.as_view(), name="employee-report"),
     path("contracts/", ContractReportView.as_view(), name="contract-report"),
     path("financial/", FinancialReportView.as_view(), name="financial-report"),
+    path("apartment-sales/", ApartmentSalesReportView.as_view(), name="apartment-sales-report"),
+    path("apartment-payments/", ApartmentPaymentsReportView.as_view(), name="apartment-payments-report"),
+    path("apartment-outstanding/", ApartmentOutstandingReportView.as_view(), name="apartment-outstanding-report"),
 ]

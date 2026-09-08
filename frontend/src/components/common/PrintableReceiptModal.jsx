@@ -149,6 +149,7 @@ export default function PrintableReceiptModal({
   onClose,
   title,
   subtitle,
+  numberLabel = "Receipt No.",
   receiptNumber,
   receiptDate,
   status,
@@ -385,7 +386,7 @@ export default function PrintableReceiptModal({
             title,
             subtitle,
             metaHtml: `
-              <div class="small">Receipt No.</div>
+              <div class="small">${escapeHtml(numberLabel)}</div>
               <div class="number">${escapeHtml(receiptNumber)}</div>
               <div class="small">${escapeHtml(receiptDate)}</div>
               <div class="status">${escapeHtml(status)}</div>
@@ -467,7 +468,7 @@ export default function PrintableReceiptModal({
                 subtitle={subtitle}
                 meta={
                   <div className="text-right">
-                  <p className="text-xs text-slate-500">Receipt No.</p>
+                  <p className="text-xs text-slate-500">{numberLabel}</p>
                   <p className="text-lg font-extrabold">{receiptNumber}</p>
                   <p className="text-xs text-slate-500">{receiptDate}</p>
                   <p className="mt-2 inline-flex rounded-full border border-slate-900 px-3 py-1 text-[11px] font-bold uppercase">

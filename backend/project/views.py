@@ -3,20 +3,43 @@ from rest_framework.decorators import api_view
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework import mixins, viewsets
+from rest_framework.decorators import action
+
+from django.db import transaction
+from django.db.models import DecimalField, F, Q, Sum, Value
+from django.db.models.functions import Coalesce
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from django.utils.dateparse import parse_date
 
 from accounts.permissions import RBACPermission
 from accounts.services import has_permission
-from .models import Project
-from .serializers import ProjectListSerializer,ProjectSerializer
+from .models import Apartment, ApartmentPayment, ApartmentSale, Building, Customer, Floor, Project
+from .serializers import (
+    ApartmentPaymentSerializer,
+    ApartmentSaleSerializer,
+    ApartmentSerializer,
+    BuildingSerializer,
+    BulkApartmentCreateSerializer,
+    BulkFloorCreateSerializer,
+    CustomerSerializer,
+    FloorSerializer,
+    ProjectListSerializer,
+    ProjectSerializer,
+)
 # Create your views here.
 
 @api_view(['GET','POST'])
 def project_list_create(request):
     if request.method=='GET':
-        if not has_permission(request.user, "projects.view"):
+        if not (
+            has_permission(request.user, "projects.view")
+            or has_permission(request.user, "projects.view_assigned")
+        ):
             raise PermissionDenied()
-        projects=Project.objects.all()
+        projects = _scope_to_available_projects(Project.objects.all(), request.user, "id")
         serializer=ProjectListSerializer(
             projects,
             many=True
@@ -38,9 +61,13 @@ def project_list_create(request):
         status=status.HTTP_400_BAD_REQUEST,
     )
 
-class ProjectDetailView(
-    RetrieveUpdateDestroyAPIView
-):
+def _scope_to_available_projects(queryset, user, field="project_id"):
+    if has_permission(user, "projects.view"):
+        return queryset
+    return queryset.filter(**{f"{field}__in": user.project_assignments.values("project_id")})
+
+
+class ProjectDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Project.objects.prefetch_related(
         "expenses",
         "subcontractor_contracts__payments",
@@ -52,6 +79,352 @@ class ProjectDetailView(
     permission_classes = [RBACPermission]
     rbac_resource = "projects"
 
+    def get_queryset(self):
+        return _scope_to_available_projects(super().get_queryset(), self.request.user, "id")
+
+
+class BuildingViewSet(viewsets.ModelViewSet):
+    serializer_class = BuildingSerializer
+    permission_classes = [RBACPermission]
+    rbac_resource = "buildings"
+
+    def get_queryset(self):
+        queryset = Building.objects.select_related("project")
+        queryset = _scope_to_available_projects(queryset, self.request.user)
+        project_id = self.request.query_params.get("project")
+        if project_id:
+            queryset = queryset.filter(project_id=project_id)
+        return queryset
+
+    def perform_destroy(self, instance):
+        if ApartmentSale.objects.filter(apartment__building=instance).exists():
+            raise ValidationError({"detail": ["A building with apartment sales cannot be deleted."]})
+        instance.delete()
+
+
+class FloorViewSet(viewsets.ModelViewSet):
+    serializer_class = FloorSerializer
+    permission_classes = [RBACPermission]
+    rbac_resource = "floors"
+    rbac_action_permissions = {"bulk_create": ("floors.bulk_create",)}
+
+    def get_queryset(self):
+        queryset = Floor.objects.select_related("building", "building__project")
+        queryset = _scope_to_available_projects(queryset, self.request.user, "building__project_id")
+        project_id = self.request.query_params.get("project")
+        building_id = self.request.query_params.get("building")
+        if project_id:
+            queryset = queryset.filter(building__project_id=project_id)
+        if building_id:
+            queryset = queryset.filter(building_id=building_id)
+        return queryset
+
+    @action(detail=False, methods=["post"], url_path="bulk")
+    @transaction.atomic
+    def bulk_create(self, request):
+        serializer = BulkFloorCreateSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        floors = serializer.save()
+        return Response(
+            FloorSerializer(floors, many=True, context=self.get_serializer_context()).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+    def perform_destroy(self, instance):
+        if ApartmentSale.objects.filter(apartment__floor=instance).exists():
+            raise ValidationError({"detail": ["A floor with apartment sales cannot be deleted."]})
+        instance.delete()
+
+
+class ApartmentViewSet(viewsets.ModelViewSet):
+    serializer_class = ApartmentSerializer
+    permission_classes = [RBACPermission]
+    rbac_resource = "apartments"
+    rbac_action_permissions = {"bulk_create": ("apartments.bulk_create",)}
+
+    def get_queryset(self):
+        queryset = Apartment.objects.select_related("project", "building", "floor")
+        queryset = _scope_to_available_projects(queryset, self.request.user)
+        for field in ("project", "building", "floor", "status"):
+            value = self.request.query_params.get(field)
+            if value:
+                queryset = queryset.filter(**{field: value})
+        return queryset
+
+    @action(detail=False, methods=["post"], url_path="bulk")
+    @transaction.atomic
+    def bulk_create(self, request):
+        serializer = BulkApartmentCreateSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        apartments = serializer.save()
+        return Response(
+            ApartmentSerializer(apartments, many=True, context=self.get_serializer_context()).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+    def perform_destroy(self, instance):
+        if ApartmentSale.objects.filter(apartment=instance).exists():
+            raise ValidationError({"detail": ["A sold apartment cannot be deleted."]})
+        instance.delete()
+
+
+class CustomerViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
+    serializer_class = CustomerSerializer
+    permission_classes = [RBACPermission]
+    rbac_resource = "apartment_sales"
+    rbac_action_permissions = {
+        "list": (
+            "apartment_sales.view",
+            "apartment_sales.create",
+            "apartment_sales.update",
+        ),
+        "retrieve": (
+            "apartment_sales.view",
+            "apartment_sales.create",
+            "apartment_sales.update",
+        ),
+        "create": ("apartment_sales.create",),
+    }
+
+    def get_queryset(self):
+        queryset = Customer.objects.select_related("project")
+        queryset = _scope_to_available_projects(queryset, self.request.user)
+        project_id = self.request.query_params.get("project")
+        if project_id:
+            queryset = queryset.filter(project_id=project_id)
+        return queryset
+
+
+class ApartmentSaleViewSet(
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
+    serializer_class = ApartmentSaleSerializer
+    permission_classes = [RBACPermission]
+    rbac_resource = "apartment_sales"
+    rbac_action_permissions = {"cancel": ("apartment_sales.cancel",)}
+
+    def get_locked_queryset(self):
+        queryset = ApartmentSale.objects.select_for_update().select_related(
+            "apartment__project",
+            "customer",
+        )
+        return _scope_to_available_projects(
+            queryset,
+            self.request.user,
+            "apartment__project_id",
+        )
+
+    def get_queryset(self):
+        paid_field = DecimalField(max_digits=15, decimal_places=2)
+        queryset = ApartmentSale.objects.select_related(
+            "apartment",
+            "apartment__project",
+            "apartment__building",
+            "apartment__floor",
+            "customer",
+            "created_by",
+            "cancelled_by",
+        ).prefetch_related("payments", "payments__customer", "payments__recorded_by").annotate(
+            _paid_total=Coalesce(Sum("payments__amount"), Value(0), output_field=paid_field)
+        )
+        queryset = _scope_to_available_projects(queryset, self.request.user, "apartment__project_id")
+        project_id = self.request.query_params.get("project")
+        building_id = self.request.query_params.get("building")
+        apartment_id = self.request.query_params.get("apartment")
+        customer_id = self.request.query_params.get("customer")
+        payment_status = self.request.query_params.get("payment_status", "").upper()
+        sale_status = self.request.query_params.get("status", "").upper()
+        sale_date = self.request.query_params.get("date")
+        date_from = self.request.query_params.get("date_from")
+        date_to = self.request.query_params.get("date_to")
+        if project_id:
+            queryset = queryset.filter(apartment__project_id=project_id)
+        if building_id:
+            queryset = queryset.filter(apartment__building_id=building_id)
+        if apartment_id:
+            queryset = queryset.filter(apartment_id=apartment_id)
+        if customer_id:
+            queryset = queryset.filter(customer_id=customer_id)
+        if sale_status:
+            if sale_status not in ApartmentSale.Status.values:
+                raise ValidationError({"status": ["Select a valid sale status."]})
+            queryset = queryset.filter(status=sale_status)
+        for field, value, lookup in (
+            ("date", sale_date, "sale_date"),
+            ("date_from", date_from, "sale_date__gte"),
+            ("date_to", date_to, "sale_date__lte"),
+        ):
+            if value:
+                parsed = parse_date(value)
+                if not parsed:
+                    raise ValidationError({field: ["Enter a valid date."]})
+                queryset = queryset.filter(**{lookup: parsed})
+
+        if payment_status == ApartmentSale.PaymentStatus.UNPAID:
+            queryset = queryset.filter(status=ApartmentSale.Status.ACTIVE, _paid_total=0)
+        elif payment_status == ApartmentSale.PaymentStatus.PARTIALLY_PAID:
+            queryset = queryset.filter(
+                status=ApartmentSale.Status.ACTIVE,
+                _paid_total__gt=0,
+                _paid_total__lt=F("sale_price"),
+            )
+        elif payment_status == ApartmentSale.PaymentStatus.PAID:
+            queryset = queryset.filter(
+                status=ApartmentSale.Status.ACTIVE,
+                _paid_total__gte=F("sale_price"),
+            )
+        elif payment_status == ApartmentSale.PaymentStatus.CANCELLED:
+            queryset = queryset.filter(status=ApartmentSale.Status.CANCELLED)
+        elif payment_status:
+            raise ValidationError({"payment_status": ["Select a valid payment status."]})
+
+        if self.request.query_params.get("outstanding", "").lower() in {"1", "true", "yes"}:
+            queryset = queryset.filter(
+                status=ApartmentSale.Status.ACTIVE,
+                _paid_total__lt=F("sale_price"),
+            )
+        return queryset
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        apartment_id = serializer.validated_data["apartment"].id
+        try:
+            apartment = Apartment.objects.select_for_update().select_related("project").get(pk=apartment_id)
+        except Apartment.DoesNotExist as exc:
+            raise ValidationError({"apartment": ["The selected apartment is not available."]}) from exc
+
+        if apartment.status != Apartment.Status.AVAILABLE or ApartmentSale.objects.filter(
+            apartment=apartment,
+            status=ApartmentSale.Status.ACTIVE,
+        ).exists():
+            raise ValidationError({"apartment": ["This apartment has already been sold."]})
+        customer = serializer.validated_data["customer"]
+        if customer.project_id != apartment.project_id:
+            raise ValidationError({"customer": ["The customer must belong to the apartment project."]})
+
+        sale = serializer.save(apartment=apartment, created_by=request.user)
+        apartment.status = Apartment.Status.SOLD
+        apartment.save(update_fields=["status", "updated_at"])
+        result = self.get_queryset().get(pk=sale.pk)
+        return Response(self.get_serializer(result).data, status=status.HTTP_201_CREATED)
+
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = get_object_or_404(self.get_locked_queryset(), pk=kwargs["pk"])
+        self.check_object_permissions(request, instance)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        previous_customer_id = instance.customer_id
+        previous_currency = instance.currency
+        sale = serializer.save()
+        if sale.customer_id != previous_customer_id:
+            sale.payments.update(customer=sale.customer)
+        if sale.currency != previous_currency:
+            sale.payments.update(currency=sale.currency)
+        result = self.get_queryset().get(pk=sale.pk)
+        return Response(self.get_serializer(result).data)
+
+    @action(detail=True, methods=["post"])
+    @transaction.atomic
+    def cancel(self, request, pk=None):
+        sale = get_object_or_404(self.get_locked_queryset(), pk=pk)
+        self.check_object_permissions(request, sale)
+        if sale.status == ApartmentSale.Status.CANCELLED:
+            raise ValidationError({"status": ["This sale has already been cancelled."]})
+        reason = str(request.data.get("reason", "")).strip()
+        if not reason:
+            raise ValidationError({"cancellation_reason": ["Cancellation reason is required."]})
+
+        apartment = Apartment.objects.select_for_update().get(pk=sale.apartment_id)
+        sale.status = ApartmentSale.Status.CANCELLED
+        sale.cancellation_reason = reason
+        sale.cancelled_at = timezone.now()
+        sale.cancelled_by = request.user
+        sale.save(update_fields=[
+            "status", "cancellation_reason", "cancelled_at", "cancelled_by", "updated_at",
+        ])
+        apartment.status = Apartment.Status.AVAILABLE
+        apartment.save(update_fields=["status", "updated_at"])
+        result = self.get_queryset().get(pk=sale.pk)
+        return Response(self.get_serializer(result).data)
+
+
+class ApartmentPaymentViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
+    serializer_class = ApartmentPaymentSerializer
+    permission_classes = [RBACPermission]
+    rbac_resource = "apartment_payments"
+
+    def get_queryset(self):
+        queryset = ApartmentPayment.objects.select_related(
+            "sale",
+            "sale__apartment",
+            "sale__apartment__project",
+            "customer",
+            "recorded_by",
+        )
+        queryset = _scope_to_available_projects(queryset, self.request.user, "sale__apartment__project_id")
+        project_id = self.request.query_params.get("project")
+        sale_id = self.request.query_params.get("sale")
+        customer_id = self.request.query_params.get("customer")
+        if project_id:
+            queryset = queryset.filter(sale__apartment__project_id=project_id)
+        if sale_id:
+            queryset = queryset.filter(sale_id=sale_id)
+        if customer_id:
+            queryset = queryset.filter(customer_id=customer_id)
+        return queryset
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        sale_id = serializer.validated_data["sale"].id
+        sale_queryset = ApartmentSale.objects.select_for_update().select_related(
+            "apartment__project", "customer"
+        )
+        sale_queryset = _scope_to_available_projects(
+            sale_queryset, request.user, "apartment__project_id"
+        )
+        try:
+            sale = sale_queryset.get(pk=sale_id)
+        except ApartmentSale.DoesNotExist as exc:
+            raise ValidationError({"sale": ["The selected sale is not available."]}) from exc
+
+        customer = serializer.validated_data["customer"]
+        currency = serializer.validated_data["currency"]
+        amount = serializer.validated_data["amount"]
+        errors = {}
+        if sale.status == ApartmentSale.Status.CANCELLED:
+            errors["sale"] = ["Payments cannot be recorded against a cancelled sale."]
+        if customer.id != sale.customer_id:
+            errors["customer"] = ["The payment customer must match the sale customer."]
+        if currency != sale.currency:
+            errors["currency"] = ["Payment currency must match the sale currency."]
+        if amount > sale.remaining_balance:
+            errors["amount"] = ["Payment amount cannot exceed the remaining balance."]
+        if errors:
+            raise ValidationError(errors)
+
+        payment = serializer.save(sale=sale, customer=sale.customer, recorded_by=request.user)
+        return Response(self.get_serializer(payment).data, status=status.HTTP_201_CREATED)
+
 
 import os
 import re
@@ -62,8 +435,6 @@ from xml.sax.saxutils import escape
 from django.conf import settings
 from django.http import HttpResponse
 from django.db.models import Prefetch
-from django.shortcuts import get_object_or_404
-from django.utils import timezone
 
 from rest_framework.views import APIView
 

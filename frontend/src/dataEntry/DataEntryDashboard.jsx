@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import {
   CalendarCheck,
@@ -10,10 +9,12 @@ import {
   ClipboardList,
   BarChart3,
   HardHat,
+  Building2,
 } from "lucide-react";
 
 import { useLanguage } from "../hooks/useLanguage";
 import { useAuth } from "../auth/AuthContext";
+import { APARTMENT_MANAGEMENT_PERMISSIONS } from "../auth/roles";
 import { hasAnyPermission } from "../../utils/permissions";
 
 export default function DataEntryDashboard() {
@@ -120,6 +121,14 @@ export default function DataEntryDashboard() {
     },
 
     {
+      title: t("dataEntry.cards.apartmentManagement"),
+      body: t("dataEntry.cards.apartmentManagementText"),
+      to: "/data-entry/apartment-management",
+      icon: Building2,
+      visible: hasAnyPermission(permissions, APARTMENT_MANAGEMENT_PERMISSIONS),
+    },
+
+    {
       title: "Reports",
       body: "View reports",
       to: "/data-entry/reports",
@@ -127,6 +136,9 @@ export default function DataEntryDashboard() {
       visible: hasAnyPermission(permissions, [
         "reports.view",
         "reports.export",
+        "apartment_sales_reports.view",
+        "apartment_payment_reports.view",
+        "apartment_outstanding_reports.view",
       ]),
     },
 

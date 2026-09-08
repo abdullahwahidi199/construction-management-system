@@ -19,6 +19,7 @@ from .serializers import (
     BudgetComparisonSerializer,
     AlertsSummarySerializer,
     ActivitySerializer,
+    ApartmentSummarySerializer,
 )
 from accounts.permissions import RBACPermission
 
@@ -36,7 +37,7 @@ class FullDashboardView(DashboardAPIView):
     """
 
     def get(self, request):
-        data = DashboardService.get_full_dashboard()
+        data = DashboardService.get_full_dashboard(user=request.user)
         serializer = FullDashboardSerializer(data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -52,6 +53,15 @@ class ProjectOverviewView(DashboardAPIView):
     def get(self, request):
         data = DashboardService.get_project_overview()
         serializer = ProjectOverviewSerializer(data)
+        return Response(serializer.data)
+
+
+class ApartmentSummaryView(DashboardAPIView):
+    """GET /api/dashboard/apartments/"""
+
+    def get(self, request):
+        data = DashboardService.get_apartment_summary(user=request.user)
+        serializer = ApartmentSummarySerializer(data)
         return Response(serializer.data)
 
 

@@ -32,6 +32,7 @@ vi.mock("../hooks/useLanguage", () => ({
         "auth.logout": "Logout",
         "dailyWorkers.title": "Daily Workers",
         "managerNavbar.attendance": "Attendance",
+        "managerNavbar.apartmentManagement": "Apartment Management",
         "managerNavbar.brand": "Lanader Manager",
         "managerNavbar.closeMenu": "Close menu",
         "managerNavbar.contracts": "Contracts",
@@ -93,6 +94,9 @@ function renderNavbar(initialPath = "/manager/dashboard") {
 
 const allPermissions = [
   "projects.view",
+  "buildings.view",
+  "floors.view",
+  "apartments.view",
   "contracts.view",
   "employees.view",
   "daily_workers.view",
@@ -123,6 +127,7 @@ describe("ManagerNavbar", () => {
     expect(screen.getAllByText("Dashboard").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Projects").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Contracts").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Expenses").length).toBeGreaterThan(0);
 
     const desktopMoreButton = screen
       .getAllByRole("button", { name: /more/i })
@@ -132,6 +137,7 @@ describe("ManagerNavbar", () => {
     const moreMenu = screen.getByRole("menu");
     expect(within(moreMenu).getByText("People")).toBeInTheDocument();
     expect(within(moreMenu).getByText("Finance")).toBeInTheDocument();
+    expect(within(moreMenu).getByText("Apartment Management")).toBeInTheDocument();
     expect(within(moreMenu).getByText("Expense Approvals")).toBeInTheDocument();
     expect(within(moreMenu).getByText("99+")).toBeInTheDocument();
 

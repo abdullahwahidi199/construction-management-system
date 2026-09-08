@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -28,9 +28,11 @@ import ProjectEditView from "../../components/reusableComponents/ProjectEditView
 import DeleteConfirmModal from "../../components/ui/DeleteConfirmModal";
 import Button from "../../components/ui/Button";
 import PermissionWrapper from "../../auth/PermissionWrapper";
+import { APARTMENT_MANAGEMENT_PERMISSIONS } from "../../auth/roles";
 import { useLanguage } from "../../hooks/useLanguage";
 import useRealtimeEvents from "../../hooks/useRealtimeEvents";
 import toast from "react-hot-toast";
+import ApartmentManagement from "./ApartmentManagement";
 const getStatusConfig = (status, t) => {
   const s = status?.toLowerCase();
   if (s === "active" || s === "in progress")
@@ -220,7 +222,10 @@ export default function ProjectDetails() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProjectDetails();
+    // The project id is the request identity; realtime refreshes call the same loader.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useRealtimeEvents((message) => {
@@ -240,7 +245,7 @@ export default function ProjectDetails() {
       setDeleteOpen(false);
       toast.success("Project deleted.");
       navigate("/manager/projects");
-    } catch (err) {
+    } catch {
       // Central axios handling shows the user-facing error.
     } finally {
       setDeleting(false);
@@ -264,7 +269,7 @@ export default function ProjectDetails() {
       link.remove();
       window.URL.revokeObjectURL(url);
       toast.success("Project PDF downloaded.");
-    } catch (err) {
+    } catch {
       // Central axios handling shows the user-facing error.
     }
   };
@@ -353,6 +358,12 @@ export default function ProjectDetails() {
 
   const progress = getTimelineProgress();
   const ArrowIcon = isRTL ? ArrowRight : ArrowLeft;
+  const apartmentSummary = project.apartment_summary || {
+    total: 0,
+    available: 0,
+    sold: 0,
+    currencies: {},
+  };
   return (
     <>
       <div className="space-y-6">
@@ -497,6 +508,51 @@ export default function ProjectDetails() {
             color="warning"
           />
         </div>
+        {(apartmentSummary.can_view_inventory || apartmentSummary.can_view_sales) && <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
+          <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
+            <Building2 className="h-4 w-4" />
+            {t("ProjectDetails.apartmentSalesSummary")}
+          </h3>
+          {apartmentSummary.can_view_inventory && <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {[
+              [t("ProjectDetails.totalApartments"), apartmentSummary.total],
+              [t("ProjectDetails.availableApartments"), apartmentSummary.available],
+              [t("ProjectDetails.soldApartments"), apartmentSummary.sold],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-lg bg-[var(--hover)] p-3">
+                <p className="text-xs text-[var(--muted)]">{label}</p>
+                <p className="mt-1 text-xl font-semibold text-[var(--text)]">{value ?? 0}</p>
+              </div>
+            ))}
+          </div>}
+          {apartmentSummary.can_view_sales && <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {["AFN", "USD"].map((currency) => {
+              const totals = apartmentSummary.currencies?.[currency] || {};
+              return (
+                <div key={currency} className="rounded-xl border border-[var(--border)] p-4">
+                  <h4 className="font-semibold text-[var(--text)]">{currency}</h4>
+                  <dl className="mt-3 space-y-2 text-sm">
+                    {[
+                      [t("ProjectDetails.totalSales"), totals.sales],
+                      [t("ProjectDetails.totalReceived"), totals.received],
+                      [t("ProjectDetails.totalOutstanding"), totals.outstanding],
+                    ].map(([label, value]) => (
+                      <div key={label} className="flex items-center justify-between gap-3">
+                        <dt className="text-[var(--muted)]">{label}</dt>
+                        <dd className="font-semibold tabular-nums text-[var(--text)]">
+                          {formatAmount(value)} {currency}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              );
+            })}
+          </div>}
+        </div>}
+        <PermissionWrapper permissions={APARTMENT_MANAGEMENT_PERMISSIONS}>
+          <ApartmentManagement project={project} />
+        </PermissionWrapper>
         {/* ── Contract Financial Summary ───────────────── */}
         <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
           <h3 className="mb-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">

@@ -15,6 +15,7 @@ from .views import (
     BudgetComparisonView,
     AlertsView,
     RecentActivityView,
+    ApartmentSummaryView,
 )
 
 app_name = "dashboard"
@@ -32,6 +33,11 @@ urlpatterns = [
         "projects/",
         ProjectOverviewView.as_view(),
         name="project-overview",
+    ),
+    path(
+        "apartments/",
+        ApartmentSummaryView.as_view(),
+        name="apartment-summary",
     ),
     path(
         "financial/",

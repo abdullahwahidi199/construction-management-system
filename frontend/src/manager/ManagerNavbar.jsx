@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   BarChart3,
+  Building2,
   BriefcaseBusiness,
   CalendarCheck,
   ClipboardCheck,
+  CreditCard,
   ChevronDown,
   CircleDollarSign,
   Command,
@@ -28,6 +30,7 @@ import { useLanguage } from "../hooks/useLanguage";
 import NotificationBell from "../components/notifications/NotificationBell";
 import { useRealtimeNotifications } from "../components/notifications/RealtimeNotificationCenter";
 import { useAuth } from "../auth/AuthContext";
+import { APARTMENT_MANAGEMENT_PERMISSIONS } from "../auth/roles";
 import { useCompany } from "../context/CompanyContext";
 import { hasAnyPermission } from "../../utils/permissions";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
@@ -120,10 +123,10 @@ function MoreNavMenu({ groups, pathname, open, onToggle, onClose, t }) {
       <button
         type="button"
         onClick={onToggle}
-        className={`group relative inline-flex h-10 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-medium transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35 ${
+        className={`group relative inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border px-3 text-sm font-semibold shadow-sm transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--primary)/35 ${
           active || open
-            ? "text-(--text)"
-            : "text-(--muted) hover:bg-(--hover) hover:text-(--text)"
+            ? "border-(--primary)/30 bg-(--primary)/10 text-(--primary)"
+            : "border-(--border) bg-(--card) text-(--text) hover:border-(--primary)/30 hover:bg-(--hover)"
         }`}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -550,6 +553,24 @@ export default function ManagerNavbar() {
           "projects.delete",
         ],
       },
+      apartmentManagement: {
+        name: labelOr(t, "managerNavbar.apartmentManagement", "Apartment Management"),
+        path: "/manager/apartment-management",
+        icon: Building2,
+        permissions: APARTMENT_MANAGEMENT_PERMISSIONS,
+      },
+      apartmentSales: {
+        name: labelOr(t, "managerNavbar.apartmentSales", "Apartment Sales"),
+        path: "/manager/apartment-sales",
+        icon: Building2,
+        permissions: ["apartment_sales.view"],
+      },
+      outstandingApartmentPayments: {
+        name: labelOr(t, "managerNavbar.outstandingPayments", "Outstanding Payments"),
+        path: "/manager/outstanding-apartment-payments",
+        icon: CreditCard,
+        permissions: ["apartment_sales.view"],
+      },
       contracts: {
         name: t("managerNavbar.contracts"),
         path: "/manager/contracts",
@@ -645,7 +666,13 @@ export default function ManagerNavbar() {
         name: t("managerNavbar.reports"),
         path: "/manager/reports",
         icon: BarChart3,
-        permissions: ["reports.view", "reports.export"],
+        permissions: [
+          "reports.view",
+          "reports.export",
+          "apartment_sales_reports.view",
+          "apartment_payment_reports.view",
+          "apartment_outstanding_reports.view",
+        ],
       },
     };
 
@@ -659,6 +686,11 @@ export default function ManagerNavbar() {
         type: "link",
         ...pages.projects,
         hidden: !canView(pages.projects.permissions),
+      },
+      {
+        type: "link",
+        ...pages.apartmentManagement,
+        hidden: !canView(pages.apartmentManagement.permissions),
       },
       {
         type: "link",
@@ -681,7 +713,12 @@ export default function ManagerNavbar() {
         key: "finance",
         name: t("managerNavbar.finance"),
         icon: CircleDollarSign,
-        items: visible(["expenseApprovals", "payrolls"]),
+        items: visible([
+          "apartmentSales",
+          "outstandingApartmentPayments",
+          "expenseApprovals",
+          "payrolls",
+        ]),
       },
       {
         type: "group",
@@ -707,7 +744,6 @@ export default function ManagerNavbar() {
       : [group],
   );
   const primaryDesktopPaths = new Set([
-    "/admin/dashboard",
     "/manager/dashboard",
     "/manager/projects",
     "/manager/contracts",
@@ -731,6 +767,8 @@ export default function ManagerNavbar() {
   useBodyScrollLock(mobileOpen);
 
   useEffect(() => {
+    // Route changes intentionally close transient navigation surfaces.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMobileOpen(false);
     setOpenDropdown(null);
     setProfileOpen(false);

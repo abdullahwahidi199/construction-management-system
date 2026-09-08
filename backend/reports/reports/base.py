@@ -9,8 +9,9 @@ class BaseReport:
     """
     report_name = "Base Report"
 
-    def __init__(self, filters: dict = None):
+    def __init__(self, filters: dict = None, user=None):
         self.filters = filters or {}
+        self.user = user
         self.generated_at = datetime.now()
 
     def get_date_range(self):
