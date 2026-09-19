@@ -16,7 +16,7 @@ from .models import (
 from expenses.serializers import ProjectExpenseSerializer
 from subcontractor.models import Contract
 from subcontractor.serializers import ContractListSerializer
-from django.db.models import Count, Q, Sum
+from django.db.models import Avg, Count, Q, Sum
 from decimal import Decimal
 from labour.models import WorkerPayroll
 from Employees.models import Employee, Payroll
@@ -422,6 +422,7 @@ class ProjectSerializer(CalendarModelSerializer):
     direct_expenses_afn = serializers.SerializerMethodField()
     total_expenses_usd = serializers.SerializerMethodField()
     total_expenses_afn = serializers.SerializerMethodField()
+    average_expense_exchange_rate = serializers.SerializerMethodField()
 
     # contracts = serializers.SerializerMethodField()
 
@@ -514,6 +515,14 @@ class ProjectSerializer(CalendarModelSerializer):
             sum(float(exp.total_afn) for exp in obj.expenses.approved()),
             2
         )
+
+    def get_average_expense_exchange_rate(self, obj):
+        average = (
+            obj.expenses.approved()
+            .filter(exchange_rate__gt=0)
+            .aggregate(value=Avg("exchange_rate"))["value"]
+        )
+        return round(float(average), 4) if average is not None else None
 
     def get_total_expenses_usd(self, obj):
         direct = Decimal(str(self.get_direct_expenses_usd(obj)))

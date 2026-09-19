@@ -294,7 +294,9 @@ describe("ExpensesMain", () => {
     fireEvent.change(screen.getByDisplayValue("All statuses"), { target: { value: "approved" } });
     fireEvent.change(screen.getAllByDisplayValue("")[0], { target: { value: "2026-01-01" } });
     fireEvent.change(screen.getAllByDisplayValue("")[0], { target: { value: "2026-01-31" } });
-    fireEvent.change(screen.getByDisplayValue("Newest"), { target: { value: "expense_date" } });
+    fireEvent.change(screen.getByDisplayValue("Newest"), {
+      target: { value: "expense_date,created_at" },
+    });
 
     const latestEndpoint = latestExpenseEndpoint();
     expect(latestEndpoint).toContain("project=1");

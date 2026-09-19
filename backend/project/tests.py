@@ -8,12 +8,14 @@ from common.test_helpers import (
     create_contract,
     create_contract_payment,
     create_employee,
+    create_expense,
     create_payroll,
     create_project,
     create_user,
 )
 from Employees.models import Employee, PayrollPayment
 from accounts.models import Permission, ProjectAssignment, RolePermission
+from expenses.models import Expense
 from project.models import (
     Apartment,
     ApartmentPayment,
@@ -121,6 +123,24 @@ class ProjectAPITests(APITestCase):
         self.assertEqual(response.data["budget_currency"], "USD")
         self.assertIn("total_expenses_usd", response.data)
         self.assertIn("total_contract_value", response.data)
+
+    def test_project_detail_includes_average_approved_expense_exchange_rate(self):
+        project = create_project()
+        create_expense(project, exchange_rate=Decimal("70.0000"))
+        create_expense(project, exchange_rate=Decimal("72.0000"))
+        create_expense(
+            project,
+            exchange_rate=Decimal("100.0000"),
+            approval_status=Expense.ApprovalStatus.PENDING,
+        )
+
+        response = self.client.get(f"/api/projects/{project.id}/")
+
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(
+            Decimal(str(response.data["average_expense_exchange_rate"])),
+            Decimal("71.0"),
+        )
 
     def test_project_detail_handles_contract_without_value(self):
         project = create_project(estimated_budget=Decimal("1000.00"), budget_currency="USD")

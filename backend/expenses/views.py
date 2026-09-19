@@ -42,6 +42,7 @@ from .services import (
 from accounts.permissions import RBACPermission
 from accounts.services import has_permission
 from common.calendar_utils import get_module_calendar, parse_calendar_date
+from subcontractor.services import ContractService
 
 
 # =========================
@@ -114,11 +115,12 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     ordering_fields = [
         "expense_date",
+        "created_at",
         "serial_number",
         "total_usd_calc",
     ]
 
-    ordering = ["-expense_date"]  # correct DRF ordering field
+    ordering = ["-expense_date", "-created_at"]
 
     pagination_class = ExpensePagination
 
@@ -208,6 +210,20 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         return self._update_expense(request, *args, partial=True, **kwargs)
+
+    @action(detail=True, methods=["get"])
+    def receipt(self, request, pk=None):
+        expense = self.get_object()
+        if expense.approval_status != Expense.ApprovalStatus.APPROVED:
+            raise PermissionDenied("Expense must be approved before printing.")
+
+        data = dict(self.get_serializer(expense).data)
+        data["contract_financial_summary"] = (
+            ContractService.get_contract_expense_summary(expense.contract)
+            if expense.contract_id
+            else None
+        )
+        return Response(data)
 
     @action(detail=True, methods=["post"])
     def approve(self, request, pk=None):
@@ -472,10 +488,15 @@ class ExpensePDFExportView(APIView):
         if status_filter and status_filter != Expense.ApprovalStatus.APPROVED:
             raise PermissionDenied("Only approved expenses can be exported.")
 
-        qs = Expense.objects.approved().select_related(
-            "project",
-            "contract",
-            "contract__subcontractor",
+        qs = (
+            Expense.objects.approved()
+            .select_related("project", "contract", "contract__subcontractor")
+            .annotate(
+                total_usd_calc=ExpressionWrapper(
+                    F("amount_usd"),
+                    output_field=DecimalField(max_digits=20, decimal_places=2),
+                )
+            )
         )
 
         search = self.request.GET.get("search")
@@ -489,7 +510,7 @@ class ExpensePDFExportView(APIView):
         approver = self.request.GET.get("approver") or self.request.GET.get("approved_by")
         ordering = self.request.GET.get(
             "ordering",
-            "-expense_date",
+            "-expense_date,-created_at",
         )
 
         if search:
@@ -529,7 +550,18 @@ class ExpensePDFExportView(APIView):
                 expense_date__lte=date_to
             )
 
-        return qs.order_by(ordering)
+        allowed_ordering_fields = {
+            "expense_date",
+            "created_at",
+            "serial_number",
+            "total_usd_calc",
+        }
+        ordering_fields = [
+            field
+            for field in (part.strip() for part in ordering.split(","))
+            if field.lstrip("-") in allowed_ordering_fields
+        ]
+        return qs.order_by(*(ordering_fields or ["-expense_date", "-created_at"]))
 
     def get(self, request):
 
@@ -598,7 +630,7 @@ class ExpensePDFExportView(APIView):
         date_to = request.GET.get("expense_date__lte")
         ordering = request.GET.get(
             "ordering",
-            "-expense_date",
+            "-expense_date,-created_at",
         )
 
         project_name = "All Projects"
@@ -622,11 +654,17 @@ class ExpensePDFExportView(APIView):
 
         ordering_labels = {
             "-expense_date": "Date (Newest First)",
+            "-expense_date,-created_at": "Date (Newest First)",
             "expense_date": "Date (Oldest First)",
+            "expense_date,created_at": "Date (Oldest First)",
             "-serial_number": "Serial # (High → Low)",
+            "-serial_number,-created_at": "Serial # (High → Low)",
             "serial_number": "Serial # (Low → High)",
+            "serial_number,created_at": "Serial # (Low → High)",
             "-total_usd_calc": "Amount (High → Low)",
+            "-total_usd_calc,-created_at": "Amount (High → Low)",
             "total_usd_calc": "Amount (Low → High)",
+            "total_usd_calc,created_at": "Amount (Low → High)",
         }
 
         # ------------------------------------------

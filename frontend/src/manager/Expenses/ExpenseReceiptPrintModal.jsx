@@ -37,6 +37,58 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
   const approvalDate = displayDateTime(expense.approved_at);
   const totalUsd = expense.total_usd_equivalent ?? expense.total_usd ?? 0;
   const totalAfn = expense.total_afn_equivalent ?? expense.total_afn ?? 0;
+  const contractSummary = expense.contract_financial_summary;
+  const formatMoney = (value) =>
+    Number(value || 0).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  const contractHistoryRows = contractSummary
+    ? [
+        {
+          currency: "USD",
+          symbol: "$",
+          payments: Number(contractSummary.payments_made_usd || 0),
+          expenses: Number(contractSummary.total_contract_expenses_usd || 0),
+          total: Number(contractSummary.total_cash_outflow_usd || 0),
+        },
+        {
+          currency: "AFN",
+          symbol: "AFN ",
+          payments: Number(contractSummary.payments_made_afn || 0),
+          expenses: Number(contractSummary.total_contract_expenses_afn || 0),
+          total: Number(contractSummary.total_cash_outflow_afn || 0),
+        },
+      ].filter((row) => row.payments || row.expenses || row.total)
+    : [];
+  const contractHistoryHtml = contractSummary
+    ? `
+      <div class="section">
+        <div class="section-title">Contract Payment History</div>
+        <div class="description-box"><strong>${expense.contract_label || "Contract"}</strong></div>
+        <div class="amounts" style="margin-top: 5px;">
+          ${contractHistoryRows
+            .map(
+              (row) => `
+                <div class="amount-row">
+                  <span class="label">Recorded contract payments (${row.currency})</span>
+                  <span class="value">${row.symbol}${formatMoney(row.payments)}</span>
+                </div>
+                <div class="amount-row">
+                  <span class="label">Linked approved expenses (${row.currency})</span>
+                  <span class="value">${row.symbol}${formatMoney(row.expenses)}</span>
+                </div>
+                <div class="amount-row total">
+                  <span class="label">Total paid to contract (${row.currency})</span>
+                  <span class="value">${row.symbol}${formatMoney(row.total)}</span>
+                </div>
+              `,
+            )
+            .join("")}
+        </div>
+      </div>
+    `
+    : "";
 
   const handlePrint = () => {
     if (!canPrint) return;
@@ -52,6 +104,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
       <head>
         <title>Expense Receipt #${expense.serial_number}</title>
         <style>
+          @page { size: A4 portrait; margin: 20mm; }
           * {
             margin: 0;
             padding: 0;
@@ -61,15 +114,32 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
               "Helvetica Neue", Arial, sans-serif;
             color: #111827;
-            padding: 48px 56px;
-            line-height: 1.5;
-            font-size: 14px;
+            padding: 24px 28px;
+            line-height: 1.3;
+            font-size: 11px;
           }
           .document {
-            max-width: 780px;
+            max-width: 190mm;
             margin: 0 auto;
           }
           ${renderPrintBrandingStyles()}
+          .company-brand-header {
+            gap: 10px;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+          }
+          .company-brand-logo { width: 40px; height: 40px; }
+          .company-brand-name { font-size: 14px; }
+          .company-brand-detail { font-size: 9px; margin-top: 1px; }
+          .company-document-meta { min-width: 120px; }
+          .company-document-title { font-size: 13px; }
+          .company-document-subtitle { font-size: 9px; margin-top: 1px; }
+          .company-brand-footer {
+            margin-top: 14px;
+            padding-top: 6px;
+            font-size: 9px;
+            line-height: 1.25;
+          }
 
           /* Header */
           .doc-header {
@@ -123,22 +193,22 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             overflow: hidden;
-            margin-bottom: 28px;
+            margin-bottom: 8px;
           }
           .info-grid .cell {
             background: #fafafa;
-            padding: 12px 16px;
+            padding: 6px 9px;
           }
           .info-grid .label {
-            font-size: 10px;
+            font-size: 9px;
             color: #9ca3af;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            margin-bottom: 1px;
             font-weight: 600;
           }
           .info-grid .value {
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 600;
             color: #111827;
             text-transform: capitalize;
@@ -146,22 +216,23 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
 
           /* Section title */
           .section-title {
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #4b5563;
-            margin-bottom: 10px;
-            padding-bottom: 6px;
+            margin-bottom: 5px;
+            padding-bottom: 3px;
             border-bottom: 1px solid #e5e7eb;
           }
           .section {
-            margin-bottom: 28px;
+            margin-bottom: 12px;
           }
           .description-box {
-            font-size: 14px;
+            font-size: 11px;
             color: #1f2937;
-            padding: 4px 0;
+            padding: 2px 0;
+            overflow-wrap: anywhere;
           }
 
           /* Amounts */
@@ -174,8 +245,8 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 18px;
-            font-size: 14px;
+            padding: 6px 10px;
+            font-size: 11px;
             border-bottom: 1px solid #f3f4f6;
           }
           .amount-row:last-child {
@@ -197,7 +268,7 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
           }
           .amount-row.total .value {
             color: #ffffff;
-            font-size: 17px;
+            font-size: 12px;
             font-weight: 800;
           }
           .amount-row.subtotal {
@@ -211,45 +282,51 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
 
           /* Signatures */
           .signatures {
-            margin-top: 56px;
+            margin-top: 24px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
+            gap: 12px;
           }
           .signature-block {
             text-align: center;
           }
           .signature-line {
-            height: 48px;
+            height: 32px;
             border-bottom: 1.5px solid #9ca3af;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
           }
           .signature-block .role {
-            font-size: 12px;
+            font-size: 9px;
             font-weight: 700;
             color: #111827;
             text-transform: uppercase;
             letter-spacing: 0.5px;
           }
           .signature-block .hint {
-            font-size: 10px;
+            font-size: 9px;
             color: #9ca3af;
-            margin-top: 2px;
+            margin-top: 1px;
           }
 
           /* Footer */
           .doc-footer {
-            margin-top: 48px;
-            padding-top: 16px;
+            margin-top: 14px;
+            padding-top: 6px;
             border-top: 1px solid #e5e7eb;
             text-align: center;
-            font-size: 10px;
+            font-size: 9px;
             color: #9ca3af;
             letter-spacing: 0.5px;
           }
 
           @media print {
-            body { padding: 24px 32px; }
+            html, body { width: 100%; }
+            body { padding: 2mm; }
+            .document { max-width: none; }
+            .section, .info-grid, .amounts, .signatures,
+            .company-brand-header, .company-brand-footer {
+              break-inside: avoid;
+            }
             .amount-row.total { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .info-grid .cell,
             .amount-row.subtotal { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -331,6 +408,8 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
               </div>
             </div>
           </div>
+
+          ${contractHistoryHtml}
 
           ${
             expense.remarks
@@ -581,6 +660,50 @@ export default function ExpenseReceiptPrintModal({ isOpen, onClose, expense }) {
                   </div>
                 </div>
               </div>
+
+              {contractSummary && (
+                <div className="mb-7">
+                  <p className="mb-2 border-b border-[var(--border)] pb-1.5 text-[11px] font-bold uppercase tracking-wide text-[var(--muted)]">
+                    Contract Payment History
+                  </p>
+                  <p className="mb-3 text-sm font-semibold text-[var(--text)]">
+                    {expense.contract_label || "Contract"}
+                  </p>
+                  <div className="space-y-3">
+                    {contractHistoryRows.map((row) => (
+                      <div
+                        key={row.currency}
+                        className="overflow-hidden rounded-lg border border-[var(--border)]"
+                      >
+                        <div className="flex justify-between border-b border-[var(--border)] px-4 py-3 text-sm">
+                          <span className="text-[var(--muted)]">
+                            Recorded contract payments ({row.currency})
+                          </span>
+                          <span className="font-semibold text-[var(--text)]">
+                            {row.symbol}{formatMoney(row.payments)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between border-b border-[var(--border)] px-4 py-3 text-sm">
+                          <span className="text-[var(--muted)]">
+                            Linked approved expenses ({row.currency})
+                          </span>
+                          <span className="font-semibold text-[var(--text)]">
+                            {row.symbol}{formatMoney(row.expenses)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between bg-[var(--text)] px-4 py-3.5 text-sm">
+                          <span className="font-semibold text-white/80">
+                            Total paid to contract ({row.currency})
+                          </span>
+                          <span className="text-lg font-extrabold text-white">
+                            {row.symbol}{formatMoney(row.total)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Remarks */}
               {expense.remarks && (

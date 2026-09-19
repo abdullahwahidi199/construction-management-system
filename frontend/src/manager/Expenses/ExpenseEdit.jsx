@@ -411,7 +411,15 @@ export default function ExpenseEdit({
                 contracts={contracts}
                 value={formData.contract}
                 projectId={formData.project}
-                onChange={(value) => handleChange("contract", value)}
+                onChange={(value, contractProjectId) => {
+                  if (
+                    contractProjectId &&
+                    String(contractProjectId) !== String(formData.project)
+                  ) {
+                    handleChange("project", String(contractProjectId));
+                  }
+                  handleChange("contract", value);
+                }}
                 error={errors.contract}
                 selectedFallback={
                   expense.contract

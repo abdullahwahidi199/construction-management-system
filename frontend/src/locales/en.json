@@ -71,6 +71,7 @@
     "expenses": "Expenses",
     "expensesUsd": "Expenses (USD)",
     "expensesAfn": "Expenses (AFN)",
+    "averageExchangeRate": "Average Expense Exchange Rate",
 
     "payroll": "Payroll",
     "netPayrollUsd": "Net Payroll (USD)",
@@ -442,7 +443,7 @@
     "totalSales": "Total Sales",
     "totalReceived": "Total Received",
     "totalOutstanding": "Total Outstanding",
-
+    "averageExchangeRate": "Average Exchange Rate",
     "contractFinancialSummary": "Contract Financial Summary",
     "totalContractValue": "Total Contract Value",
     "totalPayments": "Paid to Subcontractors",

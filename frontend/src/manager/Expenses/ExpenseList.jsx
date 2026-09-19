@@ -18,6 +18,7 @@ import PermissionWrapper from "../../auth/PermissionWrapper";
 import { useLanguage } from "../../hooks/useLanguage";
 import { useCalendar } from "../../hooks/useCalendar";
 import DeleteConfirmModal from "../../components/ui/DeleteConfirmModal";
+import instance from "../../api/axiosInstance";
 
 const categoryConfig = {
   food: {
@@ -70,9 +71,9 @@ export default function ExpenseList({
   canDelete = true,
   projects = [],
   contracts = [],
+  sortBy = "-expense_date,-created_at",
+  onSort,
 }) {
-  const [sortField, setSortField] = useState("expense_date");
-  const [sortDirection, setSortDirection] = useState("desc");
   const [selectedExpenses, setSelectedExpenses] = useState([]);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
@@ -81,6 +82,7 @@ export default function ExpenseList({
   const [printBlockMessage, setPrintBlockMessage] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [printingExpenseId, setPrintingExpenseId] = useState(null);
   const { t, lang } = useLanguage();
   const { formatDate, formatDateTime } = useCalendar("expenses");
 
@@ -92,14 +94,6 @@ export default function ExpenseList({
     if (usdAmount > 0) return { value: usdAmount, currency: "USD" };
     if (afnAmount > 0) return { value: afnAmount, currency: "AFN" };
     return { value: 0, currency: "USD" };
-  };
-
-  const getTotalAmount = (expense) => {
-    return (
-      parseFloat(expense.total_usd_equivalent ?? expense.total_usd) ||
-      parseFloat(expense.total_afn_equivalent ?? expense.total_afn) ||
-      0
-    );
   };
 
   const getEquivalentTotals = (expense) => ({
@@ -134,37 +128,16 @@ export default function ExpenseList({
       result = result.filter((exp) => exp.category === selectedCategory);
     }
 
-    result.sort((a, b) => {
-      let aValue = a[sortField];
-      let bValue = b[sortField];
-
-      if (sortField === "expense_date") {
-        aValue = String(aValue || "");
-        bValue = String(bValue || "");
-      } else if (sortField === "amount") {
-        aValue = getTotalAmount(a);
-        bValue = getTotalAmount(b);
-      }
-
-      return sortDirection === "asc"
-        ? aValue > bValue
-          ? 1
-          : -1
-        : aValue < bValue
-          ? 1
-          : -1;
-    });
-
     return result;
-  }, [expenses, searchTerm, selectedCategory, sortField, sortDirection]);
+  }, [expenses, searchTerm, selectedCategory]);
 
   const handleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("desc");
-    }
+    const backendField = field === "amount" ? "total_usd_calc" : field;
+    const currentPrimary = String(sortBy).split(",")[0];
+    const isDescending = currentPrimary === `-${backendField}`;
+    const direction = isDescending ? "" : "-";
+    const tieDirection = isDescending ? "" : "-";
+    onSort?.(`${direction}${backendField},${tieDirection}created_at`);
   };
 
   const toggleSelectExpense = (id) => {
@@ -225,13 +198,26 @@ export default function ExpenseList({
     }
   };
 
-  const handlePrint = (expense) => {
+  const handlePrint = async (expense) => {
     if (expense.approval_status !== "approved") {
       setPrintBlockMessage("Expense must be approved before printing.");
       return;
     }
-    setPrintBlockMessage("");
-    setPrintExpense(expense);
+
+    try {
+      setPrintBlockMessage("");
+      setPrintingExpenseId(expense.id);
+      const response = await instance.get(`expenses/${expense.id}/receipt/`, {
+        skipGlobalErrorToast: true,
+      });
+      setPrintExpense(response.data);
+    } catch (error) {
+      setPrintBlockMessage(
+        error?.userMessage || "Unable to load the receipt payment history.",
+      );
+    } finally {
+      setPrintingExpenseId(null);
+    }
   };
   if (filteredExpenses.length === 0 && expenses.length > 0) {
     return (
@@ -428,7 +414,10 @@ export default function ExpenseList({
 
                         <button
                           onClick={() => handlePrint(expense)}
-                          disabled={expense.approval_status !== "approved"}
+                          disabled={
+                            expense.approval_status !== "approved" ||
+                            printingExpenseId === expense.id
+                          }
                           className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--text)] disabled:cursor-not-allowed disabled:opacity-45"
                           title={
                             expense.approval_status === "approved"
@@ -436,7 +425,11 @@ export default function ExpenseList({
                               : "Expense must be approved before printing."
                           }
                         >
-                          <Printer className="h-4 w-4" />
+                          {printingExpenseId === expense.id ? (
+                            <RefreshCw className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Printer className="h-4 w-4" />
+                          )}
                         </button>
                         {canDelete && (
                           <PermissionWrapper permissions={["expenses.delete"]}>
@@ -581,14 +574,21 @@ export default function ExpenseList({
                   <button
                     type="button"
                     onClick={() => handlePrint(expense)}
-                    disabled={expense.approval_status !== "approved"}
+                    disabled={
+                      expense.approval_status !== "approved" ||
+                      printingExpenseId === expense.id
+                    }
                     className={`inline-flex h-12 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-55 ${
                       expense.approval_status === "approved"
                         ? "border-[var(--border)] text-[var(--success)]"
                         : "border-[var(--border)] text-[var(--muted)]"
                     }`}
                   >
-                    <Printer className="h-4 w-4" />
+                    {printingExpenseId === expense.id ? (
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Printer className="h-4 w-4" />
+                    )}
                     {t("ExpenseList.printReceipt")}
                   </button>
                   {canDelete && (

@@ -429,6 +429,7 @@
     "estimatedBudget": "اټکلي بودیجه",
     "expensesUsd": "لګښتونه (ډالر)",
     "expensesAfn": "لګښتونه (افغانۍ)",
+    "averageExchangeRate": "د لګښتونو د تبادلې اوسط نرخ",
     "startDate": "د پیل نېټه",
     "expectedCompletion": "د بشپړېدو اټکل شوې نېټه",
     "apartmentSalesSummary": "د اپارتمانونو د پلور لنډیز",

@@ -146,4 +146,66 @@ describe("ExpenseCreateModal", () => {
     expect(await screen.findByText("Project is required")).toBeInTheDocument();
     expect(onCreate).not.toHaveBeenCalled();
   });
+
+  it("uses a searchable react-select for project contracts", () => {
+    render(
+      <ExpenseCreateModal
+        isOpen
+        onClose={vi.fn()}
+        onCreate={onCreate}
+        projects={[{ id: 1, name: "Tower" }]}
+        contracts={[
+          {
+            id: 7,
+            project: 1,
+            contract_number: "CNT-007",
+            title: "Plumbing Works",
+          },
+        ]}
+      />,
+    );
+
+    fireEvent.change(screen.getByDisplayValue("Select Project"), {
+      target: { value: "1" },
+    });
+    const contractSelect = screen.getByRole("combobox", { name: "Contract" });
+    expect(contractSelect).toHaveAttribute("type", "text");
+
+    fireEvent.change(contractSelect, { target: { value: "Plumbing" } });
+    expect(screen.getByText("CNT-007 - Plumbing Works")).toBeInTheDocument();
+  });
+
+  it("opens contract choices on field click and allows typing before selecting a project", () => {
+    render(
+      <ExpenseCreateModal
+        isOpen
+        onClose={vi.fn()}
+        onCreate={onCreate}
+        projects={[{ id: 1, name: "Tower" }]}
+        contracts={[
+          {
+            id: 7,
+            project: 1,
+            contract_number: "CNT-007",
+            title: "Plumbing Works",
+          },
+        ]}
+      />,
+    );
+
+    const contractSelect = screen.getByRole("combobox", { name: "Contract" });
+    expect(contractSelect).toBeEnabled();
+    fireEvent.mouseDown(contractSelect);
+    expect(
+      screen.getByRole("option", { name: "CNT-007 - Plumbing Works" }),
+    ).toBeInTheDocument();
+
+    fireEvent.change(contractSelect, { target: { value: "Plumbing" } });
+    fireEvent.click(
+      screen.getByRole("option", { name: "CNT-007 - Plumbing Works" }),
+    );
+
+    expect(screen.getByDisplayValue("Tower")).toBeInTheDocument();
+    expect(screen.getByText("CNT-007 - Plumbing Works")).toBeInTheDocument();
+  });
 });

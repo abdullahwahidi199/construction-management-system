@@ -22,6 +22,7 @@ import {
   Timer,
   TrendingUp,
   Download,
+  Coins,
 } from "lucide-react";
 import instance from "../../api/axiosInstance";
 import ProjectEditView from "../../components/reusableComponents/ProjectEditView";
@@ -104,6 +105,15 @@ const formatCurrency = (amount) => {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
+};
+
+const formatExchangeRate = (amount) => {
+  const value = Number(amount);
+  if (!Number.isFinite(value) || value <= 0) return "—";
+  return `1 USD = ${value.toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 4,
+  })} AFN`;
 };
 
 const formatRelativeDate = (dateString, t) => {
@@ -465,7 +475,7 @@ export default function ProjectDetails() {
         </div>
 
         {/* ── Quick Stats ──────────────────────────── */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             icon={Layers}
             label={t("ProjectDetails.totalFloors")}
@@ -492,6 +502,13 @@ export default function ProjectDetails() {
             label={t("ProjectDetails.expensesAfn")}
             value={formatAFN(project.total_expenses_afn) || "0"}
             color="warning"
+          />
+
+          <StatCard
+            icon={Coins}
+            label={t("ProjectDetails.averageExchangeRate")}
+            value={formatExchangeRate(project.average_expense_exchange_rate)}
+            color="violet"
           />
 
           <StatCard

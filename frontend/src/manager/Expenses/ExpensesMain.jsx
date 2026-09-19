@@ -35,6 +35,7 @@ import CalendarDatePicker from "../../components/common/CalendarDatePicker";
 import { useCalendar } from "../../hooks/useCalendar";
 
 const RTL_LANGS = ["dr", "ps", "fa", "dar", "prs"];
+const DEFAULT_SORT = "-expense_date,-created_at";
 
 export default function ExpensesMain({ dataEntryMode = false }) {
   const { t, lang } = useLanguage();
@@ -51,7 +52,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDateFrom, setFilterDateFrom] = useState("");
   const [filterDateTo, setFilterDateTo] = useState("");
-  const [sortBy, setSortBy] = useState("-expense_date");
+  const [sortBy, setSortBy] = useState(DEFAULT_SORT);
   const [showFilters, setShowFilters] = useState(false);
 
   // Debounce search input
@@ -120,7 +121,11 @@ export default function ExpensesMain({ dataEntryMode = false }) {
     try {
       await postData("expenses/", formData);
       setOpen(false);
-      refetch();
+      if (page === 1) {
+        await refetch();
+      } else {
+        setPage(1);
+      }
       toast.success("Expense submitted successfully.");
     } catch (err) {
       // Central axios handling shows the user-facing error.
@@ -197,7 +202,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
     setFilterStatus("");
     setFilterDateFrom("");
     setFilterDateTo("");
-    setSortBy("-expense_date");
+    setSortBy(DEFAULT_SORT);
     setPage(1);
   };
 
@@ -209,7 +214,7 @@ export default function ExpensesMain({ dataEntryMode = false }) {
     filterStatus,
     filterDateFrom,
     filterDateTo,
-    sortBy !== "-expense_date",
+    sortBy !== DEFAULT_SORT,
   ].filter(Boolean).length;
 
   const expenseList = expenses?.results?.results || [];
@@ -277,22 +282,25 @@ export default function ExpensesMain({ dataEntryMode = false }) {
   };
 
   const sortOptions = [
-    { value: "-expense_date", label: t("ExpensesMain.sortOptions.dateNewest") },
-    { value: "expense_date", label: t("ExpensesMain.sortOptions.dateOldest") },
+    { value: DEFAULT_SORT, label: t("ExpensesMain.sortOptions.dateNewest") },
     {
-      value: "-serial_number",
+      value: "expense_date,created_at",
+      label: t("ExpensesMain.sortOptions.dateOldest"),
+    },
+    {
+      value: "-serial_number,-created_at",
       label: t("ExpensesMain.sortOptions.serialHighLow"),
     },
     {
-      value: "serial_number",
+      value: "serial_number,created_at",
       label: t("ExpensesMain.sortOptions.serialLowHigh"),
     },
     {
-      value: "-total_usd_calc",
+      value: "-total_usd_calc,-created_at",
       label: t("ExpensesMain.sortOptions.amountHighLow"),
     },
     {
-      value: "total_usd_calc",
+      value: "total_usd_calc,created_at",
       label: t("ExpensesMain.sortOptions.amountLowHigh"),
     },
   ];
@@ -861,12 +869,12 @@ export default function ExpensesMain({ dataEntryMode = false }) {
                 </button>
               </span>
             )}
-            {sortBy !== "-expense_date" && (
+            {sortBy !== DEFAULT_SORT && (
               <span className="inline-flex items-center gap-1 rounded-lg bg-[var(--primary)]/10 px-2.5 py-1 text-xs font-medium text-[var(--primary)]">
                 {t("ExpensesMain.activeFilters.sort")}{" "}
                 {sortOptions.find((o) => o.value === sortBy)?.label || sortBy}
                 <button
-                  onClick={() => setSortBy("-expense_date")}
+                  onClick={() => setSortBy(DEFAULT_SORT)}
                   className="ms-1 hover:text-[var(--primary)]/70"
                 >
                   <X className="h-3 w-3" strokeWidth={2.5} />
@@ -981,6 +989,11 @@ export default function ExpensesMain({ dataEntryMode = false }) {
           canDelete={!dataEntryMode}
           projects={projects || []}
           contracts={contracts}
+          sortBy={sortBy}
+          onSort={(value) => {
+            setSortBy(value);
+            setPage(1);
+          }}
         />
       )}
 

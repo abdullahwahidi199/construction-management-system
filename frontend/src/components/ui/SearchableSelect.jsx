@@ -16,6 +16,11 @@ export default function SearchableSelect({
   disabled = false,
   error,
   required = false,
+  inputValue,
+  onInputChange,
+  noOptionsMessage = "No subcontractors found",
+  isClearable = false,
+  openMenuOnFocus = false,
 }) {
   const generatedId = useId();
   const inputId = `searchable-select-${generatedId.replace(/:/g, "")}`;
@@ -38,10 +43,14 @@ export default function SearchableSelect({
         placeholder={placeholder}
         isDisabled={disabled}
         isSearchable
+        isClearable={isClearable}
+        openMenuOnFocus={openMenuOnFocus}
+        inputValue={inputValue}
+        onInputChange={onInputChange}
         aria-invalid={!!error}
         menuPosition="fixed"
         menuPortalTarget={typeof document === "undefined" ? null : document.body}
-        noOptionsMessage={() => "No subcontractors found"}
+        noOptionsMessage={() => noOptionsMessage}
         styles={{
           control: (base, state) => ({
             ...base,

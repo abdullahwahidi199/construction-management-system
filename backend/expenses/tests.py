@@ -7,6 +7,7 @@ from accounts.models import ApplicationSettings
 from common.test_helpers import (
     create_admin,
     create_contract,
+    create_contract_payment,
     create_expense,
     create_project,
     create_user,
@@ -187,6 +188,50 @@ class ExpenseWorkflowAPITests(APITestCase):
             Decimal("11200.00"),
         )
 
+    def test_newest_expense_sort_uses_creation_time_for_same_expense_date(self):
+        first = create_expense(self.project, description="First entry")
+        second = create_expense(self.project, description="Newest entry")
+
+        response = self.client.get(
+            "/api/expenses/?ordering=-expense_date,-created_at"
+        )
+
+        self.assertEqual(response.status_code, 200, response.data)
+        ids = [row["id"] for row in response.data["results"]["results"]]
+        self.assertEqual(ids[:2], [second.id, first.id])
+
+    def test_receipt_includes_contract_payments_and_linked_expense_totals(self):
+        contract = create_contract(project=self.project, currency="USD")
+        create_contract_payment(contract=contract, amount=Decimal("800.00"))
+        expenses = [
+            create_expense(
+                self.project,
+                contract=contract,
+                amount_usd=Decimal("50.00"),
+            )
+            for _ in range(10)
+        ]
+        create_expense(
+            self.project,
+            contract=contract,
+            amount_usd=Decimal("1000.00"),
+            approval_status=Expense.ApprovalStatus.PENDING,
+        )
+
+        response = self.client.get(f"/api/expenses/{expenses[0].id}/receipt/")
+
+        self.assertEqual(response.status_code, 200, response.data)
+        summary = response.data["contract_financial_summary"]
+        self.assertEqual(Decimal(summary["payments_made_usd"]), Decimal("800.00"))
+        self.assertEqual(
+            Decimal(summary["total_contract_expenses_usd"]),
+            Decimal("500.00"),
+        )
+        self.assertEqual(
+            Decimal(summary["total_cash_outflow_usd"]),
+            Decimal("1300.00"),
+        )
+
     def test_approval_workflow_pending_approve_reject_and_notifications(self):
         approver = create_user(
             username="approver",
@@ -297,6 +342,17 @@ class ExpenseWorkflowAPITests(APITestCase):
         response = self.client.get("/api/expenses/export-pdf/?status=pending")
 
         self.assertEqual(response.status_code, 403)
+
+    def test_expense_export_accepts_stable_multi_field_ordering(self):
+        create_expense(self.project)
+        create_expense(self.project)
+
+        response = self.client.get(
+            "/api/expenses/export-pdf/?ordering=-expense_date,-created_at"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/pdf")
 
     def test_concurrent_expense_serial_generation_is_unique_per_project(self):
         first = create_expense(self.project)

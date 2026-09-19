@@ -47,6 +47,7 @@ const translate = vi.hoisted(() => (key, params) => {
     "ProjectDetails.estimatedBudget": "Estimated budget",
     "ProjectDetails.expensesUsd": "Expenses USD",
     "ProjectDetails.expensesAfn": "Expenses AFN",
+    "ProjectDetails.averageExchangeRate": "Average exchange rate",
     "ProjectDetails.startDate": "Start date",
     "ProjectDetails.expectedCompletion": "Expected completion",
     "ProjectDetails.contractFinancialSummary": "Contract financial summary",
@@ -139,6 +140,7 @@ const fullProject = {
   estimated_budget: "250000",
   total_expenses_usd: "12000",
   total_expenses_afn: "840000",
+  average_expense_exchange_rate: "70.0000",
   start_date: "2026-01-01",
   expected_completion_date: "2026-07-31",
   actual_completion_date: "",
@@ -217,6 +219,8 @@ describe("ProjectDetails", () => {
     expect(screen.getAllByText("$250,000").length).toBeGreaterThan(1);
     expect(screen.getByText("$12,000")).toBeInTheDocument();
     expect(screen.getAllByText("840,000").length).toBeGreaterThan(0);
+    expect(screen.getByText("Average exchange rate")).toBeInTheDocument();
+    expect(screen.getByText("1 USD = 70 AFN")).toBeInTheDocument();
     expect(screen.getByText("Contract financial summary")).toBeInTheDocument();
     expect(screen.getByText("Daily Worker Payroll")).toBeInTheDocument();
     expect(screen.getByText("2 records")).toBeInTheDocument();

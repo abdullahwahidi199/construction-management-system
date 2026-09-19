@@ -1,12 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { FileText, Search } from "lucide-react";
 import instance from "../../api/axiosInstance";
-import {
-  fieldControlClass,
-  fieldControlErrorClass,
-  fieldErrorClass,
-  fieldLabelClass,
-} from "../../components/ui/formStyles.jsx";
+import SearchableSelect from "../../components/ui/SearchableSelect";
 
 function contractLabel(contract) {
   if (!contract) return "";
@@ -36,7 +30,6 @@ export default function ExpenseContractSelector({
   useEffect(() => {
     const term = search.trim();
     if (term.length < 2) {
-      setRemoteContracts([]);
       return undefined;
     }
 
@@ -51,7 +44,7 @@ export default function ExpenseContractSelector({
           skipGlobalErrorToast: true,
         });
         setRemoteContracts(response.data?.results || response.data || []);
-      } catch (error) {
+      } catch {
         setRemoteContracts([]);
       }
     }, 300);
@@ -86,37 +79,38 @@ export default function ExpenseContractSelector({
     });
   }, [contracts, projectId, remoteContracts, search, selectedFallback, value]);
 
+  const options = availableContracts.map((contract) => ({
+    value: contract.id,
+    label: contractLabel(contract),
+  }));
+
   return (
-    <div className="space-y-2">
-      <label className={fieldLabelClass}>Contract</label>
-      <div className="relative">
-        <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
-        <input
-          type="search"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          className={`${fieldControlClass} ps-10`}
-          placeholder="Search active contracts"
-        />
-      </div>
-      <div className="relative">
-        <FileText className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
-        <select
-          value={value || ""}
-          onChange={(event) => onChange?.(event.target.value)}
-          className={`${fieldControlClass} ps-10 ${
-            error ? fieldControlErrorClass : ""
-          }`}
-        >
-          <option value="">No contract</option>
-          {availableContracts.map((contract) => (
-            <option key={contract.id} value={contract.id}>
-              {contractLabel(contract)}
-            </option>
-          ))}
-        </select>
-      </div>
-      {error && <p className={fieldErrorClass}>{error}</p>}
-    </div>
+    <SearchableSelect
+      label="Contract"
+      value={value}
+      onChange={(nextValue) => {
+        const selectedContract = availableContracts.find(
+          (contract) => String(contract.id) === String(nextValue),
+        );
+        onChange?.(nextValue, selectedContract?.project || "");
+      }}
+      options={options}
+      placeholder="Search active contracts"
+      inputValue={search}
+      onInputChange={(nextValue, actionMeta) => {
+        if (actionMeta.action === "input-change") {
+          setSearch(nextValue);
+          if (nextValue.trim().length < 2) setRemoteContracts([]);
+        }
+        if (actionMeta.action === "menu-close") {
+          setSearch("");
+          setRemoteContracts([]);
+        }
+      }}
+      noOptionsMessage="No matching contracts"
+      openMenuOnFocus
+      isClearable
+      error={error}
+    />
   );
 }
