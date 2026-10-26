@@ -16,6 +16,7 @@ from django.utils.dateparse import parse_date
 
 from accounts.permissions import RBACPermission
 from accounts.services import has_permission
+from apartment_services.models import ServiceCharge
 from .models import Apartment, ApartmentPayment, ApartmentSale, Building, Customer, Floor, Project
 from .serializers import (
     ApartmentPaymentSerializer,
@@ -82,6 +83,13 @@ class ProjectDetailView(RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return _scope_to_available_projects(super().get_queryset(), self.request.user, "id")
 
+    def perform_destroy(self, instance):
+        if ServiceCharge.objects.filter(apartment__project=instance).exists():
+            raise ValidationError({
+                "detail": ["A project with service charge history cannot be deleted."],
+            })
+        instance.delete()
+
 
 class BuildingViewSet(viewsets.ModelViewSet):
     serializer_class = BuildingSerializer
@@ -99,6 +107,8 @@ class BuildingViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         if ApartmentSale.objects.filter(apartment__building=instance).exists():
             raise ValidationError({"detail": ["A building with apartment sales cannot be deleted."]})
+        if ServiceCharge.objects.filter(apartment__building=instance).exists():
+            raise ValidationError({"detail": ["A building with service charge history cannot be deleted."]})
         instance.delete()
 
 
@@ -133,6 +143,8 @@ class FloorViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         if ApartmentSale.objects.filter(apartment__floor=instance).exists():
             raise ValidationError({"detail": ["A floor with apartment sales cannot be deleted."]})
+        if ServiceCharge.objects.filter(apartment__floor=instance).exists():
+            raise ValidationError({"detail": ["A floor with service charge history cannot be deleted."]})
         instance.delete()
 
 
@@ -165,6 +177,8 @@ class ApartmentViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         if ApartmentSale.objects.filter(apartment=instance).exists():
             raise ValidationError({"detail": ["A sold apartment cannot be deleted."]})
+        if ServiceCharge.objects.filter(apartment=instance).exists():
+            raise ValidationError({"detail": ["An apartment with service charge history cannot be deleted."]})
         instance.delete()
 
 

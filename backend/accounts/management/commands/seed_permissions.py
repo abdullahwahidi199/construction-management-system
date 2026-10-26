@@ -62,6 +62,14 @@ PERMISSIONS = [
     ("apartment_payment_reports.view", "View Apartment Payment Reports", "Apartment Reports"),
     ("apartment_outstanding_reports.view", "View Apartment Outstanding Reports", "Apartment Reports"),
 
+    # Apartment Services
+    ("services.view", "View Apartment Services", "Apartment Services"),
+    ("service_settings.manage", "Manage Service Setup", "Apartment Services"),
+    ("service_charges.generate", "Generate Service Charges", "Apartment Services"),
+    ("service_charges.adjust", "Adjust Service Charges", "Apartment Services"),
+    ("service_payments.record", "Record Service Payments", "Apartment Services"),
+    ("service_payments.view", "View Service Payments", "Apartment Services"),
+
     # Expenses
     ("expenses.view", "View Expenses", "Expenses"),
     ("expenses.create", "Create Expenses", "Expenses"),
@@ -197,6 +205,13 @@ ROLE_PERMISSIONS = {
         "apartment_payment_reports.view",
         "apartment_outstanding_reports.view",
 
+        "services.view",
+        "service_settings.manage",
+        "service_charges.generate",
+        "service_charges.adjust",
+        "service_payments.record",
+        "service_payments.view",
+
         "expenses.view",
         "expenses.create",
         "expenses.update",
@@ -238,6 +253,10 @@ ROLE_PERMISSIONS = {
         "apartment_sales.cancel",
         "apartment_payments.view",
         "apartment_payments.create",
+
+        "services.view",
+        "service_payments.record",
+        "service_payments.view",
 
         "expenses.view",
         "expenses.create",

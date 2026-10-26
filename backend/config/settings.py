@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "accounts",
     'project',
+    'apartment_services',
     'expenses',
     'Employees',
     'labour',

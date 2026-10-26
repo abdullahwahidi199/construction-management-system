@@ -33,6 +33,7 @@ CALENDAR_MODULES = [
     "daily_worker_payroll",
     "contract_payments",
     "contract_variations",
+    "services",
 ]
 
 AFGHAN_MONTH_NAMES = {
